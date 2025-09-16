@@ -127,6 +127,25 @@ def task_check_one_per_file():
     sys.exit(1)
 
 
+def task_all():
+  """Shorthand to run all presubmit checks."""
+  fail = False
+
+  for i, fn in enumerate((task_lint, task_breaking, task_check_one_per_file)):
+    if i > 0:
+      print()
+    print(f'$ {sys.argv[0]} {fn.__name__.removeprefix("task_")}')
+    try:
+      fn()
+      print('ok')
+    except SystemExit:
+      print('FAIL')
+      fail = True
+
+  if fail:
+    sys.exit(1)
+
+
 def main(args: list[str]):
   # Note: this is probably too cute - if argument parsing ever gets more serious
   # than "subcommand with one additional optional positional argument", it would
