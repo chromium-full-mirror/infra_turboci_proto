@@ -62,6 +62,11 @@ def task_breaking(basis: None|str = None):
   """
   if basis is None:
     basis = check_output(['git', 'mark-merge-base']).split()[-1]
+    if basis == 'None':
+      # In a `bot_update` style checkout, mark-merge-base may return None.
+      # In this context, HEAD~1 is correct because the CL was cherry-picked onto
+      # the appropriate parent context (previous CL or current ref value).
+      basis = 'HEAD~1'
   check_call([_Buf, 'breaking', '--against', f'.git#ref={basis}'])
 
 
