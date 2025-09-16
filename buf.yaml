@@ -1,0 +1,20 @@
+# This file configures https://buf.build/
+version: v2
+modules:
+  - path: .
+    excludes:
+      # Otherwise buf picks up standard google proto files under
+      # ./tools/include.
+      - tools
+lint:
+  use:
+    - STANDARD
+    - COMMENTS
+    - PACKAGE_SAME_JAVA_MULTIPLE_FILES
+    - STABLE_PACKAGE_NO_IMPORT_UNSTABLE
+  except:
+    - SERVICE_SUFFIX
+  enum_zero_value_suffix: _UNKNOWN
+  rpc_allow_same_request_response: false
+  rpc_allow_google_protobuf_empty_requests: false
+  rpc_allow_google_protobuf_empty_responses: false
