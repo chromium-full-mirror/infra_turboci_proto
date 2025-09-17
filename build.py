@@ -21,7 +21,7 @@ import textwrap
 
 from google.protobuf.descriptor_pb2  import FileDescriptorSet
 
-from typing import Generator, NoReturn, Sequence
+from typing import NoReturn
 
 _RepoRoot = Path(__file__).absolute().parent
 
@@ -117,6 +117,31 @@ def task_compile_desc(outfile: None|str = None):
     protoc('-o', tf.name)
 
 
+def _transform_grpc(module: str, base: Path, file: Path) -> str:
+  protoPkg = str(file.parent)
+  target = base / file.parent / 'grpcpb' / file.name
+  os.makedirs(target.parent, exist_ok=True)
+  with open(target, 'w', encoding='utf-8') as outf:
+    did_package = False
+    did_import = False
+
+    for line in (base/file).read_text().splitlines(keepends=True):
+      if not did_package and line.startswith('package '):
+        line = 'package grpcpb\n'
+        did_package = True
+      elif not did_import and line.startswith('import '):
+        # We found the first `import` statement - add our . imported package as
+        # fhe first import.
+        if line.startswith('import ('):
+          line += f'\t. "{module}/{protoPkg}"\n'
+        else:
+          line = f'import . "{module}/{protoPkg}"\n' + line
+        did_import = True
+      outf.write(line)
+  os.remove(base/file)
+  return str(target.relative_to(base))
+
+
 def task_compile_go(mode: None|str = None):
   """Runs `protoc` to compile all Go stubs.
 
@@ -131,19 +156,34 @@ def task_compile_go(mode: None|str = None):
     sys.exit(1)
 
   goRoot = _RepoRoot / 'go'
+  module = 'go.chromium.org/turboci/proto/go'
 
   # build to tempdir to implement mode=check
   with tempfile.TemporaryDirectory() as tdir:
-    protoc(f'--go_out={tdir}', '--go_opt=module=go.chromium.org/turboci/proto/go')
+    protoc(f'--go_out={tdir}',
+           f'--go_opt=module={module}',
+           f'--go-grpc_out={tdir}',
+           f'--go-grpc_opt=module={module}')
+
+    newFiles = []
+    # Transform all "_grpc.pb.go" files:
+    for file in glob.glob('**/*.pb.go', recursive=True, root_dir=tdir):
+      if file.endswith('_grpc.pb.go'):
+        newFiles.append(_transform_grpc(module, Path(tdir), Path(file)))
+      else:
+        newFiles.append(file)
 
     if not mode:
       task_clean()
-      for file in glob.glob('**/*.pb.go', recursive=True, root_dir=tdir):
+      for file in newFiles:
         print(file)
+        target = goRoot / file
+        os.makedirs(target.parent, exist_ok=True)
         os.rename(Path(tdir) / file, goRoot / file)
+
     elif mode == 'check':
       got = set(glob.glob('**/*.pb.go', recursive=True, root_dir=goRoot))
-      want = set(glob.glob('**/*.pb.go', recursive=True, root_dir=tdir))
+      want = set(newFiles)
 
       report = {}
 
@@ -163,7 +203,7 @@ def task_compile_go(mode: None|str = None):
         if files:
           print(f'{category}:')
           for file in files:
-            print(f'  {file}')
+            print(f'  go/{file}')
 
       sys.exit(1)
 

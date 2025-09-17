@@ -36,7 +36,7 @@ def CheckProtoBackwardCompatibility(input_api, output_api):
       kwargs={'cwd': input_api.PresubmitLocalPath()},
       message=msg,
   )])
-  if rslt:
+  if any(r.fatal for r in rslt):
     rslt.extend(to_add)
   return rslt
 
