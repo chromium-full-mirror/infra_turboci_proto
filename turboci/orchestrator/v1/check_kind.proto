@@ -6,8 +6,8 @@ edition = "2023";
 
 package turboci.orchestrator.v1;
 
-option java_multiple_files = true;
 option go_package = "go.chromium.org/turboci/proto/go/orchestrator/v1;orchestrator";
+option java_multiple_files = true;
 
 // CheckKind informs the 'general' type of this Check, independent of whatever
 // options it may have.

@@ -58,6 +58,30 @@ def task_clean():
     os.remove(file)
 
 
+def task_format(mode: None|str = None):
+  """Formats all proto files.
+
+  If `mode` is `check`, then this will just check that the protos are correctly
+  formatted and will not write to disk.
+
+  Example:
+    build.py format check
+  """
+  if mode not in (None, 'check'):
+    print(f'format: unknown mode={mode!r}')
+    sys.exit(1)
+
+  if not mode:
+    check_call(['buf', 'format', '-w'])
+  else:
+    delta = check_output(['buf', 'format', '-d'])
+    if delta:
+      print(delta)
+      print()
+      print(f'Fix formatting by running `{sys.argv[0]} format`.')
+      sys.exit(1)
+
+
 def task_lint():
   """Runs `buf lint` on all protos in the current repo."""
   check_call(['buf', 'lint'])
@@ -247,8 +271,15 @@ def task_all():
   """Shorthand to run all presubmit checks."""
   fail = False
 
-  for i, fn in enumerate((task_lint, task_breaking, task_check_one_per_file,
-                          task_compile_go)):
+  allTasks = (
+    task_format,
+    task_lint,
+    task_breaking,
+    task_check_one_per_file,
+    task_compile_go,
+  )
+
+  for i, fn in enumerate(allTasks):
     if i > 0:
       print()
     print(f'$ {sys.argv[0]} {fn.__name__.removeprefix("task_")}')

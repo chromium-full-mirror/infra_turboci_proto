@@ -6,8 +6,8 @@ edition = "2023";
 
 package turboci.orchestrator.v1;
 
-option java_multiple_files = true;
 option go_package = "go.chromium.org/turboci/proto/go/orchestrator/v1;orchestrator";
+option java_multiple_files = true;
 
 // NOTE - This is CheckState with prefixed enum values instead of Check.State
 // so that field_options.proto can import this without making a circular import

@@ -81,3 +81,11 @@ def CheckGoStubs(input_api, output_api):
       message=output_api.PresubmitError,
   )])
 
+
+def CheckFormat(input_api, output_api):
+  return input_api.RunTests([input_api.Command(
+      name='build.py format check',
+      cmd=['build.py', 'format', 'check'],
+      kwargs={'cwd': input_api.PresubmitLocalPath()},
+      message=output_api.PresubmitError,
+  )])
