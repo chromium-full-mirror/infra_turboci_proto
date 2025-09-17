@@ -1,0 +1,32 @@
+// Copyright 2025 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+edition = "2023";
+
+package turboci.orchestrator.v1;
+
+import "turboci/orchestrator/v1/identifier.proto";
+
+option go_package = "go.chromium.org/turboci/proto/go/orchestrator/v1;orchestrator";
+option java_multiple_files = true;
+
+// Represents an actor which owns/created/edited a node.
+message Actor {
+  // Placeholder type for when the Orchestrator itself makes this edit.
+  message Orchestrator {}
+
+  // The kind of editor which edited this node.
+  oneof kind {
+    // The StageAttempt which generated this Edit.
+    //
+    // This is the most common case.
+    Identifier.StageAttempt stage_attempt = 1;
+
+    // The Orchestrator generated this Edit.
+    Orchestrator orchestrator = 2;
+
+    // TBD: general service account editor if/when WriteNodes allows
+    // external-to-the-workflow writes.
+  }
+}
