@@ -2,10 +2,10 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-"""Top-level presubmit script for infra.
+"""Integration with `git cl presubmit`.
 
 See http://dev.chromium.org/developers/how-tos/depottools/presubmit-scripts for
-details on the presubmit API built into gcl.
+details on the presubmit API built into `git cl`.
 """
 
 PRESUBMIT_VERSION='2.0.0'
@@ -52,8 +52,8 @@ def CheckLint(input_api, output_api):
 
 def CheckProtoc(input_api, output_api):
   return input_api.RunTests([input_api.Command(
-      name='build.py compile',
-      cmd=['build.py', 'compile'],
+      name='build.py compile_desc',
+      cmd=['build.py', 'compile_desc'],
       kwargs={'cwd': input_api.PresubmitLocalPath()},
       message=output_api.PresubmitError,
   )])
@@ -71,3 +71,13 @@ def CheckOneDeclPerFile(input_api, output_api):
 def CheckLicense(input_api, output_api):
   input_api.DEFAULT_FILES_TO_CHECK += (r'.+\.proto$',)
   return input_api.canned_checks.CheckLicense(input_api, output_api)
+
+
+def CheckGoStubs(input_api, output_api):
+  return input_api.RunTests([input_api.Command(
+      name='build.py compile_go check',
+      cmd=['build.py', 'compile_go', 'check'],
+      kwargs={'cwd': input_api.PresubmitLocalPath()},
+      message=output_api.PresubmitError,
+  )])
+
