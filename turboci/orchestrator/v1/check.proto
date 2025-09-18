@@ -136,16 +136,18 @@ message Check {
   // Results belong to exactly one Actor (usually a StageAttempt), and any given
   // Actor may only have one Result per Check.
   //
-  // A Check may have multiple Results, and each Result may have
-  // multiple pieces of result data. This could occur when multiple Stages all
-  // contribute results to the same Check (e.g. sharding, multiple executions,
-  // etc.).
+  // A Check may have multiple Results, and each Result may have multiple pieces
+  // of result data. This could occur when multiple Stages all contribute
+  // results to the same Check (e.g. sharding, multiple executions, etc.).
   message Result {
+    // Identifier for this Result.
+    Identifier.CheckResult identifier = 1;
+
     // The entity which created this Result.
-    Actor owner = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+    Actor owner = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
     // The time at which this Result was created.
-    google.protobuf.Timestamp created_at = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp created_at = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 
     // ResultDatumRef is a reference to a CheckResultDatum.
     message ResultDatumRef {
@@ -172,7 +174,7 @@ message Check {
     //
     // You can use QueryNodes to get a CheckView which includes this Check and
     // also Result Data.
-    repeated ResultDatumRef data = 3;
+    repeated ResultDatumRef data = 4;
 
     // The time at which this Result is finalized.
     //
@@ -180,7 +182,7 @@ message Check {
     //   * A StageAttempt `owner` ends (becomes COMPLETE or INCOMPLETE).
     //   * The `owner` explicitly indicates that their results are final.
     //   * The Check advances to the FINAL state.
-    google.protobuf.Timestamp finalized_at = 4;
+    google.protobuf.Timestamp finalized_at = 5;
   }
   // The list of Results this Check has.
   //

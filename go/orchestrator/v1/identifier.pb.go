@@ -44,6 +44,7 @@ type Identifier struct {
 	//	*Identifier_WorkPlan_
 	//	*Identifier_Check_
 	//	*Identifier_CheckOption_
+	//	*Identifier_CheckResult_
 	//	*Identifier_CheckResultDatum_
 	//	*Identifier_CheckEdit_
 	//	*Identifier_CheckEditOption_
@@ -114,6 +115,15 @@ func (x *Identifier) GetCheckOption() *Identifier_CheckOption {
 	if x != nil {
 		if x, ok := x.Type.(*Identifier_CheckOption_); ok {
 			return x.CheckOption
+		}
+	}
+	return nil
+}
+
+func (x *Identifier) GetCheckResult() *Identifier_CheckResult {
+	if x != nil {
+		if x, ok := x.Type.(*Identifier_CheckResult_); ok {
+			return x.CheckResult
 		}
 	}
 	return nil
@@ -192,34 +202,39 @@ type Identifier_CheckOption_ struct {
 	CheckOption *Identifier_CheckOption `protobuf:"bytes,3,opt,name=check_option,json=checkOption,oneof"`
 }
 
+type Identifier_CheckResult_ struct {
+	// A particular Check.Result.
+	CheckResult *Identifier_CheckResult `protobuf:"bytes,4,opt,name=check_result,json=checkResult,oneof"`
+}
+
 type Identifier_CheckResultDatum_ struct {
 	// Data associated with a particular result in a Check.
-	CheckResultDatum *Identifier_CheckResultDatum `protobuf:"bytes,4,opt,name=check_result_datum,json=checkResultDatum,oneof"`
+	CheckResultDatum *Identifier_CheckResultDatum `protobuf:"bytes,5,opt,name=check_result_datum,json=checkResultDatum,oneof"`
 }
 
 type Identifier_CheckEdit_ struct {
 	// An edit to a Check.
-	CheckEdit *Identifier_CheckEdit `protobuf:"bytes,5,opt,name=check_edit,json=checkEdit,oneof"`
+	CheckEdit *Identifier_CheckEdit `protobuf:"bytes,6,opt,name=check_edit,json=checkEdit,oneof"`
 }
 
 type Identifier_CheckEditOption_ struct {
 	// Option data for an edit to a Check.
-	CheckEditOption *Identifier_CheckEditOption `protobuf:"bytes,6,opt,name=check_edit_option,json=checkEditOption,oneof"`
+	CheckEditOption *Identifier_CheckEditOption `protobuf:"bytes,7,opt,name=check_edit_option,json=checkEditOption,oneof"`
 }
 
 type Identifier_Stage_ struct {
 	// A Stage within a WorkPlan.
-	Stage *Identifier_Stage `protobuf:"bytes,7,opt,name=stage,oneof"`
+	Stage *Identifier_Stage `protobuf:"bytes,8,opt,name=stage,oneof"`
 }
 
 type Identifier_StageAttempt_ struct {
 	// A specific attempt at a Stage.
-	StageAttempt *Identifier_StageAttempt `protobuf:"bytes,8,opt,name=stage_attempt,json=stageAttempt,oneof"`
+	StageAttempt *Identifier_StageAttempt `protobuf:"bytes,9,opt,name=stage_attempt,json=stageAttempt,oneof"`
 }
 
 type Identifier_StageEdit_ struct {
 	// An edit to a Stage.
-	StageEdit *Identifier_StageEdit `protobuf:"bytes,9,opt,name=stage_edit,json=stageEdit,oneof"`
+	StageEdit *Identifier_StageEdit `protobuf:"bytes,10,opt,name=stage_edit,json=stageEdit,oneof"`
 }
 
 func (*Identifier_WorkPlan_) isIdentifier_Type() {}
@@ -227,6 +242,8 @@ func (*Identifier_WorkPlan_) isIdentifier_Type() {}
 func (*Identifier_Check_) isIdentifier_Type() {}
 
 func (*Identifier_CheckOption_) isIdentifier_Type() {}
+
+func (*Identifier_CheckResult_) isIdentifier_Type() {}
 
 func (*Identifier_CheckResultDatum_) isIdentifier_Type() {}
 
@@ -371,7 +388,9 @@ type Identifier_CheckOption struct {
 	// The check that this option belongs to.
 	Check *Identifier_Check `protobuf:"bytes,1,opt,name=check" json:"check,omitempty"`
 	// The 1-based index of this datum within the Check.options list.
-	OptionsIdx    *int32 `protobuf:"varint,2,opt,name=options_idx,json=optionsIdx" json:"options_idx,omitempty"`
+	//
+	// This is 1-based to distinguish it from 0/unset (which is invalid).
+	Idx           *int32 `protobuf:"varint,2,opt,name=idx" json:"idx,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -413,36 +432,100 @@ func (x *Identifier_CheckOption) GetCheck() *Identifier_Check {
 	return nil
 }
 
-func (x *Identifier_CheckOption) GetOptionsIdx() int32 {
-	if x != nil && x.OptionsIdx != nil {
-		return *x.OptionsIdx
+func (x *Identifier_CheckOption) GetIdx() int32 {
+	if x != nil && x.Idx != nil {
+		return *x.Idx
+	}
+	return 0
+}
+
+// Identifies a Check Result within a WorkPlan.
+//
+// Serialized as "<check>:R<results_idx>".
+//
+// E.g. "<check.work_plan.id>:C<check.id>:R<idx>"
+//
+// This is separate from `Check` because it may reside in a different realm
+// than the Check itself.
+type Identifier_CheckResult struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The check that this result belongs to.
+	Check *Identifier_Check `protobuf:"bytes,1,opt,name=check" json:"check,omitempty"`
+	// The 1-based index of this result within the Check.results list.
+	//
+	// This is 1-based to distinguish it from 0/unset (which is invalid).
+	Idx           *int32 `protobuf:"varint,2,opt,name=idx" json:"idx,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Identifier_CheckResult) Reset() {
+	*x = Identifier_CheckResult{}
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Identifier_CheckResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Identifier_CheckResult) ProtoMessage() {}
+
+func (x *Identifier_CheckResult) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Identifier_CheckResult.ProtoReflect.Descriptor instead.
+func (*Identifier_CheckResult) Descriptor() ([]byte, []int) {
+	return file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP(), []int{0, 3}
+}
+
+func (x *Identifier_CheckResult) GetCheck() *Identifier_Check {
+	if x != nil {
+		return x.Check
+	}
+	return nil
+}
+
+func (x *Identifier_CheckResult) GetIdx() int32 {
+	if x != nil && x.Idx != nil {
+		return *x.Idx
 	}
 	return 0
 }
 
 // Identifies a Datum for a Check's Result within a WorkPlan.
 //
-// Serialized as "<check_result>:R<results_idx>:D<results_data_idx>".
+// Serialized as "<result>:D<results_data_idx>".
 //
-// E.g. "<check.work_plan.id>:C<check.id>:R<results_idx>:D<results_data_idx>"
+// E.g. "<result.check.work_plan.id>:C<result.check.id>:R<result.idx>:D<idx>"
 //
 // This is separate from `Check` because it may reside in a different realm
 // than the Check itself.
 type Identifier_CheckResultDatum struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The check that this result belongs to.
-	Check *Identifier_Check `protobuf:"bytes,1,opt,name=check" json:"check,omitempty"`
-	// The 1-based index of this result within the Check.results list.
-	ResultsIdx *int32 `protobuf:"varint,2,opt,name=results_idx,json=resultsIdx" json:"results_idx,omitempty"`
+	// The check resunt that this datum belongs to.
+	Result *Identifier_CheckResult `protobuf:"bytes,1,opt,name=result" json:"result,omitempty"`
 	// The 1-based index of this datum within the Check.Result.data list.
-	ResultsDataIdx *int32 `protobuf:"varint,3,opt,name=results_data_idx,json=resultsDataIdx" json:"results_data_idx,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	//
+	// This is 1-based to distinguish it from 0/unset (which is invalid).
+	Idx           *int32 `protobuf:"varint,2,opt,name=idx" json:"idx,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Identifier_CheckResultDatum) Reset() {
 	*x = Identifier_CheckResultDatum{}
-	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[4]
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -454,7 +537,7 @@ func (x *Identifier_CheckResultDatum) String() string {
 func (*Identifier_CheckResultDatum) ProtoMessage() {}
 
 func (x *Identifier_CheckResultDatum) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[4]
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -467,26 +550,19 @@ func (x *Identifier_CheckResultDatum) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Identifier_CheckResultDatum.ProtoReflect.Descriptor instead.
 func (*Identifier_CheckResultDatum) Descriptor() ([]byte, []int) {
-	return file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP(), []int{0, 3}
+	return file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP(), []int{0, 4}
 }
 
-func (x *Identifier_CheckResultDatum) GetCheck() *Identifier_Check {
+func (x *Identifier_CheckResultDatum) GetResult() *Identifier_CheckResult {
 	if x != nil {
-		return x.Check
+		return x.Result
 	}
 	return nil
 }
 
-func (x *Identifier_CheckResultDatum) GetResultsIdx() int32 {
-	if x != nil && x.ResultsIdx != nil {
-		return *x.ResultsIdx
-	}
-	return 0
-}
-
-func (x *Identifier_CheckResultDatum) GetResultsDataIdx() int32 {
-	if x != nil && x.ResultsDataIdx != nil {
-		return *x.ResultsDataIdx
+func (x *Identifier_CheckResultDatum) GetIdx() int32 {
+	if x != nil && x.Idx != nil {
+		return *x.Idx
 	}
 	return 0
 }
@@ -509,7 +585,7 @@ type Identifier_CheckEdit struct {
 
 func (x *Identifier_CheckEdit) Reset() {
 	*x = Identifier_CheckEdit{}
-	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[5]
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -521,7 +597,7 @@ func (x *Identifier_CheckEdit) String() string {
 func (*Identifier_CheckEdit) ProtoMessage() {}
 
 func (x *Identifier_CheckEdit) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[5]
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -534,7 +610,7 @@ func (x *Identifier_CheckEdit) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Identifier_CheckEdit.ProtoReflect.Descriptor instead.
 func (*Identifier_CheckEdit) Descriptor() ([]byte, []int) {
-	return file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP(), []int{0, 4}
+	return file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP(), []int{0, 5}
 }
 
 func (x *Identifier_CheckEdit) GetCheck() *Identifier_Check {
@@ -566,6 +642,8 @@ type Identifier_CheckEditOption struct {
 	CheckEdit *Identifier_CheckEdit `protobuf:"bytes,1,opt,name=check_edit,json=checkEdit" json:"check_edit,omitempty"`
 	// The 1-based index of this datum within the Edit.check.delta.options
 	// list.
+	//
+	// This is 1-based to distinguish it from 0/unset (which is invalid).
 	CheckDeltaOptionsIdx *int32 `protobuf:"varint,2,opt,name=check_delta_options_idx,json=checkDeltaOptionsIdx" json:"check_delta_options_idx,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
@@ -573,7 +651,7 @@ type Identifier_CheckEditOption struct {
 
 func (x *Identifier_CheckEditOption) Reset() {
 	*x = Identifier_CheckEditOption{}
-	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[6]
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -585,7 +663,7 @@ func (x *Identifier_CheckEditOption) String() string {
 func (*Identifier_CheckEditOption) ProtoMessage() {}
 
 func (x *Identifier_CheckEditOption) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[6]
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -598,7 +676,7 @@ func (x *Identifier_CheckEditOption) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Identifier_CheckEditOption.ProtoReflect.Descriptor instead.
 func (*Identifier_CheckEditOption) Descriptor() ([]byte, []int) {
-	return file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP(), []int{0, 5}
+	return file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP(), []int{0, 6}
 }
 
 func (x *Identifier_CheckEditOption) GetCheckEdit() *Identifier_CheckEdit {
@@ -667,7 +745,7 @@ type Identifier_Stage struct {
 
 func (x *Identifier_Stage) Reset() {
 	*x = Identifier_Stage{}
-	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[7]
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -679,7 +757,7 @@ func (x *Identifier_Stage) String() string {
 func (*Identifier_Stage) ProtoMessage() {}
 
 func (x *Identifier_Stage) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[7]
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -692,7 +770,7 @@ func (x *Identifier_Stage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Identifier_Stage.ProtoReflect.Descriptor instead.
 func (*Identifier_Stage) Descriptor() ([]byte, []int) {
-	return file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP(), []int{0, 6}
+	return file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP(), []int{0, 7}
 }
 
 func (x *Identifier_Stage) GetWorkPlan() *Identifier_WorkPlan {
@@ -723,6 +801,8 @@ type Identifier_StageAttempt struct {
 	// The Stage that this Stage Attempt belongs to.
 	Stage *Identifier_Stage `protobuf:"bytes,1,opt,name=stage" json:"stage,omitempty"`
 	// The 1-based index of this attempt within the Stage.attempts list.
+	//
+	// This is 1-based to distinguish it from 0/unset (which is invalid).
 	AttemptsIdx   *int32 `protobuf:"varint,2,opt,name=attempts_idx,json=attemptsIdx" json:"attempts_idx,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -730,7 +810,7 @@ type Identifier_StageAttempt struct {
 
 func (x *Identifier_StageAttempt) Reset() {
 	*x = Identifier_StageAttempt{}
-	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[8]
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -742,7 +822,7 @@ func (x *Identifier_StageAttempt) String() string {
 func (*Identifier_StageAttempt) ProtoMessage() {}
 
 func (x *Identifier_StageAttempt) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[8]
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -755,7 +835,7 @@ func (x *Identifier_StageAttempt) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Identifier_StageAttempt.ProtoReflect.Descriptor instead.
 func (*Identifier_StageAttempt) Descriptor() ([]byte, []int) {
-	return file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP(), []int{0, 7}
+	return file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP(), []int{0, 8}
 }
 
 func (x *Identifier_StageAttempt) GetStage() *Identifier_Stage {
@@ -790,7 +870,7 @@ type Identifier_StageEdit struct {
 
 func (x *Identifier_StageEdit) Reset() {
 	*x = Identifier_StageEdit{}
-	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[9]
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -802,7 +882,7 @@ func (x *Identifier_StageEdit) String() string {
 func (*Identifier_StageEdit) ProtoMessage() {}
 
 func (x *Identifier_StageEdit) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[9]
+	mi := &file_turboci_orchestrator_v1_identifier_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -815,7 +895,7 @@ func (x *Identifier_StageEdit) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Identifier_StageEdit.ProtoReflect.Descriptor instead.
 func (*Identifier_StageEdit) Descriptor() ([]byte, []int) {
-	return file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP(), []int{0, 8}
+	return file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP(), []int{0, 9}
 }
 
 func (x *Identifier_StageEdit) GetStage() *Identifier_Stage {
@@ -836,34 +916,36 @@ var File_turboci_orchestrator_v1_identifier_proto protoreflect.FileDescriptor
 
 const file_turboci_orchestrator_v1_identifier_proto_rawDesc = "" +
 	"\n" +
-	"(turboci/orchestrator/v1/identifier.proto\x12\x17turboci.orchestrator.v1\x1a&turboci/orchestrator/v1/revision.proto\"\x9a\x0e\n" +
+	"(turboci/orchestrator/v1/identifier.proto\x12\x17turboci.orchestrator.v1\x1a&turboci/orchestrator/v1/revision.proto\"\x91\x0f\n" +
 	"\n" +
 	"Identifier\x12K\n" +
 	"\twork_plan\x18\x01 \x01(\v2,.turboci.orchestrator.v1.Identifier.WorkPlanH\x00R\bworkPlan\x12A\n" +
 	"\x05check\x18\x02 \x01(\v2).turboci.orchestrator.v1.Identifier.CheckH\x00R\x05check\x12T\n" +
-	"\fcheck_option\x18\x03 \x01(\v2/.turboci.orchestrator.v1.Identifier.CheckOptionH\x00R\vcheckOption\x12d\n" +
-	"\x12check_result_datum\x18\x04 \x01(\v24.turboci.orchestrator.v1.Identifier.CheckResultDatumH\x00R\x10checkResultDatum\x12N\n" +
+	"\fcheck_option\x18\x03 \x01(\v2/.turboci.orchestrator.v1.Identifier.CheckOptionH\x00R\vcheckOption\x12T\n" +
+	"\fcheck_result\x18\x04 \x01(\v2/.turboci.orchestrator.v1.Identifier.CheckResultH\x00R\vcheckResult\x12d\n" +
+	"\x12check_result_datum\x18\x05 \x01(\v24.turboci.orchestrator.v1.Identifier.CheckResultDatumH\x00R\x10checkResultDatum\x12N\n" +
 	"\n" +
-	"check_edit\x18\x05 \x01(\v2-.turboci.orchestrator.v1.Identifier.CheckEditH\x00R\tcheckEdit\x12a\n" +
-	"\x11check_edit_option\x18\x06 \x01(\v23.turboci.orchestrator.v1.Identifier.CheckEditOptionH\x00R\x0fcheckEditOption\x12A\n" +
-	"\x05stage\x18\a \x01(\v2).turboci.orchestrator.v1.Identifier.StageH\x00R\x05stage\x12W\n" +
-	"\rstage_attempt\x18\b \x01(\v20.turboci.orchestrator.v1.Identifier.StageAttemptH\x00R\fstageAttempt\x12N\n" +
+	"check_edit\x18\x06 \x01(\v2-.turboci.orchestrator.v1.Identifier.CheckEditH\x00R\tcheckEdit\x12a\n" +
+	"\x11check_edit_option\x18\a \x01(\v23.turboci.orchestrator.v1.Identifier.CheckEditOptionH\x00R\x0fcheckEditOption\x12A\n" +
+	"\x05stage\x18\b \x01(\v2).turboci.orchestrator.v1.Identifier.StageH\x00R\x05stage\x12W\n" +
+	"\rstage_attempt\x18\t \x01(\v20.turboci.orchestrator.v1.Identifier.StageAttemptH\x00R\fstageAttempt\x12N\n" +
 	"\n" +
-	"stage_edit\x18\t \x01(\v2-.turboci.orchestrator.v1.Identifier.StageEditH\x00R\tstageEdit\x1a\x1a\n" +
+	"stage_edit\x18\n" +
+	" \x01(\v2-.turboci.orchestrator.v1.Identifier.StageEditH\x00R\tstageEdit\x1a\x1a\n" +
 	"\bWorkPlan\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x1ab\n" +
 	"\x05Check\x12I\n" +
 	"\twork_plan\x18\x01 \x01(\v2,.turboci.orchestrator.v1.Identifier.WorkPlanR\bworkPlan\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\tR\x02id\x1ao\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x1a`\n" +
 	"\vCheckOption\x12?\n" +
-	"\x05check\x18\x01 \x01(\v2).turboci.orchestrator.v1.Identifier.CheckR\x05check\x12\x1f\n" +
-	"\voptions_idx\x18\x02 \x01(\x05R\n" +
-	"optionsIdx\x1a\x9e\x01\n" +
-	"\x10CheckResultDatum\x12?\n" +
-	"\x05check\x18\x01 \x01(\v2).turboci.orchestrator.v1.Identifier.CheckR\x05check\x12\x1f\n" +
-	"\vresults_idx\x18\x02 \x01(\x05R\n" +
-	"resultsIdx\x12(\n" +
-	"\x10results_data_idx\x18\x03 \x01(\x05R\x0eresultsDataIdx\x1a\x89\x01\n" +
+	"\x05check\x18\x01 \x01(\v2).turboci.orchestrator.v1.Identifier.CheckR\x05check\x12\x10\n" +
+	"\x03idx\x18\x02 \x01(\x05R\x03idx\x1a`\n" +
+	"\vCheckResult\x12?\n" +
+	"\x05check\x18\x01 \x01(\v2).turboci.orchestrator.v1.Identifier.CheckR\x05check\x12\x10\n" +
+	"\x03idx\x18\x02 \x01(\x05R\x03idx\x1am\n" +
+	"\x10CheckResultDatum\x12G\n" +
+	"\x06result\x18\x01 \x01(\v2/.turboci.orchestrator.v1.Identifier.CheckResultR\x06result\x12\x10\n" +
+	"\x03idx\x18\x02 \x01(\x05R\x03idx\x1a\x89\x01\n" +
 	"\tCheckEdit\x12?\n" +
 	"\x05check\x18\x01 \x01(\v2).turboci.orchestrator.v1.Identifier.CheckR\x05check\x12;\n" +
 	"\aversion\x18\x02 \x01(\v2!.turboci.orchestrator.v1.RevisionR\aversion\x1a\x96\x01\n" +
@@ -894,45 +976,48 @@ func file_turboci_orchestrator_v1_identifier_proto_rawDescGZIP() []byte {
 	return file_turboci_orchestrator_v1_identifier_proto_rawDescData
 }
 
-var file_turboci_orchestrator_v1_identifier_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_turboci_orchestrator_v1_identifier_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_turboci_orchestrator_v1_identifier_proto_goTypes = []any{
 	(*Identifier)(nil),                  // 0: turboci.orchestrator.v1.Identifier
 	(*Identifier_WorkPlan)(nil),         // 1: turboci.orchestrator.v1.Identifier.WorkPlan
 	(*Identifier_Check)(nil),            // 2: turboci.orchestrator.v1.Identifier.Check
 	(*Identifier_CheckOption)(nil),      // 3: turboci.orchestrator.v1.Identifier.CheckOption
-	(*Identifier_CheckResultDatum)(nil), // 4: turboci.orchestrator.v1.Identifier.CheckResultDatum
-	(*Identifier_CheckEdit)(nil),        // 5: turboci.orchestrator.v1.Identifier.CheckEdit
-	(*Identifier_CheckEditOption)(nil),  // 6: turboci.orchestrator.v1.Identifier.CheckEditOption
-	(*Identifier_Stage)(nil),            // 7: turboci.orchestrator.v1.Identifier.Stage
-	(*Identifier_StageAttempt)(nil),     // 8: turboci.orchestrator.v1.Identifier.StageAttempt
-	(*Identifier_StageEdit)(nil),        // 9: turboci.orchestrator.v1.Identifier.StageEdit
-	(*Revision)(nil),                    // 10: turboci.orchestrator.v1.Revision
+	(*Identifier_CheckResult)(nil),      // 4: turboci.orchestrator.v1.Identifier.CheckResult
+	(*Identifier_CheckResultDatum)(nil), // 5: turboci.orchestrator.v1.Identifier.CheckResultDatum
+	(*Identifier_CheckEdit)(nil),        // 6: turboci.orchestrator.v1.Identifier.CheckEdit
+	(*Identifier_CheckEditOption)(nil),  // 7: turboci.orchestrator.v1.Identifier.CheckEditOption
+	(*Identifier_Stage)(nil),            // 8: turboci.orchestrator.v1.Identifier.Stage
+	(*Identifier_StageAttempt)(nil),     // 9: turboci.orchestrator.v1.Identifier.StageAttempt
+	(*Identifier_StageEdit)(nil),        // 10: turboci.orchestrator.v1.Identifier.StageEdit
+	(*Revision)(nil),                    // 11: turboci.orchestrator.v1.Revision
 }
 var file_turboci_orchestrator_v1_identifier_proto_depIdxs = []int32{
 	1,  // 0: turboci.orchestrator.v1.Identifier.work_plan:type_name -> turboci.orchestrator.v1.Identifier.WorkPlan
 	2,  // 1: turboci.orchestrator.v1.Identifier.check:type_name -> turboci.orchestrator.v1.Identifier.Check
 	3,  // 2: turboci.orchestrator.v1.Identifier.check_option:type_name -> turboci.orchestrator.v1.Identifier.CheckOption
-	4,  // 3: turboci.orchestrator.v1.Identifier.check_result_datum:type_name -> turboci.orchestrator.v1.Identifier.CheckResultDatum
-	5,  // 4: turboci.orchestrator.v1.Identifier.check_edit:type_name -> turboci.orchestrator.v1.Identifier.CheckEdit
-	6,  // 5: turboci.orchestrator.v1.Identifier.check_edit_option:type_name -> turboci.orchestrator.v1.Identifier.CheckEditOption
-	7,  // 6: turboci.orchestrator.v1.Identifier.stage:type_name -> turboci.orchestrator.v1.Identifier.Stage
-	8,  // 7: turboci.orchestrator.v1.Identifier.stage_attempt:type_name -> turboci.orchestrator.v1.Identifier.StageAttempt
-	9,  // 8: turboci.orchestrator.v1.Identifier.stage_edit:type_name -> turboci.orchestrator.v1.Identifier.StageEdit
-	1,  // 9: turboci.orchestrator.v1.Identifier.Check.work_plan:type_name -> turboci.orchestrator.v1.Identifier.WorkPlan
-	2,  // 10: turboci.orchestrator.v1.Identifier.CheckOption.check:type_name -> turboci.orchestrator.v1.Identifier.Check
-	2,  // 11: turboci.orchestrator.v1.Identifier.CheckResultDatum.check:type_name -> turboci.orchestrator.v1.Identifier.Check
-	2,  // 12: turboci.orchestrator.v1.Identifier.CheckEdit.check:type_name -> turboci.orchestrator.v1.Identifier.Check
-	10, // 13: turboci.orchestrator.v1.Identifier.CheckEdit.version:type_name -> turboci.orchestrator.v1.Revision
-	5,  // 14: turboci.orchestrator.v1.Identifier.CheckEditOption.check_edit:type_name -> turboci.orchestrator.v1.Identifier.CheckEdit
-	1,  // 15: turboci.orchestrator.v1.Identifier.Stage.work_plan:type_name -> turboci.orchestrator.v1.Identifier.WorkPlan
-	7,  // 16: turboci.orchestrator.v1.Identifier.StageAttempt.stage:type_name -> turboci.orchestrator.v1.Identifier.Stage
-	7,  // 17: turboci.orchestrator.v1.Identifier.StageEdit.stage:type_name -> turboci.orchestrator.v1.Identifier.Stage
-	10, // 18: turboci.orchestrator.v1.Identifier.StageEdit.version:type_name -> turboci.orchestrator.v1.Revision
-	19, // [19:19] is the sub-list for method output_type
-	19, // [19:19] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	4,  // 3: turboci.orchestrator.v1.Identifier.check_result:type_name -> turboci.orchestrator.v1.Identifier.CheckResult
+	5,  // 4: turboci.orchestrator.v1.Identifier.check_result_datum:type_name -> turboci.orchestrator.v1.Identifier.CheckResultDatum
+	6,  // 5: turboci.orchestrator.v1.Identifier.check_edit:type_name -> turboci.orchestrator.v1.Identifier.CheckEdit
+	7,  // 6: turboci.orchestrator.v1.Identifier.check_edit_option:type_name -> turboci.orchestrator.v1.Identifier.CheckEditOption
+	8,  // 7: turboci.orchestrator.v1.Identifier.stage:type_name -> turboci.orchestrator.v1.Identifier.Stage
+	9,  // 8: turboci.orchestrator.v1.Identifier.stage_attempt:type_name -> turboci.orchestrator.v1.Identifier.StageAttempt
+	10, // 9: turboci.orchestrator.v1.Identifier.stage_edit:type_name -> turboci.orchestrator.v1.Identifier.StageEdit
+	1,  // 10: turboci.orchestrator.v1.Identifier.Check.work_plan:type_name -> turboci.orchestrator.v1.Identifier.WorkPlan
+	2,  // 11: turboci.orchestrator.v1.Identifier.CheckOption.check:type_name -> turboci.orchestrator.v1.Identifier.Check
+	2,  // 12: turboci.orchestrator.v1.Identifier.CheckResult.check:type_name -> turboci.orchestrator.v1.Identifier.Check
+	4,  // 13: turboci.orchestrator.v1.Identifier.CheckResultDatum.result:type_name -> turboci.orchestrator.v1.Identifier.CheckResult
+	2,  // 14: turboci.orchestrator.v1.Identifier.CheckEdit.check:type_name -> turboci.orchestrator.v1.Identifier.Check
+	11, // 15: turboci.orchestrator.v1.Identifier.CheckEdit.version:type_name -> turboci.orchestrator.v1.Revision
+	6,  // 16: turboci.orchestrator.v1.Identifier.CheckEditOption.check_edit:type_name -> turboci.orchestrator.v1.Identifier.CheckEdit
+	1,  // 17: turboci.orchestrator.v1.Identifier.Stage.work_plan:type_name -> turboci.orchestrator.v1.Identifier.WorkPlan
+	8,  // 18: turboci.orchestrator.v1.Identifier.StageAttempt.stage:type_name -> turboci.orchestrator.v1.Identifier.Stage
+	8,  // 19: turboci.orchestrator.v1.Identifier.StageEdit.stage:type_name -> turboci.orchestrator.v1.Identifier.Stage
+	11, // 20: turboci.orchestrator.v1.Identifier.StageEdit.version:type_name -> turboci.orchestrator.v1.Revision
+	21, // [21:21] is the sub-list for method output_type
+	21, // [21:21] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_turboci_orchestrator_v1_identifier_proto_init() }
@@ -945,6 +1030,7 @@ func file_turboci_orchestrator_v1_identifier_proto_init() {
 		(*Identifier_WorkPlan_)(nil),
 		(*Identifier_Check_)(nil),
 		(*Identifier_CheckOption_)(nil),
+		(*Identifier_CheckResult_)(nil),
 		(*Identifier_CheckResultDatum_)(nil),
 		(*Identifier_CheckEdit_)(nil),
 		(*Identifier_CheckEditOption_)(nil),
@@ -958,7 +1044,7 @@ func file_turboci_orchestrator_v1_identifier_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_orchestrator_v1_identifier_proto_rawDesc), len(file_turboci_orchestrator_v1_identifier_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

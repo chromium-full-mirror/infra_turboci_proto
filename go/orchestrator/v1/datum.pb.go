@@ -134,7 +134,7 @@ const file_turboci_orchestrator_v1_datum_proto_rawDesc = "" +
 	"\x05Datum\x12R\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2#.turboci.orchestrator.v1.IdentifierB\r\x82\x86\xf6\xfb\x0f\a\x12\x05\n" +
-	"\x03\x03\x04\x06R\n" +
+	"\x03\x03\x05\aR\n" +
 	"identifier\x12\x19\n" +
 	"\x05realm\x18\x02 \x01(\tB\x03\xe0A\x05R\x05realm\x12;\n" +
 	"\aversion\x18\x03 \x01(\v2!.turboci.orchestrator.v1.RevisionR\aversion\x12*\n" +

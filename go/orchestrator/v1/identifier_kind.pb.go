@@ -41,45 +41,49 @@ const (
 	IdentifierKind_IDENTIFIER_KIND_CHECK IdentifierKind = 2
 	// An Identifier.CheckOption.
 	IdentifierKind_IDENTIFIER_KIND_CHECK_OPTION IdentifierKind = 3
+	// An Identifier.CheckResult.
+	IdentifierKind_IDENTIFIER_KIND_CHECK_RESULT IdentifierKind = 4
 	// An Identifier.CheckResultDatum.
-	IdentifierKind_IDENTIFIER_KIND_CHECK_RESULT_DATUM IdentifierKind = 4
+	IdentifierKind_IDENTIFIER_KIND_CHECK_RESULT_DATUM IdentifierKind = 5
 	// An Identifier.CheckEdit.
-	IdentifierKind_IDENTIFIER_KIND_CHECK_EDIT IdentifierKind = 5
+	IdentifierKind_IDENTIFIER_KIND_CHECK_EDIT IdentifierKind = 6
 	// An Identifier.CheckEditOption.
-	IdentifierKind_IDENTIFIER_KIND_CHECK_EDIT_OPTION IdentifierKind = 6
+	IdentifierKind_IDENTIFIER_KIND_CHECK_EDIT_OPTION IdentifierKind = 7
 	// An Identifier.Stage.
-	IdentifierKind_IDENTIFIER_KIND_STAGE IdentifierKind = 7
+	IdentifierKind_IDENTIFIER_KIND_STAGE IdentifierKind = 8
 	// An Identifier.StageAttempt.
-	IdentifierKind_IDENTIFIER_KIND_STAGE_ATTEMPT IdentifierKind = 8
+	IdentifierKind_IDENTIFIER_KIND_STAGE_ATTEMPT IdentifierKind = 9
 	// An Identifier.StageEdit.
-	IdentifierKind_IDENTIFIER_KIND_STAGE_EDIT IdentifierKind = 9
+	IdentifierKind_IDENTIFIER_KIND_STAGE_EDIT IdentifierKind = 10
 )
 
 // Enum value maps for IdentifierKind.
 var (
 	IdentifierKind_name = map[int32]string{
-		0: "IDENTIFIER_KIND_UNKNOWN",
-		1: "IDENTIFIER_KIND_WORK_PLAN",
-		2: "IDENTIFIER_KIND_CHECK",
-		3: "IDENTIFIER_KIND_CHECK_OPTION",
-		4: "IDENTIFIER_KIND_CHECK_RESULT_DATUM",
-		5: "IDENTIFIER_KIND_CHECK_EDIT",
-		6: "IDENTIFIER_KIND_CHECK_EDIT_OPTION",
-		7: "IDENTIFIER_KIND_STAGE",
-		8: "IDENTIFIER_KIND_STAGE_ATTEMPT",
-		9: "IDENTIFIER_KIND_STAGE_EDIT",
+		0:  "IDENTIFIER_KIND_UNKNOWN",
+		1:  "IDENTIFIER_KIND_WORK_PLAN",
+		2:  "IDENTIFIER_KIND_CHECK",
+		3:  "IDENTIFIER_KIND_CHECK_OPTION",
+		4:  "IDENTIFIER_KIND_CHECK_RESULT",
+		5:  "IDENTIFIER_KIND_CHECK_RESULT_DATUM",
+		6:  "IDENTIFIER_KIND_CHECK_EDIT",
+		7:  "IDENTIFIER_KIND_CHECK_EDIT_OPTION",
+		8:  "IDENTIFIER_KIND_STAGE",
+		9:  "IDENTIFIER_KIND_STAGE_ATTEMPT",
+		10: "IDENTIFIER_KIND_STAGE_EDIT",
 	}
 	IdentifierKind_value = map[string]int32{
 		"IDENTIFIER_KIND_UNKNOWN":            0,
 		"IDENTIFIER_KIND_WORK_PLAN":          1,
 		"IDENTIFIER_KIND_CHECK":              2,
 		"IDENTIFIER_KIND_CHECK_OPTION":       3,
-		"IDENTIFIER_KIND_CHECK_RESULT_DATUM": 4,
-		"IDENTIFIER_KIND_CHECK_EDIT":         5,
-		"IDENTIFIER_KIND_CHECK_EDIT_OPTION":  6,
-		"IDENTIFIER_KIND_STAGE":              7,
-		"IDENTIFIER_KIND_STAGE_ATTEMPT":      8,
-		"IDENTIFIER_KIND_STAGE_EDIT":         9,
+		"IDENTIFIER_KIND_CHECK_RESULT":       4,
+		"IDENTIFIER_KIND_CHECK_RESULT_DATUM": 5,
+		"IDENTIFIER_KIND_CHECK_EDIT":         6,
+		"IDENTIFIER_KIND_CHECK_EDIT_OPTION":  7,
+		"IDENTIFIER_KIND_STAGE":              8,
+		"IDENTIFIER_KIND_STAGE_ATTEMPT":      9,
+		"IDENTIFIER_KIND_STAGE_EDIT":         10,
 	}
 )
 
@@ -114,18 +118,20 @@ var File_turboci_orchestrator_v1_identifier_kind_proto protoreflect.FileDescript
 
 const file_turboci_orchestrator_v1_identifier_kind_proto_rawDesc = "" +
 	"\n" +
-	"-turboci/orchestrator/v1/identifier_kind.proto\x12\x17turboci.orchestrator.v1*\xd6\x02\n" +
+	"-turboci/orchestrator/v1/identifier_kind.proto\x12\x17turboci.orchestrator.v1*\xf8\x02\n" +
 	"\x0eIdentifierKind\x12\x1b\n" +
 	"\x17IDENTIFIER_KIND_UNKNOWN\x10\x00\x12\x1d\n" +
 	"\x19IDENTIFIER_KIND_WORK_PLAN\x10\x01\x12\x19\n" +
 	"\x15IDENTIFIER_KIND_CHECK\x10\x02\x12 \n" +
-	"\x1cIDENTIFIER_KIND_CHECK_OPTION\x10\x03\x12&\n" +
-	"\"IDENTIFIER_KIND_CHECK_RESULT_DATUM\x10\x04\x12\x1e\n" +
-	"\x1aIDENTIFIER_KIND_CHECK_EDIT\x10\x05\x12%\n" +
-	"!IDENTIFIER_KIND_CHECK_EDIT_OPTION\x10\x06\x12\x19\n" +
-	"\x15IDENTIFIER_KIND_STAGE\x10\a\x12!\n" +
-	"\x1dIDENTIFIER_KIND_STAGE_ATTEMPT\x10\b\x12\x1e\n" +
-	"\x1aIDENTIFIER_KIND_STAGE_EDIT\x10\tBAP\x01Z=go.chromium.org/turboci/proto/go/orchestrator/v1;orchestratorb\beditionsp\xe8\a"
+	"\x1cIDENTIFIER_KIND_CHECK_OPTION\x10\x03\x12 \n" +
+	"\x1cIDENTIFIER_KIND_CHECK_RESULT\x10\x04\x12&\n" +
+	"\"IDENTIFIER_KIND_CHECK_RESULT_DATUM\x10\x05\x12\x1e\n" +
+	"\x1aIDENTIFIER_KIND_CHECK_EDIT\x10\x06\x12%\n" +
+	"!IDENTIFIER_KIND_CHECK_EDIT_OPTION\x10\a\x12\x19\n" +
+	"\x15IDENTIFIER_KIND_STAGE\x10\b\x12!\n" +
+	"\x1dIDENTIFIER_KIND_STAGE_ATTEMPT\x10\t\x12\x1e\n" +
+	"\x1aIDENTIFIER_KIND_STAGE_EDIT\x10\n" +
+	"BAP\x01Z=go.chromium.org/turboci/proto/go/orchestrator/v1;orchestratorb\beditionsp\xe8\a"
 
 var (
 	file_turboci_orchestrator_v1_identifier_kind_proto_rawDescOnce sync.Once

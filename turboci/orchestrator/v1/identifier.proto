@@ -65,26 +65,45 @@ message Identifier {
     Check check = 1;
 
     // The 1-based index of this datum within the Check.options list.
-    int32 options_idx = 2;
+    //
+    // This is 1-based to distinguish it from 0/unset (which is invalid).
+    int32 idx = 2;
   }
 
-  // Identifies a Datum for a Check's Result within a WorkPlan.
+  // Identifies a Check Result within a WorkPlan.
   //
-  // Serialized as "<check_result>:R<results_idx>:D<results_data_idx>".
+  // Serialized as "<check>:R<results_idx>".
   //
-  // E.g. "<check.work_plan.id>:C<check.id>:R<results_idx>:D<results_data_idx>"
+  // E.g. "<check.work_plan.id>:C<check.id>:R<idx>"
   //
   // This is separate from `Check` because it may reside in a different realm
   // than the Check itself.
-  message CheckResultDatum {
+  message CheckResult {
     // The check that this result belongs to.
     Check check = 1;
 
     // The 1-based index of this result within the Check.results list.
-    int32 results_idx = 2;
+    //
+    // This is 1-based to distinguish it from 0/unset (which is invalid).
+    int32 idx = 2;
+  }
+
+  // Identifies a Datum for a Check's Result within a WorkPlan.
+  //
+  // Serialized as "<result>:D<results_data_idx>".
+  //
+  // E.g. "<result.check.work_plan.id>:C<result.check.id>:R<result.idx>:D<idx>"
+  //
+  // This is separate from `Check` because it may reside in a different realm
+  // than the Check itself.
+  message CheckResultDatum {
+    // The check resunt that this datum belongs to.
+    CheckResult result = 1;
 
     // The 1-based index of this datum within the Check.Result.data list.
-    int32 results_data_idx = 3;
+    //
+    // This is 1-based to distinguish it from 0/unset (which is invalid).
+    int32 idx = 2;
   }
 
   // Identifies a CheckEdit within a WorkPlan.
@@ -116,6 +135,8 @@ message Identifier {
 
     // The 1-based index of this datum within the Edit.check.delta.options
     // list.
+    //
+    // This is 1-based to distinguish it from 0/unset (which is invalid).
     int32 check_delta_options_idx = 2;
   }
 
@@ -181,6 +202,8 @@ message Identifier {
     Stage stage = 1;
 
     // The 1-based index of this attempt within the Stage.attempts list.
+    //
+    // This is 1-based to distinguish it from 0/unset (which is invalid).
     int32 attempts_idx = 2;
   }
 
@@ -209,18 +232,20 @@ message Identifier {
     Check check = 2;
     // Option data for a Check.
     CheckOption check_option = 3;
+    // A particular Check.Result.
+    CheckResult check_result = 4;
     // Data associated with a particular result in a Check.
-    CheckResultDatum check_result_datum = 4;
+    CheckResultDatum check_result_datum = 5;
     // An edit to a Check.
-    CheckEdit check_edit = 5;
+    CheckEdit check_edit = 6;
     // Option data for an edit to a Check.
-    CheckEditOption check_edit_option = 6;
+    CheckEditOption check_edit_option = 7;
 
     // A Stage within a WorkPlan.
-    Stage stage = 7;
+    Stage stage = 8;
     // A specific attempt at a Stage.
-    StageAttempt stage_attempt = 8;
+    StageAttempt stage_attempt = 9;
     // An edit to a Stage.
-    StageEdit stage_edit = 9;
+    StageEdit stage_edit = 10;
   }
 }
