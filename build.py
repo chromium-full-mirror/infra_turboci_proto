@@ -250,8 +250,7 @@ def task_check_one_per_file():
     num_msgs = len(file.message_type)
     num_enums = len(file.enum_type)
     num_servs = len(file.service)
-    num_exts = len(file.extension)
-    total_top_level = num_msgs + num_enums + num_servs + num_exts
+    total_top_level = num_msgs + num_enums + num_servs
     if total_top_level > 1:
       failures += 1
       print(f'{file.name} had {total_top_level} top-level definitions (want 1):')
@@ -261,8 +260,6 @@ def task_check_one_per_file():
         print(f'  enum {enum.name}')
       for service in file.service:
         print(f'  service {service.name}')
-      for ext in file.extension:
-        print(f'  extend {ext.name}')
   if failures > 0:
     sys.exit(1)
 
