@@ -64,7 +64,7 @@ message Identifier {
     // The check that this option belongs to.
     Check check = 1;
 
-    // The 1-based index of this datum within the Check.option list.
+    // The 1-based index of this datum within the Check.options list.
     int32 options_idx = 2;
   }
 

@@ -370,7 +370,7 @@ type Identifier_CheckOption struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The check that this option belongs to.
 	Check *Identifier_Check `protobuf:"bytes,1,opt,name=check" json:"check,omitempty"`
-	// The 1-based index of this datum within the Check.option list.
+	// The 1-based index of this datum within the Check.options list.
 	OptionsIdx    *int32 `protobuf:"varint,2,opt,name=options_idx,json=optionsIdx" json:"options_idx,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
