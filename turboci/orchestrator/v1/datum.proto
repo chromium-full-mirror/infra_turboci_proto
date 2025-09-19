@@ -7,10 +7,10 @@ edition = "2023";
 package turboci.orchestrator.v1;
 
 import "google/api/field_behavior.proto";
-import "google/protobuf/any.proto";
 import "turboci/orchestrator/v1/field_options.proto";
 import "turboci/orchestrator/v1/identifier.proto";
 import "turboci/orchestrator/v1/revision.proto";
+import "turboci/orchestrator/v1/value.proto";
 
 option go_package = "go.chromium.org/turboci/proto/go/orchestrator/v1;orchestrator";
 option java_multiple_files = true;
@@ -45,19 +45,19 @@ message Datum {
 
   // The actual value of this Datum.
   //
-  // The turboci orchestrator requires that the type of the `data` here be
-  // pre-registered [here](TBD). This registration ensures that:
+  // The TurboCI orchestrator requires that the type_url of the `value` here be
+  // [pre-registered](TBD). This registration ensures that:
   //   * The proto type URL is known to the service frontend (otherwise the
   //     service frontend will reject the type).
-  //   * The type is compatible in the context of this Options (i.e. within
+  //   * The type is compatible in the context of this Datum (i.e. within
   //     a Check or Check.Result of a certain Kind).
   //
   // Once a type is registered, however, the Orchestrator service will not
-  // require the content (i.e. value.value) to be conformant to its registered
-  // type. That is - Workflows may run with newer versions of the type
-  // definition for a given registered type. This allows rapid prototyping of
-  // workflows without the need to land and deploy schema changes ahead of time.
-  google.protobuf.Any value = 4;
+  // require the content to be conformant to its registered type. That is
+  // - Workflows may run with newer versions of the type definition for a given
+  // registered type. This allows rapid prototyping of workflows without the
+  // need to land and deploy schema changes ahead of time.
+  Value value = 4;
 
   // TBD: An additional disambiguator/key in addition to value.type_url?
 

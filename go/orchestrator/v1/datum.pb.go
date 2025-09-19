@@ -14,7 +14,6 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	anypb "google.golang.org/protobuf/types/known/anypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -51,19 +50,19 @@ type Datum struct {
 	Version *Revision `protobuf:"bytes,3,opt,name=version" json:"version,omitempty"`
 	// The actual value of this Datum.
 	//
-	// The turboci orchestrator requires that the type of the `data` here be
-	// pre-registered [here](TBD). This registration ensures that:
+	// The TurboCI orchestrator requires that the type_url of the `value` here be
+	// [pre-registered](TBD). This registration ensures that:
 	//   - The proto type URL is known to the service frontend (otherwise the
 	//     service frontend will reject the type).
-	//   - The type is compatible in the context of this Options (i.e. within
+	//   - The type is compatible in the context of this Datum (i.e. within
 	//     a Check or Check.Result of a certain Kind).
 	//
 	// Once a type is registered, however, the Orchestrator service will not
-	// require the content (i.e. value.value) to be conformant to its registered
-	// type. That is - Workflows may run with newer versions of the type
-	// definition for a given registered type. This allows rapid prototyping of
-	// workflows without the need to land and deploy schema changes ahead of time.
-	Value         *anypb.Any `protobuf:"bytes,4,opt,name=value" json:"value,omitempty"`
+	// require the content to be conformant to its registered type. That is
+	// - Workflows may run with newer versions of the type definition for a given
+	// registered type. This allows rapid prototyping of workflows without the
+	// need to land and deploy schema changes ahead of time.
+	Value         *Value `protobuf:"bytes,4,opt,name=value" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -119,7 +118,7 @@ func (x *Datum) GetVersion() *Revision {
 	return nil
 }
 
-func (x *Datum) GetValue() *anypb.Any {
+func (x *Datum) GetValue() *Value {
 	if x != nil {
 		return x.Value
 	}
@@ -130,15 +129,15 @@ var File_turboci_orchestrator_v1_datum_proto protoreflect.FileDescriptor
 
 const file_turboci_orchestrator_v1_datum_proto_rawDesc = "" +
 	"\n" +
-	"#turboci/orchestrator/v1/datum.proto\x12\x17turboci.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\x1a+turboci/orchestrator/v1/field_options.proto\x1a(turboci/orchestrator/v1/identifier.proto\x1a&turboci/orchestrator/v1/revision.proto\"\xdf\x01\n" +
+	"#turboci/orchestrator/v1/datum.proto\x12\x17turboci.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a+turboci/orchestrator/v1/field_options.proto\x1a(turboci/orchestrator/v1/identifier.proto\x1a&turboci/orchestrator/v1/revision.proto\x1a#turboci/orchestrator/v1/value.proto\"\xe9\x01\n" +
 	"\x05Datum\x12R\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2#.turboci.orchestrator.v1.IdentifierB\r\x82\x86\xf6\xfb\x0f\a\x12\x05\n" +
 	"\x03\x03\x05\aR\n" +
 	"identifier\x12\x19\n" +
 	"\x05realm\x18\x02 \x01(\tB\x03\xe0A\x05R\x05realm\x12;\n" +
-	"\aversion\x18\x03 \x01(\v2!.turboci.orchestrator.v1.RevisionR\aversion\x12*\n" +
-	"\x05value\x18\x04 \x01(\v2\x14.google.protobuf.AnyR\x05valueBAP\x01Z=go.chromium.org/turboci/proto/go/orchestrator/v1;orchestratorb\beditionsp\xe8\a"
+	"\aversion\x18\x03 \x01(\v2!.turboci.orchestrator.v1.RevisionR\aversion\x124\n" +
+	"\x05value\x18\x04 \x01(\v2\x1e.turboci.orchestrator.v1.ValueR\x05valueBAP\x01Z=go.chromium.org/turboci/proto/go/orchestrator/v1;orchestratorb\beditionsp\xe8\a"
 
 var (
 	file_turboci_orchestrator_v1_datum_proto_rawDescOnce sync.Once
@@ -157,12 +156,12 @@ var file_turboci_orchestrator_v1_datum_proto_goTypes = []any{
 	(*Datum)(nil),      // 0: turboci.orchestrator.v1.Datum
 	(*Identifier)(nil), // 1: turboci.orchestrator.v1.Identifier
 	(*Revision)(nil),   // 2: turboci.orchestrator.v1.Revision
-	(*anypb.Any)(nil),  // 3: google.protobuf.Any
+	(*Value)(nil),      // 3: turboci.orchestrator.v1.Value
 }
 var file_turboci_orchestrator_v1_datum_proto_depIdxs = []int32{
 	1, // 0: turboci.orchestrator.v1.Datum.identifier:type_name -> turboci.orchestrator.v1.Identifier
 	2, // 1: turboci.orchestrator.v1.Datum.version:type_name -> turboci.orchestrator.v1.Revision
-	3, // 2: turboci.orchestrator.v1.Datum.value:type_name -> google.protobuf.Any
+	3, // 2: turboci.orchestrator.v1.Datum.value:type_name -> turboci.orchestrator.v1.Value
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
@@ -178,6 +177,7 @@ func file_turboci_orchestrator_v1_datum_proto_init() {
 	file_turboci_orchestrator_v1_field_options_proto_init()
 	file_turboci_orchestrator_v1_identifier_proto_init()
 	file_turboci_orchestrator_v1_revision_proto_init()
+	file_turboci_orchestrator_v1_value_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
