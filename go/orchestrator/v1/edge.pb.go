@@ -14,7 +14,6 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -103,8 +102,21 @@ type Edge_Resolution struct {
 	// If this is `true`, then this Edge's condition is satisfied.
 	// If this is `false`, then this Edge's condition is unsatisfiable.
 	Satisfied *bool `protobuf:"varint,1,opt,name=satisfied" json:"satisfied,omitempty"`
-	// The time at which this resolution was made.
-	At            *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at" json:"at,omitempty"`
+	// The version of the target node which caused this Edge (or EdgeGroup) to
+	// be satisfied/unsatisfiable.
+	//
+	// This will always be less than or equal to the version in `at`.
+	TargetVersion *Revision `protobuf:"bytes,2,opt,name=target_version,json=targetVersion" json:"target_version,omitempty"`
+	// The database revsision (commit timestamp) at which this resolution was
+	// made.
+	//
+	// Edges in the Orchestrator MAY be resolved in an eventually-consistent
+	// fashion, which means that it's possible to observe the target of this
+	// edge in a satisfying state for this edge, but the edge is still not
+	// marked as resolved.
+	//
+	// This will always be greater than or equal to the version in `target_version`.
+	At            *Revision `protobuf:"bytes,3,opt,name=at" json:"at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -146,7 +158,14 @@ func (x *Edge_Resolution) GetSatisfied() bool {
 	return false
 }
 
-func (x *Edge_Resolution) GetAt() *timestamppb.Timestamp {
+func (x *Edge_Resolution) GetTargetVersion() *Revision {
+	if x != nil {
+		return x.TargetVersion
+	}
+	return nil
+}
+
+func (x *Edge_Resolution) GetAt() *Revision {
 	if x != nil {
 		return x.At
 	}
@@ -157,16 +176,17 @@ var File_turboci_orchestrator_v1_edge_proto protoreflect.FileDescriptor
 
 const file_turboci_orchestrator_v1_edge_proto_rawDesc = "" +
 	"\n" +
-	"\"turboci/orchestrator/v1/edge.proto\x12\x17turboci.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a(turboci/orchestrator/v1/identifier.proto\"\xef\x01\n" +
+	"\"turboci/orchestrator/v1/edge.proto\x12\x17turboci.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a(turboci/orchestrator/v1/identifier.proto\x1a&turboci/orchestrator/v1/revision.proto\"\xc6\x02\n" +
 	"\x04Edge\x12;\n" +
 	"\x06target\x18\x01 \x01(\v2#.turboci.orchestrator.v1.IdentifierR\x06target\x12H\n" +
 	"\n" +
 	"resolution\x18\x02 \x01(\v2(.turboci.orchestrator.v1.Edge.ResolutionR\n" +
-	"resolution\x1a`\n" +
+	"resolution\x1a\xb6\x01\n" +
 	"\n" +
 	"Resolution\x12!\n" +
-	"\tsatisfied\x18\x01 \x01(\bB\x03\xe0A\x05R\tsatisfied\x12/\n" +
-	"\x02at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x05R\x02atBAP\x01Z=go.chromium.org/turboci/proto/go/orchestrator/v1;orchestratorb\beditionsp\xe8\a"
+	"\tsatisfied\x18\x01 \x01(\bB\x03\xe0A\x05R\tsatisfied\x12M\n" +
+	"\x0etarget_version\x18\x02 \x01(\v2!.turboci.orchestrator.v1.RevisionB\x03\xe0A\x05R\rtargetVersion\x126\n" +
+	"\x02at\x18\x03 \x01(\v2!.turboci.orchestrator.v1.RevisionB\x03\xe0A\x05R\x02atBAP\x01Z=go.chromium.org/turboci/proto/go/orchestrator/v1;orchestratorb\beditionsp\xe8\a"
 
 var (
 	file_turboci_orchestrator_v1_edge_proto_rawDescOnce sync.Once
@@ -182,20 +202,21 @@ func file_turboci_orchestrator_v1_edge_proto_rawDescGZIP() []byte {
 
 var file_turboci_orchestrator_v1_edge_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_orchestrator_v1_edge_proto_goTypes = []any{
-	(*Edge)(nil),                  // 0: turboci.orchestrator.v1.Edge
-	(*Edge_Resolution)(nil),       // 1: turboci.orchestrator.v1.Edge.Resolution
-	(*Identifier)(nil),            // 2: turboci.orchestrator.v1.Identifier
-	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
+	(*Edge)(nil),            // 0: turboci.orchestrator.v1.Edge
+	(*Edge_Resolution)(nil), // 1: turboci.orchestrator.v1.Edge.Resolution
+	(*Identifier)(nil),      // 2: turboci.orchestrator.v1.Identifier
+	(*Revision)(nil),        // 3: turboci.orchestrator.v1.Revision
 }
 var file_turboci_orchestrator_v1_edge_proto_depIdxs = []int32{
 	2, // 0: turboci.orchestrator.v1.Edge.target:type_name -> turboci.orchestrator.v1.Identifier
 	1, // 1: turboci.orchestrator.v1.Edge.resolution:type_name -> turboci.orchestrator.v1.Edge.Resolution
-	3, // 2: turboci.orchestrator.v1.Edge.Resolution.at:type_name -> google.protobuf.Timestamp
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	3, // 2: turboci.orchestrator.v1.Edge.Resolution.target_version:type_name -> turboci.orchestrator.v1.Revision
+	3, // 3: turboci.orchestrator.v1.Edge.Resolution.at:type_name -> turboci.orchestrator.v1.Revision
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_turboci_orchestrator_v1_edge_proto_init() }
@@ -204,6 +225,7 @@ func file_turboci_orchestrator_v1_edge_proto_init() {
 		return
 	}
 	file_turboci_orchestrator_v1_identifier_proto_init()
+	file_turboci_orchestrator_v1_revision_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

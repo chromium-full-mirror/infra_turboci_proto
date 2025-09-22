@@ -7,8 +7,8 @@ edition = "2023";
 package turboci.orchestrator.v1;
 
 import "google/api/field_behavior.proto";
-import "google/protobuf/timestamp.proto";
 import "turboci/orchestrator/v1/identifier.proto";
+import "turboci/orchestrator/v1/revision.proto";
 
 option go_package = "go.chromium.org/turboci/proto/go/orchestrator/v1;orchestrator";
 option java_multiple_files = true;
@@ -37,8 +37,22 @@ message Edge {
     // If this is `false`, then this Edge's condition is unsatisfiable.
     bool satisfied = 1 [(google.api.field_behavior) = IMMUTABLE];
 
-    // The time at which this resolution was made.
-    google.protobuf.Timestamp at = 2 [(google.api.field_behavior) = IMMUTABLE];
+    // The version of the target node which caused this Edge (or EdgeGroup) to
+    // be satisfied/unsatisfiable.
+    //
+    // This will always be less than or equal to the version in `at`.
+    Revision target_version = 2 [(google.api.field_behavior) = IMMUTABLE];
+
+    // The database revsision (commit timestamp) at which this resolution was
+    // made.
+    //
+    // Edges in the Orchestrator MAY be resolved in an eventually-consistent
+    // fashion, which means that it's possible to observe the target of this
+    // edge in a satisfying state for this edge, but the edge is still not
+    // marked as resolved.
+    //
+    // This will always be greater than or equal to the version in `target_version`.
+    Revision at = 3 [(google.api.field_behavior) = IMMUTABLE];
   }
   // Indicates if this Edge was resolved yet.
   //

@@ -14,7 +14,6 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -290,8 +289,9 @@ type Check_Result struct {
 	Identifier *Identifier_CheckResult `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
 	// The entity which created this Result.
 	Owner *Actor `protobuf:"bytes,2,opt,name=owner" json:"owner,omitempty"`
-	// The time at which this Result was created.
-	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
+	// The database revsision (commit timestamp) at which this Result was
+	// created.
+	CreatedAt *Revision `protobuf:"bytes,3,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
 	// Data form the bulk of the result.
 	//
 	// NOTE: Most data should be stored in ResultDB via turboci.ResultStorage.
@@ -305,13 +305,14 @@ type Check_Result struct {
 	// You can use QueryNodes to get a CheckView which includes this Check and
 	// also Result Data.
 	Data []*Check_Result_ResultDatumRef `protobuf:"bytes,4,rep,name=data" json:"data,omitempty"`
-	// The time at which this Result is finalized.
+	// The database revsision (commit timestamp) at which this Result is
+	// finalized.
 	//
 	// This is set when:
 	//   - A StageAttempt `owner` ends (becomes COMPLETE or INCOMPLETE).
 	//   - The `owner` explicitly indicates that their results are final.
 	//   - The Check advances to the FINAL state.
-	FinalizedAt   *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=finalized_at,json=finalizedAt" json:"finalized_at,omitempty"`
+	FinalizedAt   *Revision `protobuf:"bytes,5,opt,name=finalized_at,json=finalizedAt" json:"finalized_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -360,7 +361,7 @@ func (x *Check_Result) GetOwner() *Actor {
 	return nil
 }
 
-func (x *Check_Result) GetCreatedAt() *timestamppb.Timestamp {
+func (x *Check_Result) GetCreatedAt() *Revision {
 	if x != nil {
 		return x.CreatedAt
 	}
@@ -374,7 +375,7 @@ func (x *Check_Result) GetData() []*Check_Result_ResultDatumRef {
 	return nil
 }
 
-func (x *Check_Result) GetFinalizedAt() *timestamppb.Timestamp {
+func (x *Check_Result) GetFinalizedAt() *Revision {
 	if x != nil {
 		return x.FinalizedAt
 	}
@@ -440,7 +441,7 @@ var File_turboci_orchestrator_v1_check_proto protoreflect.FileDescriptor
 
 const file_turboci_orchestrator_v1_check_proto_rawDesc = "" +
 	"\n" +
-	"#turboci/orchestrator/v1/check.proto\x12\x17turboci.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a#turboci/orchestrator/v1/actor.proto\x1a(turboci/orchestrator/v1/check_kind.proto\x1a)turboci/orchestrator/v1/check_state.proto\x1a(turboci/orchestrator/v1/edge_group.proto\x1a+turboci/orchestrator/v1/field_options.proto\x1a(turboci/orchestrator/v1/identifier.proto\x1a&turboci/orchestrator/v1/revision.proto\"\xfd\b\n" +
+	"#turboci/orchestrator/v1/check.proto\x12\x17turboci.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a#turboci/orchestrator/v1/actor.proto\x1a(turboci/orchestrator/v1/check_kind.proto\x1a)turboci/orchestrator/v1/check_state.proto\x1a(turboci/orchestrator/v1/edge_group.proto\x1a+turboci/orchestrator/v1/field_options.proto\x1a(turboci/orchestrator/v1/identifier.proto\x1a&turboci/orchestrator/v1/revision.proto\"\x8b\t\n" +
 	"\x05Check\x12N\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2).turboci.orchestrator.v1.Identifier.CheckB\x03\xe0A\x05R\n" +
@@ -463,16 +464,16 @@ const file_turboci_orchestrator_v1_check_proto_rawDesc = "" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2/.turboci.orchestrator.v1.Identifier.CheckOptionR\n" +
 	"identifier\x12\x19\n" +
-	"\btype_url\x18\x02 \x01(\tR\atypeUrl\x1a\xe1\x03\n" +
+	"\btype_url\x18\x02 \x01(\tR\atypeUrl\x1a\xef\x03\n" +
 	"\x06Result\x12O\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2/.turboci.orchestrator.v1.Identifier.CheckResultR\n" +
 	"identifier\x129\n" +
-	"\x05owner\x18\x02 \x01(\v2\x1e.turboci.orchestrator.v1.ActorB\x03\xe0A\x03R\x05owner\x12>\n" +
+	"\x05owner\x18\x02 \x01(\v2\x1e.turboci.orchestrator.v1.ActorB\x03\xe0A\x03R\x05owner\x12E\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\tcreatedAt\x12H\n" +
-	"\x04data\x18\x04 \x03(\v24.turboci.orchestrator.v1.Check.Result.ResultDatumRefR\x04data\x12=\n" +
-	"\ffinalized_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\vfinalizedAt\x1a\x81\x01\n" +
+	"created_at\x18\x03 \x01(\v2!.turboci.orchestrator.v1.RevisionB\x03\xe0A\x03R\tcreatedAt\x12H\n" +
+	"\x04data\x18\x04 \x03(\v24.turboci.orchestrator.v1.Check.Result.ResultDatumRefR\x04data\x12D\n" +
+	"\ffinalized_at\x18\x05 \x01(\v2!.turboci.orchestrator.v1.RevisionR\vfinalizedAt\x1a\x81\x01\n" +
 	"\x0eResultDatumRef\x12T\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v24.turboci.orchestrator.v1.Identifier.CheckResultDatumR\n" +
@@ -505,8 +506,7 @@ var file_turboci_orchestrator_v1_check_proto_goTypes = []any{
 	(*Identifier_CheckOption)(nil),      // 9: turboci.orchestrator.v1.Identifier.CheckOption
 	(*Identifier_CheckResult)(nil),      // 10: turboci.orchestrator.v1.Identifier.CheckResult
 	(*Actor)(nil),                       // 11: turboci.orchestrator.v1.Actor
-	(*timestamppb.Timestamp)(nil),       // 12: google.protobuf.Timestamp
-	(*Identifier_CheckResultDatum)(nil), // 13: turboci.orchestrator.v1.Identifier.CheckResultDatum
+	(*Identifier_CheckResultDatum)(nil), // 12: turboci.orchestrator.v1.Identifier.CheckResultDatum
 }
 var file_turboci_orchestrator_v1_check_proto_depIdxs = []int32{
 	4,  // 0: turboci.orchestrator.v1.Check.identifier:type_name -> turboci.orchestrator.v1.Identifier.Check
@@ -519,10 +519,10 @@ var file_turboci_orchestrator_v1_check_proto_depIdxs = []int32{
 	9,  // 7: turboci.orchestrator.v1.Check.OptionRef.identifier:type_name -> turboci.orchestrator.v1.Identifier.CheckOption
 	10, // 8: turboci.orchestrator.v1.Check.Result.identifier:type_name -> turboci.orchestrator.v1.Identifier.CheckResult
 	11, // 9: turboci.orchestrator.v1.Check.Result.owner:type_name -> turboci.orchestrator.v1.Actor
-	12, // 10: turboci.orchestrator.v1.Check.Result.created_at:type_name -> google.protobuf.Timestamp
+	6,  // 10: turboci.orchestrator.v1.Check.Result.created_at:type_name -> turboci.orchestrator.v1.Revision
 	3,  // 11: turboci.orchestrator.v1.Check.Result.data:type_name -> turboci.orchestrator.v1.Check.Result.ResultDatumRef
-	12, // 12: turboci.orchestrator.v1.Check.Result.finalized_at:type_name -> google.protobuf.Timestamp
-	13, // 13: turboci.orchestrator.v1.Check.Result.ResultDatumRef.identifier:type_name -> turboci.orchestrator.v1.Identifier.CheckResultDatum
+	6,  // 12: turboci.orchestrator.v1.Check.Result.finalized_at:type_name -> turboci.orchestrator.v1.Revision
+	12, // 13: turboci.orchestrator.v1.Check.Result.ResultDatumRef.identifier:type_name -> turboci.orchestrator.v1.Identifier.CheckResultDatum
 	14, // [14:14] is the sub-list for method output_type
 	14, // [14:14] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name

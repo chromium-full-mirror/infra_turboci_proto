@@ -7,7 +7,6 @@ edition = "2023";
 package turboci.orchestrator.v1;
 
 import "google/api/field_behavior.proto";
-import "google/protobuf/timestamp.proto";
 import "turboci/orchestrator/v1/actor.proto";
 import "turboci/orchestrator/v1/check_kind.proto";
 import "turboci/orchestrator/v1/check_state.proto";
@@ -146,8 +145,9 @@ message Check {
     // The entity which created this Result.
     Actor owner = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-    // The time at which this Result was created.
-    google.protobuf.Timestamp created_at = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+    // The database revsision (commit timestamp) at which this Result was
+    // created.
+    Revision created_at = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 
     // ResultDatumRef is a reference to a CheckResultDatum.
     message ResultDatumRef {
@@ -176,13 +176,14 @@ message Check {
     // also Result Data.
     repeated ResultDatumRef data = 4;
 
-    // The time at which this Result is finalized.
+    // The database revsision (commit timestamp) at which this Result is
+    // finalized.
     //
     // This is set when:
     //   * A StageAttempt `owner` ends (becomes COMPLETE or INCOMPLETE).
     //   * The `owner` explicitly indicates that their results are final.
     //   * The Check advances to the FINAL state.
-    google.protobuf.Timestamp finalized_at = 5;
+    Revision finalized_at = 5;
   }
   // The list of Results this Check has.
   //

@@ -31,9 +31,6 @@ option java_multiple_files = true;
 // states later which fall between these 4 initial states.
 enum CheckState {
   // UNKNOWN is the default, invalid, state.
-  //
-  // In the context of (turboci).check.editable, this refers to a field which is
-  // editable only if the Check does not already exist.
   CHECK_STATE_UNKNOWN = 0;
 
   // PLANNING indicates that the workflow is still editing this Check.

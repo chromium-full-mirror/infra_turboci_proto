@@ -34,7 +34,7 @@ const (
 //	AWAITING_GROUP -> FINAL
 //
 // (The transition through AWAITING_GROUP may be instantaneous if the Stage's
-// wait_group is empty)
+// continuation_group is empty)
 //
 // The Orchestrator entirely manages Stage state evolution.
 //
@@ -58,11 +58,11 @@ const (
 	// The Stage has concluded it's attempts to execute (e.g. the final attempt
 	// succeeded or the Stage ran out of retries/time), but during its run one or
 	// more StageAttempts emitted additional Stages which it added to
-	// Stage.wait_group, and one or more of those are not yet FINAL.
+	// Stage.continuation_group, and one or more of those are not yet FINAL.
 	StageState_STAGE_STATE_AWAITING_GROUP StageState = 30
 	// The Stage has concluded it's attempts to execute (e.g. the final attempt
-	// succeeded or the Stage ran out of retries/time) and the Stage.wait_group
-	// is fully resolved (or empty).
+	// succeeded or the Stage ran out of retries/time) and the
+	// Stage.continuation_group is fully resolved (or empty).
 	StageState_STAGE_STATE_FINAL StageState = 40
 )
 

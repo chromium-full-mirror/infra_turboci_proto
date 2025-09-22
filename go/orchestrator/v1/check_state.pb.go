@@ -45,9 +45,6 @@ type CheckState int32
 
 const (
 	// UNKNOWN is the default, invalid, state.
-	//
-	// In the context of (turboci).check.editable, this refers to a field which is
-	// editable only if the Check does not already exist.
 	CheckState_CHECK_STATE_UNKNOWN CheckState = 0
 	// PLANNING indicates that the workflow is still editing this Check.
 	//
