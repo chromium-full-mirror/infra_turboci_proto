@@ -6,45 +6,46 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import collections
 import contextlib
 import filecmp
 import glob
 import inspect
 import os
+from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import textwrap
-
-from google.protobuf.descriptor_pb2  import FileDescriptorSet
-
 from typing import NoReturn
+
+from google.protobuf.descriptor_pb2 import FileDescriptorSet
 
 _RepoRoot = Path(__file__).absolute().parent
 
 _env = os.environ.copy()
-_env['PATH'] = os.path.pathsep.join((
-  str((_RepoRoot / 'tools' / 'bin').absolute()),
-  _env['PATH']))
+_env['PATH'] = os.path.pathsep.join(
+    (str((_RepoRoot / 'tools' / 'bin').absolute()), _env['PATH'])
+)
 
 
-def check_output(cmd: list[str|Path]) -> str|NoReturn:
+def check_output(cmd: list[str | Path]) -> str | NoReturn:
   print(f"running: {' '.join(str(c) for c in cmd)}")
   p = subprocess.Popen(
       cmd,
-      cwd=_RepoRoot, env=_env,
+      cwd=_RepoRoot,
+      env=_env,
       stdout=subprocess.PIPE,
-      stderr=sys.stderr, encoding='utf-8')
+      stderr=sys.stderr,
+      encoding='utf-8',
+  )
   out, _ = p.communicate(None)
   if p.returncode != 0:
     sys.exit(p.returncode)
   return out
 
 
-def check_call(cmd: list[str|Path]):
+def check_call(cmd: list[str | Path]):
   print(f"running: {' '.join(str(c) for c in cmd)}")
   ret = subprocess.call(cmd, cwd=_RepoRoot, env=_env)
   if ret != 0:
@@ -58,7 +59,7 @@ def task_clean():
     os.remove(file)
 
 
-def task_format(mode: None|str = None):
+def task_format(mode: None | str = None):
   """Formats all proto files.
 
   If `mode` is `check`, then this will just check that the protos are correctly
@@ -87,7 +88,7 @@ def task_lint():
   check_call(['buf', 'lint'])
 
 
-def task_breaking(basis: None|str = None):
+def task_breaking(basis: None | str = None):
   """Runs `buf breaking` on all protos in the current repo.
 
   Uses base of the current branch as the reference to calculate breaking changes
@@ -109,7 +110,7 @@ def task_breaking(basis: None|str = None):
 
 def protoc(*args: str):
   with tempfile.NamedTemporaryFile() as argfile:
-    argfile.writelines((arg+'\n').encode() for arg in args)
+    argfile.writelines((arg + '\n').encode() for arg in args)
     # include the whole repo as a proto path
     argfile.write(b'-I.\n')
     # compile all proto files under the turboci directory
@@ -124,7 +125,7 @@ def quick_glob(pattern: str) -> list[str]:
   return glob.glob(pattern, root_dir=_RepoRoot, recursive=True)
 
 
-def task_compile_desc(outfile: None|str = None):
+def task_compile_desc(outfile: None | str = None):
   """Runs `protoc` to ensure all protos can compile to a proto descriptor.
 
   The descriptor is discarded, unless outfile is provided.
@@ -132,9 +133,11 @@ def task_compile_desc(outfile: None|str = None):
   if outfile is None:
     guardFn = tempfile.NamedTemporaryFile
   else:
+
     @contextlib.contextmanager
     def _guardFn():
       yield collections.namedtuple('fakeNamed', 'name')(outfile)
+
     guardFn = _guardFn
 
   with guardFn() as tf:
@@ -149,7 +152,7 @@ def _transform_grpc(module: str, base: Path, file: Path) -> str:
     did_package = False
     did_import = False
 
-    for line in (base/file).read_text().splitlines(keepends=True):
+    for line in (base / file).read_text().splitlines(keepends=True):
       if not did_package and line.startswith('package '):
         line = 'package grpcpb\n'
         did_package = True
@@ -162,11 +165,11 @@ def _transform_grpc(module: str, base: Path, file: Path) -> str:
           line = f'import . "{module}/{protoPkg}"\n' + line
         did_import = True
       outf.write(line)
-  os.remove(base/file)
+  os.remove(base / file)
   return str(target.relative_to(base))
 
 
-def task_compile_go(mode: None|str = None):
+def task_compile_go(mode: None | str = None):
   """Runs `protoc` to compile all Go stubs.
 
   If `mode` is `check`, then this will just check that the currently generated
@@ -183,11 +186,13 @@ def task_compile_go(mode: None|str = None):
   module = 'go.chromium.org/turboci/proto/go'
 
   # build to tempdir to implement mode=check
-  with tempfile.TemporaryDirectory() as tdir:
-    protoc(f'--go_out={tdir}',
-           f'--go_opt=module={module}',
-           f'--go-grpc_out={tdir}',
-           f'--go-grpc_opt=module={module}')
+  with tempfile.TemporaryDirectory(dir=_RepoRoot) as tdir:
+    protoc(
+        f'--go_out={tdir}',
+        f'--go_opt=module={module}',
+        f'--go-grpc_out={tdir}',
+        f'--go-grpc_opt=module={module}',
+    )
 
     newFiles = []
     # Transform all "_grpc.pb.go" files:
@@ -214,14 +219,15 @@ def task_compile_go(mode: None|str = None):
       report['missing in repo'] = want - got
       report['extra in repo'] = got - want
       _, report['with diff'], errs = filecmp.cmpfiles(
-          goRoot, tdir, want.intersection(got), shallow=False)
+          goRoot, tdir, want.intersection(got), shallow=False
+      )
       if errs:
         for err in errs:
           print('error for file', err)
         sys.exit(1)
 
       if all(not value for value in report.values()):
-        return # ok!
+        return  # ok!
 
       for category, files in sorted(report.items()):
         if files:
@@ -233,8 +239,7 @@ def task_compile_go(mode: None|str = None):
 
 
 def task_check_one_per_file():
-  """Runs `protoc` to generate a descriptor, then ensures that every top-level
-  type (Message, Enum, Extension) is unique within its .proto file.
+  """Ensures that every top-level type is unique within its .proto file.
 
   This is a best-practice check that we want to enforce for this repo.
   """
@@ -253,7 +258,9 @@ def task_check_one_per_file():
     total_top_level = num_msgs + num_enums + num_servs
     if total_top_level > 1:
       failures += 1
-      print(f'{file.name} had {total_top_level} top-level definitions (want 1):')
+      print(
+          f'{file.name} had {total_top_level} top-level definitions (want 1):'
+      )
       for msg in file.message_type:
         print(f'  message {msg.name}')
       for enum in file.enum_type:
@@ -269,11 +276,11 @@ def task_all():
   fail = False
 
   allTasks = (
-    task_format,
-    task_lint,
-    task_breaking,
-    task_check_one_per_file,
-    task_compile_go,
+      task_format,
+      task_lint,
+      task_breaking,
+      task_check_one_per_file,
+      task_compile_go,
   )
 
   for i, fn in enumerate(allTasks):
@@ -295,9 +302,11 @@ def main(args: list[str]):
   # Note: this is probably too cute - if argument parsing ever gets more serious
   # than "subcommand with one additional optional positional argument", it would
   # be best to convert this to argparse.
-  tasks = {name.removeprefix('task_'): value
-           for name, value in globals().items()
-           if name.startswith('task_')}
+  tasks = {
+      name.removeprefix('task_'): value
+      for name, value in globals().items()
+      if name.startswith('task_')
+  }
 
   def help() -> NoReturn:
     print(f'Usage: {sys.argv[0]} [cmd] [additional args...]')
