@@ -150,20 +150,13 @@ def _transform_grpc(module: str, base: Path, file: Path) -> str:
   os.makedirs(target.parent, exist_ok=True)
   with open(target, 'w', encoding='utf-8') as outf:
     did_package = False
-    did_import = False
 
     for line in (base / file).read_text().splitlines(keepends=True):
       if not did_package and line.startswith('package '):
-        line = 'package grpcpb\n'
+        curPkg = line.split()[-1]
+        line = f'package {curPkg}grpcpb\n\n'
+        line += f'import . "{module}/{protoPkg}"\n'
         did_package = True
-      elif not did_import and line.startswith('import '):
-        # We found the first `import` statement - add our . imported package as
-        # fhe first import.
-        if line.startswith('import ('):
-          line += f'\t. "{module}/{protoPkg}"\n'
-        else:
-          line = f'import . "{module}/{protoPkg}"\n' + line
-        did_import = True
       outf.write(line)
   os.remove(base / file)
   return str(target.relative_to(base))

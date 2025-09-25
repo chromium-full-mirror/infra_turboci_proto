@@ -32,7 +32,12 @@ type FieldOptions struct {
 	// Field options which apply to Check messages.
 	Check *FieldOptions_CheckFieldOptions `protobuf:"bytes,1,opt,name=check" json:"check,omitempty"`
 	// Field options which apply to fields containing Identifiers.
-	Id            *FieldOptions_IdentifierOptions `protobuf:"bytes,2,opt,name=id" json:"id,omitempty"`
+	Id *FieldOptions_IdentifierOptions `protobuf:"bytes,2,opt,name=id" json:"id,omitempty"`
+	// True if this field only applies during creation of the target node.
+	//
+	// If this field is supplied and the target node already exists, its value
+	// must match the target's value for this field.
+	CreationOnly  *bool `protobuf:"varint,3,opt,name=creation_only,json=creationOnly" json:"creation_only,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -79,6 +84,13 @@ func (x *FieldOptions) GetId() *FieldOptions_IdentifierOptions {
 		return x.Id
 	}
 	return nil
+}
+
+func (x *FieldOptions) GetCreationOnly() bool {
+	if x != nil && x.CreationOnly != nil {
+		return *x.CreationOnly
+	}
+	return false
 }
 
 // CheckFieldOptions are field options which apply to Check messages.
@@ -220,10 +232,11 @@ var File_turboci_orchestrator_v1_field_options_proto protoreflect.FileDescriptor
 
 const file_turboci_orchestrator_v1_field_options_proto_rawDesc = "" +
 	"\n" +
-	"+turboci/orchestrator/v1/field_options.proto\x12\x17turboci.orchestrator.v1\x1a google/protobuf/descriptor.proto\x1a)turboci/orchestrator/v1/check_state.proto\x1a-turboci/orchestrator/v1/identifier_kind.proto\"\xd4\x02\n" +
+	"+turboci/orchestrator/v1/field_options.proto\x12\x17turboci.orchestrator.v1\x1a google/protobuf/descriptor.proto\x1a)turboci/orchestrator/v1/check_state.proto\x1a-turboci/orchestrator/v1/identifier_kind.proto\"\xf9\x02\n" +
 	"\fFieldOptions\x12M\n" +
 	"\x05check\x18\x01 \x01(\v27.turboci.orchestrator.v1.FieldOptions.CheckFieldOptionsR\x05check\x12G\n" +
-	"\x02id\x18\x02 \x01(\v27.turboci.orchestrator.v1.FieldOptions.IdentifierOptionsR\x02id\x1aT\n" +
+	"\x02id\x18\x02 \x01(\v27.turboci.orchestrator.v1.FieldOptions.IdentifierOptionsR\x02id\x12#\n" +
+	"\rcreation_only\x18\x03 \x01(\bR\fcreationOnly\x1aT\n" +
 	"\x11CheckFieldOptions\x12?\n" +
 	"\beditable\x18\x01 \x01(\x0e2#.turboci.orchestrator.v1.CheckStateR\beditable\x1aV\n" +
 	"\x11IdentifierOptions\x12A\n" +

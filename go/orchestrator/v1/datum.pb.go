@@ -62,6 +62,8 @@ type Datum struct {
 	// - Workflows may run with newer versions of the type definition for a given
 	// registered type. This allows rapid prototyping of workflows without the
 	// need to land and deploy schema changes ahead of time.
+	//
+	// The `type_url` of this value is immutable.
 	Value         *Value `protobuf:"bytes,4,opt,name=value" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
