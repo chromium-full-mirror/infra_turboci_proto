@@ -249,10 +249,13 @@ func (x *WriteNodesRequest_RealmValue) GetValue() *anypb.Any {
 //	  if WriteNodes(..., txn={nodes+more_nodes, snapshot_version}) {
 //	    # Success!
 //
-//	    # Do not attempt to do more writes after this point in this loop
-//	    # because you will not have a new read snapshot on the graph state;
-//	    # Start another transaction loop instead, including re-querying any
-//	    # nodes that you just wrote.
+//	    # It would be technically possible to use the written_version field from the
+//	    # response to do another WriteNodes call, assuming you supply a subset of
+//	    # the `nodes_observed` to the new write. However, if this second write fails,
+//	    # you must restart the second write process from after the first Write.
+//	    #
+//	    # It is simplest to just start a second transaction loop, including potentially
+//	    # re-reading the nodes_observed.
 //	    break
 //	  } else {
 //	    # failure - retry from the top
@@ -369,6 +372,10 @@ type WriteNodesRequest_CheckWrite struct {
 	//
 	// Empty groups will be pruned from this. You can remove all dependencies by
 	// providing a single, empty, EdgeGroup.
+	//
+	// If this Write transitions the Check to PLANNED and also provides
+	// dependencies, these must match identically to the already-written
+	// dependencies.
 	Dependencies []*EdgeGroup `protobuf:"bytes,5,rep,name=dependencies" json:"dependencies,omitempty"`
 	// Write data to a Result for this Check.
 	//
@@ -529,7 +536,7 @@ type WriteNodesRequest_StageWrite struct {
 	// Dependencies for this Stage.
 	//
 	// If the Stage already exists, this will only result in an error if it
-	// doesn't match the existing dependencies.
+	// doesn't match the existing dependencies identically.
 	Dependencies []*EdgeGroup `protobuf:"bytes,4,rep,name=dependencies" json:"dependencies,omitempty"`
 	// The requested retry policy of the Stage.
 	//

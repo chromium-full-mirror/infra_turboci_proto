@@ -27,9 +27,21 @@ const (
 
 // Response message for TurboCIGraphService.WriteNodes.
 type WriteNodesResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The committed revision of this write.
+	//
+	// This can be used to read back e.g. Edits from the graph or otherwise
+	// communicate to other readers what version they must observe to see the
+	// writes done in this RPC.
+	//
+	// You can, technically, chain Writes together with this - however if a Write
+	// finds a transaction conflict, you will have to restart the chain from that
+	// write (not from the beginning of the chain).
+	//
+	// See WriteNodesRequest.TransactionDetails.
+	WrittenVersion *Revision `protobuf:"bytes,1,opt,name=written_version,json=writtenVersion" json:"written_version,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *WriteNodesResponse) Reset() {
@@ -62,12 +74,20 @@ func (*WriteNodesResponse) Descriptor() ([]byte, []int) {
 	return file_turboci_orchestrator_v1_write_nodes_response_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *WriteNodesResponse) GetWrittenVersion() *Revision {
+	if x != nil {
+		return x.WrittenVersion
+	}
+	return nil
+}
+
 var File_turboci_orchestrator_v1_write_nodes_response_proto protoreflect.FileDescriptor
 
 const file_turboci_orchestrator_v1_write_nodes_response_proto_rawDesc = "" +
 	"\n" +
-	"2turboci/orchestrator/v1/write_nodes_response.proto\x12\x17turboci.orchestrator.v1\"\x14\n" +
-	"\x12WriteNodesResponseBAP\x01Z=go.chromium.org/turboci/proto/go/orchestrator/v1;orchestratorb\beditionsp\xe8\a"
+	"2turboci/orchestrator/v1/write_nodes_response.proto\x12\x17turboci.orchestrator.v1\x1a&turboci/orchestrator/v1/revision.proto\"`\n" +
+	"\x12WriteNodesResponse\x12J\n" +
+	"\x0fwritten_version\x18\x01 \x01(\v2!.turboci.orchestrator.v1.RevisionR\x0ewrittenVersionBAP\x01Z=go.chromium.org/turboci/proto/go/orchestrator/v1;orchestratorb\beditionsp\xe8\a"
 
 var (
 	file_turboci_orchestrator_v1_write_nodes_response_proto_rawDescOnce sync.Once
@@ -84,13 +104,15 @@ func file_turboci_orchestrator_v1_write_nodes_response_proto_rawDescGZIP() []byt
 var file_turboci_orchestrator_v1_write_nodes_response_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_orchestrator_v1_write_nodes_response_proto_goTypes = []any{
 	(*WriteNodesResponse)(nil), // 0: turboci.orchestrator.v1.WriteNodesResponse
+	(*Revision)(nil),           // 1: turboci.orchestrator.v1.Revision
 }
 var file_turboci_orchestrator_v1_write_nodes_response_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: turboci.orchestrator.v1.WriteNodesResponse.written_version:type_name -> turboci.orchestrator.v1.Revision
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_turboci_orchestrator_v1_write_nodes_response_proto_init() }
@@ -98,6 +120,7 @@ func file_turboci_orchestrator_v1_write_nodes_response_proto_init() {
 	if File_turboci_orchestrator_v1_write_nodes_response_proto != nil {
 		return
 	}
+	file_turboci_orchestrator_v1_revision_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
