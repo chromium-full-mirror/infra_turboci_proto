@@ -59,13 +59,22 @@ def CheckProtoc(input_api, output_api):
   )])
 
 
-def CheckOneDeclPerFile(input_api, output_api):
+def CheckGoPackageOption(input_api, output_api):
   return input_api.RunTests([input_api.Command(
-      name='build.py check_one_per_file',
-      cmd=['build.py', 'check_one_per_file'],
+      name='build.py check_go_package',
+      cmd=['build.py', 'check_go_package'],
       kwargs={'cwd': input_api.PresubmitLocalPath()},
       message=output_api.PresubmitError,
   )])
+
+def CheckServiceDefinitions(input_api, output_api):
+  return input_api.RunTests([input_api.Command(
+      name='build.py check_service_definitions',
+      cmd=['build.py', 'check_service_definitions'],
+      kwargs={'cwd': input_api.PresubmitLocalPath()},
+      message=output_api.PresubmitError,
+  )])
+
 
 
 def CheckLicense(input_api, output_api):

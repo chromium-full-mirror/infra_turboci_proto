@@ -12,11 +12,13 @@ import filecmp
 import glob
 import inspect
 import os
-from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
 import textwrap
+
+from pathlib import Path
 from typing import NoReturn
 
 from google.protobuf.descriptor_pb2 import FileDescriptorSet
@@ -56,7 +58,7 @@ def task_clean():
   """Removes all generated files."""
   print('cleaning go/**/*.pb.go')
   for file in quick_glob('go/**/*.pb.go'):
-    os.remove(file)
+    os.remove(_RepoRoot / file)
 
 
 def task_format(mode: None | str = None):
@@ -108,6 +110,103 @@ def task_breaking(basis: None | str = None):
   check_call(['buf', 'breaking', '--against', f'.git#ref={basis}'])
 
 
+def task_check_service_definitions():
+  """Checks that there is a maximum of one service definition per package.
+
+  Also checks that the file with that definition contains only the service, and
+  no other top-level declarations.
+  """
+  with _fds() as fds:
+    _task_check_service_definitions(fds)
+
+
+def _task_check_service_definitions(desc: FileDescriptorSet):
+  ok = True
+  per_namespace: dict[str, set[str]] = {}
+  for file in desc.file:
+    if file.service:
+      to_add = per_namespace.get(file.package)
+      if not to_add:
+        to_add = set()
+        per_namespace[file.package] = to_add
+      to_add.update(s.name for s in file.service)
+      other_types = []
+      for msg in file.message_type:
+        other_types.append(f'message {msg.name}')
+      for enum in file.enum_type:
+        other_types.append(f'enum {enum.name}')
+      for ext in file.extension:
+        other_types.append(f'ext {ext.name}')
+      if other_types:
+        ok = False
+        print(f'{file.name}: found other types along with service definition:')
+        for typ in other_types:
+          print(f'  {typ}')
+
+  for ns, services in per_namespace.items():
+    if len(services) > 1:
+      ok = False
+      print(f'namespace {ns!r} had multiple services:')
+      for svc in services:
+        print(f'  {svc!r}')
+
+  if not ok:
+    sys.exit(1)
+
+
+def task_check_go_package():
+  """Checks that go_package options make sense.
+
+  Protos are always organized like:
+    * turboci.dir...something.vX
+    * the base of the go_package option must be (. replaced with /):
+      go.chromium.org/turboci/proto/go/dir...vX:PKGNAME
+    * PKGNAME must be `something` (the last component before the version)
+    * for service protos:
+        * the proto file's name must end with _service.proto.
+        * the importpath must have an additional '/grpcpb' at the end.
+        * the PKGNAME must have 'grpcpb' appended.
+    * for non-service protos:
+        * the proto file's name must NOT end with _service.proto.
+  """
+  with _fds() as fds:
+    _task_check_go_package(fds)
+
+
+_filenameRegex = re.compile(r'^turboci/(?:.*/)?([^/]*)/v[^/]*/(.*)\.proto$')
+
+
+def _task_check_go_package(desc: FileDescriptorSet):
+  ok = True
+  for file in desc.file:
+    mtch = _filenameRegex.match(file.name)
+    if not mtch:
+      print(f'bad filename {file.name}')
+      ok = False
+      continue
+
+    pkgname, filename = mtch.group(1), mtch.group(2)
+
+    expectPkg = file.package.removeprefix('turboci.').replace('.', '/')
+
+    if bool(file.service):
+      if not filename.endswith('_service'):
+        print(f'{file.name}: bad filename: need _service suffix.')
+      expectOption = f'{expectPkg}/grpcpb;{pkgname}grpcpb'
+    else:
+      if filename.endswith('_service'):
+        print(f'{file.name}: bad filename: must not have _service suffix.')
+      expectOption = f'{expectPkg};{pkgname}pb'
+    expectOption = f'go.chromium.org/turboci/proto/go/{expectOption}'
+
+    if (got := file.options.go_package) != expectOption:
+      print(f'{file.name}: bad go_package {got!r}: wanted {expectOption!r}')
+      ok = False
+
+  if not ok:
+    sys.exit(1)
+
+
 def protoc(*args: str):
   with tempfile.NamedTemporaryFile() as argfile:
     argfile.writelines((arg + '\n').encode() for arg in args)
@@ -141,25 +240,21 @@ def task_compile_desc(outfile: None | str = None):
     guardFn = _guardFn
 
   with guardFn() as tf:
-    protoc('-o', tf.name)
+    args = ['-o', tf.name]
+    if outfile:
+      args += ['--retain_options', '--include_source_info']
+    protoc(*args)
 
 
-def _transform_grpc(module: str, base: Path, file: Path) -> str:
-  protoPkg = str(file.parent)
-  target = base / file.parent / 'grpcpb' / file.name
-  os.makedirs(target.parent, exist_ok=True)
-  with open(target, 'w', encoding='utf-8') as outf:
-    did_package = False
+@contextlib.contextmanager
+def _fds():
+  fds = FileDescriptorSet()
+  with tempfile.NamedTemporaryFile() as tf:
+    task_compile_desc(tf.name)
 
-    for line in (base / file).read_text().splitlines(keepends=True):
-      if not did_package and line.startswith('package '):
-        curPkg = line.split()[-1]
-        line = f'package {curPkg}grpcpb\n\n'
-        line += f'import . "{module}/{protoPkg}"\n'
-        did_package = True
-      outf.write(line)
-  os.remove(base / file)
-  return str(target.relative_to(base))
+    dat = tf.read()
+    fds.MergeFromString(dat)
+    yield fds
 
 
 def task_compile_go(mode: None | str = None):
@@ -190,10 +285,7 @@ def task_compile_go(mode: None | str = None):
     newFiles = []
     # Transform all "_grpc.pb.go" files:
     for file in glob.glob('**/*.pb.go', recursive=True, root_dir=tdir):
-      if file.endswith('_grpc.pb.go'):
-        newFiles.append(_transform_grpc(module, Path(tdir), Path(file)))
-      else:
-        newFiles.append(file)
+      newFiles.append(file)
 
     if not mode:
       task_clean()
@@ -231,64 +323,39 @@ def task_compile_go(mode: None | str = None):
       sys.exit(1)
 
 
-def task_check_one_per_file():
-  """Ensures that every top-level type is unique within its .proto file.
-
-  This is a best-practice check that we want to enforce for this repo.
-  """
-  fds = FileDescriptorSet()
-  with tempfile.NamedTemporaryFile() as tf:
-    task_compile_desc(tf.name)
-
-    dat = tf.read()
-    fds.MergeFromString(dat)
-
-  failures = 0
-  for file in fds.file:
-    num_msgs = len(file.message_type)
-    num_enums = len(file.enum_type)
-    num_servs = len(file.service)
-    total_top_level = num_msgs + num_enums + num_servs
-    if total_top_level > 1:
-      failures += 1
-      print(
-          f'{file.name} had {total_top_level} top-level definitions (want 1):'
-      )
-      for msg in file.message_type:
-        print(f'  message {msg.name}')
-      for enum in file.enum_type:
-        print(f'  enum {enum.name}')
-      for service in file.service:
-        print(f'  service {service.name}')
-  if failures > 0:
-    sys.exit(1)
-
-
 def task_all():
   """Shorthand to run all presubmit checks."""
   fail = False
 
-  allTasks = (
-      task_format,
-      task_lint,
-      task_breaking,
-      task_check_one_per_file,
-      task_compile_go,
-  )
+  with _fds() as fds:
+    def check_service_definitions():
+      _task_check_service_definitions(fds)
 
-  for i, fn in enumerate(allTasks):
-    if i > 0:
-      print()
-    print(f'$ {sys.argv[0]} {fn.__name__.removeprefix("task_")}')
-    try:
-      fn()
-      print('ok')
-    except SystemExit:
-      print('FAIL')
-      fail = True
+    def check_go_package():
+      _task_check_go_package(fds)
 
-  if fail:
-    sys.exit(1)
+    allTasks = (
+        task_format,
+        check_service_definitions,
+        check_go_package,
+        task_lint,
+        task_breaking,
+        task_compile_go,
+    )
+
+    for i, fn in enumerate(allTasks):
+      if i > 0:
+        print()
+      print(f'$ {sys.argv[0]} {fn.__name__.removeprefix("task_")}')
+      try:
+        fn()
+        print('ok')
+      except SystemExit:
+        print('FAIL')
+        fail = True
+
+    if fail:
+      sys.exit(1)
 
 
 def main(args: list[str]):
