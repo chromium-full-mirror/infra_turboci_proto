@@ -661,6 +661,7 @@ type WriteNodesRequest_CurrentStageWrite struct {
 	//   - SCHEDULED -> RUNNING
 	//   - SCHEDULED -> COMPLETE
 	//   - SCHEDULED -> INCOMPLETE
+	//   - RUNNING -> TEARING_DOWN
 	//   - RUNNING -> COMPLETE
 	//   - RUNNING -> INCOMPLETE
 	State *StageAttemptState `protobuf:"varint,1,opt,name=state,enum=turboci.graph.orchestrator.v1.StageAttemptState" json:"state,omitempty"`
