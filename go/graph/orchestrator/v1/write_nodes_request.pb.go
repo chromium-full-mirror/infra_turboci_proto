@@ -38,7 +38,8 @@ type WriteNodesRequest struct {
 	// This is in addition to regular RPC authorization.
 	//
 	// If missing, this RPC will check that the caller additionally has the
-	// 'turboci.workplans.writeExternal' in all affected realms.
+	// 'turboci.workplans.writeExternal' permission on Workplan(s) in the
+	// CheckWrites/StageWrites.
 	StageAttemptToken *string `protobuf:"bytes,1,opt,name=stage_attempt_token,json=stageAttemptToken" json:"stage_attempt_token,omitempty"`
 	// The reason for this write operation, as supplied by the entity performing
 	// the write.
@@ -284,7 +285,7 @@ type WriteNodesRequest_TransactionDetails struct {
 	// The 'version' of the GraphView returned from QueryNodes.
 	//
 	// If multiple queries were made in this transaction, this revision MUST be
-	// the first revision observed. Providing ensure_version to QueryNodes will
+	// the first revision observed. Providing version.require to QueryNodes will
 	// help enforce this.
 	SnapshotVersion *Revision `protobuf:"bytes,2,opt,name=snapshot_version,json=snapshotVersion" json:"snapshot_version,omitempty"`
 	unknownFields   protoimpl.UnknownFields

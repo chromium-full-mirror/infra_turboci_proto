@@ -7,6 +7,8 @@ edition = "2023";
 package turboci.graph.orchestrator.v1;
 
 import "turboci/graph/orchestrator/v1/method_options.proto";
+import "turboci/graph/orchestrator/v1/query_nodes_request.proto";
+import "turboci/graph/orchestrator/v1/query_nodes_response.proto";
 import "turboci/graph/orchestrator/v1/write_nodes_request.proto";
 import "turboci/graph/orchestrator/v1/write_nodes_response.proto";
 
@@ -71,7 +73,55 @@ service TurboCIOrchestrator {
     };
   }
 
-  // TBD: QueryNodes
+  // QueryNodes allows querying nodes in a fairly simple way.
+  //
+  // In the future we may add a more advanced API to open up more of GQL's
+  // underlying expressiveness.
+  rpc QueryNodes(QueryNodesRequest) returns (QueryNodesResponse) {
+    option (turboci_rpc) = {
+      permission: {
+        name: "turboci.workplans.readExternal"
+        in: IDENTIFIER_KIND_WORK_PLAN
+        for: "calls without StageAttemptToken from this WorkPlan"
+      }
+
+      permission: {
+        name: "turboci.checks.read"
+        in: IDENTIFIER_KIND_CHECK
+        for: "reading Checks (and their edits and reason details)"
+      }
+
+      permission: {
+        name: "turboci.typeUrls.wildcard"
+        in: IDENTIFIER_KIND_WORK_PLAN
+        for: "including * in type_urls"
+      }
+
+      permission: {
+        name: "turboci.checkOptions.read"
+        in: IDENTIFIER_KIND_CHECK_OPTION
+        for: "reading option data. Needs .checks.read on the containing Check, too"
+      }
+
+      permission: {
+        name: "turboci.checkResults.read"
+        in: IDENTIFIER_KIND_CHECK_RESULT_DATUM
+        for: "reading check result data. Needs .checks.read on the containing Check, too"
+      }
+
+      permission: {
+        name: "turboci.stages.read"
+        in: IDENTIFIER_KIND_STAGE
+        for: "reading Stages (and their edits and reason details)"
+      }
+
+      permission: {
+        name: "turboci.worknodes.read"
+        in: IDENTIFIER_KIND_STAGE
+        for: "read of WorkNode-type Stages"
+      }
+    };
+  }
 
   // TBD: Idempotent way to allocate N WorkNode IDs - this will allow safe node
   // ID allocation outside of a transaction so that WorkNodes can be

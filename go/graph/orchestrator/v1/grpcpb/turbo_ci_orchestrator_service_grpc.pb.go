@@ -25,6 +25,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	TurboCIOrchestrator_WriteNodes_FullMethodName = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/WriteNodes"
+	TurboCIOrchestrator_QueryNodes_FullMethodName = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/QueryNodes"
 )
 
 // TurboCIOrchestratorClient is the client API for TurboCIOrchestrator service.
@@ -40,6 +41,11 @@ type TurboCIOrchestratorClient interface {
 	// NOTE: Simple workflows can have all Checks, Check options and Stages in the
 	// same realm, minimizing the number of required bindings.
 	WriteNodes(ctx context.Context, in *v1.WriteNodesRequest, opts ...grpc.CallOption) (*v1.WriteNodesResponse, error)
+	// QueryNodes allows querying nodes in a fairly simple way.
+	//
+	// In the future we may add a more advanced API to open up more of GQL's
+	// underlying expressiveness.
+	QueryNodes(ctx context.Context, in *v1.QueryNodesRequest, opts ...grpc.CallOption) (*v1.QueryNodesResponse, error)
 }
 
 type turboCIOrchestratorClient struct {
@@ -60,6 +66,16 @@ func (c *turboCIOrchestratorClient) WriteNodes(ctx context.Context, in *v1.Write
 	return out, nil
 }
 
+func (c *turboCIOrchestratorClient) QueryNodes(ctx context.Context, in *v1.QueryNodesRequest, opts ...grpc.CallOption) (*v1.QueryNodesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(v1.QueryNodesResponse)
+	err := c.cc.Invoke(ctx, TurboCIOrchestrator_QueryNodes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TurboCIOrchestratorServer is the server API for TurboCIOrchestrator service.
 // All implementations must embed UnimplementedTurboCIOrchestratorServer
 // for forward compatibility.
@@ -73,6 +89,11 @@ type TurboCIOrchestratorServer interface {
 	// NOTE: Simple workflows can have all Checks, Check options and Stages in the
 	// same realm, minimizing the number of required bindings.
 	WriteNodes(context.Context, *v1.WriteNodesRequest) (*v1.WriteNodesResponse, error)
+	// QueryNodes allows querying nodes in a fairly simple way.
+	//
+	// In the future we may add a more advanced API to open up more of GQL's
+	// underlying expressiveness.
+	QueryNodes(context.Context, *v1.QueryNodesRequest) (*v1.QueryNodesResponse, error)
 	mustEmbedUnimplementedTurboCIOrchestratorServer()
 }
 
@@ -85,6 +106,9 @@ type UnimplementedTurboCIOrchestratorServer struct{}
 
 func (UnimplementedTurboCIOrchestratorServer) WriteNodes(context.Context, *v1.WriteNodesRequest) (*v1.WriteNodesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method WriteNodes not implemented")
+}
+func (UnimplementedTurboCIOrchestratorServer) QueryNodes(context.Context, *v1.QueryNodesRequest) (*v1.QueryNodesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method QueryNodes not implemented")
 }
 func (UnimplementedTurboCIOrchestratorServer) mustEmbedUnimplementedTurboCIOrchestratorServer() {}
 func (UnimplementedTurboCIOrchestratorServer) testEmbeddedByValue()                             {}
@@ -125,6 +149,24 @@ func _TurboCIOrchestrator_WriteNodes_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TurboCIOrchestrator_QueryNodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.QueryNodesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TurboCIOrchestratorServer).QueryNodes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TurboCIOrchestrator_QueryNodes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TurboCIOrchestratorServer).QueryNodes(ctx, req.(*v1.QueryNodesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TurboCIOrchestrator_ServiceDesc is the grpc.ServiceDesc for TurboCIOrchestrator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -135,6 +177,10 @@ var TurboCIOrchestrator_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "WriteNodes",
 			Handler:    _TurboCIOrchestrator_WriteNodes_Handler,
+		},
+		{
+			MethodName: "QueryNodes",
+			Handler:    _TurboCIOrchestrator_QueryNodes_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

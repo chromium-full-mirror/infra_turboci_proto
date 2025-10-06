@@ -48,7 +48,8 @@ message WriteNodesRequest {
   // This is in addition to regular RPC authorization.
   //
   // If missing, this RPC will check that the caller additionally has the
-  // 'turboci.workplans.writeExternal' in all affected realms.
+  // 'turboci.workplans.writeExternal' permission on Workplan(s) in the
+  // CheckWrites/StageWrites.
   string stage_attempt_token = 1;
 
   // The reason for this write operation, as supplied by the entity performing
@@ -131,7 +132,7 @@ message WriteNodesRequest {
     // The 'version' of the GraphView returned from QueryNodes.
     //
     // If multiple queries were made in this transaction, this revision MUST be
-    // the first revision observed. Providing ensure_version to QueryNodes will
+    // the first revision observed. Providing version.require to QueryNodes will
     // help enforce this.
     Revision snapshot_version = 2;
   }
