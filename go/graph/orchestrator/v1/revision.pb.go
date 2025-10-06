@@ -16,7 +16,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -33,13 +32,8 @@ const (
 // evolution of the revision type as well as to distinguish against regular
 // Timestamps used elsewhere in the schema.
 type Revision struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The spanner commit timestamp which represents this revision.
-	//
-	// This may be rendered as a string in some contexts (e.g. as part of the
-	// serialization of an Identity.CheckEdit), in which case it will be
-	// "T<seconds>/<nanos>".
-	Ts            *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=ts" json:"ts,omitempty"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Ts *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=ts,proto3,oneof"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -69,37 +63,55 @@ func (x *Revision) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Revision.ProtoReflect.Descriptor instead.
-func (*Revision) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_revision_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Revision) GetTs() *timestamppb.Timestamp {
 	if x != nil {
-		return x.Ts
+		return x.xxx_hidden_Ts
 	}
 	return nil
+}
+
+func (x *Revision) SetTs(v *timestamppb.Timestamp) {
+	x.xxx_hidden_Ts = v
+}
+
+func (x *Revision) HasTs() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Ts != nil
+}
+
+func (x *Revision) ClearTs() {
+	x.xxx_hidden_Ts = nil
+}
+
+type Revision_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The spanner commit timestamp which represents this revision.
+	//
+	// This may be rendered as a string in some contexts (e.g. as part of the
+	// serialization of an Identity.CheckEdit), in which case it will be
+	// "T<seconds>/<nanos>".
+	Ts *timestamppb.Timestamp
+}
+
+func (b0 Revision_builder) Build() *Revision {
+	m0 := &Revision{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Ts = b.Ts
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_revision_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_revision_proto_rawDesc = "" +
 	"\n" +
-	",turboci/graph/orchestrator/v1/revision.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\";\n" +
-	"\bRevision\x12/\n" +
-	"\x02ts\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\x02tsBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_revision_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_revision_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_revision_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_revision_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_revision_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_revision_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_revision_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_revision_proto_rawDescData
-}
+	",turboci/graph/orchestrator/v1/revision.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"G\n" +
+	"\bRevision\x124\n" +
+	"\x02ts\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03H\x00R\x02ts\x88\x01\x01B\x05\n" +
+	"\x03_tsBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_revision_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_revision_proto_goTypes = []any{
@@ -120,6 +132,7 @@ func file_turboci_graph_orchestrator_v1_revision_proto_init() {
 	if File_turboci_graph_orchestrator_v1_revision_proto != nil {
 		return
 	}
+	file_turboci_graph_orchestrator_v1_revision_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

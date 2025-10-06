@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -20,7 +20,7 @@ message QueryNodesRequest {
   //
   // If missing, this RPC will check that the caller additionally has the
   // 'turboci.workplans.readExternal' on the implied workplans.
-  string stage_attempt_token = 1;
+  optional string stage_attempt_token = 1;
 
   // VersionRestriction describes how this query can be constrained by database
   // version.
@@ -58,7 +58,7 @@ message QueryNodesRequest {
   //
   // Otherwise, this restricts how the query interacts with the underlying
   // database.
-  VersionRestriction version = 2;
+  optional VersionRestriction version = 2;
 
   // One or more Queries to select nodes to return.
   repeated Query query = 3;

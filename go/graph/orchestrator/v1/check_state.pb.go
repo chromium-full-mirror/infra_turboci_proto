@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -113,11 +112,6 @@ func (x CheckState) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use CheckState.Descriptor instead.
-func (CheckState) EnumDescriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_check_state_proto_rawDescGZIP(), []int{0}
-}
-
 var File_turboci_graph_orchestrator_v1_check_state_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_check_state_proto_rawDesc = "" +
@@ -130,19 +124,7 @@ const file_turboci_graph_orchestrator_v1_check_state_proto_rawDesc = "" +
 	"\x12\x17\n" +
 	"\x13CHECK_STATE_PLANNED\x10\x14\x12\x17\n" +
 	"\x13CHECK_STATE_WAITING\x10\x1e\x12\x15\n" +
-	"\x11CHECK_STATE_FINAL\x10(BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_check_state_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_check_state_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_check_state_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_check_state_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_check_state_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_check_state_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_check_state_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_check_state_proto_rawDescData
-}
+	"\x11CHECK_STATE_FINAL\x10(BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_check_state_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_check_state_proto_goTypes = []any{

@@ -16,7 +16,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -32,62 +31,17 @@ const (
 // Allows atomically writing to multiple nodes (Checks, Stages) in a single
 // transaction.
 type WriteNodesRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The token of the Stage Attempt which is performing this write.
-	//
-	// This is in addition to regular RPC authorization.
-	//
-	// If missing, this RPC will check that the caller additionally has the
-	// 'turboci.workplans.writeExternal' permission on Workplan(s) in the
-	// CheckWrites/StageWrites.
-	StageAttemptToken *string `protobuf:"bytes,1,opt,name=stage_attempt_token,json=stageAttemptToken" json:"stage_attempt_token,omitempty"`
-	// The reason for this write operation, as supplied by the entity performing
-	// the write.
-	//
-	// This should be used to detail any information about WHY this write is
-	// happening, or details about what changes are being made.
-	//
-	// This will be reflected in the CheckEdit or StageEdit logs for all
-	// Checks and/or Stages affected by this write.
-	//
-	// This is repeated to allow reasons in multiple security domains; By
-	// convention, these should be ordered from most to least specific, so if
-	// a client only wants to display one Reason, it should be the first in this
-	// list which they have access to.
-	Reasons []*Edit_Reason `protobuf:"bytes,2,rep,name=reasons" json:"reasons,omitempty"`
-	// Set if the caller wants to make this write transactional with a subset of
-	// the graph at a particular snapshot.
-	//
-	// If this is unset, then this is an 'oblivious write' and any valid writes
-	// will apply/overwrite the current database state, assuming they are
-	// semantically valid (i.e. it will still not be possible to change a Check's
-	// realm, or roll a Check's state backwards, etc.).
-	//
-	// There are common cases where this will be left unset, for example when a
-	// Stage Attempt updates its own progress based on its own internal state, or
-	// when a Stage Attempt records results for a Check off of some internal
-	// computation. It's allowed for a Stage Attempt to tie this progress update
-	// to the state of the graph, but it's not expected or required.
-	Txn *WriteNodesRequest_TransactionDetails `protobuf:"bytes,3,opt,name=txn" json:"txn,omitempty"`
-	// Write to zero or more Checks.
-	Checks []*WriteNodesRequest_CheckWrite `protobuf:"bytes,4,rep,name=checks" json:"checks,omitempty"`
-	// Write to zero or more Stages.
-	Stages []*WriteNodesRequest_StageWrite `protobuf:"bytes,5,rep,name=stages" json:"stages,omitempty"`
-	// State for the current Stage as indicated by `stage_attempt_token`.
-	//
-	// It is invalid to set this without also setting `stage_attempt_token`.
-	//
-	// All WriteNodes calls with a token act as a heartbeat for the current Stage
-	// Attempt indicated by the token. If you need to implement the 'simplest
-	// heartbeat', you can make a WriteNodes call with the token set and nothing
-	// else.
-	//
-	// TBD: Document the SCHEDULED -> RUNNING state transition requirements (i.e.
-	// setting a unique worker_id and handling multiple logicall processes all
-	// trying to transition to RUNNING at the same time).
-	CurrentStage  *WriteNodesRequest_CurrentStageWrite `protobuf:"bytes,6,opt,name=current_stage,json=currentStage" json:"current_stage,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                        protoimpl.MessageState                `protogen:"opaque.v1"`
+	xxx_hidden_StageAttemptToken *string                               `protobuf:"bytes,1,opt,name=stage_attempt_token,json=stageAttemptToken,proto3,oneof"`
+	xxx_hidden_Reasons           *[]*Edit_Reason                       `protobuf:"bytes,2,rep,name=reasons,proto3"`
+	xxx_hidden_Txn               *WriteNodesRequest_TransactionDetails `protobuf:"bytes,3,opt,name=txn,proto3,oneof"`
+	xxx_hidden_Checks            *[]*WriteNodesRequest_CheckWrite      `protobuf:"bytes,4,rep,name=checks,proto3"`
+	xxx_hidden_Stages            *[]*WriteNodesRequest_StageWrite      `protobuf:"bytes,5,rep,name=stages,proto3"`
+	xxx_hidden_CurrentStage      *WriteNodesRequest_CurrentStageWrite  `protobuf:"bytes,6,opt,name=current_stage,json=currentStage,proto3,oneof"`
+	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
+	XXX_presence                 [1]uint32
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
 }
 
 func (x *WriteNodesRequest) Reset() {
@@ -115,69 +69,200 @@ func (x *WriteNodesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteNodesRequest.ProtoReflect.Descriptor instead.
-func (*WriteNodesRequest) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *WriteNodesRequest) GetStageAttemptToken() string {
-	if x != nil && x.StageAttemptToken != nil {
-		return *x.StageAttemptToken
+	if x != nil {
+		if x.xxx_hidden_StageAttemptToken != nil {
+			return *x.xxx_hidden_StageAttemptToken
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *WriteNodesRequest) GetReasons() []*Edit_Reason {
 	if x != nil {
-		return x.Reasons
+		if x.xxx_hidden_Reasons != nil {
+			return *x.xxx_hidden_Reasons
+		}
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest) GetTxn() *WriteNodesRequest_TransactionDetails {
 	if x != nil {
-		return x.Txn
+		return x.xxx_hidden_Txn
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest) GetChecks() []*WriteNodesRequest_CheckWrite {
 	if x != nil {
-		return x.Checks
+		if x.xxx_hidden_Checks != nil {
+			return *x.xxx_hidden_Checks
+		}
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest) GetStages() []*WriteNodesRequest_StageWrite {
 	if x != nil {
-		return x.Stages
+		if x.xxx_hidden_Stages != nil {
+			return *x.xxx_hidden_Stages
+		}
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest) GetCurrentStage() *WriteNodesRequest_CurrentStageWrite {
 	if x != nil {
-		return x.CurrentStage
+		return x.xxx_hidden_CurrentStage
 	}
 	return nil
+}
+
+func (x *WriteNodesRequest) SetStageAttemptToken(v string) {
+	x.xxx_hidden_StageAttemptToken = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 6)
+}
+
+func (x *WriteNodesRequest) SetReasons(v []*Edit_Reason) {
+	x.xxx_hidden_Reasons = &v
+}
+
+func (x *WriteNodesRequest) SetTxn(v *WriteNodesRequest_TransactionDetails) {
+	x.xxx_hidden_Txn = v
+}
+
+func (x *WriteNodesRequest) SetChecks(v []*WriteNodesRequest_CheckWrite) {
+	x.xxx_hidden_Checks = &v
+}
+
+func (x *WriteNodesRequest) SetStages(v []*WriteNodesRequest_StageWrite) {
+	x.xxx_hidden_Stages = &v
+}
+
+func (x *WriteNodesRequest) SetCurrentStage(v *WriteNodesRequest_CurrentStageWrite) {
+	x.xxx_hidden_CurrentStage = v
+}
+
+func (x *WriteNodesRequest) HasStageAttemptToken() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *WriteNodesRequest) HasTxn() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Txn != nil
+}
+
+func (x *WriteNodesRequest) HasCurrentStage() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_CurrentStage != nil
+}
+
+func (x *WriteNodesRequest) ClearStageAttemptToken() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_StageAttemptToken = nil
+}
+
+func (x *WriteNodesRequest) ClearTxn() {
+	x.xxx_hidden_Txn = nil
+}
+
+func (x *WriteNodesRequest) ClearCurrentStage() {
+	x.xxx_hidden_CurrentStage = nil
+}
+
+type WriteNodesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The token of the Stage Attempt which is performing this write.
+	//
+	// This is in addition to regular RPC authorization.
+	//
+	// If missing, this RPC will check that the caller additionally has the
+	// 'turboci.workplans.writeExternal' permission on Workplan(s) in the
+	// CheckWrites/StageWrites.
+	StageAttemptToken *string
+	// The reason for this write operation, as supplied by the entity performing
+	// the write.
+	//
+	// This should be used to detail any information about WHY this write is
+	// happening, or details about what changes are being made.
+	//
+	// This will be reflected in the CheckEdit or StageEdit logs for all
+	// Checks and/or Stages affected by this write.
+	//
+	// This is repeated to allow reasons in multiple security domains; By
+	// convention, these should be ordered from most to least specific, so if
+	// a client only wants to display one Reason, it should be the first in this
+	// list which they have access to.
+	Reasons []*Edit_Reason
+	// Set if the caller wants to make this write transactional with a subset of
+	// the graph at a particular snapshot.
+	//
+	// If this is unset, then this is an 'oblivious write' and any valid writes
+	// will apply/overwrite the current database state, assuming they are
+	// semantically valid (i.e. it will still not be possible to change a Check's
+	// realm, or roll a Check's state backwards, etc.).
+	//
+	// There are common cases where this will be left unset, for example when a
+	// Stage Attempt updates its own progress based on its own internal state, or
+	// when a Stage Attempt records results for a Check off of some internal
+	// computation. It's allowed for a Stage Attempt to tie this progress update
+	// to the state of the graph, but it's not expected or required.
+	Txn *WriteNodesRequest_TransactionDetails
+	// Write to zero or more Checks.
+	Checks []*WriteNodesRequest_CheckWrite
+	// Write to zero or more Stages.
+	Stages []*WriteNodesRequest_StageWrite
+	// State for the current Stage as indicated by `stage_attempt_token`.
+	//
+	// It is invalid to set this without also setting `stage_attempt_token`.
+	//
+	// All WriteNodes calls with a token act as a heartbeat for the current Stage
+	// Attempt indicated by the token. If you need to implement the 'simplest
+	// heartbeat', you can make a WriteNodes call with the token set and nothing
+	// else.
+	//
+	// TBD: Document the SCHEDULED -> RUNNING state transition requirements (i.e.
+	// setting a unique worker_id and handling multiple logicall processes all
+	// trying to transition to RUNNING at the same time).
+	CurrentStage *WriteNodesRequest_CurrentStageWrite
+}
+
+func (b0 WriteNodesRequest_builder) Build() *WriteNodesRequest {
+	m0 := &WriteNodesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.StageAttemptToken != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 6)
+		x.xxx_hidden_StageAttemptToken = b.StageAttemptToken
+	}
+	x.xxx_hidden_Reasons = &b.Reasons
+	x.xxx_hidden_Txn = b.Txn
+	x.xxx_hidden_Checks = &b.Checks
+	x.xxx_hidden_Stages = &b.Stages
+	x.xxx_hidden_CurrentStage = b.CurrentStage
+	return m0
 }
 
 // RealmValue describes a standard Any which resides in a given security
 // realm.
 type WriteNodesRequest_RealmValue struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The realm to assign to this value (if the value is being created).
-	// If it's unset/empty, it will inherit from the realm of the Stage
-	// indicated by stage_attempt_token. If it's unset/empty and there is no
-	// stage_attempt_token, the update will be rejected.
-	//
-	// If the value is being overwritten and `realm` is provided, it must match
-	// the already-written value's realm.
-	Realm *string `protobuf:"bytes,1,opt,name=realm" json:"realm,omitempty"`
-	// The value to set.
-	Value         *anypb.Any `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Realm       *string                `protobuf:"bytes,1,opt,name=realm,proto3,oneof"`
+	xxx_hidden_Value       *anypb.Any             `protobuf:"bytes,2,opt,name=value,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *WriteNodesRequest_RealmValue) Reset() {
@@ -205,23 +290,80 @@ func (x *WriteNodesRequest_RealmValue) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteNodesRequest_RealmValue.ProtoReflect.Descriptor instead.
-func (*WriteNodesRequest_RealmValue) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDescGZIP(), []int{0, 0}
-}
-
 func (x *WriteNodesRequest_RealmValue) GetRealm() string {
-	if x != nil && x.Realm != nil {
-		return *x.Realm
+	if x != nil {
+		if x.xxx_hidden_Realm != nil {
+			return *x.xxx_hidden_Realm
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *WriteNodesRequest_RealmValue) GetValue() *anypb.Any {
 	if x != nil {
-		return x.Value
+		return x.xxx_hidden_Value
 	}
 	return nil
+}
+
+func (x *WriteNodesRequest_RealmValue) SetRealm(v string) {
+	x.xxx_hidden_Realm = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *WriteNodesRequest_RealmValue) SetValue(v *anypb.Any) {
+	x.xxx_hidden_Value = v
+}
+
+func (x *WriteNodesRequest_RealmValue) HasRealm() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *WriteNodesRequest_RealmValue) HasValue() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Value != nil
+}
+
+func (x *WriteNodesRequest_RealmValue) ClearRealm() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Realm = nil
+}
+
+func (x *WriteNodesRequest_RealmValue) ClearValue() {
+	x.xxx_hidden_Value = nil
+}
+
+type WriteNodesRequest_RealmValue_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The realm to assign to this value (if the value is being created).
+	// If it's unset/empty, it will inherit from the realm of the Stage
+	// indicated by stage_attempt_token. If it's unset/empty and there is no
+	// stage_attempt_token, the update will be rejected.
+	//
+	// If the value is being overwritten and `realm` is provided, it must match
+	// the already-written value's realm.
+	Realm *string
+	// The value to set.
+	Value *anypb.Any
+}
+
+func (b0 WriteNodesRequest_RealmValue_builder) Build() *WriteNodesRequest_RealmValue {
+	m0 := &WriteNodesRequest_RealmValue{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Realm != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_Realm = b.Realm
+	}
+	x.xxx_hidden_Value = b.Value
+	return m0
 }
 
 // TransactionDetails encapsulates the information necessary to make this
@@ -264,32 +406,11 @@ func (x *WriteNodesRequest_RealmValue) GetValue() *anypb.Any {
 //	  }
 //	}
 type WriteNodesRequest_TransactionDetails struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// A list of all nodes observed which lead to this write.
-	//
-	// This SHOULD include all nodes which your computation used as inputs
-	// for making a decision. If you locally filtered the GraphView before the
-	// computation, it is OK to omit nodes which were filtered out, because you
-	// would do the same write regardless of those filtered nodes' content.
-	//
-	// This MAY include nodes which were absent from the GraphView - this means
-	// that the write is conditional on their absence (e.g. "I queried for X and
-	// didn't find it, so I'm doing a write based on that information. If X DOES
-	// exist at the time of the write, I want to abort and try again.").
-	//
-	// NOTE: If you are writing what you THINK is a new node, the safe thing to
-	// do is to query for that node before doing the write (to confirm it
-	// doesn't exist) and then also include that node ID in this list (to
-	// confirm it didn't start existing before your write).
-	NodesObserved []*v1.Identifier `protobuf:"bytes,1,rep,name=nodes_observed,json=nodesObserved" json:"nodes_observed,omitempty"`
-	// The 'version' of the GraphView returned from QueryNodes.
-	//
-	// If multiple queries were made in this transaction, this revision MUST be
-	// the first revision observed. Providing version.require to QueryNodes will
-	// help enforce this.
-	SnapshotVersion *Revision `protobuf:"bytes,2,opt,name=snapshot_version,json=snapshotVersion" json:"snapshot_version,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state                      protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_NodesObserved   *[]*v1.Identifier      `protobuf:"bytes,1,rep,name=nodes_observed,json=nodesObserved,proto3"`
+	xxx_hidden_SnapshotVersion *Revision              `protobuf:"bytes,2,opt,name=snapshot_version,json=snapshotVersion,proto3,oneof"`
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
 }
 
 func (x *WriteNodesRequest_TransactionDetails) Reset() {
@@ -317,95 +438,93 @@ func (x *WriteNodesRequest_TransactionDetails) ProtoReflect() protoreflect.Messa
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteNodesRequest_TransactionDetails.ProtoReflect.Descriptor instead.
-func (*WriteNodesRequest_TransactionDetails) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDescGZIP(), []int{0, 1}
-}
-
 func (x *WriteNodesRequest_TransactionDetails) GetNodesObserved() []*v1.Identifier {
 	if x != nil {
-		return x.NodesObserved
+		if x.xxx_hidden_NodesObserved != nil {
+			return *x.xxx_hidden_NodesObserved
+		}
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest_TransactionDetails) GetSnapshotVersion() *Revision {
 	if x != nil {
-		return x.SnapshotVersion
+		return x.xxx_hidden_SnapshotVersion
 	}
 	return nil
 }
 
+func (x *WriteNodesRequest_TransactionDetails) SetNodesObserved(v []*v1.Identifier) {
+	x.xxx_hidden_NodesObserved = &v
+}
+
+func (x *WriteNodesRequest_TransactionDetails) SetSnapshotVersion(v *Revision) {
+	x.xxx_hidden_SnapshotVersion = v
+}
+
+func (x *WriteNodesRequest_TransactionDetails) HasSnapshotVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_SnapshotVersion != nil
+}
+
+func (x *WriteNodesRequest_TransactionDetails) ClearSnapshotVersion() {
+	x.xxx_hidden_SnapshotVersion = nil
+}
+
+type WriteNodesRequest_TransactionDetails_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// A list of all nodes observed which lead to this write.
+	//
+	// This SHOULD include all nodes which your computation used as inputs
+	// for making a decision. If you locally filtered the GraphView before the
+	// computation, it is OK to omit nodes which were filtered out, because you
+	// would do the same write regardless of those filtered nodes' content.
+	//
+	// This MAY include nodes which were absent from the GraphView - this means
+	// that the write is conditional on their absence (e.g. "I queried for X and
+	// didn't find it, so I'm doing a write based on that information. If X DOES
+	// exist at the time of the write, I want to abort and try again.").
+	//
+	// NOTE: If you are writing what you THINK is a new node, the safe thing to
+	// do is to query for that node before doing the write (to confirm it
+	// doesn't exist) and then also include that node ID in this list (to
+	// confirm it didn't start existing before your write).
+	NodesObserved []*v1.Identifier
+	// The 'version' of the GraphView returned from QueryNodes.
+	//
+	// If multiple queries were made in this transaction, this revision MUST be
+	// the first revision observed. Providing version.require to QueryNodes will
+	// help enforce this.
+	SnapshotVersion *Revision
+}
+
+func (b0 WriteNodesRequest_TransactionDetails_builder) Build() *WriteNodesRequest_TransactionDetails {
+	m0 := &WriteNodesRequest_TransactionDetails{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_NodesObserved = &b.NodesObserved
+	x.xxx_hidden_SnapshotVersion = b.SnapshotVersion
+	return m0
+}
+
 // A description of modifications to make to a single Check.
 type WriteNodesRequest_CheckWrite struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The check to write to.
-	//
-	// If the WorkPlan is left blank, will be populated with the WorkPlan in
-	// `stage_attempt_token`, if it's provided.
-	//
-	// Otherwise, the Check must belong to the stage_attempt_token's WorkPlan,
-	// or the caller must have the additional "turboci.workplans.writeExternal"
-	// permission in the check's realm (or in the realm of the option/result
-	// data).
-	Check *v1.Check `protobuf:"bytes,1,opt,name=check" json:"check,omitempty"`
-	// Realm to assign to this check.
-	//
-	// If this is set, and the Check DOES already exist, this MUST match the
-	// existing realm.
-	//
-	// If absent and this CheckWrite creates the Check, the written Check will
-	// copy its realm from the Stage doing the write (assuming
-	// `stage_attempt_token` is set). If `stage_attempt_token` is unset and this
-	// field is absent, the write will be rejected.
-	Realm *string `protobuf:"bytes,2,opt,name=realm" json:"realm,omitempty"`
-	// Kind to assign to this check.
-	//
-	// If this is set, and the Check DOES already exist, this MUST match the
-	// existing Check kind.
-	Kind *CheckKind `protobuf:"varint,3,opt,name=kind,enum=turboci.graph.orchestrator.v1.CheckKind" json:"kind,omitempty"`
-	// The list of Options to write/overwrite.
-	//
-	// Must be unique on `RealmValue.value.type_url`.
-	Options []*WriteNodesRequest_RealmValue `protobuf:"bytes,4,rep,name=options" json:"options,omitempty"`
-	// Dependencies for this Check.
-	//
-	// If set, fully overwrites the dependencies field in the target Check.
-	//
-	// Empty groups will be pruned from this. You can remove all dependencies by
-	// providing a single, empty, EdgeGroup.
-	//
-	// If this Write transitions the Check to PLANNED and also provides
-	// dependencies, these must match identically to the already-written
-	// dependencies.
-	Dependencies []*EdgeGroup `protobuf:"bytes,5,rep,name=dependencies" json:"dependencies,omitempty"`
-	// Write data to a Result for this Check.
-	//
-	// The Result to write in is keyed on:
-	//   - The Stage Attempt (if stage_attempt_token is provided)
-	//   - The caller's identity (if stage_attempt_token is absent)
-	//
-	// If the given keyed Result does not exist, it will be automatically
-	// created. Multiple calls to WriteNodes from this same StageAttempt or
-	// service account will update the same Result, and the Result will be
-	// automatically finalized when this StageAttempt ends (if a WriteNodes with
-	// `finalize_results` is not called before then).
-	//
-	// The data here will overwrite existing data of the same type in the
-	// selected Result for this StageAttempt.
-	Results []*WriteNodesRequest_RealmValue `protobuf:"bytes,6,rep,name=results" json:"results,omitempty"`
-	// If set, finalize the Check.Result.
-	//
-	// No more data may be written to the Result from the caller after this is
-	// set.
-	FinalizeResults *bool `protobuf:"varint,7,opt,name=finalize_results,json=finalizeResults" json:"finalize_results,omitempty"`
-	// The new state of this Check.
-	//
-	// If set, must be equal to, or greater than, the current state of the
-	// Check.
-	State         *CheckState `protobuf:"varint,8,opt,name=state,enum=turboci.graph.orchestrator.v1.CheckState" json:"state,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                      protoimpl.MessageState           `protogen:"opaque.v1"`
+	xxx_hidden_Check           *v1.Check                        `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
+	xxx_hidden_Realm           *string                          `protobuf:"bytes,2,opt,name=realm,proto3,oneof"`
+	xxx_hidden_Kind            CheckKind                        `protobuf:"varint,3,opt,name=kind,proto3,enum=turboci.graph.orchestrator.v1.CheckKind,oneof"`
+	xxx_hidden_Options         *[]*WriteNodesRequest_RealmValue `protobuf:"bytes,4,rep,name=options,proto3"`
+	xxx_hidden_Dependencies    *[]*EdgeGroup                    `protobuf:"bytes,5,rep,name=dependencies,proto3"`
+	xxx_hidden_Results         *[]*WriteNodesRequest_RealmValue `protobuf:"bytes,6,rep,name=results,proto3"`
+	xxx_hidden_FinalizeResults bool                             `protobuf:"varint,7,opt,name=finalize_results,json=finalizeResults,proto3,oneof"`
+	xxx_hidden_State           CheckState                       `protobuf:"varint,8,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
+	XXX_raceDetectHookData     protoimpl.RaceDetectHookData
+	XXX_presence               [1]uint32
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
 }
 
 func (x *WriteNodesRequest_CheckWrite) Reset() {
@@ -433,65 +552,265 @@ func (x *WriteNodesRequest_CheckWrite) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteNodesRequest_CheckWrite.ProtoReflect.Descriptor instead.
-func (*WriteNodesRequest_CheckWrite) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDescGZIP(), []int{0, 2}
-}
-
 func (x *WriteNodesRequest_CheckWrite) GetCheck() *v1.Check {
 	if x != nil {
-		return x.Check
+		return x.xxx_hidden_Check
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest_CheckWrite) GetRealm() string {
-	if x != nil && x.Realm != nil {
-		return *x.Realm
+	if x != nil {
+		if x.xxx_hidden_Realm != nil {
+			return *x.xxx_hidden_Realm
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *WriteNodesRequest_CheckWrite) GetKind() CheckKind {
-	if x != nil && x.Kind != nil {
-		return *x.Kind
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 2) {
+			return x.xxx_hidden_Kind
+		}
 	}
 	return CheckKind_CHECK_KIND_UNKNOWN
 }
 
 func (x *WriteNodesRequest_CheckWrite) GetOptions() []*WriteNodesRequest_RealmValue {
 	if x != nil {
-		return x.Options
+		if x.xxx_hidden_Options != nil {
+			return *x.xxx_hidden_Options
+		}
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest_CheckWrite) GetDependencies() []*EdgeGroup {
 	if x != nil {
-		return x.Dependencies
+		if x.xxx_hidden_Dependencies != nil {
+			return *x.xxx_hidden_Dependencies
+		}
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest_CheckWrite) GetResults() []*WriteNodesRequest_RealmValue {
 	if x != nil {
-		return x.Results
+		if x.xxx_hidden_Results != nil {
+			return *x.xxx_hidden_Results
+		}
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest_CheckWrite) GetFinalizeResults() bool {
-	if x != nil && x.FinalizeResults != nil {
-		return *x.FinalizeResults
+	if x != nil {
+		return x.xxx_hidden_FinalizeResults
 	}
 	return false
 }
 
 func (x *WriteNodesRequest_CheckWrite) GetState() CheckState {
-	if x != nil && x.State != nil {
-		return *x.State
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 7) {
+			return x.xxx_hidden_State
+		}
 	}
 	return CheckState_CHECK_STATE_UNKNOWN
+}
+
+func (x *WriteNodesRequest_CheckWrite) SetCheck(v *v1.Check) {
+	x.xxx_hidden_Check = v
+}
+
+func (x *WriteNodesRequest_CheckWrite) SetRealm(v string) {
+	x.xxx_hidden_Realm = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 8)
+}
+
+func (x *WriteNodesRequest_CheckWrite) SetKind(v CheckKind) {
+	x.xxx_hidden_Kind = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 8)
+}
+
+func (x *WriteNodesRequest_CheckWrite) SetOptions(v []*WriteNodesRequest_RealmValue) {
+	x.xxx_hidden_Options = &v
+}
+
+func (x *WriteNodesRequest_CheckWrite) SetDependencies(v []*EdgeGroup) {
+	x.xxx_hidden_Dependencies = &v
+}
+
+func (x *WriteNodesRequest_CheckWrite) SetResults(v []*WriteNodesRequest_RealmValue) {
+	x.xxx_hidden_Results = &v
+}
+
+func (x *WriteNodesRequest_CheckWrite) SetFinalizeResults(v bool) {
+	x.xxx_hidden_FinalizeResults = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 8)
+}
+
+func (x *WriteNodesRequest_CheckWrite) SetState(v CheckState) {
+	x.xxx_hidden_State = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 7, 8)
+}
+
+func (x *WriteNodesRequest_CheckWrite) HasCheck() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Check != nil
+}
+
+func (x *WriteNodesRequest_CheckWrite) HasRealm() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *WriteNodesRequest_CheckWrite) HasKind() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *WriteNodesRequest_CheckWrite) HasFinalizeResults() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
+}
+
+func (x *WriteNodesRequest_CheckWrite) HasState() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 7)
+}
+
+func (x *WriteNodesRequest_CheckWrite) ClearCheck() {
+	x.xxx_hidden_Check = nil
+}
+
+func (x *WriteNodesRequest_CheckWrite) ClearRealm() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Realm = nil
+}
+
+func (x *WriteNodesRequest_CheckWrite) ClearKind() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Kind = CheckKind_CHECK_KIND_UNKNOWN
+}
+
+func (x *WriteNodesRequest_CheckWrite) ClearFinalizeResults() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
+	x.xxx_hidden_FinalizeResults = false
+}
+
+func (x *WriteNodesRequest_CheckWrite) ClearState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 7)
+	x.xxx_hidden_State = CheckState_CHECK_STATE_UNKNOWN
+}
+
+type WriteNodesRequest_CheckWrite_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The check to write to.
+	//
+	// If the WorkPlan is left blank, will be populated with the WorkPlan in
+	// `stage_attempt_token`, if it's provided.
+	//
+	// Otherwise, the Check must belong to the stage_attempt_token's WorkPlan,
+	// or the caller must have the additional "turboci.workplans.writeExternal"
+	// permission in the check's realm (or in the realm of the option/result
+	// data).
+	Check *v1.Check
+	// Realm to assign to this check.
+	//
+	// If this is set, and the Check DOES already exist, this MUST match the
+	// existing realm.
+	//
+	// If absent and this CheckWrite creates the Check, the written Check will
+	// copy its realm from the Stage doing the write (assuming
+	// `stage_attempt_token` is set). If `stage_attempt_token` is unset and this
+	// field is absent, the write will be rejected.
+	Realm *string
+	// Kind to assign to this check.
+	//
+	// If this is set, and the Check DOES already exist, this MUST match the
+	// existing Check kind.
+	Kind *CheckKind
+	// The list of Options to write/overwrite.
+	//
+	// Must be unique on `RealmValue.value.type_url`.
+	Options []*WriteNodesRequest_RealmValue
+	// Dependencies for this Check.
+	//
+	// If set, fully overwrites the dependencies field in the target Check.
+	//
+	// Empty groups will be pruned from this. You can remove all dependencies by
+	// providing a single, empty, EdgeGroup.
+	//
+	// If this Write transitions the Check to PLANNED and also provides
+	// dependencies, these must match identically to the already-written
+	// dependencies.
+	Dependencies []*EdgeGroup
+	// Write data to a Result for this Check.
+	//
+	// The Result to write in is keyed on:
+	//   - The Stage Attempt (if stage_attempt_token is provided)
+	//   - The caller's identity (if stage_attempt_token is absent)
+	//
+	// If the given keyed Result does not exist, it will be automatically
+	// created. Multiple calls to WriteNodes from this same StageAttempt or
+	// service account will update the same Result, and the Result will be
+	// automatically finalized when this StageAttempt ends (if a WriteNodes with
+	// `finalize_results` is not called before then).
+	//
+	// The data here will overwrite existing data of the same type in the
+	// selected Result for this StageAttempt.
+	Results []*WriteNodesRequest_RealmValue
+	// If set, finalize the Check.Result.
+	//
+	// No more data may be written to the Result from the caller after this is
+	// set.
+	FinalizeResults *bool
+	// The new state of this Check.
+	//
+	// If set, must be equal to, or greater than, the current state of the
+	// Check.
+	State *CheckState
+}
+
+func (b0 WriteNodesRequest_CheckWrite_builder) Build() *WriteNodesRequest_CheckWrite {
+	m0 := &WriteNodesRequest_CheckWrite{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Check = b.Check
+	if b.Realm != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 8)
+		x.xxx_hidden_Realm = b.Realm
+	}
+	if b.Kind != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 8)
+		x.xxx_hidden_Kind = *b.Kind
+	}
+	x.xxx_hidden_Options = &b.Options
+	x.xxx_hidden_Dependencies = &b.Dependencies
+	x.xxx_hidden_Results = &b.Results
+	if b.FinalizeResults != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 8)
+		x.xxx_hidden_FinalizeResults = *b.FinalizeResults
+	}
+	if b.State != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 7, 8)
+		x.xxx_hidden_State = *b.State
+	}
+	return m0
 }
 
 // A description of modifications to make to a single Stage.
@@ -500,74 +819,18 @@ func (x *WriteNodesRequest_CheckWrite) GetState() CheckState {
 // itself. If you are a Stage implementation and need to manage the state of
 // your own StageAttempt, see CurrentStageWrite.
 type WriteNodesRequest_StageWrite struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The stage to write to.
-	//
-	// If the WorkPlan is left blank, will be populated with the WorkPlan in
-	// `stage_attempt_token`, if it's provided.
-	//
-	// Otherwise, the Stage must belong to the stage_attempt_token's WorkPlan,
-	// or the caller must have the additional "turboci.workplans.writeExternal"
-	// permission in the stage's realm.
-	Stage *v1.Stage `protobuf:"bytes,1,opt,name=stage" json:"stage,omitempty"`
-	// The arguments of the Stage.
-	//
-	// A Stage MUST have `args` - if this write would create the Stage and
-	// `args` is omitted, the write will be rejected.
-	//
-	// TBD: Document executor registration/selection process.
-	//
-	// TBD: What to do on double-creation? Do we compare args (protobuf
-	// serialization is not canonical/deterministic, but in practice if the
-	// same process creates the same stage twice, it will likely have the same
-	// args).
-	//
-	// We could just accept 'same type' == OK and ignore the value, but this
-	// feels a bit wishy-washy.
-	Args *anypb.Any `protobuf:"bytes,2,opt,name=args" json:"args,omitempty"`
-	// Realm to assign to this Stage.
-	//
-	// If the Stage already exists, this will only result in an error if it
-	// doesn't match the existing realm.
-	//
-	// If absent, the written Stage will copy its realm from the Stage doing
-	// the write (assuming `stage_attempt_token` is set). If
-	// `stage_attempt_token` is unset and this field is absent, the write will
-	// be rejected.
-	Realm *string `protobuf:"bytes,3,opt,name=realm" json:"realm,omitempty"`
-	// Dependencies for this Stage.
-	//
-	// If the Stage already exists, this will only result in an error if it
-	// doesn't match the existing dependencies identically.
-	Dependencies []*EdgeGroup `protobuf:"bytes,4,rep,name=dependencies" json:"dependencies,omitempty"`
-	// The requested retry policy of the Stage.
-	//
-	// If the Stage already exists, this will only result in an error if this
-	// requested policy doesn't match doesn't match the existing requested policy.
-	//
-	// If this write creates the stage and the requested_execution_policy is
-	// omitted, the stage will get the default ExecutionPolicy from the
-	// Executor.
-	RequestedExecutionPolicy *ExecutionPolicy `protobuf:"bytes,5,opt,name=requested_execution_policy,json=requestedExecutionPolicy" json:"requested_execution_policy,omitempty"`
-	// The Check assignments of the Stage.
-	//
-	// If the Stage already exists, this will only result in an error if it
-	// doesn't match the existing assignments.
-	Assignments []*Stage_Assignment `protobuf:"bytes,6,rep,name=assignments" json:"assignments,omitempty"`
-	// If true, ensures that this Stage is marked for cancellation.
-	//
-	// If the Stage is in the ATTEMPTING state, and the current Attempt is
-	// RUNNING, the Attempt will transition to CANCELLING - Otherwise the
-	// current Attempt will be marked INCOMPLETE.
-	//
-	// If the Stage is already marked for cancellation, setting this is a no-op.
-	//
-	// A value of `false` is the same as `unset` (no-op).
-	//
-	// Use the top-level `reason` field to provide the cancellation reason.
-	Cancelled     *bool `protobuf:"varint,7,opt,name=cancelled" json:"cancelled,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                               protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Stage                    *v1.Stage              `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`
+	xxx_hidden_Args                     *anypb.Any             `protobuf:"bytes,2,opt,name=args,proto3,oneof"`
+	xxx_hidden_Realm                    *string                `protobuf:"bytes,3,opt,name=realm,proto3,oneof"`
+	xxx_hidden_Dependencies             *[]*EdgeGroup          `protobuf:"bytes,4,rep,name=dependencies,proto3"`
+	xxx_hidden_RequestedExecutionPolicy *ExecutionPolicy       `protobuf:"bytes,5,opt,name=requested_execution_policy,json=requestedExecutionPolicy,proto3,oneof"`
+	xxx_hidden_Assignments              *[]*Stage_Assignment   `protobuf:"bytes,6,rep,name=assignments,proto3"`
+	xxx_hidden_Cancelled                bool                   `protobuf:"varint,7,opt,name=cancelled,proto3,oneof"`
+	XXX_raceDetectHookData              protoimpl.RaceDetectHookData
+	XXX_presence                        [1]uint32
+	unknownFields                       protoimpl.UnknownFields
+	sizeCache                           protoimpl.SizeCache
 }
 
 func (x *WriteNodesRequest_StageWrite) Reset() {
@@ -595,58 +858,237 @@ func (x *WriteNodesRequest_StageWrite) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteNodesRequest_StageWrite.ProtoReflect.Descriptor instead.
-func (*WriteNodesRequest_StageWrite) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDescGZIP(), []int{0, 3}
-}
-
 func (x *WriteNodesRequest_StageWrite) GetStage() *v1.Stage {
 	if x != nil {
-		return x.Stage
+		return x.xxx_hidden_Stage
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest_StageWrite) GetArgs() *anypb.Any {
 	if x != nil {
-		return x.Args
+		return x.xxx_hidden_Args
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest_StageWrite) GetRealm() string {
-	if x != nil && x.Realm != nil {
-		return *x.Realm
+	if x != nil {
+		if x.xxx_hidden_Realm != nil {
+			return *x.xxx_hidden_Realm
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *WriteNodesRequest_StageWrite) GetDependencies() []*EdgeGroup {
 	if x != nil {
-		return x.Dependencies
+		if x.xxx_hidden_Dependencies != nil {
+			return *x.xxx_hidden_Dependencies
+		}
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest_StageWrite) GetRequestedExecutionPolicy() *ExecutionPolicy {
 	if x != nil {
-		return x.RequestedExecutionPolicy
+		return x.xxx_hidden_RequestedExecutionPolicy
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest_StageWrite) GetAssignments() []*Stage_Assignment {
 	if x != nil {
-		return x.Assignments
+		if x.xxx_hidden_Assignments != nil {
+			return *x.xxx_hidden_Assignments
+		}
 	}
 	return nil
 }
 
 func (x *WriteNodesRequest_StageWrite) GetCancelled() bool {
-	if x != nil && x.Cancelled != nil {
-		return *x.Cancelled
+	if x != nil {
+		return x.xxx_hidden_Cancelled
 	}
 	return false
+}
+
+func (x *WriteNodesRequest_StageWrite) SetStage(v *v1.Stage) {
+	x.xxx_hidden_Stage = v
+}
+
+func (x *WriteNodesRequest_StageWrite) SetArgs(v *anypb.Any) {
+	x.xxx_hidden_Args = v
+}
+
+func (x *WriteNodesRequest_StageWrite) SetRealm(v string) {
+	x.xxx_hidden_Realm = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 7)
+}
+
+func (x *WriteNodesRequest_StageWrite) SetDependencies(v []*EdgeGroup) {
+	x.xxx_hidden_Dependencies = &v
+}
+
+func (x *WriteNodesRequest_StageWrite) SetRequestedExecutionPolicy(v *ExecutionPolicy) {
+	x.xxx_hidden_RequestedExecutionPolicy = v
+}
+
+func (x *WriteNodesRequest_StageWrite) SetAssignments(v []*Stage_Assignment) {
+	x.xxx_hidden_Assignments = &v
+}
+
+func (x *WriteNodesRequest_StageWrite) SetCancelled(v bool) {
+	x.xxx_hidden_Cancelled = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 7)
+}
+
+func (x *WriteNodesRequest_StageWrite) HasStage() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Stage != nil
+}
+
+func (x *WriteNodesRequest_StageWrite) HasArgs() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Args != nil
+}
+
+func (x *WriteNodesRequest_StageWrite) HasRealm() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *WriteNodesRequest_StageWrite) HasRequestedExecutionPolicy() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_RequestedExecutionPolicy != nil
+}
+
+func (x *WriteNodesRequest_StageWrite) HasCancelled() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
+}
+
+func (x *WriteNodesRequest_StageWrite) ClearStage() {
+	x.xxx_hidden_Stage = nil
+}
+
+func (x *WriteNodesRequest_StageWrite) ClearArgs() {
+	x.xxx_hidden_Args = nil
+}
+
+func (x *WriteNodesRequest_StageWrite) ClearRealm() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Realm = nil
+}
+
+func (x *WriteNodesRequest_StageWrite) ClearRequestedExecutionPolicy() {
+	x.xxx_hidden_RequestedExecutionPolicy = nil
+}
+
+func (x *WriteNodesRequest_StageWrite) ClearCancelled() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
+	x.xxx_hidden_Cancelled = false
+}
+
+type WriteNodesRequest_StageWrite_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The stage to write to.
+	//
+	// If the WorkPlan is left blank, will be populated with the WorkPlan in
+	// `stage_attempt_token`, if it's provided.
+	//
+	// Otherwise, the Stage must belong to the stage_attempt_token's WorkPlan,
+	// or the caller must have the additional "turboci.workplans.writeExternal"
+	// permission in the stage's realm.
+	Stage *v1.Stage
+	// The arguments of the Stage.
+	//
+	// A Stage MUST have `args` - if this write would create the Stage and
+	// `args` is omitted, the write will be rejected.
+	//
+	// TBD: Document executor registration/selection process.
+	//
+	// TBD: What to do on double-creation? Do we compare args (protobuf
+	// serialization is not canonical/deterministic, but in practice if the
+	// same process creates the same stage twice, it will likely have the same
+	// args).
+	//
+	// We could just accept 'same type' == OK and ignore the value, but this
+	// feels a bit wishy-washy.
+	Args *anypb.Any
+	// Realm to assign to this Stage.
+	//
+	// If the Stage already exists, this will only result in an error if it
+	// doesn't match the existing realm.
+	//
+	// If absent, the written Stage will copy its realm from the Stage doing
+	// the write (assuming `stage_attempt_token` is set). If
+	// `stage_attempt_token` is unset and this field is absent, the write will
+	// be rejected.
+	Realm *string
+	// Dependencies for this Stage.
+	//
+	// If the Stage already exists, this will only result in an error if it
+	// doesn't match the existing dependencies identically.
+	Dependencies []*EdgeGroup
+	// The requested retry policy of the Stage.
+	//
+	// If the Stage already exists, this will only result in an error if this
+	// requested policy doesn't match doesn't match the existing requested policy.
+	//
+	// If this write creates the stage and the requested_execution_policy is
+	// omitted, the stage will get the default ExecutionPolicy from the
+	// Executor.
+	RequestedExecutionPolicy *ExecutionPolicy
+	// The Check assignments of the Stage.
+	//
+	// If the Stage already exists, this will only result in an error if it
+	// doesn't match the existing assignments.
+	Assignments []*Stage_Assignment
+	// If true, ensures that this Stage is marked for cancellation.
+	//
+	// If the Stage is in the ATTEMPTING state, and the current Attempt is
+	// RUNNING, the Attempt will transition to CANCELLING - Otherwise the
+	// current Attempt will be marked INCOMPLETE.
+	//
+	// If the Stage is already marked for cancellation, setting this is a no-op.
+	//
+	// A value of `false` is the same as `unset` (no-op).
+	//
+	// Use the top-level `reason` field to provide the cancellation reason.
+	Cancelled *bool
+}
+
+func (b0 WriteNodesRequest_StageWrite_builder) Build() *WriteNodesRequest_StageWrite {
+	m0 := &WriteNodesRequest_StageWrite{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Stage = b.Stage
+	x.xxx_hidden_Args = b.Args
+	if b.Realm != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 7)
+		x.xxx_hidden_Realm = b.Realm
+	}
+	x.xxx_hidden_Dependencies = &b.Dependencies
+	x.xxx_hidden_RequestedExecutionPolicy = b.RequestedExecutionPolicy
+	x.xxx_hidden_Assignments = &b.Assignments
+	if b.Cancelled != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 7)
+		x.xxx_hidden_Cancelled = *b.Cancelled
+	}
+	return m0
 }
 
 // Internal writes for the Stage indicated by the token.
@@ -654,29 +1096,13 @@ func (x *WriteNodesRequest_StageWrite) GetCancelled() bool {
 // These aspects come from either the Executor which owns this Stage Attempt,
 // or the running Stage Attempt process.
 type WriteNodesRequest_CurrentStageWrite struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Report the attempt's current state. This can only make the following
-	// transitions (since all other transitions are handled by the Orchestrator
-	// itself):
-	//
-	//   - SCHEDULED -> RUNNING
-	//   - SCHEDULED -> COMPLETE
-	//   - SCHEDULED -> INCOMPLETE
-	//   - RUNNING -> TEARING_DOWN
-	//   - RUNNING -> COMPLETE
-	//   - RUNNING -> INCOMPLETE
-	State *StageAttemptState `protobuf:"varint,1,opt,name=state,enum=turboci.graph.orchestrator.v1.StageAttemptState" json:"state,omitempty"`
-	// Ensure all provided edges are included in `Stage.continuation_group`.
-	//
-	// Edges are deduplicated with `Stage.continuation_group` if they have the
-	// same `target`.
-	//
-	// TBD: When edges have conditions, will want to coalesce the conditions
-	// with `and` instead? Or just reject multiple conditional Edges with the
-	// same target? Or replace the condition in the existing Edge?
-	EnsureInContinuationGroup []*Edge `protobuf:"bytes,3,rep,name=ensure_in_continuation_group,json=ensureInContinuationGroup" json:"ensure_in_continuation_group,omitempty"`
-	unknownFields             protoimpl.UnknownFields
-	sizeCache                 protoimpl.SizeCache
+	state                                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_State                     StageAttemptState      `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
+	xxx_hidden_EnsureInContinuationGroup *[]*Edge               `protobuf:"bytes,3,rep,name=ensure_in_continuation_group,json=ensureInContinuationGroup,proto3"`
+	XXX_raceDetectHookData               protoimpl.RaceDetectHookData
+	XXX_presence                         [1]uint32
+	unknownFields                        protoimpl.UnknownFields
+	sizeCache                            protoimpl.SizeCache
 }
 
 func (x *WriteNodesRequest_CurrentStageWrite) Reset() {
@@ -704,50 +1130,110 @@ func (x *WriteNodesRequest_CurrentStageWrite) ProtoReflect() protoreflect.Messag
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteNodesRequest_CurrentStageWrite.ProtoReflect.Descriptor instead.
-func (*WriteNodesRequest_CurrentStageWrite) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDescGZIP(), []int{0, 4}
-}
-
 func (x *WriteNodesRequest_CurrentStageWrite) GetState() StageAttemptState {
-	if x != nil && x.State != nil {
-		return *x.State
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
+			return x.xxx_hidden_State
+		}
 	}
 	return StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
 }
 
 func (x *WriteNodesRequest_CurrentStageWrite) GetEnsureInContinuationGroup() []*Edge {
 	if x != nil {
-		return x.EnsureInContinuationGroup
+		if x.xxx_hidden_EnsureInContinuationGroup != nil {
+			return *x.xxx_hidden_EnsureInContinuationGroup
+		}
 	}
 	return nil
+}
+
+func (x *WriteNodesRequest_CurrentStageWrite) SetState(v StageAttemptState) {
+	x.xxx_hidden_State = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *WriteNodesRequest_CurrentStageWrite) SetEnsureInContinuationGroup(v []*Edge) {
+	x.xxx_hidden_EnsureInContinuationGroup = &v
+}
+
+func (x *WriteNodesRequest_CurrentStageWrite) HasState() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *WriteNodesRequest_CurrentStageWrite) ClearState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_State = StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
+}
+
+type WriteNodesRequest_CurrentStageWrite_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Report the attempt's current state. This can only make the following
+	// transitions (since all other transitions are handled by the Orchestrator
+	// itself):
+	//
+	//   - SCHEDULED -> RUNNING
+	//   - SCHEDULED -> COMPLETE
+	//   - SCHEDULED -> INCOMPLETE
+	//   - RUNNING -> TEARING_DOWN
+	//   - RUNNING -> COMPLETE
+	//   - RUNNING -> INCOMPLETE
+	State *StageAttemptState
+	// Ensure all provided edges are included in `Stage.continuation_group`.
+	//
+	// Edges are deduplicated with `Stage.continuation_group` if they have the
+	// same `target`.
+	//
+	// TBD: When edges have conditions, will want to coalesce the conditions
+	// with `and` instead? Or just reject multiple conditional Edges with the
+	// same target? Or replace the condition in the existing Edge?
+	EnsureInContinuationGroup []*Edge
+}
+
+func (b0 WriteNodesRequest_CurrentStageWrite_builder) Build() *WriteNodesRequest_CurrentStageWrite {
+	m0 := &WriteNodesRequest_CurrentStageWrite{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.State != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_State = *b.State
+	}
+	x.xxx_hidden_EnsureInContinuationGroup = &b.EnsureInContinuationGroup
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x19google/protobuf/any.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a.turboci/graph/orchestrator/v1/edge_group.proto\x1a(turboci/graph/orchestrator/v1/edit.proto\x1a4turboci/graph/orchestrator/v1/execution_policy.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\"\x83\x10\n" +
-	"\x11WriteNodesRequest\x12.\n" +
-	"\x13stage_attempt_token\x18\x01 \x01(\tR\x11stageAttemptToken\x12D\n" +
-	"\areasons\x18\x02 \x03(\v2*.turboci.graph.orchestrator.v1.Edit.ReasonR\areasons\x12U\n" +
-	"\x03txn\x18\x03 \x01(\v2C.turboci.graph.orchestrator.v1.WriteNodesRequest.TransactionDetailsR\x03txn\x12S\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x19google/protobuf/any.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a.turboci/graph/orchestrator/v1/edge_group.proto\x1a(turboci/graph/orchestrator/v1/edit.proto\x1a4turboci/graph/orchestrator/v1/execution_policy.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\"\xc3\x12\n" +
+	"\x11WriteNodesRequest\x123\n" +
+	"\x13stage_attempt_token\x18\x01 \x01(\tH\x00R\x11stageAttemptToken\x88\x01\x01\x12D\n" +
+	"\areasons\x18\x02 \x03(\v2*.turboci.graph.orchestrator.v1.Edit.ReasonR\areasons\x12Z\n" +
+	"\x03txn\x18\x03 \x01(\v2C.turboci.graph.orchestrator.v1.WriteNodesRequest.TransactionDetailsH\x01R\x03txn\x88\x01\x01\x12S\n" +
 	"\x06checks\x18\x04 \x03(\v2;.turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWriteR\x06checks\x12S\n" +
-	"\x06stages\x18\x05 \x03(\v2;.turboci.graph.orchestrator.v1.WriteNodesRequest.StageWriteR\x06stages\x12g\n" +
-	"\rcurrent_stage\x18\x06 \x01(\v2B.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWriteR\fcurrentStage\x1aX\n" +
+	"\x06stages\x18\x05 \x03(\v2;.turboci.graph.orchestrator.v1.WriteNodesRequest.StageWriteR\x06stages\x12l\n" +
+	"\rcurrent_stage\x18\x06 \x01(\v2B.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWriteH\x02R\fcurrentStage\x88\x01\x01\x1av\n" +
 	"\n" +
-	"RealmValue\x12\x1e\n" +
-	"\x05realm\x18\x01 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01R\x05realm\x12*\n" +
-	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\x05value\x1a\xc1\x01\n" +
+	"RealmValue\x12#\n" +
+	"\x05realm\x18\x01 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x00R\x05realm\x88\x01\x01\x12/\n" +
+	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyH\x01R\x05value\x88\x01\x01B\b\n" +
+	"\x06_realmB\b\n" +
+	"\x06_value\x1a\xdb\x01\n" +
 	"\x12TransactionDetails\x12W\n" +
 	"\x0enodes_observed\x18\x01 \x03(\v2 .turboci.graph.ids.v1.IdentifierB\x0e\x82\x86\xf6\xfb\x0f\b\x12\x06\n" +
-	"\x04\x02\x03\x05\bR\rnodesObserved\x12R\n" +
-	"\x10snapshot_version\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionR\x0fsnapshotVersion\x1a\xc4\x04\n" +
+	"\x04\x02\x03\x05\bR\rnodesObserved\x12W\n" +
+	"\x10snapshot_version\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\x0fsnapshotVersion\x88\x01\x01B\x13\n" +
+	"\x11_snapshot_version\x1a\x99\x05\n" +
 	"\n" +
-	"CheckWrite\x121\n" +
-	"\x05check\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckR\x05check\x12\x1e\n" +
-	"\x05realm\x18\x02 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01R\x05realm\x12F\n" +
-	"\x04kind\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01R\x04kind\x12a\n" +
+	"CheckWrite\x126\n" +
+	"\x05check\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckH\x00R\x05check\x88\x01\x01\x12#\n" +
+	"\x05realm\x18\x02 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x01R\x05realm\x88\x01\x01\x12K\n" +
+	"\x04kind\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x02R\x04kind\x88\x01\x01\x12a\n" +
 	"\aoptions\x18\x04 \x03(\v2;.turboci.graph.orchestrator.v1.WriteNodesRequest.RealmValueB\n" +
 	"\x82\x86\xf6\xfb\x0f\x04\n" +
 	"\x02\b\n" +
@@ -758,36 +1244,39 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x01\x02R\fdependencies\x12a\n" +
 	"\aresults\x18\x06 \x03(\v2;.turboci.graph.orchestrator.v1.WriteNodesRequest.RealmValueB\n" +
 	"\x82\x86\xf6\xfb\x0f\x04\n" +
-	"\x02\b\x1eR\aresults\x125\n" +
+	"\x02\b\x1eR\aresults\x12:\n" +
 	"\x10finalize_results\x18\a \x01(\bB\n" +
 	"\x82\x86\xf6\xfb\x0f\x04\n" +
-	"\x02\b\x1eR\x0ffinalizeResults\x12?\n" +
-	"\x05state\x18\b \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateR\x05state\x1a\xe4\x03\n" +
+	"\x02\b\x1eH\x03R\x0ffinalizeResults\x88\x01\x01\x12D\n" +
+	"\x05state\x18\b \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x04R\x05state\x88\x01\x01B\b\n" +
+	"\x06_checkB\b\n" +
+	"\x06_realmB\a\n" +
+	"\x05_kindB\x13\n" +
+	"\x11_finalize_resultsB\b\n" +
+	"\x06_state\x1a\xc7\x04\n" +
 	"\n" +
-	"StageWrite\x121\n" +
-	"\x05stage\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageR\x05stage\x122\n" +
-	"\x04args\x18\x02 \x01(\v2\x14.google.protobuf.AnyB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01R\x04args\x12\x1e\n" +
-	"\x05realm\x18\x03 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01R\x05realm\x12\\\n" +
+	"StageWrite\x126\n" +
+	"\x05stage\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageH\x00R\x05stage\x88\x01\x01\x127\n" +
+	"\x04args\x18\x02 \x01(\v2\x14.google.protobuf.AnyB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x01R\x04args\x88\x01\x01\x12#\n" +
+	"\x05realm\x18\x03 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x02R\x05realm\x88\x01\x01\x12\\\n" +
 	"\fdependencies\x18\x04 \x03(\v2(.turboci.graph.orchestrator.v1.EdgeGroupB\x0e\x82\x86\xf6\xfb\x0f\b\x12\x04\n" +
-	"\x02\b\x02\x18\x01R\fdependencies\x12v\n" +
-	"\x1arequested_execution_policy\x18\x05 \x01(\v2..turboci.graph.orchestrator.v1.ExecutionPolicyB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01R\x18requestedExecutionPolicy\x12[\n" +
-	"\vassignments\x18\x06 \x03(\v2/.turboci.graph.orchestrator.v1.Stage.AssignmentB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01R\vassignments\x12\x1c\n" +
-	"\tcancelled\x18\a \x01(\bR\tcancelled\x1a\xc1\x01\n" +
-	"\x11CurrentStageWrite\x12F\n" +
-	"\x05state\x18\x01 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateR\x05state\x12d\n" +
-	"\x1censure_in_continuation_group\x18\x03 \x03(\v2#.turboci.graph.orchestrator.v1.EdgeR\x19ensureInContinuationGroupBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDescData
-}
+	"\x02\b\x02\x18\x01R\fdependencies\x12{\n" +
+	"\x1arequested_execution_policy\x18\x05 \x01(\v2..turboci.graph.orchestrator.v1.ExecutionPolicyB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x03R\x18requestedExecutionPolicy\x88\x01\x01\x12[\n" +
+	"\vassignments\x18\x06 \x03(\v2/.turboci.graph.orchestrator.v1.Stage.AssignmentB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01R\vassignments\x12!\n" +
+	"\tcancelled\x18\a \x01(\bH\x04R\tcancelled\x88\x01\x01B\b\n" +
+	"\x06_stageB\a\n" +
+	"\x05_argsB\b\n" +
+	"\x06_realmB\x1d\n" +
+	"\x1b_requested_execution_policyB\f\n" +
+	"\n" +
+	"_cancelled\x1a\xd0\x01\n" +
+	"\x11CurrentStageWrite\x12K\n" +
+	"\x05state\x18\x01 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x00R\x05state\x88\x01\x01\x12d\n" +
+	"\x1censure_in_continuation_group\x18\x03 \x03(\v2#.turboci.graph.orchestrator.v1.EdgeR\x19ensureInContinuationGroupB\b\n" +
+	"\x06_stateB\x16\n" +
+	"\x14_stage_attempt_tokenB\x06\n" +
+	"\x04_txnB\x10\n" +
+	"\x0e_current_stageBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_turboci_graph_orchestrator_v1_write_nodes_request_proto_goTypes = []any{
@@ -855,6 +1344,12 @@ func file_turboci_graph_orchestrator_v1_write_nodes_request_proto_init() {
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_init()
+	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[0].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[1].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[2].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[3].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[4].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

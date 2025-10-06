@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.executor.v1;
 
@@ -14,7 +14,7 @@ option java_multiple_files = true;
 // Request to cancel a stage attempt.
 message CancelStageRequest {
   // Stage attempt to cancel.
-  ids.v1.StageAttempt attempt = 1;
+  optional ids.v1.StageAttempt attempt = 1;
 }
 
 // Response to cancel a stage attempt.

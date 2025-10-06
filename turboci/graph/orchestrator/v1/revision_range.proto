@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -18,12 +18,12 @@ message RevisionRange {
   // The first revision in the range.
   //
   // If omitted, the range is unbounded on the lower end.
-  google.protobuf.Timestamp start = 1;
+  optional google.protobuf.Timestamp start = 1;
 
   // The first revision *after* the range.
   //
   // Objects with a revision equal to this are NOT included in the range.
   //
   // If omitted, the range is unbounded on the upper end.
-  google.protobuf.Timestamp end = 2;
+  optional google.protobuf.Timestamp end = 2;
 }

@@ -15,7 +15,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -43,25 +42,13 @@ const (
 //
 // See QueryNodesRequest.version for how this Query interacts with transactions.
 type Query struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Type URLs (for Check Option Datum, Check Result Datum, Stage args,
-	// CheckEdit Option Datum and CheckEdit Result) that the caller wants to see
-	// in the response.  Any child Node whose type URL is not specified here
-	// will be omitted in the response.
-	//
-	// TBD: The special value "*" means that the caller wants to see all type
-	// URLs, but this requires an extra permission. Extra permission is needed
-	// to encourage clients to be explicit about what they want to reduce
-	// bandwidth, coupling and increase auditability.
-	TypeUrls []string `protobuf:"bytes,1,rep,name=type_urls,json=typeUrls" json:"type_urls,omitempty"`
-	// Select an arbitrary set of nodes.
-	Select *Query_Select `protobuf:"bytes,2,opt,name=select" json:"select,omitempty"`
-	// Expand that set of nodes by following their edges.
-	Expand *Query_Expand `protobuf:"bytes,3,opt,name=expand" json:"expand,omitempty"`
-	// The data to collect from the expanded node set.
-	Collect       *Query_Collect `protobuf:"bytes,4,opt,name=collect" json:"collect,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_TypeUrls []string               `protobuf:"bytes,1,rep,name=type_urls,json=typeUrls,proto3"`
+	xxx_hidden_Select   *Query_Select          `protobuf:"bytes,2,opt,name=select,proto3,oneof"`
+	xxx_hidden_Expand   *Query_Expand          `protobuf:"bytes,3,opt,name=expand,proto3,oneof"`
+	xxx_hidden_Collect  *Query_Collect         `protobuf:"bytes,4,opt,name=collect,proto3,oneof"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *Query) Reset() {
@@ -89,55 +76,124 @@ func (x *Query) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Query.ProtoReflect.Descriptor instead.
-func (*Query) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Query) GetTypeUrls() []string {
 	if x != nil {
-		return x.TypeUrls
+		return x.xxx_hidden_TypeUrls
 	}
 	return nil
 }
 
 func (x *Query) GetSelect() *Query_Select {
 	if x != nil {
-		return x.Select
+		return x.xxx_hidden_Select
 	}
 	return nil
 }
 
 func (x *Query) GetExpand() *Query_Expand {
 	if x != nil {
-		return x.Expand
+		return x.xxx_hidden_Expand
 	}
 	return nil
 }
 
 func (x *Query) GetCollect() *Query_Collect {
 	if x != nil {
-		return x.Collect
+		return x.xxx_hidden_Collect
 	}
 	return nil
 }
 
+func (x *Query) SetTypeUrls(v []string) {
+	x.xxx_hidden_TypeUrls = v
+}
+
+func (x *Query) SetSelect(v *Query_Select) {
+	x.xxx_hidden_Select = v
+}
+
+func (x *Query) SetExpand(v *Query_Expand) {
+	x.xxx_hidden_Expand = v
+}
+
+func (x *Query) SetCollect(v *Query_Collect) {
+	x.xxx_hidden_Collect = v
+}
+
+func (x *Query) HasSelect() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Select != nil
+}
+
+func (x *Query) HasExpand() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Expand != nil
+}
+
+func (x *Query) HasCollect() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Collect != nil
+}
+
+func (x *Query) ClearSelect() {
+	x.xxx_hidden_Select = nil
+}
+
+func (x *Query) ClearExpand() {
+	x.xxx_hidden_Expand = nil
+}
+
+func (x *Query) ClearCollect() {
+	x.xxx_hidden_Collect = nil
+}
+
+type Query_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Type URLs (for Check Option Datum, Check Result Datum, Stage args,
+	// CheckEdit Option Datum and CheckEdit Result) that the caller wants to see
+	// in the response.  Any child Node whose type URL is not specified here
+	// will be omitted in the response.
+	//
+	// TBD: The special value "*" means that the caller wants to see all type
+	// URLs, but this requires an extra permission. Extra permission is needed
+	// to encourage clients to be explicit about what they want to reduce
+	// bandwidth, coupling and increase auditability.
+	TypeUrls []string
+	// Select an arbitrary set of nodes.
+	Select *Query_Select
+	// Expand that set of nodes by following their edges.
+	Expand *Query_Expand
+	// The data to collect from the expanded node set.
+	Collect *Query_Collect
+}
+
+func (b0 Query_builder) Build() *Query {
+	m0 := &Query{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_TypeUrls = b.TypeUrls
+	x.xxx_hidden_Select = b.Select
+	x.xxx_hidden_Expand = b.Expand
+	x.xxx_hidden_Collect = b.Collect
+	return m0
+}
+
 // Select picks some set of nodes out of the graph.
 type Query_Select struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Which WorkPlans to search across.
-	Workplan *Query_Select_WorkPlanConstraint `protobuf:"bytes,1,opt,name=workplan" json:"workplan,omitempty"`
-	// The identifiers of specific nodes to select.
-	//
-	// This should be used if you already know the identifiers of the nodes you
-	// care about.
-	Nodes []*v1.Identifier `protobuf:"bytes,2,rep,name=nodes" json:"nodes,omitempty"`
-	// Select Checks matching these patterns.
-	CheckPatterns []*Query_Select_CheckPattern `protobuf:"bytes,3,rep,name=check_patterns,json=checkPatterns" json:"check_patterns,omitempty"`
-	// Select Stages matching these patterns.
-	StagePatterns []*Query_Select_StagePattern `protobuf:"bytes,4,rep,name=stage_patterns,json=stagePatterns" json:"stage_patterns,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                    protoimpl.MessageState           `protogen:"opaque.v1"`
+	xxx_hidden_Workplan      *Query_Select_WorkPlanConstraint `protobuf:"bytes,1,opt,name=workplan,proto3,oneof"`
+	xxx_hidden_Nodes         *[]*v1.Identifier                `protobuf:"bytes,2,rep,name=nodes,proto3"`
+	xxx_hidden_CheckPatterns *[]*Query_Select_CheckPattern    `protobuf:"bytes,3,rep,name=check_patterns,json=checkPatterns,proto3"`
+	xxx_hidden_StagePatterns *[]*Query_Select_StagePattern    `protobuf:"bytes,4,rep,name=stage_patterns,json=stagePatterns,proto3"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *Query_Select) Reset() {
@@ -165,47 +221,101 @@ func (x *Query_Select) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Query_Select.ProtoReflect.Descriptor instead.
-func (*Query_Select) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_proto_rawDescGZIP(), []int{0, 0}
-}
-
 func (x *Query_Select) GetWorkplan() *Query_Select_WorkPlanConstraint {
 	if x != nil {
-		return x.Workplan
+		return x.xxx_hidden_Workplan
 	}
 	return nil
 }
 
 func (x *Query_Select) GetNodes() []*v1.Identifier {
 	if x != nil {
-		return x.Nodes
+		if x.xxx_hidden_Nodes != nil {
+			return *x.xxx_hidden_Nodes
+		}
 	}
 	return nil
 }
 
 func (x *Query_Select) GetCheckPatterns() []*Query_Select_CheckPattern {
 	if x != nil {
-		return x.CheckPatterns
+		if x.xxx_hidden_CheckPatterns != nil {
+			return *x.xxx_hidden_CheckPatterns
+		}
 	}
 	return nil
 }
 
 func (x *Query_Select) GetStagePatterns() []*Query_Select_StagePattern {
 	if x != nil {
-		return x.StagePatterns
+		if x.xxx_hidden_StagePatterns != nil {
+			return *x.xxx_hidden_StagePatterns
+		}
 	}
 	return nil
+}
+
+func (x *Query_Select) SetWorkplan(v *Query_Select_WorkPlanConstraint) {
+	x.xxx_hidden_Workplan = v
+}
+
+func (x *Query_Select) SetNodes(v []*v1.Identifier) {
+	x.xxx_hidden_Nodes = &v
+}
+
+func (x *Query_Select) SetCheckPatterns(v []*Query_Select_CheckPattern) {
+	x.xxx_hidden_CheckPatterns = &v
+}
+
+func (x *Query_Select) SetStagePatterns(v []*Query_Select_StagePattern) {
+	x.xxx_hidden_StagePatterns = &v
+}
+
+func (x *Query_Select) HasWorkplan() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Workplan != nil
+}
+
+func (x *Query_Select) ClearWorkplan() {
+	x.xxx_hidden_Workplan = nil
+}
+
+type Query_Select_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Which WorkPlans to search across.
+	Workplan *Query_Select_WorkPlanConstraint
+	// The identifiers of specific nodes to select.
+	//
+	// This should be used if you already know the identifiers of the nodes you
+	// care about.
+	Nodes []*v1.Identifier
+	// Select Checks matching these patterns.
+	CheckPatterns []*Query_Select_CheckPattern
+	// Select Stages matching these patterns.
+	StagePatterns []*Query_Select_StagePattern
+}
+
+func (b0 Query_Select_builder) Build() *Query_Select {
+	m0 := &Query_Select{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Workplan = b.Workplan
+	x.xxx_hidden_Nodes = &b.Nodes
+	x.xxx_hidden_CheckPatterns = &b.CheckPatterns
+	x.xxx_hidden_StagePatterns = &b.StagePatterns
+	return m0
 }
 
 // Expand takes the selected node set and 'expands' it by following edges in
 // the graph from those nodes.
 type Query_Expand struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Instructs the query to follow dependencies of the selected node(s).
-	Dependencies  *Query_Expand_Dependencies `protobuf:"bytes,1,opt,name=dependencies" json:"dependencies,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                   protoimpl.MessageState     `protogen:"opaque.v1"`
+	xxx_hidden_Dependencies *Query_Expand_Dependencies `protobuf:"bytes,1,opt,name=dependencies,proto3,oneof"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *Query_Expand) Reset() {
@@ -233,27 +343,50 @@ func (x *Query_Expand) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Query_Expand.ProtoReflect.Descriptor instead.
-func (*Query_Expand) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_proto_rawDescGZIP(), []int{0, 1}
-}
-
 func (x *Query_Expand) GetDependencies() *Query_Expand_Dependencies {
 	if x != nil {
-		return x.Dependencies
+		return x.xxx_hidden_Dependencies
 	}
 	return nil
 }
 
+func (x *Query_Expand) SetDependencies(v *Query_Expand_Dependencies) {
+	x.xxx_hidden_Dependencies = v
+}
+
+func (x *Query_Expand) HasDependencies() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Dependencies != nil
+}
+
+func (x *Query_Expand) ClearDependencies() {
+	x.xxx_hidden_Dependencies = nil
+}
+
+type Query_Expand_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Instructs the query to follow dependencies of the selected node(s).
+	Dependencies *Query_Expand_Dependencies
+}
+
+func (b0 Query_Expand_builder) Build() *Query_Expand {
+	m0 := &Query_Expand{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Dependencies = b.Dependencies
+	return m0
+}
+
 // Collect retrieves data from the expanded node set.
 type Query_Collect struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Collect options/results/progress data.
-	Data *Query_Collect_Data `protobuf:"bytes,1,opt,name=data" json:"data,omitempty"`
-	// Collect edit records.
-	Edits         *Query_Collect_Edits `protobuf:"bytes,2,opt,name=edits" json:"edits,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Data  *Query_Collect_Data    `protobuf:"bytes,1,opt,name=data,proto3,oneof"`
+	xxx_hidden_Edits *Query_Collect_Edits   `protobuf:"bytes,2,opt,name=edits,proto3,oneof"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *Query_Collect) Reset() {
@@ -281,33 +414,75 @@ func (x *Query_Collect) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Query_Collect.ProtoReflect.Descriptor instead.
-func (*Query_Collect) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_proto_rawDescGZIP(), []int{0, 2}
-}
-
 func (x *Query_Collect) GetData() *Query_Collect_Data {
 	if x != nil {
-		return x.Data
+		return x.xxx_hidden_Data
 	}
 	return nil
 }
 
 func (x *Query_Collect) GetEdits() *Query_Collect_Edits {
 	if x != nil {
-		return x.Edits
+		return x.xxx_hidden_Edits
 	}
 	return nil
+}
+
+func (x *Query_Collect) SetData(v *Query_Collect_Data) {
+	x.xxx_hidden_Data = v
+}
+
+func (x *Query_Collect) SetEdits(v *Query_Collect_Edits) {
+	x.xxx_hidden_Edits = v
+}
+
+func (x *Query_Collect) HasData() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Data != nil
+}
+
+func (x *Query_Collect) HasEdits() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Edits != nil
+}
+
+func (x *Query_Collect) ClearData() {
+	x.xxx_hidden_Data = nil
+}
+
+func (x *Query_Collect) ClearEdits() {
+	x.xxx_hidden_Edits = nil
+}
+
+type Query_Collect_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Collect options/results/progress data.
+	Data *Query_Collect_Data
+	// Collect edit records.
+	Edits *Query_Collect_Edits
+}
+
+func (b0 Query_Collect_builder) Build() *Query_Collect {
+	m0 := &Query_Collect{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Data = b.Data
+	x.xxx_hidden_Edits = b.Edits
+	return m0
 }
 
 // How this selection of nodes should be constrained to one or more
 // WorkPlans.
 type Query_Select_WorkPlanConstraint struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Constrain this Select to the given WorkPlan(s).
-	InWorkplans   []*v1.WorkPlan `protobuf:"bytes,1,rep,name=in_workplans,json=inWorkplans" json:"in_workplans,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_InWorkplans *[]*v1.WorkPlan        `protobuf:"bytes,1,rep,name=in_workplans,json=inWorkplans,proto3"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Query_Select_WorkPlanConstraint) Reset() {
@@ -335,31 +510,44 @@ func (x *Query_Select_WorkPlanConstraint) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Query_Select_WorkPlanConstraint.ProtoReflect.Descriptor instead.
-func (*Query_Select_WorkPlanConstraint) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_proto_rawDescGZIP(), []int{0, 0, 0}
-}
-
 func (x *Query_Select_WorkPlanConstraint) GetInWorkplans() []*v1.WorkPlan {
 	if x != nil {
-		return x.InWorkplans
+		if x.xxx_hidden_InWorkplans != nil {
+			return *x.xxx_hidden_InWorkplans
+		}
 	}
 	return nil
 }
 
+func (x *Query_Select_WorkPlanConstraint) SetInWorkplans(v []*v1.WorkPlan) {
+	x.xxx_hidden_InWorkplans = &v
+}
+
+type Query_Select_WorkPlanConstraint_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Constrain this Select to the given WorkPlan(s).
+	InWorkplans []*v1.WorkPlan
+}
+
+func (b0 Query_Select_WorkPlanConstraint_builder) Build() *Query_Select_WorkPlanConstraint {
+	m0 := &Query_Select_WorkPlanConstraint{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_InWorkplans = &b.InWorkplans
+	return m0
+}
+
 // Select one or more Checks which match this pattern.
 type Query_Select_CheckPattern struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Find Checks of this kind (unset means all kinds).
-	Kind *CheckKind `protobuf:"varint,1,opt,name=kind,enum=turboci.graph.orchestrator.v1.CheckKind" json:"kind,omitempty"`
-	// Find Checks whose `Identifier.Check.id` matches this re2 regex.
-	IdRegex *string `protobuf:"bytes,2,opt,name=id_regex,json=idRegex" json:"id_regex,omitempty"`
-	// Find Checks with *any* of these options. Note that you still must set
-	// follow.check_options.type_urls to actually get the CheckOptions in the
-	// result set.
-	WithOptionTypes []string `protobuf:"bytes,3,rep,name=with_option_types,json=withOptionTypes" json:"with_option_types,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state                      protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Kind            CheckKind              `protobuf:"varint,1,opt,name=kind,proto3,enum=turboci.graph.orchestrator.v1.CheckKind,oneof"`
+	xxx_hidden_IdRegex         *string                `protobuf:"bytes,2,opt,name=id_regex,json=idRegex,proto3,oneof"`
+	xxx_hidden_WithOptionTypes []string               `protobuf:"bytes,3,rep,name=with_option_types,json=withOptionTypes,proto3"`
+	XXX_raceDetectHookData     protoimpl.RaceDetectHookData
+	XXX_presence               [1]uint32
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
 }
 
 func (x *Query_Select_CheckPattern) Reset() {
@@ -387,35 +575,102 @@ func (x *Query_Select_CheckPattern) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Query_Select_CheckPattern.ProtoReflect.Descriptor instead.
-func (*Query_Select_CheckPattern) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_proto_rawDescGZIP(), []int{0, 0, 1}
-}
-
 func (x *Query_Select_CheckPattern) GetKind() CheckKind {
-	if x != nil && x.Kind != nil {
-		return *x.Kind
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
+			return x.xxx_hidden_Kind
+		}
 	}
 	return CheckKind_CHECK_KIND_UNKNOWN
 }
 
 func (x *Query_Select_CheckPattern) GetIdRegex() string {
-	if x != nil && x.IdRegex != nil {
-		return *x.IdRegex
+	if x != nil {
+		if x.xxx_hidden_IdRegex != nil {
+			return *x.xxx_hidden_IdRegex
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Query_Select_CheckPattern) GetWithOptionTypes() []string {
 	if x != nil {
-		return x.WithOptionTypes
+		return x.xxx_hidden_WithOptionTypes
 	}
 	return nil
 }
 
+func (x *Query_Select_CheckPattern) SetKind(v CheckKind) {
+	x.xxx_hidden_Kind = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+}
+
+func (x *Query_Select_CheckPattern) SetIdRegex(v string) {
+	x.xxx_hidden_IdRegex = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+}
+
+func (x *Query_Select_CheckPattern) SetWithOptionTypes(v []string) {
+	x.xxx_hidden_WithOptionTypes = v
+}
+
+func (x *Query_Select_CheckPattern) HasKind() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Query_Select_CheckPattern) HasIdRegex() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Query_Select_CheckPattern) ClearKind() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Kind = CheckKind_CHECK_KIND_UNKNOWN
+}
+
+func (x *Query_Select_CheckPattern) ClearIdRegex() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_IdRegex = nil
+}
+
+type Query_Select_CheckPattern_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Find Checks of this kind (unset means all kinds).
+	Kind *CheckKind
+	// Find Checks whose `Identifier.Check.id` matches this re2 regex.
+	IdRegex *string
+	// Find Checks with *any* of these options. Note that you still must set
+	// follow.check_options.type_urls to actually get the CheckOptions in the
+	// result set.
+	WithOptionTypes []string
+}
+
+func (b0 Query_Select_CheckPattern_builder) Build() *Query_Select_CheckPattern {
+	m0 := &Query_Select_CheckPattern{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Kind != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		x.xxx_hidden_Kind = *b.Kind
+	}
+	if b.IdRegex != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		x.xxx_hidden_IdRegex = b.IdRegex
+	}
+	x.xxx_hidden_WithOptionTypes = b.WithOptionTypes
+	return m0
+}
+
 // Select one or more Stages which match this pattern.
 type Query_Select_StagePattern struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -445,32 +700,28 @@ func (x *Query_Select_StagePattern) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Query_Select_StagePattern.ProtoReflect.Descriptor instead.
-func (*Query_Select_StagePattern) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_proto_rawDescGZIP(), []int{0, 0, 2}
+type Query_Select_StagePattern_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 Query_Select_StagePattern_builder) Build() *Query_Select_StagePattern {
+	m0 := &Query_Select_StagePattern{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 // How to follow Check.dependencies and Stage.dependencies.
 type Query_Expand_Dependencies struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Follow this many dependents (so for some node X, follow to other
-	// nodes which depend-on X up to this distance away).
-	//
-	// 0 means "do not follow dependents".
-	//
-	// Must be >= 0.
-	DependentsDepth *int32 `protobuf:"varint,1,opt,name=dependents_depth,json=dependentsDepth" json:"dependents_depth,omitempty"`
-	// Follow this many dependencies (so for some node, follow it's
-	// `dependencies` fields up to this distance away).
-	//
-	// 0 means "do not follow dependencies".
-	//
-	// Must be >= 0.
-	DependenciesDepth *int32 `protobuf:"varint,2,opt,name=dependencies_depth,json=dependenciesDepth" json:"dependencies_depth,omitempty"`
-	// Includes only resolved edges during traversal.
-	OnlyResolved  *bool `protobuf:"varint,3,opt,name=only_resolved,json=onlyResolved" json:"only_resolved,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                        protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_DependentsDepth   int32                  `protobuf:"varint,1,opt,name=dependents_depth,json=dependentsDepth,proto3,oneof"`
+	xxx_hidden_DependenciesDepth int32                  `protobuf:"varint,2,opt,name=dependencies_depth,json=dependenciesDepth,proto3,oneof"`
+	xxx_hidden_OnlyResolved      bool                   `protobuf:"varint,3,opt,name=only_resolved,json=onlyResolved,proto3,oneof"`
+	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
+	XXX_presence                 [1]uint32
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
 }
 
 func (x *Query_Expand_Dependencies) Reset() {
@@ -498,42 +749,126 @@ func (x *Query_Expand_Dependencies) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Query_Expand_Dependencies.ProtoReflect.Descriptor instead.
-func (*Query_Expand_Dependencies) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_proto_rawDescGZIP(), []int{0, 1, 0}
-}
-
 func (x *Query_Expand_Dependencies) GetDependentsDepth() int32 {
-	if x != nil && x.DependentsDepth != nil {
-		return *x.DependentsDepth
+	if x != nil {
+		return x.xxx_hidden_DependentsDepth
 	}
 	return 0
 }
 
 func (x *Query_Expand_Dependencies) GetDependenciesDepth() int32 {
-	if x != nil && x.DependenciesDepth != nil {
-		return *x.DependenciesDepth
+	if x != nil {
+		return x.xxx_hidden_DependenciesDepth
 	}
 	return 0
 }
 
 func (x *Query_Expand_Dependencies) GetOnlyResolved() bool {
-	if x != nil && x.OnlyResolved != nil {
-		return *x.OnlyResolved
+	if x != nil {
+		return x.xxx_hidden_OnlyResolved
 	}
 	return false
+}
+
+func (x *Query_Expand_Dependencies) SetDependentsDepth(v int32) {
+	x.xxx_hidden_DependentsDepth = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+}
+
+func (x *Query_Expand_Dependencies) SetDependenciesDepth(v int32) {
+	x.xxx_hidden_DependenciesDepth = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+}
+
+func (x *Query_Expand_Dependencies) SetOnlyResolved(v bool) {
+	x.xxx_hidden_OnlyResolved = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
+}
+
+func (x *Query_Expand_Dependencies) HasDependentsDepth() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Query_Expand_Dependencies) HasDependenciesDepth() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Query_Expand_Dependencies) HasOnlyResolved() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *Query_Expand_Dependencies) ClearDependentsDepth() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_DependentsDepth = 0
+}
+
+func (x *Query_Expand_Dependencies) ClearDependenciesDepth() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_DependenciesDepth = 0
+}
+
+func (x *Query_Expand_Dependencies) ClearOnlyResolved() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_OnlyResolved = false
+}
+
+type Query_Expand_Dependencies_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Follow this many dependents (so for some node X, follow to other
+	// nodes which depend-on X up to this distance away).
+	//
+	// 0 means "do not follow dependents".
+	//
+	// Must be >= 0.
+	DependentsDepth *int32
+	// Follow this many dependencies (so for some node, follow it's
+	// `dependencies` fields up to this distance away).
+	//
+	// 0 means "do not follow dependencies".
+	//
+	// Must be >= 0.
+	DependenciesDepth *int32
+	// Includes only resolved edges during traversal.
+	OnlyResolved *bool
+}
+
+func (b0 Query_Expand_Dependencies_builder) Build() *Query_Expand_Dependencies {
+	m0 := &Query_Expand_Dependencies{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.DependentsDepth != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		x.xxx_hidden_DependentsDepth = *b.DependentsDepth
+	}
+	if b.DependenciesDepth != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		x.xxx_hidden_DependenciesDepth = *b.DependenciesDepth
+	}
+	if b.OnlyResolved != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		x.xxx_hidden_OnlyResolved = *b.OnlyResolved
+	}
+	return m0
 }
 
 // Data describes what options/results/progress data we want to retrieve
 // from the selected checks/stages.
 type Query_Collect_Data struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Describes what data the caller wants to see for Checks.
-	Check *Query_Collect_Data_Check `protobuf:"bytes,2,opt,name=check" json:"check,omitempty"`
-	// Describes what data the caller wants to see for Stages.
-	Stage         *Query_Collect_Data_Stage `protobuf:"bytes,3,opt,name=stage" json:"stage,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState    `protogen:"opaque.v1"`
+	xxx_hidden_Check *Query_Collect_Data_Check `protobuf:"bytes,2,opt,name=check,proto3,oneof"`
+	xxx_hidden_Stage *Query_Collect_Data_Stage `protobuf:"bytes,3,opt,name=stage,proto3,oneof"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *Query_Collect_Data) Reset() {
@@ -561,36 +896,78 @@ func (x *Query_Collect_Data) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Query_Collect_Data.ProtoReflect.Descriptor instead.
-func (*Query_Collect_Data) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_proto_rawDescGZIP(), []int{0, 2, 0}
-}
-
 func (x *Query_Collect_Data) GetCheck() *Query_Collect_Data_Check {
 	if x != nil {
-		return x.Check
+		return x.xxx_hidden_Check
 	}
 	return nil
 }
 
 func (x *Query_Collect_Data) GetStage() *Query_Collect_Data_Stage {
 	if x != nil {
-		return x.Stage
+		return x.xxx_hidden_Stage
 	}
 	return nil
 }
 
+func (x *Query_Collect_Data) SetCheck(v *Query_Collect_Data_Check) {
+	x.xxx_hidden_Check = v
+}
+
+func (x *Query_Collect_Data) SetStage(v *Query_Collect_Data_Stage) {
+	x.xxx_hidden_Stage = v
+}
+
+func (x *Query_Collect_Data) HasCheck() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Check != nil
+}
+
+func (x *Query_Collect_Data) HasStage() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Stage != nil
+}
+
+func (x *Query_Collect_Data) ClearCheck() {
+	x.xxx_hidden_Check = nil
+}
+
+func (x *Query_Collect_Data) ClearStage() {
+	x.xxx_hidden_Stage = nil
+}
+
+type Query_Collect_Data_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Describes what data the caller wants to see for Checks.
+	Check *Query_Collect_Data_Check
+	// Describes what data the caller wants to see for Stages.
+	Stage *Query_Collect_Data_Stage
+}
+
+func (b0 Query_Collect_Data_builder) Build() *Query_Collect_Data {
+	m0 := &Query_Collect_Data{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Check = b.Check
+	x.xxx_hidden_Stage = b.Stage
+	return m0
+}
+
 // Edits describes which edit records we want want to collect.
 type Query_Collect_Edits struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Include edits only within this range of Revisions.
-	Range *RevisionRange `protobuf:"bytes,1,opt,name=range" json:"range,omitempty"`
-	// Include Check Edits for any selected Checks in this range.
-	Check *bool `protobuf:"varint,2,opt,name=check" json:"check,omitempty"`
-	// Include Stage Edits for any selected Stages in this range.
-	Stage         *bool `protobuf:"varint,3,opt,name=stage" json:"stage,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Range       *RevisionRange         `protobuf:"bytes,1,opt,name=range,proto3,oneof"`
+	xxx_hidden_Check       bool                   `protobuf:"varint,2,opt,name=check,proto3,oneof"`
+	xxx_hidden_Stage       bool                   `protobuf:"varint,3,opt,name=stage,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Query_Collect_Edits) Reset() {
@@ -618,41 +995,112 @@ func (x *Query_Collect_Edits) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Query_Collect_Edits.ProtoReflect.Descriptor instead.
-func (*Query_Collect_Edits) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_proto_rawDescGZIP(), []int{0, 2, 1}
-}
-
 func (x *Query_Collect_Edits) GetRange() *RevisionRange {
 	if x != nil {
-		return x.Range
+		return x.xxx_hidden_Range
 	}
 	return nil
 }
 
 func (x *Query_Collect_Edits) GetCheck() bool {
-	if x != nil && x.Check != nil {
-		return *x.Check
+	if x != nil {
+		return x.xxx_hidden_Check
 	}
 	return false
 }
 
 func (x *Query_Collect_Edits) GetStage() bool {
-	if x != nil && x.Stage != nil {
-		return *x.Stage
+	if x != nil {
+		return x.xxx_hidden_Stage
 	}
 	return false
 }
 
+func (x *Query_Collect_Edits) SetRange(v *RevisionRange) {
+	x.xxx_hidden_Range = v
+}
+
+func (x *Query_Collect_Edits) SetCheck(v bool) {
+	x.xxx_hidden_Check = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+}
+
+func (x *Query_Collect_Edits) SetStage(v bool) {
+	x.xxx_hidden_Stage = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
+}
+
+func (x *Query_Collect_Edits) HasRange() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Range != nil
+}
+
+func (x *Query_Collect_Edits) HasCheck() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Query_Collect_Edits) HasStage() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *Query_Collect_Edits) ClearRange() {
+	x.xxx_hidden_Range = nil
+}
+
+func (x *Query_Collect_Edits) ClearCheck() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Check = false
+}
+
+func (x *Query_Collect_Edits) ClearStage() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Stage = false
+}
+
+type Query_Collect_Edits_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Include edits only within this range of Revisions.
+	Range *RevisionRange
+	// Include Check Edits for any selected Checks in this range.
+	Check *bool
+	// Include Stage Edits for any selected Stages in this range.
+	Stage *bool
+}
+
+func (b0 Query_Collect_Edits_builder) Build() *Query_Collect_Edits {
+	m0 := &Query_Collect_Edits{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Range = b.Range
+	if b.Check != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		x.xxx_hidden_Check = *b.Check
+	}
+	if b.Stage != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		x.xxx_hidden_Stage = *b.Stage
+	}
+	return m0
+}
+
 // Describes what data the caller wants to see for Checks.
 type Query_Collect_Data_Check struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Include CheckOptions filtered by `type_urls` for any selected Checks.
-	Options *bool `protobuf:"varint,1,opt,name=options" json:"options,omitempty"`
-	// Include Result data filtered by `type_urls` for any selected Checks.
-	ResultData    *bool `protobuf:"varint,2,opt,name=result_data,json=resultData" json:"result_data,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Options     bool                   `protobuf:"varint,1,opt,name=options,proto3,oneof"`
+	xxx_hidden_ResultData  bool                   `protobuf:"varint,2,opt,name=result_data,json=resultData,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Query_Collect_Data_Check) Reset() {
@@ -680,28 +1128,81 @@ func (x *Query_Collect_Data_Check) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Query_Collect_Data_Check.ProtoReflect.Descriptor instead.
-func (*Query_Collect_Data_Check) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_proto_rawDescGZIP(), []int{0, 2, 0, 0}
-}
-
 func (x *Query_Collect_Data_Check) GetOptions() bool {
-	if x != nil && x.Options != nil {
-		return *x.Options
+	if x != nil {
+		return x.xxx_hidden_Options
 	}
 	return false
 }
 
 func (x *Query_Collect_Data_Check) GetResultData() bool {
-	if x != nil && x.ResultData != nil {
-		return *x.ResultData
+	if x != nil {
+		return x.xxx_hidden_ResultData
 	}
 	return false
 }
 
+func (x *Query_Collect_Data_Check) SetOptions(v bool) {
+	x.xxx_hidden_Options = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *Query_Collect_Data_Check) SetResultData(v bool) {
+	x.xxx_hidden_ResultData = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *Query_Collect_Data_Check) HasOptions() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Query_Collect_Data_Check) HasResultData() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Query_Collect_Data_Check) ClearOptions() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Options = false
+}
+
+func (x *Query_Collect_Data_Check) ClearResultData() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_ResultData = false
+}
+
+type Query_Collect_Data_Check_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Include CheckOptions filtered by `type_urls` for any selected Checks.
+	Options *bool
+	// Include Result data filtered by `type_urls` for any selected Checks.
+	ResultData *bool
+}
+
+func (b0 Query_Collect_Data_Check_builder) Build() *Query_Collect_Data_Check {
+	m0 := &Query_Collect_Data_Check{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Options != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_Options = *b.Options
+	}
+	if b.ResultData != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_ResultData = *b.ResultData
+	}
+	return m0
+}
+
 // Describes what data the caller wants to see for Stages.
 type Query_Collect_Data_Stage struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -731,67 +1232,83 @@ func (x *Query_Collect_Data_Stage) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Query_Collect_Data_Stage.ProtoReflect.Descriptor instead.
-func (*Query_Collect_Data_Stage) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_proto_rawDescGZIP(), []int{0, 2, 0, 1}
+type Query_Collect_Data_Stage_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 Query_Collect_Data_Stage_builder) Build() *Query_Collect_Data_Stage {
+	m0 := &Query_Collect_Data_Stage{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_query_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_query_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/query.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a2turboci/graph/orchestrator/v1/revision_range.proto\"\xe7\f\n" +
+	")turboci/graph/orchestrator/v1/query.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a2turboci/graph/orchestrator/v1/revision_range.proto\"\xbc\x0f\n" +
 	"\x05Query\x12\x1b\n" +
-	"\ttype_urls\x18\x01 \x03(\tR\btypeUrls\x12C\n" +
-	"\x06select\x18\x02 \x01(\v2+.turboci.graph.orchestrator.v1.Query.SelectR\x06select\x12C\n" +
-	"\x06expand\x18\x03 \x01(\v2+.turboci.graph.orchestrator.v1.Query.ExpandR\x06expand\x12F\n" +
-	"\acollect\x18\x04 \x01(\v2,.turboci.graph.orchestrator.v1.Query.CollectR\acollect\x1a\xeb\x04\n" +
-	"\x06Select\x12Z\n" +
-	"\bworkplan\x18\x01 \x01(\v2>.turboci.graph.orchestrator.v1.Query.Select.WorkPlanConstraintR\bworkplan\x12D\n" +
+	"\ttype_urls\x18\x01 \x03(\tR\btypeUrls\x12H\n" +
+	"\x06select\x18\x02 \x01(\v2+.turboci.graph.orchestrator.v1.Query.SelectH\x00R\x06select\x88\x01\x01\x12H\n" +
+	"\x06expand\x18\x03 \x01(\v2+.turboci.graph.orchestrator.v1.Query.ExpandH\x01R\x06expand\x88\x01\x01\x12K\n" +
+	"\acollect\x18\x04 \x01(\v2,.turboci.graph.orchestrator.v1.Query.CollectH\x02R\acollect\x88\x01\x01\x1a\x9d\x05\n" +
+	"\x06Select\x12_\n" +
+	"\bworkplan\x18\x01 \x01(\v2>.turboci.graph.orchestrator.v1.Query.Select.WorkPlanConstraintH\x00R\bworkplan\x88\x01\x01\x12D\n" +
 	"\x05nodes\x18\x02 \x03(\v2 .turboci.graph.ids.v1.IdentifierB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
 	"\x02\x02\bR\x05nodes\x12_\n" +
 	"\x0echeck_patterns\x18\x03 \x03(\v28.turboci.graph.orchestrator.v1.Query.Select.CheckPatternR\rcheckPatterns\x12_\n" +
 	"\x0estage_patterns\x18\x04 \x03(\v28.turboci.graph.orchestrator.v1.Query.Select.StagePatternR\rstagePatterns\x1aW\n" +
 	"\x12WorkPlanConstraint\x12A\n" +
-	"\fin_workplans\x18\x01 \x03(\v2\x1e.turboci.graph.ids.v1.WorkPlanR\vinWorkplans\x1a\x93\x01\n" +
-	"\fCheckPattern\x12<\n" +
-	"\x04kind\x18\x01 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindR\x04kind\x12\x19\n" +
-	"\bid_regex\x18\x02 \x01(\tR\aidRegex\x12*\n" +
-	"\x11with_option_types\x18\x03 \x03(\tR\x0fwithOptionTypes\x1a\x0e\n" +
-	"\fStagePattern\x1a\xf6\x01\n" +
-	"\x06Expand\x12\\\n" +
-	"\fdependencies\x18\x01 \x01(\v28.turboci.graph.orchestrator.v1.Query.Expand.DependenciesR\fdependencies\x1a\x8d\x01\n" +
-	"\fDependencies\x12)\n" +
-	"\x10dependents_depth\x18\x01 \x01(\x05R\x0fdependentsDepth\x12-\n" +
-	"\x12dependencies_depth\x18\x02 \x01(\x05R\x11dependenciesDepth\x12#\n" +
-	"\ronly_resolved\x18\x03 \x01(\bR\fonlyResolved\x1a\x87\x04\n" +
-	"\aCollect\x12E\n" +
-	"\x04data\x18\x01 \x01(\v21.turboci.graph.orchestrator.v1.Query.Collect.DataR\x04data\x12H\n" +
-	"\x05edits\x18\x02 \x01(\v22.turboci.graph.orchestrator.v1.Query.Collect.EditsR\x05edits\x1a\xf1\x01\n" +
-	"\x04Data\x12M\n" +
-	"\x05check\x18\x02 \x01(\v27.turboci.graph.orchestrator.v1.Query.Collect.Data.CheckR\x05check\x12M\n" +
-	"\x05stage\x18\x03 \x01(\v27.turboci.graph.orchestrator.v1.Query.Collect.Data.StageR\x05stage\x1aB\n" +
-	"\x05Check\x12\x18\n" +
-	"\aoptions\x18\x01 \x01(\bR\aoptions\x12\x1f\n" +
-	"\vresult_data\x18\x02 \x01(\bR\n" +
-	"resultData\x1a\a\n" +
-	"\x05Stage\x1aw\n" +
-	"\x05Edits\x12B\n" +
-	"\x05range\x18\x01 \x01(\v2,.turboci.graph.orchestrator.v1.RevisionRangeR\x05range\x12\x14\n" +
-	"\x05check\x18\x02 \x01(\bR\x05check\x12\x14\n" +
-	"\x05stage\x18\x03 \x01(\bR\x05stageBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_query_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_query_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_query_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_query_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_query_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_query_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_query_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_query_proto_rawDescData
-}
+	"\fin_workplans\x18\x01 \x03(\v2\x1e.turboci.graph.ids.v1.WorkPlanR\vinWorkplans\x1a\xb3\x01\n" +
+	"\fCheckPattern\x12A\n" +
+	"\x04kind\x18\x01 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindH\x00R\x04kind\x88\x01\x01\x12\x1e\n" +
+	"\bid_regex\x18\x02 \x01(\tH\x01R\aidRegex\x88\x01\x01\x12*\n" +
+	"\x11with_option_types\x18\x03 \x03(\tR\x0fwithOptionTypesB\a\n" +
+	"\x05_kindB\v\n" +
+	"\t_id_regex\x1a\x0e\n" +
+	"\fStagePatternB\v\n" +
+	"\t_workplan\x1a\xd9\x02\n" +
+	"\x06Expand\x12a\n" +
+	"\fdependencies\x18\x01 \x01(\v28.turboci.graph.orchestrator.v1.Query.Expand.DependenciesH\x00R\fdependencies\x88\x01\x01\x1a\xda\x01\n" +
+	"\fDependencies\x12.\n" +
+	"\x10dependents_depth\x18\x01 \x01(\x05H\x00R\x0fdependentsDepth\x88\x01\x01\x122\n" +
+	"\x12dependencies_depth\x18\x02 \x01(\x05H\x01R\x11dependenciesDepth\x88\x01\x01\x12(\n" +
+	"\ronly_resolved\x18\x03 \x01(\bH\x02R\fonlyResolved\x88\x01\x01B\x13\n" +
+	"\x11_dependents_depthB\x15\n" +
+	"\x13_dependencies_depthB\x10\n" +
+	"\x0e_only_resolvedB\x0f\n" +
+	"\r_dependencies\x1a\x96\x05\n" +
+	"\aCollect\x12J\n" +
+	"\x04data\x18\x01 \x01(\v21.turboci.graph.orchestrator.v1.Query.Collect.DataH\x00R\x04data\x88\x01\x01\x12M\n" +
+	"\x05edits\x18\x02 \x01(\v22.turboci.graph.orchestrator.v1.Query.Collect.EditsH\x01R\x05edits\x88\x01\x01\x1a\xb5\x02\n" +
+	"\x04Data\x12R\n" +
+	"\x05check\x18\x02 \x01(\v27.turboci.graph.orchestrator.v1.Query.Collect.Data.CheckH\x00R\x05check\x88\x01\x01\x12R\n" +
+	"\x05stage\x18\x03 \x01(\v27.turboci.graph.orchestrator.v1.Query.Collect.Data.StageH\x01R\x05stage\x88\x01\x01\x1ah\n" +
+	"\x05Check\x12\x1d\n" +
+	"\aoptions\x18\x01 \x01(\bH\x00R\aoptions\x88\x01\x01\x12$\n" +
+	"\vresult_data\x18\x02 \x01(\bH\x01R\n" +
+	"resultData\x88\x01\x01B\n" +
+	"\n" +
+	"\b_optionsB\x0e\n" +
+	"\f_result_data\x1a\a\n" +
+	"\x05StageB\b\n" +
+	"\x06_checkB\b\n" +
+	"\x06_stage\x1a\xa4\x01\n" +
+	"\x05Edits\x12G\n" +
+	"\x05range\x18\x01 \x01(\v2,.turboci.graph.orchestrator.v1.RevisionRangeH\x00R\x05range\x88\x01\x01\x12\x19\n" +
+	"\x05check\x18\x02 \x01(\bH\x01R\x05check\x88\x01\x01\x12\x19\n" +
+	"\x05stage\x18\x03 \x01(\bH\x02R\x05stage\x88\x01\x01B\b\n" +
+	"\x06_rangeB\b\n" +
+	"\x06_checkB\b\n" +
+	"\x06_stageB\a\n" +
+	"\x05_dataB\b\n" +
+	"\x06_editsB\t\n" +
+	"\a_selectB\t\n" +
+	"\a_expandB\n" +
+	"\n" +
+	"\b_collectBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_query_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_turboci_graph_orchestrator_v1_query_proto_goTypes = []any{
@@ -843,6 +1360,15 @@ func file_turboci_graph_orchestrator_v1_query_proto_init() {
 	file_turboci_graph_orchestrator_v1_check_kind_proto_init()
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_range_proto_init()
+	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[0].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[1].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[2].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[3].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[5].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[7].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[8].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[9].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[10].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

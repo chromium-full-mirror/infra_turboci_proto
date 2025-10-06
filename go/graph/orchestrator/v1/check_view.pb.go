@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -28,25 +27,13 @@ const (
 // CheckView is a collated, partial, view of a single Check and the nodes
 // which belong to it.
 type CheckView struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The Check itself - always present.
-	Check *Check `protobuf:"bytes,1,opt,name=check" json:"check,omitempty"`
-	// Data for the Check's options which are visible and of a type which was
-	// requested.
-	OptionData []*Datum `protobuf:"bytes,2,rep,name=option_data,json=optionData" json:"option_data,omitempty"`
-	// CheckEdits for this Check which are being read.
-	//
-	// Some CheckEdits may be omitted if the user did not request them.
-	Edits []*CheckEditView `protobuf:"bytes,3,rep,name=edits" json:"edits,omitempty"`
-	// Result data for this Check which is being read.
-	//
-	// Matches 1:1 with Check.results.
-	//
-	// Some CheckResultViews may be empty if the user did not request those data
-	// types or didn't have permission to see them.
-	Results       []*CheckResultView `protobuf:"bytes,4,rep,name=results" json:"results,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Check      *Check                 `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
+	xxx_hidden_OptionData *[]*Datum              `protobuf:"bytes,2,rep,name=option_data,json=optionData,proto3"`
+	xxx_hidden_Edits      *[]*CheckEditView      `protobuf:"bytes,3,rep,name=edits,proto3"`
+	xxx_hidden_Results    *[]*CheckResultView    `protobuf:"bytes,4,rep,name=results,proto3"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *CheckView) Reset() {
@@ -74,62 +61,111 @@ func (x *CheckView) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CheckView.ProtoReflect.Descriptor instead.
-func (*CheckView) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_check_view_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *CheckView) GetCheck() *Check {
 	if x != nil {
-		return x.Check
+		return x.xxx_hidden_Check
 	}
 	return nil
 }
 
 func (x *CheckView) GetOptionData() []*Datum {
 	if x != nil {
-		return x.OptionData
+		if x.xxx_hidden_OptionData != nil {
+			return *x.xxx_hidden_OptionData
+		}
 	}
 	return nil
 }
 
 func (x *CheckView) GetEdits() []*CheckEditView {
 	if x != nil {
-		return x.Edits
+		if x.xxx_hidden_Edits != nil {
+			return *x.xxx_hidden_Edits
+		}
 	}
 	return nil
 }
 
 func (x *CheckView) GetResults() []*CheckResultView {
 	if x != nil {
-		return x.Results
+		if x.xxx_hidden_Results != nil {
+			return *x.xxx_hidden_Results
+		}
 	}
 	return nil
+}
+
+func (x *CheckView) SetCheck(v *Check) {
+	x.xxx_hidden_Check = v
+}
+
+func (x *CheckView) SetOptionData(v []*Datum) {
+	x.xxx_hidden_OptionData = &v
+}
+
+func (x *CheckView) SetEdits(v []*CheckEditView) {
+	x.xxx_hidden_Edits = &v
+}
+
+func (x *CheckView) SetResults(v []*CheckResultView) {
+	x.xxx_hidden_Results = &v
+}
+
+func (x *CheckView) HasCheck() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Check != nil
+}
+
+func (x *CheckView) ClearCheck() {
+	x.xxx_hidden_Check = nil
+}
+
+type CheckView_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The Check itself - always present.
+	Check *Check
+	// Data for the Check's options which are visible and of a type which was
+	// requested.
+	OptionData []*Datum
+	// CheckEdits for this Check which are being read.
+	//
+	// Some CheckEdits may be omitted if the user did not request them.
+	Edits []*CheckEditView
+	// Result data for this Check which is being read.
+	//
+	// Matches 1:1 with Check.results.
+	//
+	// Some CheckResultViews may be empty if the user did not request those data
+	// types or didn't have permission to see them.
+	Results []*CheckResultView
+}
+
+func (b0 CheckView_builder) Build() *CheckView {
+	m0 := &CheckView{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Check = b.Check
+	x.xxx_hidden_OptionData = &b.OptionData
+	x.xxx_hidden_Edits = &b.Edits
+	x.xxx_hidden_Results = &b.Results
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_check_view_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_check_view_proto_rawDesc = "" +
 	"\n" +
-	".turboci/graph/orchestrator/v1/check_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/check.proto\x1a3turboci/graph/orchestrator/v1/check_edit_view.proto\x1a5turboci/graph/orchestrator/v1/check_result_view.proto\x1a)turboci/graph/orchestrator/v1/datum.proto\"\x9c\x02\n" +
-	"\tCheckView\x12:\n" +
-	"\x05check\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.CheckR\x05check\x12E\n" +
+	".turboci/graph/orchestrator/v1/check_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/check.proto\x1a3turboci/graph/orchestrator/v1/check_edit_view.proto\x1a5turboci/graph/orchestrator/v1/check_result_view.proto\x1a)turboci/graph/orchestrator/v1/datum.proto\"\xab\x02\n" +
+	"\tCheckView\x12?\n" +
+	"\x05check\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.CheckH\x00R\x05check\x88\x01\x01\x12E\n" +
 	"\voption_data\x18\x02 \x03(\v2$.turboci.graph.orchestrator.v1.DatumR\n" +
 	"optionData\x12B\n" +
 	"\x05edits\x18\x03 \x03(\v2,.turboci.graph.orchestrator.v1.CheckEditViewR\x05edits\x12H\n" +
-	"\aresults\x18\x04 \x03(\v2..turboci.graph.orchestrator.v1.CheckResultViewR\aresultsBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_check_view_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_check_view_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_check_view_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_check_view_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_check_view_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_check_view_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_check_view_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_check_view_proto_rawDescData
-}
+	"\aresults\x18\x04 \x03(\v2..turboci.graph.orchestrator.v1.CheckResultViewR\aresultsB\b\n" +
+	"\x06_checkBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_check_view_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_check_view_proto_goTypes = []any{
@@ -160,6 +196,7 @@ func file_turboci_graph_orchestrator_v1_check_view_proto_init() {
 	file_turboci_graph_orchestrator_v1_check_edit_view_proto_init()
 	file_turboci_graph_orchestrator_v1_check_result_view_proto_init()
 	file_turboci_graph_orchestrator_v1_datum_proto_init()
+	file_turboci_graph_orchestrator_v1_check_view_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

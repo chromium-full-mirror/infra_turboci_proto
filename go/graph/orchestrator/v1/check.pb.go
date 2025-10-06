@@ -16,7 +16,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -55,84 +54,19 @@ const (
 //   - CheckView (graph view object for a Check and contained messages)
 //   - CheckEditView (graph view object for Edits of a Check)
 type Check struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The Check's identifier.
-	//
-	// `identifier.id` is provided by the Stage which creates this Check.
-	Identifier *v1.Check `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
-	// The coarse-grained kind of this Check.
-	//
-	// Used in UI and Data registration to restrict what data types are usable in
-	// `options` and `results.data`.
-	//
-	// Used as part of a Checks query for a coarse-grained filter.
-	Kind *CheckKind `protobuf:"varint,2,opt,name=kind,enum=turboci.graph.orchestrator.v1.CheckKind" json:"kind,omitempty"`
-	// The security realm for this Check.
-	//
-	// If unset on creation, then this will be populated with the realm of the
-	// Stage which creates this Check.
-	Realm *string `protobuf:"bytes,3,opt,name=realm" json:"realm,omitempty"`
-	// The version of this Check.
-	//
-	// Updated any time fields in this Check change.
-	//
-	// Note that changing the data in an existing Check Option or a Check Result
-	// Datum does not change any field data in this message, and thus will not
-	// change this version number (adding a new entry in `options` or in
-	// a `Result.data` would, however).
-	Version *Revision `protobuf:"bytes,4,opt,name=version" json:"version,omitempty"`
-	// The current state of the Check.
-	State *CheckState `protobuf:"varint,5,opt,name=state,enum=turboci.graph.orchestrator.v1.CheckState" json:"state,omitempty"`
-	// Dependencies on other objects in the graph.
-	//
-	// All of these dependencies must be satisfied for this Check to be unblocked
-	// and advance from the PLANNED to WAITING state.
-	//
-	// If the dependencies are unsatisfiable, then the Check will be immediately
-	// moved to FINAL state and a single Result will be added with type `TBD`.
-	//
-	// Currently Checks may only depend on other Checks in the same workflow.
-	Dependencies []*EdgeGroup `protobuf:"bytes,6,rep,name=dependencies" json:"dependencies,omitempty"`
-	// Options form the bulk of 'how to answer this Check'.
-	//
-	// It is expected that small details (like assignments to specific
-	// hardware/devices) will not be present here and will be decided by the
-	// Stages which actually produce results for this Check. The balance of what
-	// is in the Check options vs. what is in the Stage args is up to the workflow
-	// authors. It should be expected that Check options will be consumed by
-	// entities external to the Workflow (such as individual developers), and so
-	// it's recommended that the option data here be formulated in a way to be
-	// useful both in-workflow (to Stages) and to users outside the workflow. If
-	// small execution details ARE stored here, it's recommended that they be
-	// stored in a secondary data type to make it clear to external users that
-	// these details are not intended to be intrinsic for reproduction/replication
-	// of the Check results.
-	//
-	// Orchestrator will ensure that the option types here are registered to be
-	// valid for this Check's kind.
-	//
-	// This field is kept unique by `type_url` and ordered by
-	// identifier.options_idx.
-	//
-	// You can use QueryNodes to get a CheckView which includes this Check and
-	// also CheckOptions.
-	Options []*Check_OptionRef `protobuf:"bytes,7,rep,name=options" json:"options,omitempty"`
-	// The list of Results this Check has.
-	//
-	// Any time a StageAttempt adds new result *data* for this Check for the first
-	// time, a new Result will be added to this list.
-	//
-	// So, if you had 3 Stages, each with one Stage Attempt, which add result
-	// data for this Check, you would see 3 Result messages. Similarly, if you
-	// had one Stage with 3 Attempts, all 3 of which add result data for this
-	// check, you would see 3 Result messages.
-	//
-	// Check.version is advanced when a new Result is added, or new data types are
-	// added to an existing Result. However, CheckEdits will still be produced for
-	// each write to each Result datum.
-	Results       []*Check_Result `protobuf:"bytes,8,rep,name=results" json:"results,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                   protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier   *v1.Check              `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Kind         CheckKind              `protobuf:"varint,2,opt,name=kind,proto3,enum=turboci.graph.orchestrator.v1.CheckKind,oneof"`
+	xxx_hidden_Realm        *string                `protobuf:"bytes,3,opt,name=realm,proto3,oneof"`
+	xxx_hidden_Version      *Revision              `protobuf:"bytes,4,opt,name=version,proto3,oneof"`
+	xxx_hidden_State        CheckState             `protobuf:"varint,5,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
+	xxx_hidden_Dependencies *[]*EdgeGroup          `protobuf:"bytes,6,rep,name=dependencies,proto3"`
+	xxx_hidden_Options      *[]*Check_OptionRef    `protobuf:"bytes,7,rep,name=options,proto3"`
+	xxx_hidden_Results      *[]*Check_Result       `protobuf:"bytes,8,rep,name=results,proto3"`
+	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
+	XXX_presence            [1]uint32
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *Check) Reset() {
@@ -160,76 +94,281 @@ func (x *Check) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Check.ProtoReflect.Descriptor instead.
-func (*Check) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_check_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Check) GetIdentifier() *v1.Check {
 	if x != nil {
-		return x.Identifier
+		return x.xxx_hidden_Identifier
 	}
 	return nil
 }
 
 func (x *Check) GetKind() CheckKind {
-	if x != nil && x.Kind != nil {
-		return *x.Kind
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
+			return x.xxx_hidden_Kind
+		}
 	}
 	return CheckKind_CHECK_KIND_UNKNOWN
 }
 
 func (x *Check) GetRealm() string {
-	if x != nil && x.Realm != nil {
-		return *x.Realm
+	if x != nil {
+		if x.xxx_hidden_Realm != nil {
+			return *x.xxx_hidden_Realm
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Check) GetVersion() *Revision {
 	if x != nil {
-		return x.Version
+		return x.xxx_hidden_Version
 	}
 	return nil
 }
 
 func (x *Check) GetState() CheckState {
-	if x != nil && x.State != nil {
-		return *x.State
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 4) {
+			return x.xxx_hidden_State
+		}
 	}
 	return CheckState_CHECK_STATE_UNKNOWN
 }
 
 func (x *Check) GetDependencies() []*EdgeGroup {
 	if x != nil {
-		return x.Dependencies
+		if x.xxx_hidden_Dependencies != nil {
+			return *x.xxx_hidden_Dependencies
+		}
 	}
 	return nil
 }
 
 func (x *Check) GetOptions() []*Check_OptionRef {
 	if x != nil {
-		return x.Options
+		if x.xxx_hidden_Options != nil {
+			return *x.xxx_hidden_Options
+		}
 	}
 	return nil
 }
 
 func (x *Check) GetResults() []*Check_Result {
 	if x != nil {
-		return x.Results
+		if x.xxx_hidden_Results != nil {
+			return *x.xxx_hidden_Results
+		}
 	}
 	return nil
 }
 
+func (x *Check) SetIdentifier(v *v1.Check) {
+	x.xxx_hidden_Identifier = v
+}
+
+func (x *Check) SetKind(v CheckKind) {
+	x.xxx_hidden_Kind = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 8)
+}
+
+func (x *Check) SetRealm(v string) {
+	x.xxx_hidden_Realm = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 8)
+}
+
+func (x *Check) SetVersion(v *Revision) {
+	x.xxx_hidden_Version = v
+}
+
+func (x *Check) SetState(v CheckState) {
+	x.xxx_hidden_State = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 8)
+}
+
+func (x *Check) SetDependencies(v []*EdgeGroup) {
+	x.xxx_hidden_Dependencies = &v
+}
+
+func (x *Check) SetOptions(v []*Check_OptionRef) {
+	x.xxx_hidden_Options = &v
+}
+
+func (x *Check) SetResults(v []*Check_Result) {
+	x.xxx_hidden_Results = &v
+}
+
+func (x *Check) HasIdentifier() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Identifier != nil
+}
+
+func (x *Check) HasKind() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Check) HasRealm() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *Check) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Version != nil
+}
+
+func (x *Check) HasState() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+}
+
+func (x *Check) ClearIdentifier() {
+	x.xxx_hidden_Identifier = nil
+}
+
+func (x *Check) ClearKind() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Kind = CheckKind_CHECK_KIND_UNKNOWN
+}
+
+func (x *Check) ClearRealm() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Realm = nil
+}
+
+func (x *Check) ClearVersion() {
+	x.xxx_hidden_Version = nil
+}
+
+func (x *Check) ClearState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	x.xxx_hidden_State = CheckState_CHECK_STATE_UNKNOWN
+}
+
+type Check_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The Check's identifier.
+	//
+	// `identifier.id` is provided by the Stage which creates this Check.
+	Identifier *v1.Check
+	// The coarse-grained kind of this Check.
+	//
+	// Used in UI and Data registration to restrict what data types are usable in
+	// `options` and `results.data`.
+	//
+	// Used as part of a Checks query for a coarse-grained filter.
+	Kind *CheckKind
+	// The security realm for this Check.
+	//
+	// If unset on creation, then this will be populated with the realm of the
+	// Stage which creates this Check.
+	Realm *string
+	// The version of this Check.
+	//
+	// Updated any time fields in this Check change.
+	//
+	// Note that changing the data in an existing Check Option or a Check Result
+	// Datum does not change any field data in this message, and thus will not
+	// change this version number (adding a new entry in `options` or in
+	// a `Result.data` would, however).
+	Version *Revision
+	// The current state of the Check.
+	State *CheckState
+	// Dependencies on other objects in the graph.
+	//
+	// All of these dependencies must be satisfied for this Check to be unblocked
+	// and advance from the PLANNED to WAITING state.
+	//
+	// If the dependencies are unsatisfiable, then the Check will be immediately
+	// moved to FINAL state and a single Result will be added with type `TBD`.
+	//
+	// Currently Checks may only depend on other Checks in the same workflow.
+	Dependencies []*EdgeGroup
+	// Options form the bulk of 'how to answer this Check'.
+	//
+	// It is expected that small details (like assignments to specific
+	// hardware/devices) will not be present here and will be decided by the
+	// Stages which actually produce results for this Check. The balance of what
+	// is in the Check options vs. what is in the Stage args is up to the workflow
+	// authors. It should be expected that Check options will be consumed by
+	// entities external to the Workflow (such as individual developers), and so
+	// it's recommended that the option data here be formulated in a way to be
+	// useful both in-workflow (to Stages) and to users outside the workflow. If
+	// small execution details ARE stored here, it's recommended that they be
+	// stored in a secondary data type to make it clear to external users that
+	// these details are not intended to be intrinsic for reproduction/replication
+	// of the Check results.
+	//
+	// Orchestrator will ensure that the option types here are registered to be
+	// valid for this Check's kind.
+	//
+	// This field is kept unique by `type_url` and ordered by
+	// identifier.options_idx.
+	//
+	// You can use QueryNodes to get a CheckView which includes this Check and
+	// also CheckOptions.
+	Options []*Check_OptionRef
+	// The list of Results this Check has.
+	//
+	// Any time a StageAttempt adds new result *data* for this Check for the first
+	// time, a new Result will be added to this list.
+	//
+	// So, if you had 3 Stages, each with one Stage Attempt, which add result
+	// data for this Check, you would see 3 Result messages. Similarly, if you
+	// had one Stage with 3 Attempts, all 3 of which add result data for this
+	// check, you would see 3 Result messages.
+	//
+	// Check.version is advanced when a new Result is added, or new data types are
+	// added to an existing Result. However, CheckEdits will still be produced for
+	// each write to each Result datum.
+	Results []*Check_Result
+}
+
+func (b0 Check_builder) Build() *Check {
+	m0 := &Check{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Identifier = b.Identifier
+	if b.Kind != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 8)
+		x.xxx_hidden_Kind = *b.Kind
+	}
+	if b.Realm != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 8)
+		x.xxx_hidden_Realm = b.Realm
+	}
+	x.xxx_hidden_Version = b.Version
+	if b.State != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 8)
+		x.xxx_hidden_State = *b.State
+	}
+	x.xxx_hidden_Dependencies = &b.Dependencies
+	x.xxx_hidden_Options = &b.Options
+	x.xxx_hidden_Results = &b.Results
+	return m0
+}
+
 // OptionRef is a reference to a CheckOption.
 type Check_OptionRef struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The Identifier for the CheckOption, which is a Datum.
-	Identifier *v1.CheckOption `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
-	// The type_url of the data contained for this CheckOption.
-	TypeUrl       *string `protobuf:"bytes,2,opt,name=type_url,json=typeUrl" json:"type_url,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier  *v1.CheckOption        `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_TypeUrl     *string                `protobuf:"bytes,2,opt,name=type_url,json=typeUrl,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Check_OptionRef) Reset() {
@@ -257,23 +396,74 @@ func (x *Check_OptionRef) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Check_OptionRef.ProtoReflect.Descriptor instead.
-func (*Check_OptionRef) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_check_proto_rawDescGZIP(), []int{0, 0}
-}
-
 func (x *Check_OptionRef) GetIdentifier() *v1.CheckOption {
 	if x != nil {
-		return x.Identifier
+		return x.xxx_hidden_Identifier
 	}
 	return nil
 }
 
 func (x *Check_OptionRef) GetTypeUrl() string {
-	if x != nil && x.TypeUrl != nil {
-		return *x.TypeUrl
+	if x != nil {
+		if x.xxx_hidden_TypeUrl != nil {
+			return *x.xxx_hidden_TypeUrl
+		}
+		return ""
 	}
 	return ""
+}
+
+func (x *Check_OptionRef) SetIdentifier(v *v1.CheckOption) {
+	x.xxx_hidden_Identifier = v
+}
+
+func (x *Check_OptionRef) SetTypeUrl(v string) {
+	x.xxx_hidden_TypeUrl = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *Check_OptionRef) HasIdentifier() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Identifier != nil
+}
+
+func (x *Check_OptionRef) HasTypeUrl() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Check_OptionRef) ClearIdentifier() {
+	x.xxx_hidden_Identifier = nil
+}
+
+func (x *Check_OptionRef) ClearTypeUrl() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_TypeUrl = nil
+}
+
+type Check_OptionRef_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The Identifier for the CheckOption, which is a Datum.
+	Identifier *v1.CheckOption
+	// The type_url of the data contained for this CheckOption.
+	TypeUrl *string
+}
+
+func (b0 Check_OptionRef_builder) Build() *Check_OptionRef {
+	m0 := &Check_OptionRef{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Identifier = b.Identifier
+	if b.TypeUrl != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_TypeUrl = b.TypeUrl
+	}
+	return m0
 }
 
 // A Result is a container of result data for a Check.
@@ -285,37 +475,14 @@ func (x *Check_OptionRef) GetTypeUrl() string {
 // of result data. This could occur when multiple Stages all contribute
 // results to the same Check (e.g. sharding, multiple executions, etc.).
 type Check_Result struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Identifier for this Result.
-	Identifier *v1.CheckResult `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
-	// The entity which created this Result.
-	Owner *Actor `protobuf:"bytes,2,opt,name=owner" json:"owner,omitempty"`
-	// The database revsision (commit timestamp) at which this Result was
-	// created.
-	CreatedAt *Revision `protobuf:"bytes,3,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
-	// Data form the bulk of the result.
-	//
-	// NOTE: Most data should be stored in ResultDB via turboci.ResultStorage.
-	//
-	// This field is kept unique by `type_url` and ordered by
-	// identifier.options_idx.
-	//
-	// Orchestrator will ensure that the option types here are registered to be
-	// valid for this Result's kind.
-	//
-	// You can use QueryNodes to get a CheckView which includes this Check and
-	// also Result Data.
-	Data []*Check_Result_ResultDatumRef `protobuf:"bytes,4,rep,name=data" json:"data,omitempty"`
-	// The database revsision (commit timestamp) at which this Result is
-	// finalized.
-	//
-	// This is set when:
-	//   - A StageAttempt `owner` ends (becomes COMPLETE or INCOMPLETE).
-	//   - The `owner` explicitly indicates that their results are final.
-	//   - The Check advances to the FINAL state.
-	FinalizedAt   *Revision `protobuf:"bytes,5,opt,name=finalized_at,json=finalizedAt" json:"finalized_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState          `protogen:"opaque.v1"`
+	xxx_hidden_Identifier  *v1.CheckResult                 `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Owner       *Actor                          `protobuf:"bytes,2,opt,name=owner,proto3,oneof"`
+	xxx_hidden_CreatedAt   *Revision                       `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3,oneof"`
+	xxx_hidden_Data        *[]*Check_Result_ResultDatumRef `protobuf:"bytes,4,rep,name=data,proto3"`
+	xxx_hidden_FinalizedAt *Revision                       `protobuf:"bytes,5,opt,name=finalized_at,json=finalizedAt,proto3,oneof"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Check_Result) Reset() {
@@ -343,55 +510,161 @@ func (x *Check_Result) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Check_Result.ProtoReflect.Descriptor instead.
-func (*Check_Result) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_check_proto_rawDescGZIP(), []int{0, 1}
-}
-
 func (x *Check_Result) GetIdentifier() *v1.CheckResult {
 	if x != nil {
-		return x.Identifier
+		return x.xxx_hidden_Identifier
 	}
 	return nil
 }
 
 func (x *Check_Result) GetOwner() *Actor {
 	if x != nil {
-		return x.Owner
+		return x.xxx_hidden_Owner
 	}
 	return nil
 }
 
 func (x *Check_Result) GetCreatedAt() *Revision {
 	if x != nil {
-		return x.CreatedAt
+		return x.xxx_hidden_CreatedAt
 	}
 	return nil
 }
 
 func (x *Check_Result) GetData() []*Check_Result_ResultDatumRef {
 	if x != nil {
-		return x.Data
+		if x.xxx_hidden_Data != nil {
+			return *x.xxx_hidden_Data
+		}
 	}
 	return nil
 }
 
 func (x *Check_Result) GetFinalizedAt() *Revision {
 	if x != nil {
-		return x.FinalizedAt
+		return x.xxx_hidden_FinalizedAt
 	}
 	return nil
 }
 
+func (x *Check_Result) SetIdentifier(v *v1.CheckResult) {
+	x.xxx_hidden_Identifier = v
+}
+
+func (x *Check_Result) SetOwner(v *Actor) {
+	x.xxx_hidden_Owner = v
+}
+
+func (x *Check_Result) SetCreatedAt(v *Revision) {
+	x.xxx_hidden_CreatedAt = v
+}
+
+func (x *Check_Result) SetData(v []*Check_Result_ResultDatumRef) {
+	x.xxx_hidden_Data = &v
+}
+
+func (x *Check_Result) SetFinalizedAt(v *Revision) {
+	x.xxx_hidden_FinalizedAt = v
+}
+
+func (x *Check_Result) HasIdentifier() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Identifier != nil
+}
+
+func (x *Check_Result) HasOwner() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Owner != nil
+}
+
+func (x *Check_Result) HasCreatedAt() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_CreatedAt != nil
+}
+
+func (x *Check_Result) HasFinalizedAt() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_FinalizedAt != nil
+}
+
+func (x *Check_Result) ClearIdentifier() {
+	x.xxx_hidden_Identifier = nil
+}
+
+func (x *Check_Result) ClearOwner() {
+	x.xxx_hidden_Owner = nil
+}
+
+func (x *Check_Result) ClearCreatedAt() {
+	x.xxx_hidden_CreatedAt = nil
+}
+
+func (x *Check_Result) ClearFinalizedAt() {
+	x.xxx_hidden_FinalizedAt = nil
+}
+
+type Check_Result_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Identifier for this Result.
+	Identifier *v1.CheckResult
+	// The entity which created this Result.
+	Owner *Actor
+	// The database revsision (commit timestamp) at which this Result was
+	// created.
+	CreatedAt *Revision
+	// Data form the bulk of the result.
+	//
+	// NOTE: Most data should be stored in ResultDB via turboci.ResultStorage.
+	//
+	// This field is kept unique by `type_url` and ordered by
+	// identifier.options_idx.
+	//
+	// Orchestrator will ensure that the option types here are registered to be
+	// valid for this Result's kind.
+	//
+	// You can use QueryNodes to get a CheckView which includes this Check and
+	// also Result Data.
+	Data []*Check_Result_ResultDatumRef
+	// The database revsision (commit timestamp) at which this Result is
+	// finalized.
+	//
+	// This is set when:
+	//   - A StageAttempt `owner` ends (becomes COMPLETE or INCOMPLETE).
+	//   - The `owner` explicitly indicates that their results are final.
+	//   - The Check advances to the FINAL state.
+	FinalizedAt *Revision
+}
+
+func (b0 Check_Result_builder) Build() *Check_Result {
+	m0 := &Check_Result{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Identifier = b.Identifier
+	x.xxx_hidden_Owner = b.Owner
+	x.xxx_hidden_CreatedAt = b.CreatedAt
+	x.xxx_hidden_Data = &b.Data
+	x.xxx_hidden_FinalizedAt = b.FinalizedAt
+	return m0
+}
+
 // ResultDatumRef is a reference to a CheckResultDatum.
 type Check_Result_ResultDatumRef struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The Identifier for the CheckResultDatum.
-	Identifier *v1.CheckResultDatum `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
-	// The type_url of the data contained for this CheckResultDatum.
-	TypeUrl       *string `protobuf:"bytes,2,opt,name=type_url,json=typeUrl" json:"type_url,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier  *v1.CheckResultDatum   `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_TypeUrl     *string                `protobuf:"bytes,2,opt,name=type_url,json=typeUrl,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Check_Result_ResultDatumRef) Reset() {
@@ -419,38 +692,90 @@ func (x *Check_Result_ResultDatumRef) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Check_Result_ResultDatumRef.ProtoReflect.Descriptor instead.
-func (*Check_Result_ResultDatumRef) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_check_proto_rawDescGZIP(), []int{0, 1, 0}
-}
-
 func (x *Check_Result_ResultDatumRef) GetIdentifier() *v1.CheckResultDatum {
 	if x != nil {
-		return x.Identifier
+		return x.xxx_hidden_Identifier
 	}
 	return nil
 }
 
 func (x *Check_Result_ResultDatumRef) GetTypeUrl() string {
-	if x != nil && x.TypeUrl != nil {
-		return *x.TypeUrl
+	if x != nil {
+		if x.xxx_hidden_TypeUrl != nil {
+			return *x.xxx_hidden_TypeUrl
+		}
+		return ""
 	}
 	return ""
+}
+
+func (x *Check_Result_ResultDatumRef) SetIdentifier(v *v1.CheckResultDatum) {
+	x.xxx_hidden_Identifier = v
+}
+
+func (x *Check_Result_ResultDatumRef) SetTypeUrl(v string) {
+	x.xxx_hidden_TypeUrl = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *Check_Result_ResultDatumRef) HasIdentifier() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Identifier != nil
+}
+
+func (x *Check_Result_ResultDatumRef) HasTypeUrl() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Check_Result_ResultDatumRef) ClearIdentifier() {
+	x.xxx_hidden_Identifier = nil
+}
+
+func (x *Check_Result_ResultDatumRef) ClearTypeUrl() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_TypeUrl = nil
+}
+
+type Check_Result_ResultDatumRef_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The Identifier for the CheckResultDatum.
+	Identifier *v1.CheckResultDatum
+	// The type_url of the data contained for this CheckResultDatum.
+	TypeUrl *string
+}
+
+func (b0 Check_Result_ResultDatumRef_builder) Build() *Check_Result_ResultDatumRef {
+	m0 := &Check_Result_ResultDatumRef{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Identifier = b.Identifier
+	if b.TypeUrl != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_TypeUrl = b.TypeUrl
+	}
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_check_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a.turboci/graph/orchestrator/v1/edge_group.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\x8e\t\n" +
-	"\x05Check\x12@\n" +
+	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a.turboci/graph/orchestrator/v1/edge_group.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xfa\n" +
 	"\n" +
-	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckB\x03\xe0A\x05R\n" +
-	"identifier\x12A\n" +
-	"\x04kind\x18\x02 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\x03\xe0A\x05R\x04kind\x12\x19\n" +
-	"\x05realm\x18\x03 \x01(\tB\x03\xe0A\x05R\x05realm\x12A\n" +
-	"\aversion\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionR\aversion\x12?\n" +
-	"\x05state\x18\x05 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateR\x05state\x12]\n" +
+	"\x05Check\x12E\n" +
+	"\n" +
+	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckB\x03\xe0A\x05H\x00R\n" +
+	"identifier\x88\x01\x01\x12F\n" +
+	"\x04kind\x18\x02 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\x03\xe0A\x05H\x01R\x04kind\x88\x01\x01\x12\x1e\n" +
+	"\x05realm\x18\x03 \x01(\tB\x03\xe0A\x05H\x02R\x05realm\x88\x01\x01\x12F\n" +
+	"\aversion\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x03R\aversion\x88\x01\x01\x12D\n" +
+	"\x05state\x18\x05 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x04R\x05state\x88\x01\x01\x12]\n" +
 	"\fdependencies\x18\x06 \x03(\v2(.turboci.graph.orchestrator.v1.EdgeGroupB\x0f\x82\x86\xf6\xfb\x0f\t\n" +
 	"\x02\b\n" +
 	"\x12\x03\n" +
@@ -460,38 +785,40 @@ const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\x02\b\n" +
 	"R\aoptions\x12T\n" +
 	"\aresults\x18\b \x03(\v2+.turboci.graph.orchestrator.v1.Check.ResultB\r\xe0A\x03\x82\x86\xf6\xfb\x0f\x04\n" +
-	"\x02\b\x1eR\aresults\x1ai\n" +
-	"\tOptionRef\x12A\n" +
+	"\x02\b\x1eR\aresults\x1a\x8f\x01\n" +
+	"\tOptionRef\x12F\n" +
 	"\n" +
-	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckOptionR\n" +
-	"identifier\x12\x19\n" +
-	"\btype_url\x18\x02 \x01(\tR\atypeUrl\x1a\xea\x03\n" +
-	"\x06Result\x12A\n" +
+	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckOptionH\x00R\n" +
+	"identifier\x88\x01\x01\x12\x1e\n" +
+	"\btype_url\x18\x02 \x01(\tH\x01R\atypeUrl\x88\x01\x01B\r\n" +
+	"\v_identifierB\v\n" +
+	"\t_type_url\x1a\xde\x04\n" +
+	"\x06Result\x12F\n" +
 	"\n" +
-	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckResultR\n" +
-	"identifier\x12?\n" +
-	"\x05owner\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x03R\x05owner\x12K\n" +
+	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckResultH\x00R\n" +
+	"identifier\x88\x01\x01\x12D\n" +
+	"\x05owner\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x03H\x01R\x05owner\x88\x01\x01\x12P\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x03R\tcreatedAt\x12N\n" +
-	"\x04data\x18\x04 \x03(\v2:.turboci.graph.orchestrator.v1.Check.Result.ResultDatumRefR\x04data\x12J\n" +
-	"\ffinalized_at\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionR\vfinalizedAt\x1as\n" +
-	"\x0eResultDatumRef\x12F\n" +
+	"created_at\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x03H\x02R\tcreatedAt\x88\x01\x01\x12N\n" +
+	"\x04data\x18\x04 \x03(\v2:.turboci.graph.orchestrator.v1.Check.Result.ResultDatumRefR\x04data\x12O\n" +
+	"\ffinalized_at\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x03R\vfinalizedAt\x88\x01\x01\x1a\x99\x01\n" +
+	"\x0eResultDatumRef\x12K\n" +
 	"\n" +
-	"identifier\x18\x01 \x01(\v2&.turboci.graph.ids.v1.CheckResultDatumR\n" +
-	"identifier\x12\x19\n" +
-	"\btype_url\x18\x02 \x01(\tR\atypeUrlBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_check_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_check_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_check_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_check_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_check_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_check_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_check_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_check_proto_rawDescData
-}
+	"identifier\x18\x01 \x01(\v2&.turboci.graph.ids.v1.CheckResultDatumH\x00R\n" +
+	"identifier\x88\x01\x01\x12\x1e\n" +
+	"\btype_url\x18\x02 \x01(\tH\x01R\atypeUrl\x88\x01\x01B\r\n" +
+	"\v_identifierB\v\n" +
+	"\t_type_urlB\r\n" +
+	"\v_identifierB\b\n" +
+	"\x06_ownerB\r\n" +
+	"\v_created_atB\x0f\n" +
+	"\r_finalized_atB\r\n" +
+	"\v_identifierB\a\n" +
+	"\x05_kindB\b\n" +
+	"\x06_realmB\n" +
+	"\n" +
+	"\b_versionB\b\n" +
+	"\x06_stateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_check_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_turboci_graph_orchestrator_v1_check_proto_goTypes = []any{
@@ -542,6 +869,10 @@ func file_turboci_graph_orchestrator_v1_check_proto_init() {
 	file_turboci_graph_orchestrator_v1_edge_group_proto_init()
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
+	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[0].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[1].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[2].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

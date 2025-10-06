@@ -16,7 +16,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -43,19 +42,14 @@ const (
 // When writing this type to the server, only `value` is allowed to be
 // populated.
 type Value struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The actual value.
-	Value *anypb.Any `protobuf:"bytes,1,opt,name=value" json:"value,omitempty"`
-	// If true the server knows that `value` contains unknown fields according to
-	// the current proto descriptor loaded on the server.
-	//
-	// This can happen if the server's copy of the proto descriptor for `value` is
-	// out of date vs the descriptor used by the writer for this Datum.
-	HasUnknownFields *bool `protobuf:"varint,2,opt,name=has_unknown_fields,json=hasUnknownFields" json:"has_unknown_fields,omitempty"`
-	// A ProtoJSON-serialized version of `value`.
-	ValueJson     *string `protobuf:"bytes,3,opt,name=value_json,json=valueJson" json:"value_json,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                       protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Value            *anypb.Any             `protobuf:"bytes,1,opt,name=value,proto3,oneof"`
+	xxx_hidden_HasUnknownFields bool                   `protobuf:"varint,2,opt,name=has_unknown_fields,json=hasUnknownFields,proto3,oneof"`
+	xxx_hidden_ValueJson        *string                `protobuf:"bytes,3,opt,name=value_json,json=valueJson,proto3,oneof"`
+	XXX_raceDetectHookData      protoimpl.RaceDetectHookData
+	XXX_presence                [1]uint32
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
 }
 
 func (x *Value) Reset() {
@@ -83,54 +77,123 @@ func (x *Value) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Value.ProtoReflect.Descriptor instead.
-func (*Value) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_value_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Value) GetValue() *anypb.Any {
 	if x != nil {
-		return x.Value
+		return x.xxx_hidden_Value
 	}
 	return nil
 }
 
 func (x *Value) GetHasUnknownFields() bool {
-	if x != nil && x.HasUnknownFields != nil {
-		return *x.HasUnknownFields
+	if x != nil {
+		return x.xxx_hidden_HasUnknownFields
 	}
 	return false
 }
 
 func (x *Value) GetValueJson() string {
-	if x != nil && x.ValueJson != nil {
-		return *x.ValueJson
+	if x != nil {
+		if x.xxx_hidden_ValueJson != nil {
+			return *x.xxx_hidden_ValueJson
+		}
+		return ""
 	}
 	return ""
+}
+
+func (x *Value) SetValue(v *anypb.Any) {
+	x.xxx_hidden_Value = v
+}
+
+func (x *Value) SetHasUnknownFields(v bool) {
+	x.xxx_hidden_HasUnknownFields = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+}
+
+func (x *Value) SetValueJson(v string) {
+	x.xxx_hidden_ValueJson = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
+}
+
+func (x *Value) HasValue() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Value != nil
+}
+
+func (x *Value) HasHasUnknownFields() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Value) HasValueJson() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *Value) ClearValue() {
+	x.xxx_hidden_Value = nil
+}
+
+func (x *Value) ClearHasUnknownFields() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_HasUnknownFields = false
+}
+
+func (x *Value) ClearValueJson() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_ValueJson = nil
+}
+
+type Value_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The actual value.
+	Value *anypb.Any
+	// If true the server knows that `value` contains unknown fields according to
+	// the current proto descriptor loaded on the server.
+	//
+	// This can happen if the server's copy of the proto descriptor for `value` is
+	// out of date vs the descriptor used by the writer for this Datum.
+	HasUnknownFields *bool
+	// A ProtoJSON-serialized version of `value`.
+	ValueJson *string
+}
+
+func (b0 Value_builder) Build() *Value {
+	m0 := &Value{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Value = b.Value
+	if b.HasUnknownFields != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		x.xxx_hidden_HasUnknownFields = *b.HasUnknownFields
+	}
+	if b.ValueJson != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		x.xxx_hidden_ValueJson = b.ValueJson
+	}
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_value_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_value_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/value.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\"\x8a\x01\n" +
-	"\x05Value\x12*\n" +
-	"\x05value\x18\x01 \x01(\v2\x14.google.protobuf.AnyR\x05value\x121\n" +
-	"\x12has_unknown_fields\x18\x02 \x01(\bB\x03\xe0A\x03R\x10hasUnknownFields\x12\"\n" +
+	")turboci/graph/orchestrator/v1/value.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\"\xc9\x01\n" +
+	"\x05Value\x12/\n" +
+	"\x05value\x18\x01 \x01(\v2\x14.google.protobuf.AnyH\x00R\x05value\x88\x01\x01\x126\n" +
+	"\x12has_unknown_fields\x18\x02 \x01(\bB\x03\xe0A\x03H\x01R\x10hasUnknownFields\x88\x01\x01\x12'\n" +
 	"\n" +
-	"value_json\x18\x03 \x01(\tB\x03\xe0A\x03R\tvalueJsonBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_value_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_value_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_value_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_value_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_value_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_value_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_value_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_value_proto_rawDescData
-}
+	"value_json\x18\x03 \x01(\tB\x03\xe0A\x03H\x02R\tvalueJson\x88\x01\x01B\b\n" +
+	"\x06_valueB\x15\n" +
+	"\x13_has_unknown_fieldsB\r\n" +
+	"\v_value_jsonBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_value_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_value_proto_goTypes = []any{
@@ -151,6 +214,7 @@ func file_turboci_graph_orchestrator_v1_value_proto_init() {
 	if File_turboci_graph_orchestrator_v1_value_proto != nil {
 		return
 	}
+	file_turboci_graph_orchestrator_v1_value_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

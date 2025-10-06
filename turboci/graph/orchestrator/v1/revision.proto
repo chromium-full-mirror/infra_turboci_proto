@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -23,5 +23,5 @@ message Revision {
   // This may be rendered as a string in some contexts (e.g. as part of the
   // serialization of an Identity.CheckEdit), in which case it will be
   // "T<seconds>/<nanos>".
-  google.protobuf.Timestamp ts = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+  optional google.protobuf.Timestamp ts = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
 }

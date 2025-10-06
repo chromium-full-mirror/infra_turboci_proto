@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -15,7 +15,7 @@ option java_multiple_files = true;
 // Encapsulates data changes to a Stage object.
 message StageDelta {
   // If set, the new Stage state that was set as part of this edit.
-  StageState state = 1;
+  optional StageState state = 1;
 
   // NOTE: Edit.what is also the identifier for the created Stage, so is not
   // included here.

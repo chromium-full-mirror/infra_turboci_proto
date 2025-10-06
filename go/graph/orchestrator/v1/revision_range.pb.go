@@ -15,7 +15,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -30,19 +29,11 @@ const (
 //
 // This range is half-open: `[start, end)`.
 type RevisionRange struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The first revision in the range.
-	//
-	// If omitted, the range is unbounded on the lower end.
-	Start *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=start" json:"start,omitempty"`
-	// The first revision *after* the range.
-	//
-	// Objects with a revision equal to this are NOT included in the range.
-	//
-	// If omitted, the range is unbounded on the upper end.
-	End           *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=end" json:"end,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Start *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=start,proto3,oneof"`
+	xxx_hidden_End   *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=end,proto3,oneof"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *RevisionRange) Reset() {
@@ -70,45 +61,84 @@ func (x *RevisionRange) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RevisionRange.ProtoReflect.Descriptor instead.
-func (*RevisionRange) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_revision_range_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *RevisionRange) GetStart() *timestamppb.Timestamp {
 	if x != nil {
-		return x.Start
+		return x.xxx_hidden_Start
 	}
 	return nil
 }
 
 func (x *RevisionRange) GetEnd() *timestamppb.Timestamp {
 	if x != nil {
-		return x.End
+		return x.xxx_hidden_End
 	}
 	return nil
+}
+
+func (x *RevisionRange) SetStart(v *timestamppb.Timestamp) {
+	x.xxx_hidden_Start = v
+}
+
+func (x *RevisionRange) SetEnd(v *timestamppb.Timestamp) {
+	x.xxx_hidden_End = v
+}
+
+func (x *RevisionRange) HasStart() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Start != nil
+}
+
+func (x *RevisionRange) HasEnd() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_End != nil
+}
+
+func (x *RevisionRange) ClearStart() {
+	x.xxx_hidden_Start = nil
+}
+
+func (x *RevisionRange) ClearEnd() {
+	x.xxx_hidden_End = nil
+}
+
+type RevisionRange_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The first revision in the range.
+	//
+	// If omitted, the range is unbounded on the lower end.
+	Start *timestamppb.Timestamp
+	// The first revision *after* the range.
+	//
+	// Objects with a revision equal to this are NOT included in the range.
+	//
+	// If omitted, the range is unbounded on the upper end.
+	End *timestamppb.Timestamp
+}
+
+func (b0 RevisionRange_builder) Build() *RevisionRange {
+	m0 := &RevisionRange{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Start = b.Start
+	x.xxx_hidden_End = b.End
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_revision_range_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_revision_range_proto_rawDesc = "" +
 	"\n" +
-	"2turboci/graph/orchestrator/v1/revision_range.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"o\n" +
-	"\rRevisionRange\x120\n" +
-	"\x05start\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\x05start\x12,\n" +
-	"\x03end\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x03endBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_revision_range_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_revision_range_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_revision_range_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_revision_range_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_revision_range_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_revision_range_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_revision_range_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_revision_range_proto_rawDescData
-}
+	"2turboci/graph/orchestrator/v1/revision_range.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8b\x01\n" +
+	"\rRevisionRange\x125\n" +
+	"\x05start\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\x05start\x88\x01\x01\x121\n" +
+	"\x03end\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\x03end\x88\x01\x01B\b\n" +
+	"\x06_startB\x06\n" +
+	"\x04_endBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_revision_range_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_revision_range_proto_goTypes = []any{
@@ -130,6 +160,7 @@ func file_turboci_graph_orchestrator_v1_revision_range_proto_init() {
 	if File_turboci_graph_orchestrator_v1_revision_range_proto != nil {
 		return
 	}
+	file_turboci_graph_orchestrator_v1_revision_range_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

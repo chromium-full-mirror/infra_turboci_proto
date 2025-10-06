@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -27,11 +26,10 @@ const (
 
 // A view of the data for a single Check.Result.
 type CheckResultView struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The current data for each data type in this Result.
-	Data          []*Datum `protobuf:"bytes,1,rep,name=data" json:"data,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Data *[]*Datum              `protobuf:"bytes,1,rep,name=data,proto3"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *CheckResultView) Reset() {
@@ -59,16 +57,32 @@ func (x *CheckResultView) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CheckResultView.ProtoReflect.Descriptor instead.
-func (*CheckResultView) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_check_result_view_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *CheckResultView) GetData() []*Datum {
 	if x != nil {
-		return x.Data
+		if x.xxx_hidden_Data != nil {
+			return *x.xxx_hidden_Data
+		}
 	}
 	return nil
+}
+
+func (x *CheckResultView) SetData(v []*Datum) {
+	x.xxx_hidden_Data = &v
+}
+
+type CheckResultView_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The current data for each data type in this Result.
+	Data []*Datum
+}
+
+func (b0 CheckResultView_builder) Build() *CheckResultView {
+	m0 := &CheckResultView{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Data = &b.Data
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_check_result_view_proto protoreflect.FileDescriptor
@@ -77,19 +91,7 @@ const file_turboci_graph_orchestrator_v1_check_result_view_proto_rawDesc = "" +
 	"\n" +
 	"5turboci/graph/orchestrator/v1/check_result_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/datum.proto\"K\n" +
 	"\x0fCheckResultView\x128\n" +
-	"\x04data\x18\x01 \x03(\v2$.turboci.graph.orchestrator.v1.DatumR\x04dataBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_check_result_view_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_check_result_view_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_check_result_view_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_check_result_view_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_check_result_view_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_check_result_view_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_check_result_view_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_check_result_view_proto_rawDescData
-}
+	"\x04data\x18\x01 \x03(\v2$.turboci.graph.orchestrator.v1.DatumR\x04dataBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_check_result_view_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_check_result_view_proto_goTypes = []any{

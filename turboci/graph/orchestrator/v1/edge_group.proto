@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -49,7 +49,7 @@ message EdgeGroup {
   // N of multiple possible edges.
   //
   // A zero or negative threshold will be normalized to `unset`.
-  int32 threshold = 3;
+  optional int32 threshold = 3;
 
   // A bubbling up of the resolution from the child edges of this group. Used to
   // easily identify which branch of the edge tree was resolved.
@@ -66,5 +66,5 @@ message EdgeGroup {
   // EdgeGroup. For example, if `threshold` is set to 5 and this EdgeGroup has 5
   // entries, one of which is marked as `satisfied = false`, then we know this
   // EdgeGroup must also be unsatisfiable.
-  Edge.Resolution resolution = 4;
+  optional Edge.Resolution resolution = 4;
 }

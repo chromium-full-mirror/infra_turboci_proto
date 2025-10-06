@@ -15,7 +15,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -94,66 +93,20 @@ func (x ExecutionPolicy_StageTimeoutMode) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use ExecutionPolicy_StageTimeoutMode.Descriptor instead.
-func (ExecutionPolicy_StageTimeoutMode) EnumDescriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDescGZIP(), []int{0, 0}
-}
-
 // ExecutionPolicy describes constraints on how a Stage may be executed by the
 // Orchestrator.
 type ExecutionPolicy struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The heartbeat policies for Attempts of this Stage.
-	AttemptHeartbeat *ExecutionPolicy_Heartbeat `protobuf:"bytes,2,opt,name=attempt_heartbeat,json=attemptHeartbeat" json:"attempt_heartbeat,omitempty"`
-	// The timeout policies for Attempts of this Stage.
-	AttemptTimeout *ExecutionPolicy_AttemptTimeout `protobuf:"bytes,3,opt,name=attempt_timeout,json=attemptTimeout" json:"attempt_timeout,omitempty"`
-	// Policy for retrying this Stage across multiple Attempts.
-	//
-	// If omitted, the Stage will be attempted at most once.
-	Retry *ExecutionPolicy_Retry `protobuf:"bytes,4,opt,name=retry" json:"retry,omitempty"`
-	// The maximum amount of time the Stage itself can stay in a non-FINAL state.
-	//
-	// This timeout starts from the time the Stage is *created*.
-	//
-	// This supersedes all per-Attempt restrictions and is intended to be able
-	// to set a cap on the maximum overall amount of time that a stage can take.
-	//
-	// This MUST be greater than the cumulative timeouts in `attempt_timeout` - it
-	// should also account for some amount of time for this Stage to enter the
-	// ATTEMPTING state in the first place.
-	//
-	// Interaction with retries: See `stage_timeout_mode`.
-	StageTimeout *durationpb.Duration `protobuf:"bytes,5,opt,name=stage_timeout,json=stageTimeout" json:"stage_timeout,omitempty"`
-	// Describes how stage_timeout interacts with the Stage state machine.
-	//
-	// In particular, we want to avoid the situation where the Orchestrator
-	// creates 'doomed' Stage Attempts.
-	//
-	// Consider the case where a Build Stage is allotted a total of 6 hours to be
-	// scheduled, execute and complete. If there are only 4 hours left on
-	// `stage_timeout`, it likely doesn't make sense to trigger the Build with the
-	// intent on killing it off 2 hours before it will likely complete (which
-	// would just be a waste of resources).
-	//
-	// In this scenario, the two modes available today would let you:
-	//   - potentially overshoot stage_timeout by 2 hours
-	//   - fail the stage with 4 hours of stage_timeout left
-	//   - fail the stage with 4 hours of stage_timeout left (unless the stage has
-	//     zero attempts, in which case it will overshoot by 2 hours)
-	//
-	// TBD: it's possible to imagine another mode which runs a final Attempt with
-	// a modified `attempt_timeout` - this is likely more complicated (which
-	// timeout do you prune? probably pending_throttled?). Leaving this out for
-	// now to see how far these other modes get us.
-	StageTimeoutMode *ExecutionPolicy_StageTimeoutMode `protobuf:"varint,6,opt,name=stage_timeout_mode,json=stageTimeoutMode,enum=turboci.graph.orchestrator.v1.ExecutionPolicy_StageTimeoutMode,def=1" json:"stage_timeout_mode,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state                       protoimpl.MessageState           `protogen:"opaque.v1"`
+	xxx_hidden_AttemptHeartbeat *ExecutionPolicy_Heartbeat       `protobuf:"bytes,2,opt,name=attempt_heartbeat,json=attemptHeartbeat,proto3,oneof"`
+	xxx_hidden_AttemptTimeout   *ExecutionPolicy_AttemptTimeout  `protobuf:"bytes,3,opt,name=attempt_timeout,json=attemptTimeout,proto3,oneof"`
+	xxx_hidden_Retry            *ExecutionPolicy_Retry           `protobuf:"bytes,4,opt,name=retry,proto3,oneof"`
+	xxx_hidden_StageTimeout     *durationpb.Duration             `protobuf:"bytes,5,opt,name=stage_timeout,json=stageTimeout,proto3,oneof"`
+	xxx_hidden_StageTimeoutMode ExecutionPolicy_StageTimeoutMode `protobuf:"varint,6,opt,name=stage_timeout_mode,json=stageTimeoutMode,proto3,enum=turboci.graph.orchestrator.v1.ExecutionPolicy_StageTimeoutMode,oneof"`
+	XXX_raceDetectHookData      protoimpl.RaceDetectHookData
+	XXX_presence                [1]uint32
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
 }
-
-// Default values for ExecutionPolicy fields.
-const (
-	Default_ExecutionPolicy_StageTimeoutMode = ExecutionPolicy_STAGE_TIMEOUT_MODE_FINISH_CURRENT_ATTEMPT
-)
 
 func (x *ExecutionPolicy) Reset() {
 	*x = ExecutionPolicy{}
@@ -180,44 +133,183 @@ func (x *ExecutionPolicy) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecutionPolicy.ProtoReflect.Descriptor instead.
-func (*ExecutionPolicy) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *ExecutionPolicy) GetAttemptHeartbeat() *ExecutionPolicy_Heartbeat {
 	if x != nil {
-		return x.AttemptHeartbeat
+		return x.xxx_hidden_AttemptHeartbeat
 	}
 	return nil
 }
 
 func (x *ExecutionPolicy) GetAttemptTimeout() *ExecutionPolicy_AttemptTimeout {
 	if x != nil {
-		return x.AttemptTimeout
+		return x.xxx_hidden_AttemptTimeout
 	}
 	return nil
 }
 
 func (x *ExecutionPolicy) GetRetry() *ExecutionPolicy_Retry {
 	if x != nil {
-		return x.Retry
+		return x.xxx_hidden_Retry
 	}
 	return nil
 }
 
 func (x *ExecutionPolicy) GetStageTimeout() *durationpb.Duration {
 	if x != nil {
-		return x.StageTimeout
+		return x.xxx_hidden_StageTimeout
 	}
 	return nil
 }
 
 func (x *ExecutionPolicy) GetStageTimeoutMode() ExecutionPolicy_StageTimeoutMode {
-	if x != nil && x.StageTimeoutMode != nil {
-		return *x.StageTimeoutMode
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 4) {
+			return x.xxx_hidden_StageTimeoutMode
+		}
 	}
-	return Default_ExecutionPolicy_StageTimeoutMode
+	return ExecutionPolicy_STAGE_TIMEOUT_MODE_UNKNOWN
+}
+
+func (x *ExecutionPolicy) SetAttemptHeartbeat(v *ExecutionPolicy_Heartbeat) {
+	x.xxx_hidden_AttemptHeartbeat = v
+}
+
+func (x *ExecutionPolicy) SetAttemptTimeout(v *ExecutionPolicy_AttemptTimeout) {
+	x.xxx_hidden_AttemptTimeout = v
+}
+
+func (x *ExecutionPolicy) SetRetry(v *ExecutionPolicy_Retry) {
+	x.xxx_hidden_Retry = v
+}
+
+func (x *ExecutionPolicy) SetStageTimeout(v *durationpb.Duration) {
+	x.xxx_hidden_StageTimeout = v
+}
+
+func (x *ExecutionPolicy) SetStageTimeoutMode(v ExecutionPolicy_StageTimeoutMode) {
+	x.xxx_hidden_StageTimeoutMode = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 5)
+}
+
+func (x *ExecutionPolicy) HasAttemptHeartbeat() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_AttemptHeartbeat != nil
+}
+
+func (x *ExecutionPolicy) HasAttemptTimeout() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_AttemptTimeout != nil
+}
+
+func (x *ExecutionPolicy) HasRetry() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Retry != nil
+}
+
+func (x *ExecutionPolicy) HasStageTimeout() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_StageTimeout != nil
+}
+
+func (x *ExecutionPolicy) HasStageTimeoutMode() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+}
+
+func (x *ExecutionPolicy) ClearAttemptHeartbeat() {
+	x.xxx_hidden_AttemptHeartbeat = nil
+}
+
+func (x *ExecutionPolicy) ClearAttemptTimeout() {
+	x.xxx_hidden_AttemptTimeout = nil
+}
+
+func (x *ExecutionPolicy) ClearRetry() {
+	x.xxx_hidden_Retry = nil
+}
+
+func (x *ExecutionPolicy) ClearStageTimeout() {
+	x.xxx_hidden_StageTimeout = nil
+}
+
+func (x *ExecutionPolicy) ClearStageTimeoutMode() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	x.xxx_hidden_StageTimeoutMode = ExecutionPolicy_STAGE_TIMEOUT_MODE_UNKNOWN
+}
+
+type ExecutionPolicy_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The heartbeat policies for Attempts of this Stage.
+	AttemptHeartbeat *ExecutionPolicy_Heartbeat
+	// The timeout policies for Attempts of this Stage.
+	AttemptTimeout *ExecutionPolicy_AttemptTimeout
+	// Policy for retrying this Stage across multiple Attempts.
+	//
+	// If omitted, the Stage will be attempted at most once.
+	Retry *ExecutionPolicy_Retry
+	// The maximum amount of time the Stage itself can stay in a non-FINAL state.
+	//
+	// This timeout starts from the time the Stage is *created*.
+	//
+	// This supersedes all per-Attempt restrictions and is intended to be able
+	// to set a cap on the maximum overall amount of time that a stage can take.
+	//
+	// This MUST be greater than the cumulative timeouts in `attempt_timeout` - it
+	// should also account for some amount of time for this Stage to enter the
+	// ATTEMPTING state in the first place.
+	//
+	// Interaction with retries: See `stage_timeout_mode`.
+	StageTimeout *durationpb.Duration
+	// Describes how stage_timeout interacts with the Stage state machine.
+	//
+	// In particular, we want to avoid the situation where the Orchestrator
+	// creates 'doomed' Stage Attempts.
+	//
+	// Consider the case where a Build Stage is allotted a total of 6 hours to be
+	// scheduled, execute and complete. If there are only 4 hours left on
+	// `stage_timeout`, it likely doesn't make sense to trigger the Build with the
+	// intent on killing it off 2 hours before it will likely complete (which
+	// would just be a waste of resources).
+	//
+	// In this scenario, the two modes available today would let you:
+	//   - potentially overshoot stage_timeout by 2 hours
+	//   - fail the stage with 4 hours of stage_timeout left
+	//   - fail the stage with 4 hours of stage_timeout left (unless the stage has
+	//     zero attempts, in which case it will overshoot by 2 hours)
+	//
+	// TBD: it's possible to imagine another mode which runs a final Attempt with
+	// a modified `attempt_timeout` - this is likely more complicated (which
+	// timeout do you prune? probably pending_throttled?). Leaving this out for
+	// now to see how far these other modes get us.
+	//
+	// If unset, defaults to STAGE_TIMEOUT_MODE_FINISH_CURRENT_ATTEMPT.
+	StageTimeoutMode *ExecutionPolicy_StageTimeoutMode
+}
+
+func (b0 ExecutionPolicy_builder) Build() *ExecutionPolicy {
+	m0 := &ExecutionPolicy{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_AttemptHeartbeat = b.AttemptHeartbeat
+	x.xxx_hidden_AttemptTimeout = b.AttemptTimeout
+	x.xxx_hidden_Retry = b.Retry
+	x.xxx_hidden_StageTimeout = b.StageTimeout
+	if b.StageTimeoutMode != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 5)
+		x.xxx_hidden_StageTimeoutMode = *b.StageTimeoutMode
+	}
+	return m0
 }
 
 // Heartbeat indicates the minimum heartbeat interval for Stage Attempts in
@@ -260,31 +352,12 @@ func (x *ExecutionPolicy) GetStageTimeoutMode() ExecutionPolicy_StageTimeoutMode
 //
 // Heartbeat intervals, if set, currently cannot exceed 30 minutes.
 type ExecutionPolicy_Heartbeat struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The expected duration that a Stage Attempt can be in the SCHEDULED
-	// state without sending a heartbeat.
-	//
-	// If unset, then there is no required heartbeat cadence, though the stage
-	// is still subject to timeouts for the phase.
-	Scheduled *durationpb.Duration `protobuf:"bytes,1,opt,name=scheduled" json:"scheduled,omitempty"`
-	// The expected duration that a Stage Attempt can be in the RUNNING state
-	// without sending a heartbeat.
-	//
-	// If unset, then there is no required heartbeat cadence, though the stage
-	// is still subject to timeouts for the phase.
-	//
-	// NOTE: This heartbeat still applies during the CANCELLING state - it's
-	// expected that CANCELLING only applies to Stage Attempts which are
-	// RUNNING, but before the Stage Attempt actually knows this.
-	Running *durationpb.Duration `protobuf:"bytes,2,opt,name=running" json:"running,omitempty"`
-	// The expected duration that a Stage Attempt can be in the TEARING_DOWN
-	// state without sending a heartbeat.
-	//
-	// If unset, then there is no required heartbeat cadence, though the stage
-	// is still subject to timeouts for the phase.
-	TearingDown   *durationpb.Duration `protobuf:"bytes,3,opt,name=tearing_down,json=tearingDown" json:"tearing_down,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Scheduled   *durationpb.Duration   `protobuf:"bytes,1,opt,name=scheduled,proto3,oneof"`
+	xxx_hidden_Running     *durationpb.Duration   `protobuf:"bytes,2,opt,name=running,proto3,oneof"`
+	xxx_hidden_TearingDown *durationpb.Duration   `protobuf:"bytes,3,opt,name=tearing_down,json=tearingDown,proto3,oneof"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *ExecutionPolicy_Heartbeat) Reset() {
@@ -312,30 +385,107 @@ func (x *ExecutionPolicy_Heartbeat) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecutionPolicy_Heartbeat.ProtoReflect.Descriptor instead.
-func (*ExecutionPolicy_Heartbeat) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDescGZIP(), []int{0, 0}
-}
-
 func (x *ExecutionPolicy_Heartbeat) GetScheduled() *durationpb.Duration {
 	if x != nil {
-		return x.Scheduled
+		return x.xxx_hidden_Scheduled
 	}
 	return nil
 }
 
 func (x *ExecutionPolicy_Heartbeat) GetRunning() *durationpb.Duration {
 	if x != nil {
-		return x.Running
+		return x.xxx_hidden_Running
 	}
 	return nil
 }
 
 func (x *ExecutionPolicy_Heartbeat) GetTearingDown() *durationpb.Duration {
 	if x != nil {
-		return x.TearingDown
+		return x.xxx_hidden_TearingDown
 	}
 	return nil
+}
+
+func (x *ExecutionPolicy_Heartbeat) SetScheduled(v *durationpb.Duration) {
+	x.xxx_hidden_Scheduled = v
+}
+
+func (x *ExecutionPolicy_Heartbeat) SetRunning(v *durationpb.Duration) {
+	x.xxx_hidden_Running = v
+}
+
+func (x *ExecutionPolicy_Heartbeat) SetTearingDown(v *durationpb.Duration) {
+	x.xxx_hidden_TearingDown = v
+}
+
+func (x *ExecutionPolicy_Heartbeat) HasScheduled() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Scheduled != nil
+}
+
+func (x *ExecutionPolicy_Heartbeat) HasRunning() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Running != nil
+}
+
+func (x *ExecutionPolicy_Heartbeat) HasTearingDown() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_TearingDown != nil
+}
+
+func (x *ExecutionPolicy_Heartbeat) ClearScheduled() {
+	x.xxx_hidden_Scheduled = nil
+}
+
+func (x *ExecutionPolicy_Heartbeat) ClearRunning() {
+	x.xxx_hidden_Running = nil
+}
+
+func (x *ExecutionPolicy_Heartbeat) ClearTearingDown() {
+	x.xxx_hidden_TearingDown = nil
+}
+
+type ExecutionPolicy_Heartbeat_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The expected duration that a Stage Attempt can be in the SCHEDULED
+	// state without sending a heartbeat.
+	//
+	// If unset, then there is no required heartbeat cadence, though the stage
+	// is still subject to timeouts for the phase.
+	Scheduled *durationpb.Duration
+	// The expected duration that a Stage Attempt can be in the RUNNING state
+	// without sending a heartbeat.
+	//
+	// If unset, then there is no required heartbeat cadence, though the stage
+	// is still subject to timeouts for the phase.
+	//
+	// NOTE: This heartbeat still applies during the CANCELLING state - it's
+	// expected that CANCELLING only applies to Stage Attempts which are
+	// RUNNING, but before the Stage Attempt actually knows this.
+	Running *durationpb.Duration
+	// The expected duration that a Stage Attempt can be in the TEARING_DOWN
+	// state without sending a heartbeat.
+	//
+	// If unset, then there is no required heartbeat cadence, though the stage
+	// is still subject to timeouts for the phase.
+	TearingDown *durationpb.Duration
+}
+
+func (b0 ExecutionPolicy_Heartbeat_builder) Build() *ExecutionPolicy_Heartbeat {
+	m0 := &ExecutionPolicy_Heartbeat{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Scheduled = b.Scheduled
+	x.xxx_hidden_Running = b.Running
+	x.xxx_hidden_TearingDown = b.TearingDown
+	return m0
 }
 
 // AttemptTimeout describes the maximum amount of time a Stage Attempt can be in a
@@ -345,39 +495,13 @@ func (x *ExecutionPolicy_Heartbeat) GetTearingDown() *durationpb.Duration {
 // INCOMPLETE after the timeout has passed if the Stage Attempt has not yet
 // transitioned to the next state.
 type ExecutionPolicy_AttemptTimeout struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The maximum amount of time a Stage Attempt can be in the
-	// PENDING/THROTTLED state.
-	//
-	// It is calculated from the time the Attempt first enters `PENDING` to the
-	// time that it leaves `PENDING` for a non-THROTTLED state.
-	//
-	// If unset, then there is a large default limit on how long a Stage Attempt
-	// can be in the PENDING/THROTTLED state.
-	PendingThrottled *durationpb.Duration `protobuf:"bytes,1,opt,name=pending_throttled,json=pendingThrottled" json:"pending_throttled,omitempty"`
-	// The maximum amount of time a Stage Attempt can be in the SCHEDULED
-	// state.
-	//
-	// If unset, then there is a large default limit on how long a Stage Attempt
-	// can be in the SCHEDULED state.
-	Scheduled *durationpb.Duration `protobuf:"bytes,2,opt,name=scheduled" json:"scheduled,omitempty"`
-	// The maximum amount of time a Stage Attempt can be in the RUNNING state.
-	//
-	// If unset, then there is a large default limit on how long a Stage Attempt
-	// can be in the RUNNING state.
-	//
-	// NOTE: This timeout still applies during the CANCELLING state - it's
-	// expected that CANCELLING only applies to Stage Attempts which are
-	// RUNNING, but before the Stage Attempt actually knows this.
-	Running *durationpb.Duration `protobuf:"bytes,3,opt,name=running" json:"running,omitempty"`
-	// The maximum amount of time a Stage Attempt can be in the
-	// TEARING_DOWN state.
-	//
-	// If unset, then there is a large default limit on how long a Stage Attempt can be in
-	// the TEARING_DOWN state.
-	TearingDown   *durationpb.Duration `protobuf:"bytes,4,opt,name=tearing_down,json=tearingDown" json:"tearing_down,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                       protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_PendingThrottled *durationpb.Duration   `protobuf:"bytes,1,opt,name=pending_throttled,json=pendingThrottled,proto3,oneof"`
+	xxx_hidden_Scheduled        *durationpb.Duration   `protobuf:"bytes,2,opt,name=scheduled,proto3,oneof"`
+	xxx_hidden_Running          *durationpb.Duration   `protobuf:"bytes,3,opt,name=running,proto3,oneof"`
+	xxx_hidden_TearingDown      *durationpb.Duration   `protobuf:"bytes,4,opt,name=tearing_down,json=tearingDown,proto3,oneof"`
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
 }
 
 func (x *ExecutionPolicy_AttemptTimeout) Reset() {
@@ -405,47 +529,148 @@ func (x *ExecutionPolicy_AttemptTimeout) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecutionPolicy_AttemptTimeout.ProtoReflect.Descriptor instead.
-func (*ExecutionPolicy_AttemptTimeout) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDescGZIP(), []int{0, 1}
-}
-
 func (x *ExecutionPolicy_AttemptTimeout) GetPendingThrottled() *durationpb.Duration {
 	if x != nil {
-		return x.PendingThrottled
+		return x.xxx_hidden_PendingThrottled
 	}
 	return nil
 }
 
 func (x *ExecutionPolicy_AttemptTimeout) GetScheduled() *durationpb.Duration {
 	if x != nil {
-		return x.Scheduled
+		return x.xxx_hidden_Scheduled
 	}
 	return nil
 }
 
 func (x *ExecutionPolicy_AttemptTimeout) GetRunning() *durationpb.Duration {
 	if x != nil {
-		return x.Running
+		return x.xxx_hidden_Running
 	}
 	return nil
 }
 
 func (x *ExecutionPolicy_AttemptTimeout) GetTearingDown() *durationpb.Duration {
 	if x != nil {
-		return x.TearingDown
+		return x.xxx_hidden_TearingDown
 	}
 	return nil
 }
 
+func (x *ExecutionPolicy_AttemptTimeout) SetPendingThrottled(v *durationpb.Duration) {
+	x.xxx_hidden_PendingThrottled = v
+}
+
+func (x *ExecutionPolicy_AttemptTimeout) SetScheduled(v *durationpb.Duration) {
+	x.xxx_hidden_Scheduled = v
+}
+
+func (x *ExecutionPolicy_AttemptTimeout) SetRunning(v *durationpb.Duration) {
+	x.xxx_hidden_Running = v
+}
+
+func (x *ExecutionPolicy_AttemptTimeout) SetTearingDown(v *durationpb.Duration) {
+	x.xxx_hidden_TearingDown = v
+}
+
+func (x *ExecutionPolicy_AttemptTimeout) HasPendingThrottled() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_PendingThrottled != nil
+}
+
+func (x *ExecutionPolicy_AttemptTimeout) HasScheduled() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Scheduled != nil
+}
+
+func (x *ExecutionPolicy_AttemptTimeout) HasRunning() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Running != nil
+}
+
+func (x *ExecutionPolicy_AttemptTimeout) HasTearingDown() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_TearingDown != nil
+}
+
+func (x *ExecutionPolicy_AttemptTimeout) ClearPendingThrottled() {
+	x.xxx_hidden_PendingThrottled = nil
+}
+
+func (x *ExecutionPolicy_AttemptTimeout) ClearScheduled() {
+	x.xxx_hidden_Scheduled = nil
+}
+
+func (x *ExecutionPolicy_AttemptTimeout) ClearRunning() {
+	x.xxx_hidden_Running = nil
+}
+
+func (x *ExecutionPolicy_AttemptTimeout) ClearTearingDown() {
+	x.xxx_hidden_TearingDown = nil
+}
+
+type ExecutionPolicy_AttemptTimeout_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The maximum amount of time a Stage Attempt can be in the
+	// PENDING/THROTTLED state.
+	//
+	// It is calculated from the time the Attempt first enters `PENDING` to the
+	// time that it leaves `PENDING` for a non-THROTTLED state.
+	//
+	// If unset, then there is a large default limit on how long a Stage Attempt
+	// can be in the PENDING/THROTTLED state.
+	PendingThrottled *durationpb.Duration
+	// The maximum amount of time a Stage Attempt can be in the SCHEDULED
+	// state.
+	//
+	// If unset, then there is a large default limit on how long a Stage Attempt
+	// can be in the SCHEDULED state.
+	Scheduled *durationpb.Duration
+	// The maximum amount of time a Stage Attempt can be in the RUNNING state.
+	//
+	// If unset, then there is a large default limit on how long a Stage Attempt
+	// can be in the RUNNING state.
+	//
+	// NOTE: This timeout still applies during the CANCELLING state - it's
+	// expected that CANCELLING only applies to Stage Attempts which are
+	// RUNNING, but before the Stage Attempt actually knows this.
+	Running *durationpb.Duration
+	// The maximum amount of time a Stage Attempt can be in the
+	// TEARING_DOWN state.
+	//
+	// If unset, then there is a large default limit on how long a Stage Attempt can be in
+	// the TEARING_DOWN state.
+	TearingDown *durationpb.Duration
+}
+
+func (b0 ExecutionPolicy_AttemptTimeout_builder) Build() *ExecutionPolicy_AttemptTimeout {
+	m0 := &ExecutionPolicy_AttemptTimeout{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_PendingThrottled = b.PendingThrottled
+	x.xxx_hidden_Scheduled = b.Scheduled
+	x.xxx_hidden_Running = b.Running
+	x.xxx_hidden_TearingDown = b.TearingDown
+	return m0
+}
+
 // Retry describes the policy for retrying a Stage across multiple Attempts.
 type ExecutionPolicy_Retry struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The maximum number of retries (apart from the first attempt) that will be
-	// made for this Stage.
-	MaxRetries    *int32 `protobuf:"varint,1,opt,name=max_retries,json=maxRetries" json:"max_retries,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_MaxRetries  int32                  `protobuf:"varint,1,opt,name=max_retries,json=maxRetries,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *ExecutionPolicy_Retry) Reset() {
@@ -473,58 +698,94 @@ func (x *ExecutionPolicy_Retry) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ExecutionPolicy_Retry.ProtoReflect.Descriptor instead.
-func (*ExecutionPolicy_Retry) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDescGZIP(), []int{0, 2}
-}
-
 func (x *ExecutionPolicy_Retry) GetMaxRetries() int32 {
-	if x != nil && x.MaxRetries != nil {
-		return *x.MaxRetries
+	if x != nil {
+		return x.xxx_hidden_MaxRetries
 	}
 	return 0
+}
+
+func (x *ExecutionPolicy_Retry) SetMaxRetries(v int32) {
+	x.xxx_hidden_MaxRetries = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
+}
+
+func (x *ExecutionPolicy_Retry) HasMaxRetries() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *ExecutionPolicy_Retry) ClearMaxRetries() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_MaxRetries = 0
+}
+
+type ExecutionPolicy_Retry_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The maximum number of retries (apart from the first attempt) that will be
+	// made for this Stage.
+	MaxRetries *int32
+}
+
+func (b0 ExecutionPolicy_Retry_builder) Build() *ExecutionPolicy_Retry {
+	m0 := &ExecutionPolicy_Retry{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.MaxRetries != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		x.xxx_hidden_MaxRetries = *b.MaxRetries
+	}
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_execution_policy_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDesc = "" +
 	"\n" +
-	"4turboci/graph/orchestrator/v1/execution_policy.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1egoogle/protobuf/duration.proto\"\xa7\t\n" +
-	"\x0fExecutionPolicy\x12e\n" +
-	"\x11attempt_heartbeat\x18\x02 \x01(\v28.turboci.graph.orchestrator.v1.ExecutionPolicy.HeartbeatR\x10attemptHeartbeat\x12f\n" +
-	"\x0fattempt_timeout\x18\x03 \x01(\v2=.turboci.graph.orchestrator.v1.ExecutionPolicy.AttemptTimeoutR\x0eattemptTimeout\x12J\n" +
-	"\x05retry\x18\x04 \x01(\v24.turboci.graph.orchestrator.v1.ExecutionPolicy.RetryR\x05retry\x12>\n" +
-	"\rstage_timeout\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\fstageTimeout\x12\x98\x01\n" +
-	"\x12stage_timeout_mode\x18\x06 \x01(\x0e2?.turboci.graph.orchestrator.v1.ExecutionPolicy.StageTimeoutMode:)STAGE_TIMEOUT_MODE_FINISH_CURRENT_ATTEMPTR\x10stageTimeoutMode\x1a\xb7\x01\n" +
-	"\tHeartbeat\x127\n" +
-	"\tscheduled\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\tscheduled\x123\n" +
-	"\arunning\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\arunning\x12<\n" +
-	"\ftearing_down\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\vtearingDown\x1a\x84\x02\n" +
-	"\x0eAttemptTimeout\x12F\n" +
-	"\x11pending_throttled\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x10pendingThrottled\x127\n" +
-	"\tscheduled\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\tscheduled\x123\n" +
-	"\arunning\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\arunning\x12<\n" +
-	"\ftearing_down\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\vtearingDown\x1a(\n" +
-	"\x05Retry\x12\x1f\n" +
-	"\vmax_retries\x18\x01 \x01(\x05R\n" +
-	"maxRetries\"\xb2\x01\n" +
+	"4turboci/graph/orchestrator/v1/execution_policy.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1egoogle/protobuf/duration.proto\"\x95\v\n" +
+	"\x0fExecutionPolicy\x12j\n" +
+	"\x11attempt_heartbeat\x18\x02 \x01(\v28.turboci.graph.orchestrator.v1.ExecutionPolicy.HeartbeatH\x00R\x10attemptHeartbeat\x88\x01\x01\x12k\n" +
+	"\x0fattempt_timeout\x18\x03 \x01(\v2=.turboci.graph.orchestrator.v1.ExecutionPolicy.AttemptTimeoutH\x01R\x0eattemptTimeout\x88\x01\x01\x12O\n" +
+	"\x05retry\x18\x04 \x01(\v24.turboci.graph.orchestrator.v1.ExecutionPolicy.RetryH\x02R\x05retry\x88\x01\x01\x12C\n" +
+	"\rstage_timeout\x18\x05 \x01(\v2\x19.google.protobuf.DurationH\x03R\fstageTimeout\x88\x01\x01\x12r\n" +
+	"\x12stage_timeout_mode\x18\x06 \x01(\x0e2?.turboci.graph.orchestrator.v1.ExecutionPolicy.StageTimeoutModeH\x04R\x10stageTimeoutMode\x88\x01\x01\x1a\xf1\x01\n" +
+	"\tHeartbeat\x12<\n" +
+	"\tscheduled\x18\x01 \x01(\v2\x19.google.protobuf.DurationH\x00R\tscheduled\x88\x01\x01\x128\n" +
+	"\arunning\x18\x02 \x01(\v2\x19.google.protobuf.DurationH\x01R\arunning\x88\x01\x01\x12A\n" +
+	"\ftearing_down\x18\x03 \x01(\v2\x19.google.protobuf.DurationH\x02R\vtearingDown\x88\x01\x01B\f\n" +
+	"\n" +
+	"_scheduledB\n" +
+	"\n" +
+	"\b_runningB\x0f\n" +
+	"\r_tearing_down\x1a\xd9\x02\n" +
+	"\x0eAttemptTimeout\x12K\n" +
+	"\x11pending_throttled\x18\x01 \x01(\v2\x19.google.protobuf.DurationH\x00R\x10pendingThrottled\x88\x01\x01\x12<\n" +
+	"\tscheduled\x18\x02 \x01(\v2\x19.google.protobuf.DurationH\x01R\tscheduled\x88\x01\x01\x128\n" +
+	"\arunning\x18\x03 \x01(\v2\x19.google.protobuf.DurationH\x02R\arunning\x88\x01\x01\x12A\n" +
+	"\ftearing_down\x18\x04 \x01(\v2\x19.google.protobuf.DurationH\x03R\vtearingDown\x88\x01\x01B\x14\n" +
+	"\x12_pending_throttledB\f\n" +
+	"\n" +
+	"_scheduledB\n" +
+	"\n" +
+	"\b_runningB\x0f\n" +
+	"\r_tearing_down\x1a=\n" +
+	"\x05Retry\x12$\n" +
+	"\vmax_retries\x18\x01 \x01(\x05H\x00R\n" +
+	"maxRetries\x88\x01\x01B\x0e\n" +
+	"\f_max_retries\"\xb2\x01\n" +
 	"\x10StageTimeoutMode\x12\x1e\n" +
 	"\x1aSTAGE_TIMEOUT_MODE_UNKNOWN\x10\x00\x12-\n" +
 	")STAGE_TIMEOUT_MODE_FINISH_CURRENT_ATTEMPT\x10\x01\x120\n" +
 	",STAGE_TIMEOUT_MODE_BLOCK_MAX_EXECUTION_RETRY\x10\x02\x12\x1d\n" +
-	"\x19STAGE_TIMEOUT_MODE_HYBRID\x10\x03BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_execution_policy_proto_rawDescData
-}
+	"\x19STAGE_TIMEOUT_MODE_HYBRID\x10\x03B\x14\n" +
+	"\x12_attempt_heartbeatB\x12\n" +
+	"\x10_attempt_timeoutB\b\n" +
+	"\x06_retryB\x10\n" +
+	"\x0e_stage_timeoutB\x15\n" +
+	"\x13_stage_timeout_modeBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_execution_policy_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_execution_policy_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
@@ -561,6 +822,10 @@ func file_turboci_graph_orchestrator_v1_execution_policy_proto_init() {
 	if File_turboci_graph_orchestrator_v1_execution_policy_proto != nil {
 		return
 	}
+	file_turboci_graph_orchestrator_v1_execution_policy_proto_msgTypes[0].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_execution_policy_proto_msgTypes[1].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_execution_policy_proto_msgTypes[2].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_execution_policy_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

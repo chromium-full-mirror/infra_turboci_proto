@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -27,24 +26,14 @@ const (
 
 // Request message for TurboCIGraphService.QueryNodes.
 type QueryNodesRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The token of the Stage Attempt which is performing this query.
-	//
-	// This is in addition to regular RPC authorization.
-	//
-	// If missing, this RPC will check that the caller additionally has the
-	// 'turboci.workplans.readExternal' on the implied workplans.
-	StageAttemptToken *string `protobuf:"bytes,1,opt,name=stage_attempt_token,json=stageAttemptToken" json:"stage_attempt_token,omitempty"`
-	// If omitted, QueryNodes will return the current version of any nodes in the
-	// query from within a read-only transaction.
-	//
-	// Otherwise, this restricts how the query interacts with the underlying
-	// database.
-	Version *QueryNodesRequest_VersionRestriction `protobuf:"bytes,2,opt,name=version" json:"version,omitempty"`
-	// One or more Queries to select nodes to return.
-	Query         []*Query `protobuf:"bytes,3,rep,name=query" json:"query,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                        protoimpl.MessageState                `protogen:"opaque.v1"`
+	xxx_hidden_StageAttemptToken *string                               `protobuf:"bytes,1,opt,name=stage_attempt_token,json=stageAttemptToken,proto3,oneof"`
+	xxx_hidden_Version           *QueryNodesRequest_VersionRestriction `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
+	xxx_hidden_Query             *[]*Query                             `protobuf:"bytes,3,rep,name=query,proto3"`
+	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
+	XXX_presence                 [1]uint32
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
 }
 
 func (x *QueryNodesRequest) Reset() {
@@ -72,45 +61,108 @@ func (x *QueryNodesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use QueryNodesRequest.ProtoReflect.Descriptor instead.
-func (*QueryNodesRequest) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *QueryNodesRequest) GetStageAttemptToken() string {
-	if x != nil && x.StageAttemptToken != nil {
-		return *x.StageAttemptToken
+	if x != nil {
+		if x.xxx_hidden_StageAttemptToken != nil {
+			return *x.xxx_hidden_StageAttemptToken
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *QueryNodesRequest) GetVersion() *QueryNodesRequest_VersionRestriction {
 	if x != nil {
-		return x.Version
+		return x.xxx_hidden_Version
 	}
 	return nil
 }
 
 func (x *QueryNodesRequest) GetQuery() []*Query {
 	if x != nil {
-		return x.Query
+		if x.xxx_hidden_Query != nil {
+			return *x.xxx_hidden_Query
+		}
 	}
 	return nil
+}
+
+func (x *QueryNodesRequest) SetStageAttemptToken(v string) {
+	x.xxx_hidden_StageAttemptToken = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+}
+
+func (x *QueryNodesRequest) SetVersion(v *QueryNodesRequest_VersionRestriction) {
+	x.xxx_hidden_Version = v
+}
+
+func (x *QueryNodesRequest) SetQuery(v []*Query) {
+	x.xxx_hidden_Query = &v
+}
+
+func (x *QueryNodesRequest) HasStageAttemptToken() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *QueryNodesRequest) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Version != nil
+}
+
+func (x *QueryNodesRequest) ClearStageAttemptToken() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_StageAttemptToken = nil
+}
+
+func (x *QueryNodesRequest) ClearVersion() {
+	x.xxx_hidden_Version = nil
+}
+
+type QueryNodesRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The token of the Stage Attempt which is performing this query.
+	//
+	// This is in addition to regular RPC authorization.
+	//
+	// If missing, this RPC will check that the caller additionally has the
+	// 'turboci.workplans.readExternal' on the implied workplans.
+	StageAttemptToken *string
+	// If omitted, QueryNodes will return the current version of any nodes in the
+	// query from within a read-only transaction.
+	//
+	// Otherwise, this restricts how the query interacts with the underlying
+	// database.
+	Version *QueryNodesRequest_VersionRestriction
+	// One or more Queries to select nodes to return.
+	Query []*Query
+}
+
+func (b0 QueryNodesRequest_builder) Build() *QueryNodesRequest {
+	m0 := &QueryNodesRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.StageAttemptToken != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		x.xxx_hidden_StageAttemptToken = b.StageAttemptToken
+	}
+	x.xxx_hidden_Version = b.Version
+	x.xxx_hidden_Query = &b.Query
+	return m0
 }
 
 // VersionRestriction describes how this query can be constrained by database
 // version.
 type QueryNodesRequest_VersionRestriction struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// What type of restriction to apply.
-	//
-	// Types that are valid to be assigned to Restriction:
-	//
-	//	*QueryNodesRequest_VersionRestriction_Require
-	//	*QueryNodesRequest_VersionRestriction_Snapshot
-	Restriction   isQueryNodesRequest_VersionRestriction_Restriction `protobuf_oneof:"restriction"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState                             `protogen:"opaque.v1"`
+	xxx_hidden_Restriction isQueryNodesRequest_VersionRestriction_Restriction `protobuf_oneof:"restriction"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *QueryNodesRequest_VersionRestriction) Reset() {
@@ -138,21 +190,9 @@ func (x *QueryNodesRequest_VersionRestriction) ProtoReflect() protoreflect.Messa
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use QueryNodesRequest_VersionRestriction.ProtoReflect.Descriptor instead.
-func (*QueryNodesRequest_VersionRestriction) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDescGZIP(), []int{0, 0}
-}
-
-func (x *QueryNodesRequest_VersionRestriction) GetRestriction() isQueryNodesRequest_VersionRestriction_Restriction {
-	if x != nil {
-		return x.Restriction
-	}
-	return nil
-}
-
 func (x *QueryNodesRequest_VersionRestriction) GetRequire() *Revision {
 	if x != nil {
-		if x, ok := x.Restriction.(*QueryNodesRequest_VersionRestriction_Require); ok {
+		if x, ok := x.xxx_hidden_Restriction.(*queryNodesRequest_VersionRestriction_Require); ok {
 			return x.Require
 		}
 	}
@@ -161,18 +201,92 @@ func (x *QueryNodesRequest_VersionRestriction) GetRequire() *Revision {
 
 func (x *QueryNodesRequest_VersionRestriction) GetSnapshot() *Revision {
 	if x != nil {
-		if x, ok := x.Restriction.(*QueryNodesRequest_VersionRestriction_Snapshot); ok {
+		if x, ok := x.xxx_hidden_Restriction.(*queryNodesRequest_VersionRestriction_Snapshot); ok {
 			return x.Snapshot
 		}
 	}
 	return nil
 }
 
-type isQueryNodesRequest_VersionRestriction_Restriction interface {
-	isQueryNodesRequest_VersionRestriction_Restriction()
+func (x *QueryNodesRequest_VersionRestriction) SetRequire(v *Revision) {
+	if v == nil {
+		x.xxx_hidden_Restriction = nil
+		return
+	}
+	x.xxx_hidden_Restriction = &queryNodesRequest_VersionRestriction_Require{v}
 }
 
-type QueryNodesRequest_VersionRestriction_Require struct {
+func (x *QueryNodesRequest_VersionRestriction) SetSnapshot(v *Revision) {
+	if v == nil {
+		x.xxx_hidden_Restriction = nil
+		return
+	}
+	x.xxx_hidden_Restriction = &queryNodesRequest_VersionRestriction_Snapshot{v}
+}
+
+func (x *QueryNodesRequest_VersionRestriction) HasRestriction() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Restriction != nil
+}
+
+func (x *QueryNodesRequest_VersionRestriction) HasRequire() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Restriction.(*queryNodesRequest_VersionRestriction_Require)
+	return ok
+}
+
+func (x *QueryNodesRequest_VersionRestriction) HasSnapshot() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Restriction.(*queryNodesRequest_VersionRestriction_Snapshot)
+	return ok
+}
+
+func (x *QueryNodesRequest_VersionRestriction) ClearRestriction() {
+	x.xxx_hidden_Restriction = nil
+}
+
+func (x *QueryNodesRequest_VersionRestriction) ClearRequire() {
+	if _, ok := x.xxx_hidden_Restriction.(*queryNodesRequest_VersionRestriction_Require); ok {
+		x.xxx_hidden_Restriction = nil
+	}
+}
+
+func (x *QueryNodesRequest_VersionRestriction) ClearSnapshot() {
+	if _, ok := x.xxx_hidden_Restriction.(*queryNodesRequest_VersionRestriction_Snapshot); ok {
+		x.xxx_hidden_Restriction = nil
+	}
+}
+
+const QueryNodesRequest_VersionRestriction_Restriction_not_set_case case_QueryNodesRequest_VersionRestriction_Restriction = 0
+const QueryNodesRequest_VersionRestriction_Require_case case_QueryNodesRequest_VersionRestriction_Restriction = 1
+const QueryNodesRequest_VersionRestriction_Snapshot_case case_QueryNodesRequest_VersionRestriction_Restriction = 2
+
+func (x *QueryNodesRequest_VersionRestriction) WhichRestriction() case_QueryNodesRequest_VersionRestriction_Restriction {
+	if x == nil {
+		return QueryNodesRequest_VersionRestriction_Restriction_not_set_case
+	}
+	switch x.xxx_hidden_Restriction.(type) {
+	case *queryNodesRequest_VersionRestriction_Require:
+		return QueryNodesRequest_VersionRestriction_Require_case
+	case *queryNodesRequest_VersionRestriction_Snapshot:
+		return QueryNodesRequest_VersionRestriction_Snapshot_case
+	default:
+		return QueryNodesRequest_VersionRestriction_Restriction_not_set_case
+	}
+}
+
+type QueryNodesRequest_VersionRestriction_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// What type of restriction to apply.
+
+	// Fields of oneof xxx_hidden_Restriction:
 	// Require will cause the query to return the current version of all
 	// nodes (from the read-only transaction), but it will check that all
 	// queried nodes have a Revision less than or equal to this version.
@@ -184,10 +298,7 @@ type QueryNodesRequest_VersionRestriction_Require struct {
 	// Use this when issuing follow-up queries within a transaction, where you
 	// want to abort and retry that transaction as soon as you know there will
 	// be a conflict.
-	Require *Revision `protobuf:"bytes,1,opt,name=require,oneof"`
-}
-
-type QueryNodesRequest_VersionRestriction_Snapshot struct {
+	Require *Revision
 	// Query from the database at this snapshot version.
 	//
 	// This can return data older than the current version in the database.
@@ -198,40 +309,88 @@ type QueryNodesRequest_VersionRestriction_Snapshot struct {
 	// This CAN be used from a transaction (WriteNodes will eventually detect
 	// the discrepancy and you will need to retry the transaction at that
 	// point).
-	Snapshot *Revision `protobuf:"bytes,2,opt,name=snapshot,oneof"`
+	Snapshot *Revision
+	// -- end of xxx_hidden_Restriction
 }
 
-func (*QueryNodesRequest_VersionRestriction_Require) isQueryNodesRequest_VersionRestriction_Restriction() {
+func (b0 QueryNodesRequest_VersionRestriction_builder) Build() *QueryNodesRequest_VersionRestriction {
+	m0 := &QueryNodesRequest_VersionRestriction{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Require != nil {
+		x.xxx_hidden_Restriction = &queryNodesRequest_VersionRestriction_Require{b.Require}
+	}
+	if b.Snapshot != nil {
+		x.xxx_hidden_Restriction = &queryNodesRequest_VersionRestriction_Snapshot{b.Snapshot}
+	}
+	return m0
 }
 
-func (*QueryNodesRequest_VersionRestriction_Snapshot) isQueryNodesRequest_VersionRestriction_Restriction() {
+type case_QueryNodesRequest_VersionRestriction_Restriction protoreflect.FieldNumber
+
+func (x case_QueryNodesRequest_VersionRestriction_Restriction) String() string {
+	md := file_turboci_graph_orchestrator_v1_query_nodes_request_proto_msgTypes[1].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
+type isQueryNodesRequest_VersionRestriction_Restriction interface {
+	isQueryNodesRequest_VersionRestriction_Restriction()
+}
+
+type queryNodesRequest_VersionRestriction_Require struct {
+	// Require will cause the query to return the current version of all
+	// nodes (from the read-only transaction), but it will check that all
+	// queried nodes have a Revision less than or equal to this version.
+	//
+	// If QueryNodes would return a node newer than `require`, it will return
+	// FAILED_PRECONDITION with a detail message of
+	// TransactionConflictFailure.
+	//
+	// Use this when issuing follow-up queries within a transaction, where you
+	// want to abort and retry that transaction as soon as you know there will
+	// be a conflict.
+	Require *Revision `protobuf:"bytes,1,opt,name=require,proto3,oneof"`
+}
+
+type queryNodesRequest_VersionRestriction_Snapshot struct {
+	// Query from the database at this snapshot version.
+	//
+	// This can return data older than the current version in the database.
+	//
+	// Use this when trying to assemble a consistent (but possibly stale) view
+	// of the data in the database.
+	//
+	// This CAN be used from a transaction (WriteNodes will eventually detect
+	// the discrepancy and you will need to retry the transaction at that
+	// point).
+	Snapshot *Revision `protobuf:"bytes,2,opt,name=snapshot,proto3,oneof"`
+}
+
+func (*queryNodesRequest_VersionRestriction_Require) isQueryNodesRequest_VersionRestriction_Restriction() {
+}
+
+func (*queryNodesRequest_VersionRestriction_Snapshot) isQueryNodesRequest_VersionRestriction_Restriction() {
 }
 
 var File_turboci_graph_orchestrator_v1_query_nodes_request_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/query_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/query.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\x90\x03\n" +
-	"\x11QueryNodesRequest\x12.\n" +
-	"\x13stage_attempt_token\x18\x01 \x01(\tR\x11stageAttemptToken\x12]\n" +
-	"\aversion\x18\x02 \x01(\v2C.turboci.graph.orchestrator.v1.QueryNodesRequest.VersionRestrictionR\aversion\x12:\n" +
+	"7turboci/graph/orchestrator/v1/query_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/query.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xbe\x03\n" +
+	"\x11QueryNodesRequest\x123\n" +
+	"\x13stage_attempt_token\x18\x01 \x01(\tH\x00R\x11stageAttemptToken\x88\x01\x01\x12b\n" +
+	"\aversion\x18\x02 \x01(\v2C.turboci.graph.orchestrator.v1.QueryNodesRequest.VersionRestrictionH\x01R\aversion\x88\x01\x01\x12:\n" +
 	"\x05query\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.QueryR\x05query\x1a\xaf\x01\n" +
 	"\x12VersionRestriction\x12C\n" +
 	"\arequire\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\arequire\x12E\n" +
 	"\bsnapshot\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\bsnapshotB\r\n" +
-	"\vrestrictionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDescData
-}
+	"\vrestrictionB\x16\n" +
+	"\x14_stage_attempt_tokenB\n" +
+	"\n" +
+	"\b_versionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_query_nodes_request_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_query_nodes_request_proto_goTypes = []any{
@@ -259,9 +418,10 @@ func file_turboci_graph_orchestrator_v1_query_nodes_request_proto_init() {
 	}
 	file_turboci_graph_orchestrator_v1_query_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
+	file_turboci_graph_orchestrator_v1_query_nodes_request_proto_msgTypes[0].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_query_nodes_request_proto_msgTypes[1].OneofWrappers = []any{
-		(*QueryNodesRequest_VersionRestriction_Require)(nil),
-		(*QueryNodesRequest_VersionRestriction_Snapshot)(nil),
+		(*queryNodesRequest_VersionRestriction_Require)(nil),
+		(*queryNodesRequest_VersionRestriction_Snapshot)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -36,7 +36,7 @@ message GraphView {
   // When a GraphView is returned from a read operation (e.g. QueryNodes), it
   // will be the version of the snapshot of the graph used to prepare this
   // GraphView.
-  Revision version = 1;
+  optional Revision version = 1;
 
   // Checks in the graph.
   //

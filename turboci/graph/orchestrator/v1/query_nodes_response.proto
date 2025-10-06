@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -14,7 +14,7 @@ option java_multiple_files = true;
 // Response message for TurboCIGraphService.QueryNodes.
 message QueryNodesResponse {
   // The graph view of the nodes matching the query.
-  GraphView graph = 1;
+  optional GraphView graph = 1;
 
   // TBD: A field to indicate which permissions were checked that the caller
   // didn't have access to.

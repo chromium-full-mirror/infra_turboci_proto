@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -21,7 +21,7 @@ message Edge {
   // Target indicates the node that this Edge points to.
   //
   // Currently only Checks and Stages are supported.
-  ids.v1.Identifier target = 1;
+  optional ids.v1.Identifier target = 1;
 
   // The Orchestrator logically attempts to resolve an Edge any time the target
   // it points to changes - in practice, the Orchestrator will make various
@@ -35,13 +35,13 @@ message Edge {
   message Resolution {
     // If this is `true`, then this Edge's condition is satisfied.
     // If this is `false`, then this Edge's condition is unsatisfiable.
-    bool satisfied = 1 [(google.api.field_behavior) = IMMUTABLE];
+    optional bool satisfied = 1 [(google.api.field_behavior) = IMMUTABLE];
 
     // The version of the target node which caused this Edge (or EdgeGroup) to
     // be satisfied/unsatisfiable.
     //
     // This will always be less than or equal to the version in `at`.
-    Revision target_version = 2 [(google.api.field_behavior) = IMMUTABLE];
+    optional Revision target_version = 2 [(google.api.field_behavior) = IMMUTABLE];
 
     // The database revsision (commit timestamp) at which this resolution was
     // made.
@@ -52,12 +52,12 @@ message Edge {
     // marked as resolved.
     //
     // This will always be greater than or equal to the version in `target_version`.
-    Revision at = 3 [(google.api.field_behavior) = IMMUTABLE];
+    optional Revision at = 3 [(google.api.field_behavior) = IMMUTABLE];
   }
   // Indicates if this Edge was resolved yet.
   //
   // If this is absent, then this Edge has not yet been resolved.
-  Resolution resolution = 2;
+  optional Resolution resolution = 2;
 
   // TODO: Add a way to set a condition on this edge.
   //

@@ -75,7 +75,13 @@ def CheckServiceDefinitions(input_api, output_api):
       message=output_api.PresubmitError,
   )])
 
-
+def CheckAllFieldsOptional(input_api, output_api):
+  return input_api.RunTests([input_api.Command(
+      name='build.py check_all_fields_optional',
+      cmd=['build.py', 'check_all_fields_optional'],
+      kwargs={'cwd': input_api.PresubmitLocalPath()},
+      message=output_api.PresubmitError,
+  )])
 
 def CheckLicense(input_api, output_api):
   input_api.DEFAULT_FILES_TO_CHECK += (r'.+\.proto$',)

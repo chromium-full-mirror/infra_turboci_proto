@@ -16,7 +16,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -36,38 +35,15 @@ const (
 // to include additional indexable values to allow clients of TurboCI to e.g.
 // search for Checks whose options contain "type" with some specific value.
 type Datum struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The identifier of this Datum.
-	//
-	// This is used to map the Datum to the appropriate object (e.g. CheckOption,
-	// CheckResult, etc.).
-	Identifier *v1.Identifier `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
-	// Maps this datum to a security realm.
-	//
-	// If omitted, this Datum inherits the realm of the object that it belongs to
-	// (i.e. Check or Check Result).
-	Realm *string `protobuf:"bytes,2,opt,name=realm" json:"realm,omitempty"`
-	// The version of this Datum in the database.
-	Version *Revision `protobuf:"bytes,3,opt,name=version" json:"version,omitempty"`
-	// The actual value of this Datum.
-	//
-	// The TurboCI orchestrator requires that the type_url of the `value` here be
-	// [pre-registered](TBD). This registration ensures that:
-	//   - The proto type URL is known to the service frontend (otherwise the
-	//     service frontend will reject the type).
-	//   - The type is compatible in the context of this Datum (i.e. within
-	//     a Check or Check.Result of a certain Kind).
-	//
-	// Once a type is registered, however, the Orchestrator service will not
-	// require the content to be conformant to its registered type. That is
-	// - Workflows may run with newer versions of the type definition for a given
-	// registered type. This allows rapid prototyping of workflows without the
-	// need to land and deploy schema changes ahead of time.
-	//
-	// The `type_url` of this value is immutable.
-	Value         *Value `protobuf:"bytes,4,opt,name=value" json:"value,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier  *v1.Identifier         `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Realm       *string                `protobuf:"bytes,2,opt,name=realm,proto3,oneof"`
+	xxx_hidden_Version     *Revision              `protobuf:"bytes,3,opt,name=version,proto3,oneof"`
+	xxx_hidden_Value       *Value                 `protobuf:"bytes,4,opt,name=value,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Datum) Reset() {
@@ -95,64 +71,165 @@ func (x *Datum) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Datum.ProtoReflect.Descriptor instead.
-func (*Datum) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_datum_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Datum) GetIdentifier() *v1.Identifier {
 	if x != nil {
-		return x.Identifier
+		return x.xxx_hidden_Identifier
 	}
 	return nil
 }
 
 func (x *Datum) GetRealm() string {
-	if x != nil && x.Realm != nil {
-		return *x.Realm
+	if x != nil {
+		if x.xxx_hidden_Realm != nil {
+			return *x.xxx_hidden_Realm
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Datum) GetVersion() *Revision {
 	if x != nil {
-		return x.Version
+		return x.xxx_hidden_Version
 	}
 	return nil
 }
 
 func (x *Datum) GetValue() *Value {
 	if x != nil {
-		return x.Value
+		return x.xxx_hidden_Value
 	}
 	return nil
+}
+
+func (x *Datum) SetIdentifier(v *v1.Identifier) {
+	x.xxx_hidden_Identifier = v
+}
+
+func (x *Datum) SetRealm(v string) {
+	x.xxx_hidden_Realm = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
+}
+
+func (x *Datum) SetVersion(v *Revision) {
+	x.xxx_hidden_Version = v
+}
+
+func (x *Datum) SetValue(v *Value) {
+	x.xxx_hidden_Value = v
+}
+
+func (x *Datum) HasIdentifier() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Identifier != nil
+}
+
+func (x *Datum) HasRealm() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Datum) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Version != nil
+}
+
+func (x *Datum) HasValue() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Value != nil
+}
+
+func (x *Datum) ClearIdentifier() {
+	x.xxx_hidden_Identifier = nil
+}
+
+func (x *Datum) ClearRealm() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Realm = nil
+}
+
+func (x *Datum) ClearVersion() {
+	x.xxx_hidden_Version = nil
+}
+
+func (x *Datum) ClearValue() {
+	x.xxx_hidden_Value = nil
+}
+
+type Datum_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The identifier of this Datum.
+	//
+	// This is used to map the Datum to the appropriate object (e.g. CheckOption,
+	// CheckResult, etc.).
+	Identifier *v1.Identifier
+	// Maps this datum to a security realm.
+	//
+	// If omitted, this Datum inherits the realm of the object that it belongs to
+	// (i.e. Check or Check Result).
+	Realm *string
+	// The version of this Datum in the database.
+	Version *Revision
+	// The actual value of this Datum.
+	//
+	// The TurboCI orchestrator requires that the type_url of the `value` here be
+	// [pre-registered](TBD). This registration ensures that:
+	//   - The proto type URL is known to the service frontend (otherwise the
+	//     service frontend will reject the type).
+	//   - The type is compatible in the context of this Datum (i.e. within
+	//     a Check or Check.Result of a certain Kind).
+	//
+	// Once a type is registered, however, the Orchestrator service will not
+	// require the content to be conformant to its registered type. That is
+	// - Workflows may run with newer versions of the type definition for a given
+	// registered type. This allows rapid prototyping of workflows without the
+	// need to land and deploy schema changes ahead of time.
+	//
+	// The `type_url` of this value is immutable.
+	Value *Value
+}
+
+func (b0 Datum_builder) Build() *Datum {
+	m0 := &Datum{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Identifier = b.Identifier
+	if b.Realm != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
+		x.xxx_hidden_Realm = b.Realm
+	}
+	x.xxx_hidden_Version = b.Version
+	x.xxx_hidden_Value = b.Value
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_datum_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_datum_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/datum.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xf2\x01\n" +
-	"\x05Datum\x12O\n" +
+	")turboci/graph/orchestrator/v1/datum.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xb5\x02\n" +
+	"\x05Datum\x12T\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2 .turboci.graph.ids.v1.IdentifierB\r\x82\x86\xf6\xfb\x0f\a\x12\x05\n" +
-	"\x03\x03\x05\aR\n" +
-	"identifier\x12\x19\n" +
-	"\x05realm\x18\x02 \x01(\tB\x03\xe0A\x05R\x05realm\x12A\n" +
-	"\aversion\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionR\aversion\x12:\n" +
-	"\x05value\x18\x04 \x01(\v2$.turboci.graph.orchestrator.v1.ValueR\x05valueBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_datum_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_datum_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_datum_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_datum_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_datum_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_datum_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_datum_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_datum_proto_rawDescData
-}
+	"\x03\x03\x05\aH\x00R\n" +
+	"identifier\x88\x01\x01\x12\x1e\n" +
+	"\x05realm\x18\x02 \x01(\tB\x03\xe0A\x05H\x01R\x05realm\x88\x01\x01\x12F\n" +
+	"\aversion\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\aversion\x88\x01\x01\x12?\n" +
+	"\x05value\x18\x04 \x01(\v2$.turboci.graph.orchestrator.v1.ValueH\x03R\x05value\x88\x01\x01B\r\n" +
+	"\v_identifierB\b\n" +
+	"\x06_realmB\n" +
+	"\n" +
+	"\b_versionB\b\n" +
+	"\x06_valueBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_datum_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_datum_proto_goTypes = []any{
@@ -180,6 +257,7 @@ func file_turboci_graph_orchestrator_v1_datum_proto_init() {
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
 	file_turboci_graph_orchestrator_v1_value_proto_init()
+	file_turboci_graph_orchestrator_v1_datum_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

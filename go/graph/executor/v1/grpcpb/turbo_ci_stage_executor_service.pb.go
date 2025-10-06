@@ -32,7 +32,7 @@ const file_turboci_graph_executor_v1_turbo_ci_stage_executor_service_proto_rawDe
 	"?turboci/graph/executor/v1/turbo_ci_stage_executor_service.proto\x12\x19turboci.graph.executor.v1\x1a,turboci/graph/executor/v1/cancel_stage.proto\x1a)turboci/graph/executor/v1/run_stage.proto2\xed\x01\n" +
 	"\x14TurboCIStageExecutor\x12e\n" +
 	"\bRunStage\x12*.turboci.graph.executor.v1.RunStageRequest\x1a+.turboci.graph.executor.v1.RunStageResponse\"\x00\x12n\n" +
-	"\vCancelStage\x12-.turboci.graph.executor.v1.CancelStageRequest\x1a..turboci.graph.executor.v1.CancelStageResponse\"\x00BLP\x01ZHgo.chromium.org/turboci/proto/go/graph/executor/v1/grpcpb;executorgrpcpbb\beditionsp\xe8\a"
+	"\vCancelStage\x12-.turboci.graph.executor.v1.CancelStageRequest\x1a..turboci.graph.executor.v1.CancelStageResponse\"\x00BLP\x01ZHgo.chromium.org/turboci/proto/go/graph/executor/v1/grpcpb;executorgrpcpbb\x06proto3"
 
 var file_turboci_graph_executor_v1_turbo_ci_stage_executor_service_proto_goTypes = []any{
 	(*v1.RunStageRequest)(nil),     // 0: turboci.graph.executor.v1.RunStageRequest

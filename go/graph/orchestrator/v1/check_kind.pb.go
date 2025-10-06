@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -97,11 +96,6 @@ func (x CheckKind) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use CheckKind.Descriptor instead.
-func (CheckKind) EnumDescriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_check_kind_proto_rawDescGZIP(), []int{0}
-}
-
 var File_turboci_graph_orchestrator_v1_check_kind_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_check_kind_proto_rawDesc = "" +
@@ -112,19 +106,7 @@ const file_turboci_graph_orchestrator_v1_check_kind_proto_rawDesc = "" +
 	"\x11CHECK_KIND_SOURCE\x10\x01\x12\x14\n" +
 	"\x10CHECK_KIND_BUILD\x10\x02\x12\x13\n" +
 	"\x0fCHECK_KIND_TEST\x10\x03\x12\x17\n" +
-	"\x13CHECK_KIND_ANALYSIS\x10\x04BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_check_kind_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_check_kind_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_check_kind_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_check_kind_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_check_kind_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_check_kind_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_check_kind_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_check_kind_proto_rawDescData
-}
+	"\x13CHECK_KIND_ANALYSIS\x10\x04BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_check_kind_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_check_kind_proto_goTypes = []any{

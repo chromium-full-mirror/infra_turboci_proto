@@ -16,7 +16,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -36,78 +35,22 @@ const (
 //   - StageView (graph view object for a Stage and contained messages)
 //   - StageEditView (graph view object for Edits of a Stage)
 type Stage struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The Stage's identifier.
-	Identifier *v1.Stage `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
-	// The security realm for this Stage.
-	//
-	// When a Stage inserts another, the inserted Stage will inherit the realm of
-	// the inserting Stage, unless this is explicitly set.
-	Realm *string `protobuf:"bytes,2,opt,name=realm" json:"realm,omitempty"`
-	// The database revision (commit timestamp) when this Stage was created.
-	CreateTs *Revision `protobuf:"bytes,3,opt,name=create_ts,json=createTs" json:"create_ts,omitempty"`
-	// The arguments of the Stage.
-	//
-	// `identifier` is always empty.
-	//
-	// The type of this Datum must be pre-registered with the Orchestrator, and
-	// that registration will indicate which Executor should handle this Stage.
-	//
-	// NOTE: It's assumed that args.type_url will be a sufficient routing key to
-	// the various registered Executors, but it's POSSIBLE that we may need to
-	// have multiple Executors handle exactly the same Stage type, at which point
-	// we would need to either:
-	//   - Add a secondary type to distinguish them; this would have the
-	//     additional benefit of allowing us to clearly delineate the differences
-	//     via documentation, but if we have this situation a lot, it could be
-	//     confusing.
-	//   - Add another field to Stage to allow registration on (newfield,
-	//     type_url) instead of just type_url.
-	//
-	// Looking at WorkNode, there are definitely multiple executor types which
-	// accept the same arguments in WorkParameters, but these could be represented
-	// by adding a new field to WorkParameters. There is also the PARTIAL_RERUN
-	// executor type which is used when duplicating WorkNodes, but this seems like
-	// it will be handled differently with Checks (i.e. Checks of the same options
-	// would be added, and new Results of the cached results would be added. There
-	// wouldn't be a need to add placeholder Stages into such a graph). There
-	// are also some executor types which serve as a way to separate ACLs, but
-	// we expect this to be handled by realms.
-	Args *Value `protobuf:"bytes,4,opt,name=args" json:"args,omitempty"`
-	// The version of this Stage.
-	//
-	// Updated any time fields in this Stage change, which includes all changes to
-	// the active Stage Attempt (if state is ATTEMPTING).
-	Version *Revision `protobuf:"bytes,5,opt,name=version" json:"version,omitempty"`
-	// The current state of the Stage.
-	State *StageState `protobuf:"varint,6,opt,name=state,enum=turboci.graph.orchestrator.v1.StageState" json:"state,omitempty"`
-	// Stages are allowed to depend on other Checks and Stages, and will not be
-	// sent to an Executor until these dependencies are resolved.
-	Dependencies []*EdgeGroup `protobuf:"bytes,7,rep,name=dependencies" json:"dependencies,omitempty"`
-	// Execution policy for this Stage.
-	ExecutionPolicy *Stage_ExecutionPolicyState `protobuf:"bytes,8,opt,name=execution_policy,json=executionPolicy" json:"execution_policy,omitempty"`
-	// Current retry/attempts state of this Stage, stored in ascending order by
-	// created time.
-	//
-	// Only the most recent attempt (the last in the list) is potentially 'live'.
-	Attempts []*Stage_Attempt `protobuf:"bytes,9,rep,name=attempts" json:"attempts,omitempty"`
-	// The workflow's intent for this Stage.
-	Assignments []*Stage_Assignment `protobuf:"bytes,10,rep,name=assignments" json:"assignments,omitempty"`
-	// A set of other Stages, created by this Stage, which should be treated as a
-	// logical part of this Stage.
-	//
-	// Any other Stages in the graph waiting for this one to be FINAL will
-	// additionally wait for the continuation_group stages to be FINAL as well,
-	// allowing this Stage to transition to WAITING_FOR_GROUP without unblocking
-	// dependent Stages.
-	//
-	// This allows for encapsulation of work where one Stage may spawn a group of
-	// Stages which should be treated as a single unit - otherwise all waiters for
-	// this Stage would need to be informed of, and wait for, these new Stages
-	// which introduces a leaky abstraction.
-	ContinuationGroup []*Edge `protobuf:"bytes,11,rep,name=continuation_group,json=continuationGroup" json:"continuation_group,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state                        protoimpl.MessageState      `protogen:"opaque.v1"`
+	xxx_hidden_Identifier        *v1.Stage                   `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Realm             *string                     `protobuf:"bytes,2,opt,name=realm,proto3,oneof"`
+	xxx_hidden_CreateTs          *Revision                   `protobuf:"bytes,3,opt,name=create_ts,json=createTs,proto3,oneof"`
+	xxx_hidden_Args              *Value                      `protobuf:"bytes,4,opt,name=args,proto3,oneof"`
+	xxx_hidden_Version           *Revision                   `protobuf:"bytes,5,opt,name=version,proto3,oneof"`
+	xxx_hidden_State             StageState                  `protobuf:"varint,6,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
+	xxx_hidden_Dependencies      *[]*EdgeGroup               `protobuf:"bytes,7,rep,name=dependencies,proto3"`
+	xxx_hidden_ExecutionPolicy   *Stage_ExecutionPolicyState `protobuf:"bytes,8,opt,name=execution_policy,json=executionPolicy,proto3,oneof"`
+	xxx_hidden_Attempts          *[]*Stage_Attempt           `protobuf:"bytes,9,rep,name=attempts,proto3"`
+	xxx_hidden_Assignments       *[]*Stage_Assignment        `protobuf:"bytes,10,rep,name=assignments,proto3"`
+	xxx_hidden_ContinuationGroup *[]*Edge                    `protobuf:"bytes,11,rep,name=continuation_group,json=continuationGroup,proto3"`
+	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
+	XXX_presence                 [1]uint32
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
 }
 
 func (x *Stage) Reset() {
@@ -135,86 +78,317 @@ func (x *Stage) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Stage.ProtoReflect.Descriptor instead.
-func (*Stage) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_stage_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Stage) GetIdentifier() *v1.Stage {
 	if x != nil {
-		return x.Identifier
+		return x.xxx_hidden_Identifier
 	}
 	return nil
 }
 
 func (x *Stage) GetRealm() string {
-	if x != nil && x.Realm != nil {
-		return *x.Realm
+	if x != nil {
+		if x.xxx_hidden_Realm != nil {
+			return *x.xxx_hidden_Realm
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Stage) GetCreateTs() *Revision {
 	if x != nil {
-		return x.CreateTs
+		return x.xxx_hidden_CreateTs
 	}
 	return nil
 }
 
 func (x *Stage) GetArgs() *Value {
 	if x != nil {
-		return x.Args
+		return x.xxx_hidden_Args
 	}
 	return nil
 }
 
 func (x *Stage) GetVersion() *Revision {
 	if x != nil {
-		return x.Version
+		return x.xxx_hidden_Version
 	}
 	return nil
 }
 
 func (x *Stage) GetState() StageState {
-	if x != nil && x.State != nil {
-		return *x.State
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 5) {
+			return x.xxx_hidden_State
+		}
 	}
 	return StageState_STAGE_STATE_UNKNOWN
 }
 
 func (x *Stage) GetDependencies() []*EdgeGroup {
 	if x != nil {
-		return x.Dependencies
+		if x.xxx_hidden_Dependencies != nil {
+			return *x.xxx_hidden_Dependencies
+		}
 	}
 	return nil
 }
 
 func (x *Stage) GetExecutionPolicy() *Stage_ExecutionPolicyState {
 	if x != nil {
-		return x.ExecutionPolicy
+		return x.xxx_hidden_ExecutionPolicy
 	}
 	return nil
 }
 
 func (x *Stage) GetAttempts() []*Stage_Attempt {
 	if x != nil {
-		return x.Attempts
+		if x.xxx_hidden_Attempts != nil {
+			return *x.xxx_hidden_Attempts
+		}
 	}
 	return nil
 }
 
 func (x *Stage) GetAssignments() []*Stage_Assignment {
 	if x != nil {
-		return x.Assignments
+		if x.xxx_hidden_Assignments != nil {
+			return *x.xxx_hidden_Assignments
+		}
 	}
 	return nil
 }
 
 func (x *Stage) GetContinuationGroup() []*Edge {
 	if x != nil {
-		return x.ContinuationGroup
+		if x.xxx_hidden_ContinuationGroup != nil {
+			return *x.xxx_hidden_ContinuationGroup
+		}
 	}
 	return nil
+}
+
+func (x *Stage) SetIdentifier(v *v1.Stage) {
+	x.xxx_hidden_Identifier = v
+}
+
+func (x *Stage) SetRealm(v string) {
+	x.xxx_hidden_Realm = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 11)
+}
+
+func (x *Stage) SetCreateTs(v *Revision) {
+	x.xxx_hidden_CreateTs = v
+}
+
+func (x *Stage) SetArgs(v *Value) {
+	x.xxx_hidden_Args = v
+}
+
+func (x *Stage) SetVersion(v *Revision) {
+	x.xxx_hidden_Version = v
+}
+
+func (x *Stage) SetState(v StageState) {
+	x.xxx_hidden_State = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 11)
+}
+
+func (x *Stage) SetDependencies(v []*EdgeGroup) {
+	x.xxx_hidden_Dependencies = &v
+}
+
+func (x *Stage) SetExecutionPolicy(v *Stage_ExecutionPolicyState) {
+	x.xxx_hidden_ExecutionPolicy = v
+}
+
+func (x *Stage) SetAttempts(v []*Stage_Attempt) {
+	x.xxx_hidden_Attempts = &v
+}
+
+func (x *Stage) SetAssignments(v []*Stage_Assignment) {
+	x.xxx_hidden_Assignments = &v
+}
+
+func (x *Stage) SetContinuationGroup(v []*Edge) {
+	x.xxx_hidden_ContinuationGroup = &v
+}
+
+func (x *Stage) HasIdentifier() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Identifier != nil
+}
+
+func (x *Stage) HasRealm() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Stage) HasCreateTs() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_CreateTs != nil
+}
+
+func (x *Stage) HasArgs() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Args != nil
+}
+
+func (x *Stage) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Version != nil
+}
+
+func (x *Stage) HasState() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
+}
+
+func (x *Stage) HasExecutionPolicy() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_ExecutionPolicy != nil
+}
+
+func (x *Stage) ClearIdentifier() {
+	x.xxx_hidden_Identifier = nil
+}
+
+func (x *Stage) ClearRealm() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Realm = nil
+}
+
+func (x *Stage) ClearCreateTs() {
+	x.xxx_hidden_CreateTs = nil
+}
+
+func (x *Stage) ClearArgs() {
+	x.xxx_hidden_Args = nil
+}
+
+func (x *Stage) ClearVersion() {
+	x.xxx_hidden_Version = nil
+}
+
+func (x *Stage) ClearState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	x.xxx_hidden_State = StageState_STAGE_STATE_UNKNOWN
+}
+
+func (x *Stage) ClearExecutionPolicy() {
+	x.xxx_hidden_ExecutionPolicy = nil
+}
+
+type Stage_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The Stage's identifier.
+	Identifier *v1.Stage
+	// The security realm for this Stage.
+	//
+	// When a Stage inserts another, the inserted Stage will inherit the realm of
+	// the inserting Stage, unless this is explicitly set.
+	Realm *string
+	// The database revision (commit timestamp) when this Stage was created.
+	CreateTs *Revision
+	// The arguments of the Stage.
+	//
+	// `identifier` is always empty.
+	//
+	// The type of this Datum must be pre-registered with the Orchestrator, and
+	// that registration will indicate which Executor should handle this Stage.
+	//
+	// NOTE: It's assumed that args.type_url will be a sufficient routing key to
+	// the various registered Executors, but it's POSSIBLE that we may need to
+	// have multiple Executors handle exactly the same Stage type, at which point
+	// we would need to either:
+	//   - Add a secondary type to distinguish them; this would have the
+	//     additional benefit of allowing us to clearly delineate the differences
+	//     via documentation, but if we have this situation a lot, it could be
+	//     confusing.
+	//   - Add another field to Stage to allow registration on (newfield,
+	//     type_url) instead of just type_url.
+	//
+	// Looking at WorkNode, there are definitely multiple executor types which
+	// accept the same arguments in WorkParameters, but these could be represented
+	// by adding a new field to WorkParameters. There is also the PARTIAL_RERUN
+	// executor type which is used when duplicating WorkNodes, but this seems like
+	// it will be handled differently with Checks (i.e. Checks of the same options
+	// would be added, and new Results of the cached results would be added. There
+	// wouldn't be a need to add placeholder Stages into such a graph). There
+	// are also some executor types which serve as a way to separate ACLs, but
+	// we expect this to be handled by realms.
+	Args *Value
+	// The version of this Stage.
+	//
+	// Updated any time fields in this Stage change, which includes all changes to
+	// the active Stage Attempt (if state is ATTEMPTING).
+	Version *Revision
+	// The current state of the Stage.
+	State *StageState
+	// Stages are allowed to depend on other Checks and Stages, and will not be
+	// sent to an Executor until these dependencies are resolved.
+	Dependencies []*EdgeGroup
+	// Execution policy for this Stage.
+	ExecutionPolicy *Stage_ExecutionPolicyState
+	// Current retry/attempts state of this Stage, stored in ascending order by
+	// created time.
+	//
+	// Only the most recent attempt (the last in the list) is potentially 'live'.
+	Attempts []*Stage_Attempt
+	// The workflow's intent for this Stage.
+	Assignments []*Stage_Assignment
+	// A set of other Stages, created by this Stage, which should be treated as a
+	// logical part of this Stage.
+	//
+	// Any other Stages in the graph waiting for this one to be FINAL will
+	// additionally wait for the continuation_group stages to be FINAL as well,
+	// allowing this Stage to transition to WAITING_FOR_GROUP without unblocking
+	// dependent Stages.
+	//
+	// This allows for encapsulation of work where one Stage may spawn a group of
+	// Stages which should be treated as a single unit - otherwise all waiters for
+	// this Stage would need to be informed of, and wait for, these new Stages
+	// which introduces a leaky abstraction.
+	ContinuationGroup []*Edge
+}
+
+func (b0 Stage_builder) Build() *Stage {
+	m0 := &Stage{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Identifier = b.Identifier
+	if b.Realm != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 11)
+		x.xxx_hidden_Realm = b.Realm
+	}
+	x.xxx_hidden_CreateTs = b.CreateTs
+	x.xxx_hidden_Args = b.Args
+	x.xxx_hidden_Version = b.Version
+	if b.State != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 11)
+		x.xxx_hidden_State = *b.State
+	}
+	x.xxx_hidden_Dependencies = &b.Dependencies
+	x.xxx_hidden_ExecutionPolicy = b.ExecutionPolicy
+	x.xxx_hidden_Attempts = &b.Attempts
+	x.xxx_hidden_Assignments = &b.Assignments
+	x.xxx_hidden_ContinuationGroup = &b.ContinuationGroup
+	return m0
 }
 
 // ExecutionPolicyState is the set of execution policies which define the
@@ -230,24 +404,11 @@ func (x *Stage) GetContinuationGroup() []*Edge {
 // In the future, this may also include a `dynamic` policy which could allow
 // additional restrictions to be added after the Stage is created.
 type Stage_ExecutionPolicyState struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Requested execution policy is the policy which is set by the creator of
-	// this Stage.
-	//
-	// This will be validated by the Executor prior to the Stage being committed
-	// to the graph.
-	//
-	// If omitted, the Executor will provide a full ExecutionPolicy according to
-	// its own logic/configuration.
-	Requested *ExecutionPolicy `protobuf:"bytes,1,opt,name=requested" json:"requested,omitempty"`
-	// Actual execution policy is the policy validated and returned by the
-	// Executor when it accepts the Stage for insertion to the graph.
-	//
-	// This is the policy that TurboCI will use to drive Attempts for this
-	// Stage.
-	Validated     *ExecutionPolicy `protobuf:"bytes,2,opt,name=validated" json:"validated,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Requested *ExecutionPolicy       `protobuf:"bytes,1,opt,name=requested,proto3,oneof"`
+	xxx_hidden_Validated *ExecutionPolicy       `protobuf:"bytes,2,opt,name=validated,proto3,oneof"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *Stage_ExecutionPolicyState) Reset() {
@@ -275,23 +436,77 @@ func (x *Stage_ExecutionPolicyState) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Stage_ExecutionPolicyState.ProtoReflect.Descriptor instead.
-func (*Stage_ExecutionPolicyState) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_stage_proto_rawDescGZIP(), []int{0, 0}
-}
-
 func (x *Stage_ExecutionPolicyState) GetRequested() *ExecutionPolicy {
 	if x != nil {
-		return x.Requested
+		return x.xxx_hidden_Requested
 	}
 	return nil
 }
 
 func (x *Stage_ExecutionPolicyState) GetValidated() *ExecutionPolicy {
 	if x != nil {
-		return x.Validated
+		return x.xxx_hidden_Validated
 	}
 	return nil
+}
+
+func (x *Stage_ExecutionPolicyState) SetRequested(v *ExecutionPolicy) {
+	x.xxx_hidden_Requested = v
+}
+
+func (x *Stage_ExecutionPolicyState) SetValidated(v *ExecutionPolicy) {
+	x.xxx_hidden_Validated = v
+}
+
+func (x *Stage_ExecutionPolicyState) HasRequested() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Requested != nil
+}
+
+func (x *Stage_ExecutionPolicyState) HasValidated() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Validated != nil
+}
+
+func (x *Stage_ExecutionPolicyState) ClearRequested() {
+	x.xxx_hidden_Requested = nil
+}
+
+func (x *Stage_ExecutionPolicyState) ClearValidated() {
+	x.xxx_hidden_Validated = nil
+}
+
+type Stage_ExecutionPolicyState_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Requested execution policy is the policy which is set by the creator of
+	// this Stage.
+	//
+	// This will be validated by the Executor prior to the Stage being committed
+	// to the graph.
+	//
+	// If omitted, the Executor will provide a full ExecutionPolicy according to
+	// its own logic/configuration.
+	Requested *ExecutionPolicy
+	// Actual execution policy is the policy validated and returned by the
+	// Executor when it accepts the Stage for insertion to the graph.
+	//
+	// This is the policy that TurboCI will use to drive Attempts for this
+	// Stage.
+	Validated *ExecutionPolicy
+}
+
+func (b0 Stage_ExecutionPolicyState_builder) Build() *Stage_ExecutionPolicyState {
+	m0 := &Stage_ExecutionPolicyState{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Requested = b.Requested
+	x.xxx_hidden_Validated = b.Validated
+	return m0
 }
 
 // Attempt represents a single attempt to execute a Stage.
@@ -302,11 +517,151 @@ func (x *Stage_ExecutionPolicyState) GetValidated() *ExecutionPolicy {
 // TBD: Pull this into its own top-level StageAttempt entity because it will
 // need to have its own state and lifecycle/transactions.
 type Stage_Attempt struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state                  protoimpl.MessageState     `protogen:"opaque.v1"`
+	xxx_hidden_State       StageAttemptState          `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
+	xxx_hidden_Version     *Revision                  `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
+	xxx_hidden_ProcessUid  *string                    `protobuf:"bytes,3,opt,name=process_uid,json=processUid,proto3,oneof"`
+	xxx_hidden_Details     *[]*Value                  `protobuf:"bytes,4,rep,name=details,proto3"`
+	xxx_hidden_Progress    *[]*Stage_Attempt_Progress `protobuf:"bytes,5,rep,name=progress,proto3"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *Stage_Attempt) Reset() {
+	*x = Stage_Attempt{}
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Stage_Attempt) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Stage_Attempt) ProtoMessage() {}
+
+func (x *Stage_Attempt) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Stage_Attempt) GetState() StageAttemptState {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
+			return x.xxx_hidden_State
+		}
+	}
+	return StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
+}
+
+func (x *Stage_Attempt) GetVersion() *Revision {
+	if x != nil {
+		return x.xxx_hidden_Version
+	}
+	return nil
+}
+
+func (x *Stage_Attempt) GetProcessUid() string {
+	if x != nil {
+		if x.xxx_hidden_ProcessUid != nil {
+			return *x.xxx_hidden_ProcessUid
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *Stage_Attempt) GetDetails() []*Value {
+	if x != nil {
+		if x.xxx_hidden_Details != nil {
+			return *x.xxx_hidden_Details
+		}
+	}
+	return nil
+}
+
+func (x *Stage_Attempt) GetProgress() []*Stage_Attempt_Progress {
+	if x != nil {
+		if x.xxx_hidden_Progress != nil {
+			return *x.xxx_hidden_Progress
+		}
+	}
+	return nil
+}
+
+func (x *Stage_Attempt) SetState(v StageAttemptState) {
+	x.xxx_hidden_State = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 5)
+}
+
+func (x *Stage_Attempt) SetVersion(v *Revision) {
+	x.xxx_hidden_Version = v
+}
+
+func (x *Stage_Attempt) SetProcessUid(v string) {
+	x.xxx_hidden_ProcessUid = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 5)
+}
+
+func (x *Stage_Attempt) SetDetails(v []*Value) {
+	x.xxx_hidden_Details = &v
+}
+
+func (x *Stage_Attempt) SetProgress(v []*Stage_Attempt_Progress) {
+	x.xxx_hidden_Progress = &v
+}
+
+func (x *Stage_Attempt) HasState() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Stage_Attempt) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Version != nil
+}
+
+func (x *Stage_Attempt) HasProcessUid() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *Stage_Attempt) ClearState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_State = StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
+}
+
+func (x *Stage_Attempt) ClearVersion() {
+	x.xxx_hidden_Version = nil
+}
+
+func (x *Stage_Attempt) ClearProcessUid() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_ProcessUid = nil
+}
+
+type Stage_Attempt_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
 	// The current state of this Attempt.
-	State *StageAttemptState `protobuf:"varint,1,opt,name=state,enum=turboci.graph.orchestrator.v1.StageAttemptState" json:"state,omitempty"`
+	State *StageAttemptState
 	// The database revision of when the current state was set.
-	Version *Revision `protobuf:"bytes,2,opt,name=version" json:"version,omitempty"`
+	Version *Revision
 	// An opaque value provided by a Stage Attempt process (i.e. a single thread
 	// of execution which is servicing this Stage Attempt) which is used to
 	// ensure that a StageAttempt is idempotently assigned to at most one single
@@ -339,7 +694,7 @@ type Stage_Attempt struct {
 	// In the event that this accepting thread crashes, it is expected that this
 	// Stage Attempt will become INCOMPLETE on heartbeat timeout, and, retries
 	// permitting, a new Stage Attempt will be generated.
-	ProcessUid *string `protobuf:"bytes,3,opt,name=process_uid,json=processUid" json:"process_uid,omitempty"`
+	ProcessUid *string
 	// Details provided by the Executor about this Stage Attempt.
 	//
 	// This information is always updated in-whole from the Executor or
@@ -348,112 +703,39 @@ type Stage_Attempt struct {
 	//
 	// It can be set by the Executor or Stage Attempt as long as the Stage
 	// Attempt is not final (i.e. COMPLETE or INCOMPLETE).
-	Details []*Value `protobuf:"bytes,4,rep,name=details" json:"details,omitempty"`
+	Details []*Value
 	// Append-only Executor-specefic progress messages.
-	Progress      []*Stage_Attempt_Progress `protobuf:"bytes,5,rep,name=progress" json:"progress,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Progress []*Stage_Attempt_Progress
 }
 
-func (x *Stage_Attempt) Reset() {
-	*x = Stage_Attempt{}
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Stage_Attempt) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Stage_Attempt) ProtoMessage() {}
-
-func (x *Stage_Attempt) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
+func (b0 Stage_Attempt_builder) Build() *Stage_Attempt {
+	m0 := &Stage_Attempt{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.State != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 5)
+		x.xxx_hidden_State = *b.State
 	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Stage_Attempt.ProtoReflect.Descriptor instead.
-func (*Stage_Attempt) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_stage_proto_rawDescGZIP(), []int{0, 1}
-}
-
-func (x *Stage_Attempt) GetState() StageAttemptState {
-	if x != nil && x.State != nil {
-		return *x.State
+	x.xxx_hidden_Version = b.Version
+	if b.ProcessUid != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 5)
+		x.xxx_hidden_ProcessUid = b.ProcessUid
 	}
-	return StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
-}
-
-func (x *Stage_Attempt) GetVersion() *Revision {
-	if x != nil {
-		return x.Version
-	}
-	return nil
-}
-
-func (x *Stage_Attempt) GetProcessUid() string {
-	if x != nil && x.ProcessUid != nil {
-		return *x.ProcessUid
-	}
-	return ""
-}
-
-func (x *Stage_Attempt) GetDetails() []*Value {
-	if x != nil {
-		return x.Details
-	}
-	return nil
-}
-
-func (x *Stage_Attempt) GetProgress() []*Stage_Attempt_Progress {
-	if x != nil {
-		return x.Progress
-	}
-	return nil
+	x.xxx_hidden_Details = &b.Details
+	x.xxx_hidden_Progress = &b.Progress
+	return m0
 }
 
 // Assignment describes the workflow's intent that this Stage will handle one
 // or more Checks in some fashion.
 type Stage_Assignment struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The Check that this Stage should handle.
-	Target *v1.Check `protobuf:"bytes,1,opt,name=target" json:"target,omitempty"`
-	// The expected state of the Check when this Stage is FINAL.
-	//
-	// NOTE: The Stage may, during its execution, create additional Stages with
-	// this same Assignment as a way of propagating the responsibility of
-	// handling the Check to those Stages.
-	//
-	// The Orchestrator will automatically advance the state of this Check to
-	// the goal state when no more Stages are assigned to handle it with this
-	// goal state.
-	//
-	// Ex. If some stage S is assigned a Check C with goal state PLANNED, it
-	// indicates that S is responsible for ensuring that C is fully PLANNED. S
-	// could spawn some helpers (S' and S”) with this same Assignment. Assuming
-	// that S' and S” don't further propagate the responsibility of handling C,
-	// when all of S, S', and S” are FINAL, the Orchestrator will advance C to
-	// the PLANNED state.
-	//
-	// If a stage manually advances a Check to a state equal to or beyond the
-	// goal state, then the Orchestrator will stop monitoring Assignments for
-	// this Check at this goal state.
-	//
-	// Manual advancement can dangerous if done when other Stages are still
-	// operating on the Check at the earlier state (for example, if one Stage
-	// moves a Check to PLANNED while another Stage is still trying to write to
-	// the Check options, the writing Stage will fail to write out the options).
-	GoalState     *CheckState `protobuf:"varint,2,opt,name=goal_state,json=goalState,enum=turboci.graph.orchestrator.v1.CheckState" json:"goal_state,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Target      *v1.Check              `protobuf:"bytes,1,opt,name=target,proto3,oneof"`
+	xxx_hidden_GoalState   CheckState             `protobuf:"varint,2,opt,name=goal_state,json=goalState,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Stage_Assignment) Reset() {
@@ -481,23 +763,97 @@ func (x *Stage_Assignment) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Stage_Assignment.ProtoReflect.Descriptor instead.
-func (*Stage_Assignment) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_stage_proto_rawDescGZIP(), []int{0, 2}
-}
-
 func (x *Stage_Assignment) GetTarget() *v1.Check {
 	if x != nil {
-		return x.Target
+		return x.xxx_hidden_Target
 	}
 	return nil
 }
 
 func (x *Stage_Assignment) GetGoalState() CheckState {
-	if x != nil && x.GoalState != nil {
-		return *x.GoalState
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
+			return x.xxx_hidden_GoalState
+		}
 	}
 	return CheckState_CHECK_STATE_UNKNOWN
+}
+
+func (x *Stage_Assignment) SetTarget(v *v1.Check) {
+	x.xxx_hidden_Target = v
+}
+
+func (x *Stage_Assignment) SetGoalState(v CheckState) {
+	x.xxx_hidden_GoalState = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *Stage_Assignment) HasTarget() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Target != nil
+}
+
+func (x *Stage_Assignment) HasGoalState() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Stage_Assignment) ClearTarget() {
+	x.xxx_hidden_Target = nil
+}
+
+func (x *Stage_Assignment) ClearGoalState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_GoalState = CheckState_CHECK_STATE_UNKNOWN
+}
+
+type Stage_Assignment_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The Check that this Stage should handle.
+	Target *v1.Check
+	// The expected state of the Check when this Stage is FINAL.
+	//
+	// NOTE: The Stage may, during its execution, create additional Stages with
+	// this same Assignment as a way of propagating the responsibility of
+	// handling the Check to those Stages.
+	//
+	// The Orchestrator will automatically advance the state of this Check to
+	// the goal state when no more Stages are assigned to handle it with this
+	// goal state.
+	//
+	// Ex. If some stage S is assigned a Check C with goal state PLANNED, it
+	// indicates that S is responsible for ensuring that C is fully PLANNED. S
+	// could spawn some helpers (S' and S”) with this same Assignment. Assuming
+	// that S' and S” don't further propagate the responsibility of handling C,
+	// when all of S, S', and S” are FINAL, the Orchestrator will advance C to
+	// the PLANNED state.
+	//
+	// If a stage manually advances a Check to a state equal to or beyond the
+	// goal state, then the Orchestrator will stop monitoring Assignments for
+	// this Check at this goal state.
+	//
+	// Manual advancement can dangerous if done when other Stages are still
+	// operating on the Check at the earlier state (for example, if one Stage
+	// moves a Check to PLANNED while another Stage is still trying to write to
+	// the Check options, the writing Stage will fail to write out the options).
+	GoalState *CheckState
+}
+
+func (b0 Stage_Assignment_builder) Build() *Stage_Assignment {
+	m0 := &Stage_Assignment{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Target = b.Target
+	if b.GoalState != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_GoalState = *b.GoalState
+	}
+	return m0
 }
 
 // Attempt-specific progress information.
@@ -507,15 +863,14 @@ func (x *Stage_Assignment) GetGoalState() CheckState {
 // able to load just the current state of a Stage and display this
 // information in a time-oriented way.
 type Stage_Attempt_Progress struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Low-effort/human-readable progress information.
-	Msg *string `protobuf:"bytes,1,opt,name=msg" json:"msg,omitempty"`
-	// The version of this Stage which added this Progress message.
-	Version *Revision `protobuf:"bytes,2,opt,name=version" json:"version,omitempty"`
-	// Machine-readable details for this progress item.
-	Details       []*Value `protobuf:"bytes,3,rep,name=details" json:"details,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Msg         *string                `protobuf:"bytes,1,opt,name=msg,proto3,oneof"`
+	xxx_hidden_Version     *Revision              `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
+	xxx_hidden_Details     *[]*Value              `protobuf:"bytes,3,rep,name=details,proto3"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Stage_Attempt_Progress) Reset() {
@@ -543,85 +898,155 @@ func (x *Stage_Attempt_Progress) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Stage_Attempt_Progress.ProtoReflect.Descriptor instead.
-func (*Stage_Attempt_Progress) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_stage_proto_rawDescGZIP(), []int{0, 1, 0}
-}
-
 func (x *Stage_Attempt_Progress) GetMsg() string {
-	if x != nil && x.Msg != nil {
-		return *x.Msg
+	if x != nil {
+		if x.xxx_hidden_Msg != nil {
+			return *x.xxx_hidden_Msg
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Stage_Attempt_Progress) GetVersion() *Revision {
 	if x != nil {
-		return x.Version
+		return x.xxx_hidden_Version
 	}
 	return nil
 }
 
 func (x *Stage_Attempt_Progress) GetDetails() []*Value {
 	if x != nil {
-		return x.Details
+		if x.xxx_hidden_Details != nil {
+			return *x.xxx_hidden_Details
+		}
 	}
 	return nil
+}
+
+func (x *Stage_Attempt_Progress) SetMsg(v string) {
+	x.xxx_hidden_Msg = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+}
+
+func (x *Stage_Attempt_Progress) SetVersion(v *Revision) {
+	x.xxx_hidden_Version = v
+}
+
+func (x *Stage_Attempt_Progress) SetDetails(v []*Value) {
+	x.xxx_hidden_Details = &v
+}
+
+func (x *Stage_Attempt_Progress) HasMsg() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Stage_Attempt_Progress) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Version != nil
+}
+
+func (x *Stage_Attempt_Progress) ClearMsg() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Msg = nil
+}
+
+func (x *Stage_Attempt_Progress) ClearVersion() {
+	x.xxx_hidden_Version = nil
+}
+
+type Stage_Attempt_Progress_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Low-effort/human-readable progress information.
+	Msg *string
+	// The version of this Stage which added this Progress message.
+	Version *Revision
+	// Machine-readable details for this progress item.
+	Details []*Value
+}
+
+func (b0 Stage_Attempt_Progress_builder) Build() *Stage_Attempt_Progress {
+	m0 := &Stage_Attempt_Progress{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Msg != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		x.xxx_hidden_Msg = b.Msg
+	}
+	x.xxx_hidden_Version = b.Version
+	x.xxx_hidden_Details = &b.Details
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_stage_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/stage.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a.turboci/graph/orchestrator/v1/edge_group.proto\x1a4turboci/graph/orchestrator/v1/execution_policy.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xfb\f\n" +
-	"\x05Stage\x12@\n" +
+	")turboci/graph/orchestrator/v1/stage.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a.turboci/graph/orchestrator/v1/edge_group.proto\x1a4turboci/graph/orchestrator/v1/execution_policy.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\x96\x0f\n" +
+	"\x05Stage\x12E\n" +
 	"\n" +
-	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageB\x03\xe0A\x05R\n" +
-	"identifier\x12\x19\n" +
-	"\x05realm\x18\x02 \x01(\tB\x03\xe0A\x05R\x05realm\x12I\n" +
-	"\tcreate_ts\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x03R\bcreateTs\x12=\n" +
-	"\x04args\x18\x04 \x01(\v2$.turboci.graph.orchestrator.v1.ValueB\x03\xe0A\x05R\x04args\x12A\n" +
-	"\aversion\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionR\aversion\x12D\n" +
-	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateB\x03\xe0A\x03R\x05state\x12Z\n" +
+	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageB\x03\xe0A\x05H\x00R\n" +
+	"identifier\x88\x01\x01\x12\x1e\n" +
+	"\x05realm\x18\x02 \x01(\tB\x03\xe0A\x05H\x01R\x05realm\x88\x01\x01\x12N\n" +
+	"\tcreate_ts\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x03H\x02R\bcreateTs\x88\x01\x01\x12B\n" +
+	"\x04args\x18\x04 \x01(\v2$.turboci.graph.orchestrator.v1.ValueB\x03\xe0A\x05H\x03R\x04args\x88\x01\x01\x12F\n" +
+	"\aversion\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x04R\aversion\x88\x01\x01\x12I\n" +
+	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateB\x03\xe0A\x03H\x05R\x05state\x88\x01\x01\x12Z\n" +
 	"\fdependencies\x18\a \x03(\v2(.turboci.graph.orchestrator.v1.EdgeGroupB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
-	"\x02\x02\bR\fdependencies\x12d\n" +
-	"\x10execution_policy\x18\b \x01(\v29.turboci.graph.orchestrator.v1.Stage.ExecutionPolicyStateR\x0fexecutionPolicy\x12M\n" +
+	"\x02\x02\bR\fdependencies\x12i\n" +
+	"\x10execution_policy\x18\b \x01(\v29.turboci.graph.orchestrator.v1.Stage.ExecutionPolicyStateH\x06R\x0fexecutionPolicy\x88\x01\x01\x12M\n" +
 	"\battempts\x18\t \x03(\v2,.turboci.graph.orchestrator.v1.Stage.AttemptB\x03\xe0A\x03R\battempts\x12V\n" +
 	"\vassignments\x18\n" +
 	" \x03(\v2/.turboci.graph.orchestrator.v1.Stage.AssignmentB\x03\xe0A\x05R\vassignments\x12_\n" +
 	"\x12continuation_group\x18\v \x03(\v2#.turboci.graph.orchestrator.v1.EdgeB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\bR\x11continuationGroup\x1a\xbc\x01\n" +
-	"\x14ExecutionPolicyState\x12Q\n" +
-	"\trequested\x18\x01 \x01(\v2..turboci.graph.orchestrator.v1.ExecutionPolicyB\x03\xe0A\x05R\trequested\x12Q\n" +
-	"\tvalidated\x18\x02 \x01(\v2..turboci.graph.orchestrator.v1.ExecutionPolicyB\x03\xe0A\x03R\tvalidated\x1a\xea\x03\n" +
-	"\aAttempt\x12F\n" +
-	"\x05state\x18\x01 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateR\x05state\x12A\n" +
-	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionR\aversion\x12\x1f\n" +
-	"\vprocess_uid\x18\x03 \x01(\tR\n" +
-	"processUid\x12>\n" +
+	"\x01\bR\x11continuationGroup\x1a\xe2\x01\n" +
+	"\x14ExecutionPolicyState\x12V\n" +
+	"\trequested\x18\x01 \x01(\v2..turboci.graph.orchestrator.v1.ExecutionPolicyB\x03\xe0A\x05H\x00R\trequested\x88\x01\x01\x12V\n" +
+	"\tvalidated\x18\x02 \x01(\v2..turboci.graph.orchestrator.v1.ExecutionPolicyB\x03\xe0A\x03H\x01R\tvalidated\x88\x01\x01B\f\n" +
+	"\n" +
+	"_requestedB\f\n" +
+	"\n" +
+	"_validated\x1a\xbd\x04\n" +
+	"\aAttempt\x12K\n" +
+	"\x05state\x18\x01 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x00R\x05state\x88\x01\x01\x12F\n" +
+	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01\x12$\n" +
+	"\vprocess_uid\x18\x03 \x01(\tH\x02R\n" +
+	"processUid\x88\x01\x01\x12>\n" +
 	"\adetails\x18\x04 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetails\x12Q\n" +
-	"\bprogress\x18\x05 \x03(\v25.turboci.graph.orchestrator.v1.Stage.Attempt.ProgressR\bprogress\x1a\x9f\x01\n" +
-	"\bProgress\x12\x10\n" +
-	"\x03msg\x18\x01 \x01(\tR\x03msg\x12A\n" +
-	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionR\aversion\x12>\n" +
-	"\adetails\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetails\x1a\x8b\x01\n" +
+	"\bprogress\x18\x05 \x03(\v25.turboci.graph.orchestrator.v1.Stage.Attempt.ProgressR\bprogress\x1a\xbd\x01\n" +
+	"\bProgress\x12\x15\n" +
+	"\x03msg\x18\x01 \x01(\tH\x00R\x03msg\x88\x01\x01\x12F\n" +
+	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01\x12>\n" +
+	"\adetails\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetailsB\x06\n" +
+	"\x04_msgB\n" +
 	"\n" +
-	"Assignment\x123\n" +
-	"\x06target\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckR\x06target\x12H\n" +
+	"\b_versionB\b\n" +
+	"\x06_stateB\n" +
 	"\n" +
-	"goal_state\x18\x02 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateR\tgoalStateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_stage_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_stage_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_stage_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_stage_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_stage_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_stage_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_stage_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_stage_proto_rawDescData
-}
+	"\b_versionB\x0e\n" +
+	"\f_process_uid\x1a\xaf\x01\n" +
+	"\n" +
+	"Assignment\x128\n" +
+	"\x06target\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckH\x00R\x06target\x88\x01\x01\x12M\n" +
+	"\n" +
+	"goal_state\x18\x02 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x01R\tgoalState\x88\x01\x01B\t\n" +
+	"\a_targetB\r\n" +
+	"\v_goal_stateB\r\n" +
+	"\v_identifierB\b\n" +
+	"\x06_realmB\f\n" +
+	"\n" +
+	"_create_tsB\a\n" +
+	"\x05_argsB\n" +
+	"\n" +
+	"\b_versionB\b\n" +
+	"\x06_stateB\x13\n" +
+	"\x11_execution_policyBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_stage_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_turboci_graph_orchestrator_v1_stage_proto_goTypes = []any{
@@ -683,6 +1108,11 @@ func file_turboci_graph_orchestrator_v1_stage_proto_init() {
 	file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_state_proto_init()
 	file_turboci_graph_orchestrator_v1_value_proto_init()
+	file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[0].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[1].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[2].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[3].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -37,10 +37,10 @@ message WriteNodesRequest {
     //
     // If the value is being overwritten and `realm` is provided, it must match
     // the already-written value's realm.
-    string realm = 1 [(turboci).creation_only = true];
+    optional string realm = 1 [(turboci).creation_only = true];
 
     // The value to set.
-    google.protobuf.Any value = 2;
+    optional google.protobuf.Any value = 2;
   }
 
   // The token of the Stage Attempt which is performing this write.
@@ -50,7 +50,7 @@ message WriteNodesRequest {
   // If missing, this RPC will check that the caller additionally has the
   // 'turboci.workplans.writeExternal' permission on Workplan(s) in the
   // CheckWrites/StageWrites.
-  string stage_attempt_token = 1;
+  optional string stage_attempt_token = 1;
 
   // The reason for this write operation, as supplied by the entity performing
   // the write.
@@ -134,7 +134,7 @@ message WriteNodesRequest {
     // If multiple queries were made in this transaction, this revision MUST be
     // the first revision observed. Providing version.require to QueryNodes will
     // help enforce this.
-    Revision snapshot_version = 2;
+    optional Revision snapshot_version = 2;
   }
   // Set if the caller wants to make this write transactional with a subset of
   // the graph at a particular snapshot.
@@ -149,7 +149,7 @@ message WriteNodesRequest {
   // when a Stage Attempt records results for a Check off of some internal
   // computation. It's allowed for a Stage Attempt to tie this progress update
   // to the state of the graph, but it's not expected or required.
-  TransactionDetails txn = 3;
+  optional TransactionDetails txn = 3;
 
   // A description of modifications to make to a single Check.
   message CheckWrite {
@@ -162,7 +162,7 @@ message WriteNodesRequest {
     // or the caller must have the additional "turboci.workplans.writeExternal"
     // permission in the check's realm (or in the realm of the option/result
     // data).
-    ids.v1.Check check = 1;
+    optional ids.v1.Check check = 1;
 
     // Realm to assign to this check.
     //
@@ -173,13 +173,13 @@ message WriteNodesRequest {
     // copy its realm from the Stage doing the write (assuming
     // `stage_attempt_token` is set). If `stage_attempt_token` is unset and this
     // field is absent, the write will be rejected.
-    string realm = 2 [(turboci).creation_only = true];
+    optional string realm = 2 [(turboci).creation_only = true];
 
     // Kind to assign to this check.
     //
     // If this is set, and the Check DOES already exist, this MUST match the
     // existing Check kind.
-    CheckKind kind = 3 [(turboci).creation_only = true];
+    optional CheckKind kind = 3 [(turboci).creation_only = true];
 
     // The list of Options to write/overwrite.
     //
@@ -221,13 +221,13 @@ message WriteNodesRequest {
     //
     // No more data may be written to the Result from the caller after this is
     // set.
-    bool finalize_results = 7 [(turboci).check.editable = CHECK_STATE_WAITING];
+    optional bool finalize_results = 7 [(turboci).check.editable = CHECK_STATE_WAITING];
 
     // The new state of this Check.
     //
     // If set, must be equal to, or greater than, the current state of the
     // Check.
-    CheckState state = 8;
+    optional CheckState state = 8;
   }
   // Write to zero or more Checks.
   repeated CheckWrite checks = 4;
@@ -246,7 +246,7 @@ message WriteNodesRequest {
     // Otherwise, the Stage must belong to the stage_attempt_token's WorkPlan,
     // or the caller must have the additional "turboci.workplans.writeExternal"
     // permission in the stage's realm.
-    ids.v1.Stage stage = 1;
+    optional ids.v1.Stage stage = 1;
 
     // The arguments of the Stage.
     //
@@ -262,7 +262,7 @@ message WriteNodesRequest {
     //
     // We could just accept 'same type' == OK and ignore the value, but this
     // feels a bit wishy-washy.
-    google.protobuf.Any args = 2 [(turboci).creation_only = true];
+    optional google.protobuf.Any args = 2 [(turboci).creation_only = true];
 
     // Realm to assign to this Stage.
     //
@@ -273,7 +273,7 @@ message WriteNodesRequest {
     // the write (assuming `stage_attempt_token` is set). If
     // `stage_attempt_token` is unset and this field is absent, the write will
     // be rejected.
-    string realm = 3 [(turboci).creation_only = true];
+    optional string realm = 3 [(turboci).creation_only = true];
 
     // Dependencies for this Stage.
     //
@@ -293,7 +293,7 @@ message WriteNodesRequest {
     // If this write creates the stage and the requested_execution_policy is
     // omitted, the stage will get the default ExecutionPolicy from the
     // Executor.
-    ExecutionPolicy requested_execution_policy = 5 [(turboci).creation_only = true];
+    optional ExecutionPolicy requested_execution_policy = 5 [(turboci).creation_only = true];
 
     // The Check assignments of the Stage.
     //
@@ -312,7 +312,7 @@ message WriteNodesRequest {
     // A value of `false` is the same as `unset` (no-op).
     //
     // Use the top-level `reason` field to provide the cancellation reason.
-    bool cancelled = 7;
+    optional bool cancelled = 7;
 
     // TBD: Other Adjustments ?
     // TBD: Dynamic Execution Policy
@@ -335,7 +335,7 @@ message WriteNodesRequest {
     //   * RUNNING -> TEARING_DOWN
     //   * RUNNING -> COMPLETE
     //   * RUNNING -> INCOMPLETE
-    StageAttemptState state = 1;
+    optional StageAttemptState state = 1;
 
     // Ensure all provided edges are included in `Stage.continuation_group`.
     //
@@ -369,5 +369,5 @@ message WriteNodesRequest {
   // TBD: Document the SCHEDULED -> RUNNING state transition requirements (i.e.
   // setting a unique worker_id and handling multiple logicall processes all
   // trying to transition to RUNNING at the same time).
-  CurrentStageWrite current_stage = 6;
+  optional CurrentStageWrite current_stage = 6;
 }

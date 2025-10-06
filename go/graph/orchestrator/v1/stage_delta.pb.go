@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -27,19 +26,13 @@ const (
 
 // Encapsulates data changes to a Stage object.
 type StageDelta struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// If set, the new Stage state that was set as part of this edit.
-	State *StageState `protobuf:"varint,1,opt,name=state,enum=turboci.graph.orchestrator.v1.StageState" json:"state,omitempty"`
-	// Execution policy writes for this Stage.
-	//
-	// Usually this should be empty or have only one policy change - but it's
-	// possible for a single write to affect multiple policies.
-	//
-	// Like Stage.execution_policies, this will be sorted and unique on
-	// ExecutionPolicy.source.
-	ExecutionPolicies []*ExecutionPolicy `protobuf:"bytes,2,rep,name=execution_policies,json=executionPolicies" json:"execution_policies,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state                        protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_State             StageState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
+	xxx_hidden_ExecutionPolicies *[]*ExecutionPolicy    `protobuf:"bytes,2,rep,name=execution_policies,json=executionPolicies,proto3"`
+	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
+	XXX_presence                 [1]uint32
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
 }
 
 func (x *StageDelta) Reset() {
@@ -67,46 +60,82 @@ func (x *StageDelta) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StageDelta.ProtoReflect.Descriptor instead.
-func (*StageDelta) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *StageDelta) GetState() StageState {
-	if x != nil && x.State != nil {
-		return *x.State
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
+			return x.xxx_hidden_State
+		}
 	}
 	return StageState_STAGE_STATE_UNKNOWN
 }
 
 func (x *StageDelta) GetExecutionPolicies() []*ExecutionPolicy {
 	if x != nil {
-		return x.ExecutionPolicies
+		if x.xxx_hidden_ExecutionPolicies != nil {
+			return *x.xxx_hidden_ExecutionPolicies
+		}
 	}
 	return nil
+}
+
+func (x *StageDelta) SetState(v StageState) {
+	x.xxx_hidden_State = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *StageDelta) SetExecutionPolicies(v []*ExecutionPolicy) {
+	x.xxx_hidden_ExecutionPolicies = &v
+}
+
+func (x *StageDelta) HasState() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *StageDelta) ClearState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_State = StageState_STAGE_STATE_UNKNOWN
+}
+
+type StageDelta_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// If set, the new Stage state that was set as part of this edit.
+	State *StageState
+	// Execution policy writes for this Stage.
+	//
+	// Usually this should be empty or have only one policy change - but it's
+	// possible for a single write to affect multiple policies.
+	//
+	// Like Stage.execution_policies, this will be sorted and unique on
+	// ExecutionPolicy.source.
+	ExecutionPolicies []*ExecutionPolicy
+}
+
+func (b0 StageDelta_builder) Build() *StageDelta {
+	m0 := &StageDelta{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.State != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_State = *b.State
+	}
+	x.xxx_hidden_ExecutionPolicies = &b.ExecutionPolicies
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_stage_delta_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/stage_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a4turboci/graph/orchestrator/v1/execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\"\xac\x01\n" +
+	"/turboci/graph/orchestrator/v1/stage_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a4turboci/graph/orchestrator/v1/execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\"\xbb\x01\n" +
 	"\n" +
-	"StageDelta\x12?\n" +
-	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateR\x05state\x12]\n" +
-	"\x12execution_policies\x18\x02 \x03(\v2..turboci.graph.orchestrator.v1.ExecutionPolicyR\x11executionPoliciesBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDescData
-}
+	"StageDelta\x12D\n" +
+	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x00R\x05state\x88\x01\x01\x12]\n" +
+	"\x12execution_policies\x18\x02 \x03(\v2..turboci.graph.orchestrator.v1.ExecutionPolicyR\x11executionPoliciesB\b\n" +
+	"\x06_stateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_stage_delta_proto_goTypes = []any{
@@ -131,6 +160,7 @@ func file_turboci_graph_orchestrator_v1_stage_delta_proto_init() {
 	}
 	file_turboci_graph_orchestrator_v1_execution_policy_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_state_proto_init()
+	file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

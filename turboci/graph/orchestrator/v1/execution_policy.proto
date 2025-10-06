@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -62,7 +62,7 @@ message ExecutionPolicy {
     //
     // If unset, then there is no required heartbeat cadence, though the stage
     // is still subject to timeouts for the phase.
-    google.protobuf.Duration scheduled = 1;
+    optional google.protobuf.Duration scheduled = 1;
 
     // The expected duration that a Stage Attempt can be in the RUNNING state
     // without sending a heartbeat.
@@ -73,17 +73,17 @@ message ExecutionPolicy {
     // NOTE: This heartbeat still applies during the CANCELLING state - it's
     // expected that CANCELLING only applies to Stage Attempts which are
     // RUNNING, but before the Stage Attempt actually knows this.
-    google.protobuf.Duration running = 2;
+    optional google.protobuf.Duration running = 2;
 
     // The expected duration that a Stage Attempt can be in the TEARING_DOWN
     // state without sending a heartbeat.
     //
     // If unset, then there is no required heartbeat cadence, though the stage
     // is still subject to timeouts for the phase.
-    google.protobuf.Duration tearing_down = 3;
+    optional google.protobuf.Duration tearing_down = 3;
   }
   // The heartbeat policies for Attempts of this Stage.
-  Heartbeat attempt_heartbeat = 2;
+  optional Heartbeat attempt_heartbeat = 2;
 
   // AttemptTimeout describes the maximum amount of time a Stage Attempt can be in a
   // given state (in addition to restrictions imposed by Heartbeat).
@@ -100,14 +100,14 @@ message ExecutionPolicy {
     //
     // If unset, then there is a large default limit on how long a Stage Attempt
     // can be in the PENDING/THROTTLED state.
-    google.protobuf.Duration pending_throttled = 1;
+    optional google.protobuf.Duration pending_throttled = 1;
 
     // The maximum amount of time a Stage Attempt can be in the SCHEDULED
     // state.
     //
     // If unset, then there is a large default limit on how long a Stage Attempt
     // can be in the SCHEDULED state.
-    google.protobuf.Duration scheduled = 2;
+    optional google.protobuf.Duration scheduled = 2;
 
     // The maximum amount of time a Stage Attempt can be in the RUNNING state.
     //
@@ -117,23 +117,23 @@ message ExecutionPolicy {
     // NOTE: This timeout still applies during the CANCELLING state - it's
     // expected that CANCELLING only applies to Stage Attempts which are
     // RUNNING, but before the Stage Attempt actually knows this.
-    google.protobuf.Duration running = 3;
+    optional google.protobuf.Duration running = 3;
 
     // The maximum amount of time a Stage Attempt can be in the
     // TEARING_DOWN state.
     //
     // If unset, then there is a large default limit on how long a Stage Attempt can be in
     // the TEARING_DOWN state.
-    google.protobuf.Duration tearing_down = 4;
+    optional google.protobuf.Duration tearing_down = 4;
   }
   // The timeout policies for Attempts of this Stage.
-  AttemptTimeout attempt_timeout = 3;
+  optional AttemptTimeout attempt_timeout = 3;
 
   // Retry describes the policy for retrying a Stage across multiple Attempts.
   message Retry {
     // The maximum number of retries (apart from the first attempt) that will be
     // made for this Stage.
-    int32 max_retries = 1;
+    optional int32 max_retries = 1;
 
     // TBD: A way to control how TurboCI does backoff to the Executor - likely
     // it would be good enough to set this statically via Executor config. We
@@ -147,7 +147,7 @@ message ExecutionPolicy {
   // Policy for retrying this Stage across multiple Attempts.
   //
   // If omitted, the Stage will be attempted at most once.
-  Retry retry = 4;
+  optional Retry retry = 4;
 
   // The maximum amount of time the Stage itself can stay in a non-FINAL state.
   //
@@ -161,7 +161,7 @@ message ExecutionPolicy {
   // ATTEMPTING state in the first place.
   //
   // Interaction with retries: See `stage_timeout_mode`.
-  google.protobuf.Duration stage_timeout = 5;
+  optional google.protobuf.Duration stage_timeout = 5;
 
   // The description of what happens when `stage_timeout` is reached.
   enum StageTimeoutMode {
@@ -214,5 +214,7 @@ message ExecutionPolicy {
   // a modified `attempt_timeout` - this is likely more complicated (which
   // timeout do you prune? probably pending_throttled?). Leaving this out for
   // now to see how far these other modes get us.
-  StageTimeoutMode stage_timeout_mode = 6 [default = STAGE_TIMEOUT_MODE_FINISH_CURRENT_ATTEMPT];
+  //
+  // If unset, defaults to STAGE_TIMEOUT_MODE_FINISH_CURRENT_ATTEMPT.
+  optional StageTimeoutMode stage_timeout_mode = 6;
 }

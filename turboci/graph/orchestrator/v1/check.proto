@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -49,7 +49,7 @@ message Check {
   // The Check's identifier.
   //
   // `identifier.id` is provided by the Stage which creates this Check.
-  ids.v1.Check identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
+  optional ids.v1.Check identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
 
   // The coarse-grained kind of this Check.
   //
@@ -57,13 +57,13 @@ message Check {
   // `options` and `results.data`.
   //
   // Used as part of a Checks query for a coarse-grained filter.
-  CheckKind kind = 2 [(google.api.field_behavior) = IMMUTABLE];
+  optional CheckKind kind = 2 [(google.api.field_behavior) = IMMUTABLE];
 
   // The security realm for this Check.
   //
   // If unset on creation, then this will be populated with the realm of the
   // Stage which creates this Check.
-  string realm = 3 [(google.api.field_behavior) = IMMUTABLE];
+  optional string realm = 3 [(google.api.field_behavior) = IMMUTABLE];
 
   // The version of this Check.
   //
@@ -73,10 +73,10 @@ message Check {
   // Datum does not change any field data in this message, and thus will not
   // change this version number (adding a new entry in `options` or in
   // a `Result.data` would, however).
-  Revision version = 4;
+  optional Revision version = 4;
 
   // The current state of the Check.
-  CheckState state = 5;
+  optional CheckState state = 5;
 
   // Dependencies on other objects in the graph.
   //
@@ -95,10 +95,10 @@ message Check {
   // OptionRef is a reference to a CheckOption.
   message OptionRef {
     // The Identifier for the CheckOption, which is a Datum.
-    ids.v1.CheckOption identifier = 1;
+    optional ids.v1.CheckOption identifier = 1;
 
     // The type_url of the data contained for this CheckOption.
-    string type_url = 2;
+    optional string type_url = 2;
 
     // TBD: If we add an additional distinguisher key in Datum, we'd add it
     // here too (e.g. to allow multiple entries of the same type URL with
@@ -140,22 +140,22 @@ message Check {
   // results to the same Check (e.g. sharding, multiple executions, etc.).
   message Result {
     // Identifier for this Result.
-    ids.v1.CheckResult identifier = 1;
+    optional ids.v1.CheckResult identifier = 1;
 
     // The entity which created this Result.
-    Actor owner = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+    optional Actor owner = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
     // The database revsision (commit timestamp) at which this Result was
     // created.
-    Revision created_at = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+    optional Revision created_at = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 
     // ResultDatumRef is a reference to a CheckResultDatum.
     message ResultDatumRef {
       // The Identifier for the CheckResultDatum.
-      ids.v1.CheckResultDatum identifier = 1;
+      optional ids.v1.CheckResultDatum identifier = 1;
 
       // The type_url of the data contained for this CheckResultDatum.
-      string type_url = 2;
+      optional string type_url = 2;
 
       // TBD: If we add an additional distinguisher key in Datum, we'd add it
       // here too (e.g. to allow multiple entries of the same type URL with
@@ -183,7 +183,7 @@ message Check {
     //   * A StageAttempt `owner` ends (becomes COMPLETE or INCOMPLETE).
     //   * The `owner` explicitly indicates that their results are final.
     //   * The Check advances to the FINAL state.
-    Revision finalized_at = 5;
+    optional Revision finalized_at = 5;
   }
   // The list of Results this Check has.
   //

@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -228,11 +227,6 @@ func (x StageAttemptState) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use StageAttemptState.Descriptor instead.
-func (StageAttemptState) EnumDescriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_rawDescGZIP(), []int{0}
-}
-
 var File_turboci_graph_orchestrator_v1_stage_attempt_state_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_rawDesc = "" +
@@ -248,19 +242,7 @@ const file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_rawDesc = "" 
 	" STAGE_ATTEMPT_STATE_TEARING_DOWN\x10<\x12 \n" +
 	"\x1cSTAGE_ATTEMPT_STATE_COMPLETE\x10F\x12\"\n" +
 	"\x1eSTAGE_ATTEMPT_STATE_INCOMPLETE\x10P\x12&\n" +
-	"\"STAGE_ATTEMPT_STATE_AWAITING_RETRY\x10ZBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_rawDescData
-}
+	"\"STAGE_ATTEMPT_STATE_AWAITING_RETRY\x10ZBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_goTypes = []any{

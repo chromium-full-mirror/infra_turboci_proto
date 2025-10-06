@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -45,23 +44,12 @@ const (
 // belong to this Check (but you WOULD see the full content of the Check.options
 // field).
 type GraphView struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// When a GraphView is returned from a read operation (e.g. QueryNodes), it
-	// will be the version of the snapshot of the graph used to prepare this
-	// GraphView.
-	Version *Revision `protobuf:"bytes,1,opt,name=version" json:"version,omitempty"`
-	// Checks in the graph.
-	//
-	// Checks may be omitted if the user does not have permission to view them,
-	// or if the user did not request them.
-	Checks []*CheckView `protobuf:"bytes,2,rep,name=checks" json:"checks,omitempty"`
-	// Stages in the graph.
-	//
-	// Stages may be omitted if the user does not have permission to view them,
-	// or if the user did not request them.
-	Stages        []*StageView `protobuf:"bytes,3,rep,name=stages" json:"stages,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Version *Revision              `protobuf:"bytes,1,opt,name=version,proto3,oneof"`
+	xxx_hidden_Checks  *[]*CheckView          `protobuf:"bytes,2,rep,name=checks,proto3"`
+	xxx_hidden_Stages  *[]*StageView          `protobuf:"bytes,3,rep,name=stages,proto3"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *GraphView) Reset() {
@@ -89,53 +77,94 @@ func (x *GraphView) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GraphView.ProtoReflect.Descriptor instead.
-func (*GraphView) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_graph_view_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *GraphView) GetVersion() *Revision {
 	if x != nil {
-		return x.Version
+		return x.xxx_hidden_Version
 	}
 	return nil
 }
 
 func (x *GraphView) GetChecks() []*CheckView {
 	if x != nil {
-		return x.Checks
+		if x.xxx_hidden_Checks != nil {
+			return *x.xxx_hidden_Checks
+		}
 	}
 	return nil
 }
 
 func (x *GraphView) GetStages() []*StageView {
 	if x != nil {
-		return x.Stages
+		if x.xxx_hidden_Stages != nil {
+			return *x.xxx_hidden_Stages
+		}
 	}
 	return nil
+}
+
+func (x *GraphView) SetVersion(v *Revision) {
+	x.xxx_hidden_Version = v
+}
+
+func (x *GraphView) SetChecks(v []*CheckView) {
+	x.xxx_hidden_Checks = &v
+}
+
+func (x *GraphView) SetStages(v []*StageView) {
+	x.xxx_hidden_Stages = &v
+}
+
+func (x *GraphView) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Version != nil
+}
+
+func (x *GraphView) ClearVersion() {
+	x.xxx_hidden_Version = nil
+}
+
+type GraphView_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// When a GraphView is returned from a read operation (e.g. QueryNodes), it
+	// will be the version of the snapshot of the graph used to prepare this
+	// GraphView.
+	Version *Revision
+	// Checks in the graph.
+	//
+	// Checks may be omitted if the user does not have permission to view them,
+	// or if the user did not request them.
+	Checks []*CheckView
+	// Stages in the graph.
+	//
+	// Stages may be omitted if the user does not have permission to view them,
+	// or if the user did not request them.
+	Stages []*StageView
+}
+
+func (b0 GraphView_builder) Build() *GraphView {
+	m0 := &GraphView{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Version = b.Version
+	x.xxx_hidden_Checks = &b.Checks
+	x.xxx_hidden_Stages = &b.Stages
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_graph_view_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_graph_view_proto_rawDesc = "" +
 	"\n" +
-	".turboci/graph/orchestrator/v1/graph_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a.turboci/graph/orchestrator/v1/check_view.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a.turboci/graph/orchestrator/v1/stage_view.proto\"\xd2\x01\n" +
-	"\tGraphView\x12A\n" +
-	"\aversion\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionR\aversion\x12@\n" +
+	".turboci/graph/orchestrator/v1/graph_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a.turboci/graph/orchestrator/v1/check_view.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a.turboci/graph/orchestrator/v1/stage_view.proto\"\xe3\x01\n" +
+	"\tGraphView\x12F\n" +
+	"\aversion\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\aversion\x88\x01\x01\x12@\n" +
 	"\x06checks\x18\x02 \x03(\v2(.turboci.graph.orchestrator.v1.CheckViewR\x06checks\x12@\n" +
-	"\x06stages\x18\x03 \x03(\v2(.turboci.graph.orchestrator.v1.StageViewR\x06stagesBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_graph_view_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_graph_view_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_graph_view_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_graph_view_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_graph_view_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_graph_view_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_graph_view_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_graph_view_proto_rawDescData
-}
+	"\x06stages\x18\x03 \x03(\v2(.turboci.graph.orchestrator.v1.StageViewR\x06stagesB\n" +
+	"\n" +
+	"\b_versionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_graph_view_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_graph_view_proto_goTypes = []any{
@@ -163,6 +192,7 @@ func file_turboci_graph_orchestrator_v1_graph_view_proto_init() {
 	file_turboci_graph_orchestrator_v1_check_view_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_view_proto_init()
+	file_turboci_graph_orchestrator_v1_graph_view_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

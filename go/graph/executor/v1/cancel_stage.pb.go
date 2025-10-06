@@ -15,7 +15,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -28,11 +27,10 @@ const (
 
 // Request to cancel a stage attempt.
 type CancelStageRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Stage attempt to cancel.
-	Attempt       *v1.StageAttempt `protobuf:"bytes,1,opt,name=attempt" json:"attempt,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Attempt *v1.StageAttempt       `protobuf:"bytes,1,opt,name=attempt,proto3,oneof"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *CancelStageRequest) Reset() {
@@ -60,21 +58,46 @@ func (x *CancelStageRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CancelStageRequest.ProtoReflect.Descriptor instead.
-func (*CancelStageRequest) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_executor_v1_cancel_stage_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *CancelStageRequest) GetAttempt() *v1.StageAttempt {
 	if x != nil {
-		return x.Attempt
+		return x.xxx_hidden_Attempt
 	}
 	return nil
 }
 
+func (x *CancelStageRequest) SetAttempt(v *v1.StageAttempt) {
+	x.xxx_hidden_Attempt = v
+}
+
+func (x *CancelStageRequest) HasAttempt() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Attempt != nil
+}
+
+func (x *CancelStageRequest) ClearAttempt() {
+	x.xxx_hidden_Attempt = nil
+}
+
+type CancelStageRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Stage attempt to cancel.
+	Attempt *v1.StageAttempt
+}
+
+func (b0 CancelStageRequest_builder) Build() *CancelStageRequest {
+	m0 := &CancelStageRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Attempt = b.Attempt
+	return m0
+}
+
 // Response to cancel a stage attempt.
 type CancelStageResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -104,31 +127,28 @@ func (x *CancelStageResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CancelStageResponse.ProtoReflect.Descriptor instead.
-func (*CancelStageResponse) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_executor_v1_cancel_stage_proto_rawDescGZIP(), []int{1}
+type CancelStageResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 CancelStageResponse_builder) Build() *CancelStageResponse {
+	m0 := &CancelStageResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 var File_turboci_graph_executor_v1_cancel_stage_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_executor_v1_cancel_stage_proto_rawDesc = "" +
 	"\n" +
-	",turboci/graph/executor/v1/cancel_stage.proto\x12\x19turboci.graph.executor.v1\x1a%turboci/graph/ids/v1/identifier.proto\"R\n" +
-	"\x12CancelStageRequest\x12<\n" +
-	"\aattempt\x18\x01 \x01(\v2\".turboci.graph.ids.v1.StageAttemptR\aattempt\"\x15\n" +
-	"\x13CancelStageResponseBAP\x01Z=go.chromium.org/turboci/proto/go/graph/executor/v1;executorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_executor_v1_cancel_stage_proto_rawDescOnce sync.Once
-	file_turboci_graph_executor_v1_cancel_stage_proto_rawDescData []byte
-)
-
-func file_turboci_graph_executor_v1_cancel_stage_proto_rawDescGZIP() []byte {
-	file_turboci_graph_executor_v1_cancel_stage_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_executor_v1_cancel_stage_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_executor_v1_cancel_stage_proto_rawDesc), len(file_turboci_graph_executor_v1_cancel_stage_proto_rawDesc)))
-	})
-	return file_turboci_graph_executor_v1_cancel_stage_proto_rawDescData
-}
+	",turboci/graph/executor/v1/cancel_stage.proto\x12\x19turboci.graph.executor.v1\x1a%turboci/graph/ids/v1/identifier.proto\"c\n" +
+	"\x12CancelStageRequest\x12A\n" +
+	"\aattempt\x18\x01 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\aattempt\x88\x01\x01B\n" +
+	"\n" +
+	"\b_attempt\"\x15\n" +
+	"\x13CancelStageResponseBAP\x01Z=go.chromium.org/turboci/proto/go/graph/executor/v1;executorpbb\x06proto3"
 
 var file_turboci_graph_executor_v1_cancel_stage_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_executor_v1_cancel_stage_proto_goTypes = []any{
@@ -150,6 +170,7 @@ func file_turboci_graph_executor_v1_cancel_stage_proto_init() {
 	if File_turboci_graph_executor_v1_cancel_stage_proto != nil {
 		return
 	}
+	file_turboci_graph_executor_v1_cancel_stage_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

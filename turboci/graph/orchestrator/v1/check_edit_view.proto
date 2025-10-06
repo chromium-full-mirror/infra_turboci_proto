@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -19,7 +19,7 @@ message CheckEditView {
   //
   // NOTE: The Edit.reasons field will omit any Reasons with realms in
   // which you do not have read permission.
-  Edit edit = 1;
+  optional Edit edit = 1;
 
   // Data for the Edit's check.options which are visible and of a type
   // which was requested.

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -18,7 +18,7 @@ option java_multiple_files = true;
 // which belong to it.
 message CheckView {
   // The Check itself - always present.
-  Check check = 1;
+  optional Check check = 1;
 
   // Data for the Check's options which are visible and of a type which was
   // requested.

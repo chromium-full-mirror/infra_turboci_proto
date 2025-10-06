@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -30,7 +30,7 @@ option java_multiple_files = true;
 // shorter TTL.
 message Edit {
   // The node which this Edit is associated with.
-  ids.v1.Identifier for_node = 1 [
+  optional ids.v1.Identifier for_node = 1 [
     (turboci).id.allowed = IDENTIFIER_KIND_CHECK,
     (turboci).id.allowed = IDENTIFIER_KIND_STAGE
   ];
@@ -38,14 +38,14 @@ message Edit {
   // Version of the check/stage that this edit resulted in.
   //
   // When an edit applies, this `version` will match the node's version.
-  Revision version = 2;
+  optional Revision version = 2;
 
   // The time at which this Edit will be automatically garbage collected.
   //
   // Defaults to 180 days from the time of the Edit.
   //
   // TBD: Add RPC to extend the TTL of an Edit and its data.
-  google.protobuf.Timestamp expire_at = 3;
+  optional google.protobuf.Timestamp expire_at = 3;
 
   // The time at which heavyweight data associated with this Edit (e.g.
   // CheckEditOptions) will be automatically garbage collected.
@@ -53,14 +53,14 @@ message Edit {
   // Defaults to 30 days from the time of the Edit.
   //
   // TBD: Add RPC to extend the TTL of an Edit and its data.
-  google.protobuf.Timestamp data_expire_at = 4;
+  optional google.protobuf.Timestamp data_expire_at = 4;
 
   // The security realm for this Edit (duplicated from the affected Check/Stage
   // to allow easy ACL resolution).
-  string realm = 5 [(google.api.field_behavior) = IMMUTABLE];
+  optional string realm = 5 [(google.api.field_behavior) = IMMUTABLE];
 
   // The entity which generated this Edit.
-  Actor editor = 6;
+  optional Actor editor = 6;
 
   // If set, the WriteNodes call which produced this Edit was transactional over
   // this set of Identifiers.
@@ -80,13 +80,13 @@ message Edit {
     // The security realm for this reason.
     //
     // If omitted, this will be the same as the parent node's realm.
-    string realm = 1;
+    optional string realm = 1;
 
     // A 'low effort' reason for this edit.
     //
     // This is 'low effort' because it's preferable for the writer to provide
     // detailed machine-readable data in the `details` field below.
-    string reason = 2;
+    optional string reason = 2;
 
     // Machine-readable reason(s) for this edit.
     //

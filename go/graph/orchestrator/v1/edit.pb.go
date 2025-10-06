@@ -17,7 +17,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -38,59 +37,20 @@ const (
 // Option Data) will be stored separately from this Edit record and will have a
 // shorter TTL.
 type Edit struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The node which this Edit is associated with.
-	ForNode *v1.Identifier `protobuf:"bytes,1,opt,name=for_node,json=forNode" json:"for_node,omitempty"`
-	// Version of the check/stage that this edit resulted in.
-	//
-	// When an edit applies, this `version` will match the node's version.
-	Version *Revision `protobuf:"bytes,2,opt,name=version" json:"version,omitempty"`
-	// The time at which this Edit will be automatically garbage collected.
-	//
-	// Defaults to 180 days from the time of the Edit.
-	//
-	// TBD: Add RPC to extend the TTL of an Edit and its data.
-	ExpireAt *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=expire_at,json=expireAt" json:"expire_at,omitempty"`
-	// The time at which heavyweight data associated with this Edit (e.g.
-	// CheckEditOptions) will be automatically garbage collected.
-	//
-	// Defaults to 30 days from the time of the Edit.
-	//
-	// TBD: Add RPC to extend the TTL of an Edit and its data.
-	DataExpireAt *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=data_expire_at,json=dataExpireAt" json:"data_expire_at,omitempty"`
-	// The security realm for this Edit (duplicated from the affected Check/Stage
-	// to allow easy ACL resolution).
-	Realm *string `protobuf:"bytes,5,opt,name=realm" json:"realm,omitempty"`
-	// The entity which generated this Edit.
-	Editor *Actor `protobuf:"bytes,6,opt,name=editor" json:"editor,omitempty"`
-	// If set, the WriteNodes call which produced this Edit was transactional over
-	// this set of Identifiers.
-	//
-	// If this is unset, then this Edit was the result of an 'oblivious write'
-	// without a transaction snapshot.
-	TransactionalSet []*v1.Identifier `protobuf:"bytes,7,rep,name=transactional_set,json=transactionalSet" json:"transactional_set,omitempty"`
-	// The writer-provided reason(s) for this Edit.
-	//
-	// The only reason to have multiple Reason messages is to allow for different
-	// realms.
-	//
-	// NOTE: When viewing Edits, the reader will only see the reasons for which
-	// they have read permissions (that is - two different users may see different
-	// versions of this otherwise entirely-immutable Edit).
-	//
-	// By convention, these should be ordered from most to least specific, so if a
-	// client only wants to display one Reason, it should be the first in this
-	// list.
-	Reasons []*Edit_Reason `protobuf:"bytes,8,rep,name=reasons" json:"reasons,omitempty"`
-	// The actual delta of this Edit.
-	//
-	// Types that are valid to be assigned to Delta:
-	//
-	//	*Edit_Check
-	//	*Edit_Stage
-	Delta         isEdit_Delta `protobuf_oneof:"delta"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                       protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_ForNode          *v1.Identifier         `protobuf:"bytes,1,opt,name=for_node,json=forNode,proto3,oneof"`
+	xxx_hidden_Version          *Revision              `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
+	xxx_hidden_ExpireAt         *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=expire_at,json=expireAt,proto3,oneof"`
+	xxx_hidden_DataExpireAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=data_expire_at,json=dataExpireAt,proto3,oneof"`
+	xxx_hidden_Realm            *string                `protobuf:"bytes,5,opt,name=realm,proto3,oneof"`
+	xxx_hidden_Editor           *Actor                 `protobuf:"bytes,6,opt,name=editor,proto3,oneof"`
+	xxx_hidden_TransactionalSet *[]*v1.Identifier      `protobuf:"bytes,7,rep,name=transactional_set,json=transactionalSet,proto3"`
+	xxx_hidden_Reasons          *[]*Edit_Reason        `protobuf:"bytes,8,rep,name=reasons,proto3"`
+	xxx_hidden_Delta            isEdit_Delta           `protobuf_oneof:"delta"`
+	XXX_raceDetectHookData      protoimpl.RaceDetectHookData
+	XXX_presence                [1]uint32
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
 }
 
 func (x *Edit) Reset() {
@@ -118,77 +78,72 @@ func (x *Edit) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Edit.ProtoReflect.Descriptor instead.
-func (*Edit) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_edit_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Edit) GetForNode() *v1.Identifier {
 	if x != nil {
-		return x.ForNode
+		return x.xxx_hidden_ForNode
 	}
 	return nil
 }
 
 func (x *Edit) GetVersion() *Revision {
 	if x != nil {
-		return x.Version
+		return x.xxx_hidden_Version
 	}
 	return nil
 }
 
 func (x *Edit) GetExpireAt() *timestamppb.Timestamp {
 	if x != nil {
-		return x.ExpireAt
+		return x.xxx_hidden_ExpireAt
 	}
 	return nil
 }
 
 func (x *Edit) GetDataExpireAt() *timestamppb.Timestamp {
 	if x != nil {
-		return x.DataExpireAt
+		return x.xxx_hidden_DataExpireAt
 	}
 	return nil
 }
 
 func (x *Edit) GetRealm() string {
-	if x != nil && x.Realm != nil {
-		return *x.Realm
+	if x != nil {
+		if x.xxx_hidden_Realm != nil {
+			return *x.xxx_hidden_Realm
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Edit) GetEditor() *Actor {
 	if x != nil {
-		return x.Editor
+		return x.xxx_hidden_Editor
 	}
 	return nil
 }
 
 func (x *Edit) GetTransactionalSet() []*v1.Identifier {
 	if x != nil {
-		return x.TransactionalSet
+		if x.xxx_hidden_TransactionalSet != nil {
+			return *x.xxx_hidden_TransactionalSet
+		}
 	}
 	return nil
 }
 
 func (x *Edit) GetReasons() []*Edit_Reason {
 	if x != nil {
-		return x.Reasons
-	}
-	return nil
-}
-
-func (x *Edit) GetDelta() isEdit_Delta {
-	if x != nil {
-		return x.Delta
+		if x.xxx_hidden_Reasons != nil {
+			return *x.xxx_hidden_Reasons
+		}
 	}
 	return nil
 }
 
 func (x *Edit) GetCheck() *CheckDelta {
 	if x != nil {
-		if x, ok := x.Delta.(*Edit_Check); ok {
+		if x, ok := x.xxx_hidden_Delta.(*edit_Check); ok {
 			return x.Check
 		}
 	}
@@ -197,56 +152,313 @@ func (x *Edit) GetCheck() *CheckDelta {
 
 func (x *Edit) GetStage() *StageDelta {
 	if x != nil {
-		if x, ok := x.Delta.(*Edit_Stage); ok {
+		if x, ok := x.xxx_hidden_Delta.(*edit_Stage); ok {
 			return x.Stage
 		}
 	}
 	return nil
 }
 
+func (x *Edit) SetForNode(v *v1.Identifier) {
+	x.xxx_hidden_ForNode = v
+}
+
+func (x *Edit) SetVersion(v *Revision) {
+	x.xxx_hidden_Version = v
+}
+
+func (x *Edit) SetExpireAt(v *timestamppb.Timestamp) {
+	x.xxx_hidden_ExpireAt = v
+}
+
+func (x *Edit) SetDataExpireAt(v *timestamppb.Timestamp) {
+	x.xxx_hidden_DataExpireAt = v
+}
+
+func (x *Edit) SetRealm(v string) {
+	x.xxx_hidden_Realm = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 9)
+}
+
+func (x *Edit) SetEditor(v *Actor) {
+	x.xxx_hidden_Editor = v
+}
+
+func (x *Edit) SetTransactionalSet(v []*v1.Identifier) {
+	x.xxx_hidden_TransactionalSet = &v
+}
+
+func (x *Edit) SetReasons(v []*Edit_Reason) {
+	x.xxx_hidden_Reasons = &v
+}
+
+func (x *Edit) SetCheck(v *CheckDelta) {
+	if v == nil {
+		x.xxx_hidden_Delta = nil
+		return
+	}
+	x.xxx_hidden_Delta = &edit_Check{v}
+}
+
+func (x *Edit) SetStage(v *StageDelta) {
+	if v == nil {
+		x.xxx_hidden_Delta = nil
+		return
+	}
+	x.xxx_hidden_Delta = &edit_Stage{v}
+}
+
+func (x *Edit) HasForNode() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_ForNode != nil
+}
+
+func (x *Edit) HasVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Version != nil
+}
+
+func (x *Edit) HasExpireAt() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_ExpireAt != nil
+}
+
+func (x *Edit) HasDataExpireAt() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_DataExpireAt != nil
+}
+
+func (x *Edit) HasRealm() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+}
+
+func (x *Edit) HasEditor() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Editor != nil
+}
+
+func (x *Edit) HasDelta() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Delta != nil
+}
+
+func (x *Edit) HasCheck() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Delta.(*edit_Check)
+	return ok
+}
+
+func (x *Edit) HasStage() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Delta.(*edit_Stage)
+	return ok
+}
+
+func (x *Edit) ClearForNode() {
+	x.xxx_hidden_ForNode = nil
+}
+
+func (x *Edit) ClearVersion() {
+	x.xxx_hidden_Version = nil
+}
+
+func (x *Edit) ClearExpireAt() {
+	x.xxx_hidden_ExpireAt = nil
+}
+
+func (x *Edit) ClearDataExpireAt() {
+	x.xxx_hidden_DataExpireAt = nil
+}
+
+func (x *Edit) ClearRealm() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	x.xxx_hidden_Realm = nil
+}
+
+func (x *Edit) ClearEditor() {
+	x.xxx_hidden_Editor = nil
+}
+
+func (x *Edit) ClearDelta() {
+	x.xxx_hidden_Delta = nil
+}
+
+func (x *Edit) ClearCheck() {
+	if _, ok := x.xxx_hidden_Delta.(*edit_Check); ok {
+		x.xxx_hidden_Delta = nil
+	}
+}
+
+func (x *Edit) ClearStage() {
+	if _, ok := x.xxx_hidden_Delta.(*edit_Stage); ok {
+		x.xxx_hidden_Delta = nil
+	}
+}
+
+const Edit_Delta_not_set_case case_Edit_Delta = 0
+const Edit_Check_case case_Edit_Delta = 9
+const Edit_Stage_case case_Edit_Delta = 10
+
+func (x *Edit) WhichDelta() case_Edit_Delta {
+	if x == nil {
+		return Edit_Delta_not_set_case
+	}
+	switch x.xxx_hidden_Delta.(type) {
+	case *edit_Check:
+		return Edit_Check_case
+	case *edit_Stage:
+		return Edit_Stage_case
+	default:
+		return Edit_Delta_not_set_case
+	}
+}
+
+type Edit_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The node which this Edit is associated with.
+	ForNode *v1.Identifier
+	// Version of the check/stage that this edit resulted in.
+	//
+	// When an edit applies, this `version` will match the node's version.
+	Version *Revision
+	// The time at which this Edit will be automatically garbage collected.
+	//
+	// Defaults to 180 days from the time of the Edit.
+	//
+	// TBD: Add RPC to extend the TTL of an Edit and its data.
+	ExpireAt *timestamppb.Timestamp
+	// The time at which heavyweight data associated with this Edit (e.g.
+	// CheckEditOptions) will be automatically garbage collected.
+	//
+	// Defaults to 30 days from the time of the Edit.
+	//
+	// TBD: Add RPC to extend the TTL of an Edit and its data.
+	DataExpireAt *timestamppb.Timestamp
+	// The security realm for this Edit (duplicated from the affected Check/Stage
+	// to allow easy ACL resolution).
+	Realm *string
+	// The entity which generated this Edit.
+	Editor *Actor
+	// If set, the WriteNodes call which produced this Edit was transactional over
+	// this set of Identifiers.
+	//
+	// If this is unset, then this Edit was the result of an 'oblivious write'
+	// without a transaction snapshot.
+	TransactionalSet []*v1.Identifier
+	// The writer-provided reason(s) for this Edit.
+	//
+	// The only reason to have multiple Reason messages is to allow for different
+	// realms.
+	//
+	// NOTE: When viewing Edits, the reader will only see the reasons for which
+	// they have read permissions (that is - two different users may see different
+	// versions of this otherwise entirely-immutable Edit).
+	//
+	// By convention, these should be ordered from most to least specific, so if a
+	// client only wants to display one Reason, it should be the first in this
+	// list.
+	Reasons []*Edit_Reason
+	// The actual delta of this Edit.
+
+	// Fields of oneof xxx_hidden_Delta:
+	// This is a delta for a Check.
+	//
+	// `what` must be an Identifier.Check.
+	Check *CheckDelta
+	// This is a delta for a Stage.
+	//
+	// `what` must be an Identifier.Stage.
+	Stage *StageDelta
+	// -- end of xxx_hidden_Delta
+}
+
+func (b0 Edit_builder) Build() *Edit {
+	m0 := &Edit{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_ForNode = b.ForNode
+	x.xxx_hidden_Version = b.Version
+	x.xxx_hidden_ExpireAt = b.ExpireAt
+	x.xxx_hidden_DataExpireAt = b.DataExpireAt
+	if b.Realm != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 9)
+		x.xxx_hidden_Realm = b.Realm
+	}
+	x.xxx_hidden_Editor = b.Editor
+	x.xxx_hidden_TransactionalSet = &b.TransactionalSet
+	x.xxx_hidden_Reasons = &b.Reasons
+	if b.Check != nil {
+		x.xxx_hidden_Delta = &edit_Check{b.Check}
+	}
+	if b.Stage != nil {
+		x.xxx_hidden_Delta = &edit_Stage{b.Stage}
+	}
+	return m0
+}
+
+type case_Edit_Delta protoreflect.FieldNumber
+
+func (x case_Edit_Delta) String() string {
+	md := file_turboci_graph_orchestrator_v1_edit_proto_msgTypes[0].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isEdit_Delta interface {
 	isEdit_Delta()
 }
 
-type Edit_Check struct {
+type edit_Check struct {
 	// This is a delta for a Check.
 	//
 	// `what` must be an Identifier.Check.
-	Check *CheckDelta `protobuf:"bytes,9,opt,name=check,oneof"`
+	Check *CheckDelta `protobuf:"bytes,9,opt,name=check,proto3,oneof"`
 }
 
-type Edit_Stage struct {
+type edit_Stage struct {
 	// This is a delta for a Stage.
 	//
 	// `what` must be an Identifier.Stage.
-	Stage *StageDelta `protobuf:"bytes,10,opt,name=stage,oneof"`
+	Stage *StageDelta `protobuf:"bytes,10,opt,name=stage,proto3,oneof"`
 }
 
-func (*Edit_Check) isEdit_Delta() {}
+func (*edit_Check) isEdit_Delta() {}
 
-func (*Edit_Stage) isEdit_Delta() {}
+func (*edit_Stage) isEdit_Delta() {}
 
 // Human and machine-readable reasons for this Edit (provided as part of
 // WriteNodes).
 type Edit_Reason struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The security realm for this reason.
-	//
-	// If omitted, this will be the same as the parent node's realm.
-	Realm *string `protobuf:"bytes,1,opt,name=realm" json:"realm,omitempty"`
-	// A 'low effort' reason for this edit.
-	//
-	// This is 'low effort' because it's preferable for the writer to provide
-	// detailed machine-readable data in the `details` field below.
-	Reason *string `protobuf:"bytes,2,opt,name=reason" json:"reason,omitempty"`
-	// Machine-readable reason(s) for this edit.
-	//
-	// This is repeated to allow for standardized reason message types in
-	// conjunction with workflow-specific details as part of the same write
-	// record.
-	Details       []*Value `protobuf:"bytes,3,rep,name=details" json:"details,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Realm       *string                `protobuf:"bytes,1,opt,name=realm,proto3,oneof"`
+	xxx_hidden_Reason      *string                `protobuf:"bytes,2,opt,name=reason,proto3,oneof"`
+	xxx_hidden_Details     *[]*Value              `protobuf:"bytes,3,rep,name=details,proto3"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Edit_Reason) Reset() {
@@ -274,68 +486,143 @@ func (x *Edit_Reason) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Edit_Reason.ProtoReflect.Descriptor instead.
-func (*Edit_Reason) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_edit_proto_rawDescGZIP(), []int{0, 0}
-}
-
 func (x *Edit_Reason) GetRealm() string {
-	if x != nil && x.Realm != nil {
-		return *x.Realm
+	if x != nil {
+		if x.xxx_hidden_Realm != nil {
+			return *x.xxx_hidden_Realm
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Edit_Reason) GetReason() string {
-	if x != nil && x.Reason != nil {
-		return *x.Reason
+	if x != nil {
+		if x.xxx_hidden_Reason != nil {
+			return *x.xxx_hidden_Reason
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Edit_Reason) GetDetails() []*Value {
 	if x != nil {
-		return x.Details
+		if x.xxx_hidden_Details != nil {
+			return *x.xxx_hidden_Details
+		}
 	}
 	return nil
+}
+
+func (x *Edit_Reason) SetRealm(v string) {
+	x.xxx_hidden_Realm = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+}
+
+func (x *Edit_Reason) SetReason(v string) {
+	x.xxx_hidden_Reason = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+}
+
+func (x *Edit_Reason) SetDetails(v []*Value) {
+	x.xxx_hidden_Details = &v
+}
+
+func (x *Edit_Reason) HasRealm() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Edit_Reason) HasReason() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Edit_Reason) ClearRealm() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Realm = nil
+}
+
+func (x *Edit_Reason) ClearReason() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Reason = nil
+}
+
+type Edit_Reason_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The security realm for this reason.
+	//
+	// If omitted, this will be the same as the parent node's realm.
+	Realm *string
+	// A 'low effort' reason for this edit.
+	//
+	// This is 'low effort' because it's preferable for the writer to provide
+	// detailed machine-readable data in the `details` field below.
+	Reason *string
+	// Machine-readable reason(s) for this edit.
+	//
+	// This is repeated to allow for standardized reason message types in
+	// conjunction with workflow-specific details as part of the same write
+	// record.
+	Details []*Value
+}
+
+func (b0 Edit_Reason_builder) Build() *Edit_Reason {
+	m0 := &Edit_Reason{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Realm != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		x.xxx_hidden_Realm = b.Realm
+	}
+	if b.Reason != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		x.xxx_hidden_Reason = b.Reason
+	}
+	x.xxx_hidden_Details = &b.Details
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_edit_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_edit_proto_rawDesc = "" +
 	"\n" +
-	"(turboci/graph/orchestrator/v1/edit.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_delta.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_delta.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\x94\x06\n" +
-	"\x04Edit\x12I\n" +
+	"(turboci/graph/orchestrator/v1/edit.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_delta.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_delta.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xa1\a\n" +
+	"\x04Edit\x12N\n" +
 	"\bfor_node\x18\x01 \x01(\v2 .turboci.graph.ids.v1.IdentifierB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
-	"\x02\x02\bR\aforNode\x12A\n" +
-	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionR\aversion\x127\n" +
-	"\texpire_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\bexpireAt\x12@\n" +
-	"\x0edata_expire_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\fdataExpireAt\x12\x19\n" +
-	"\x05realm\x18\x05 \x01(\tB\x03\xe0A\x05R\x05realm\x12<\n" +
-	"\x06editor\x18\x06 \x01(\v2$.turboci.graph.orchestrator.v1.ActorR\x06editor\x12]\n" +
+	"\x02\x02\bH\x01R\aforNode\x88\x01\x01\x12F\n" +
+	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\aversion\x88\x01\x01\x12<\n" +
+	"\texpire_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampH\x03R\bexpireAt\x88\x01\x01\x12E\n" +
+	"\x0edata_expire_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampH\x04R\fdataExpireAt\x88\x01\x01\x12\x1e\n" +
+	"\x05realm\x18\x05 \x01(\tB\x03\xe0A\x05H\x05R\x05realm\x88\x01\x01\x12A\n" +
+	"\x06editor\x18\x06 \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x06R\x06editor\x88\x01\x01\x12]\n" +
 	"\x11transactional_set\x18\a \x03(\v2 .turboci.graph.ids.v1.IdentifierB\x0e\x82\x86\xf6\xfb\x0f\b\x12\x06\n" +
 	"\x04\x02\x03\x05\bR\x10transactionalSet\x12D\n" +
 	"\areasons\x18\b \x03(\v2*.turboci.graph.orchestrator.v1.Edit.ReasonR\areasons\x12A\n" +
 	"\x05check\x18\t \x01(\v2).turboci.graph.orchestrator.v1.CheckDeltaH\x00R\x05check\x12A\n" +
 	"\x05stage\x18\n" +
-	" \x01(\v2).turboci.graph.orchestrator.v1.StageDeltaH\x00R\x05stage\x1av\n" +
-	"\x06Reason\x12\x14\n" +
-	"\x05realm\x18\x01 \x01(\tR\x05realm\x12\x16\n" +
-	"\x06reason\x18\x02 \x01(\tR\x06reason\x12>\n" +
-	"\adetails\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetailsB\a\n" +
-	"\x05deltaBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_edit_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_edit_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_edit_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_edit_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_edit_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_edit_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_edit_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_edit_proto_rawDescData
-}
+	" \x01(\v2).turboci.graph.orchestrator.v1.StageDeltaH\x00R\x05stage\x1a\x95\x01\n" +
+	"\x06Reason\x12\x19\n" +
+	"\x05realm\x18\x01 \x01(\tH\x00R\x05realm\x88\x01\x01\x12\x1b\n" +
+	"\x06reason\x18\x02 \x01(\tH\x01R\x06reason\x88\x01\x01\x12>\n" +
+	"\adetails\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetailsB\b\n" +
+	"\x06_realmB\t\n" +
+	"\a_reasonB\a\n" +
+	"\x05deltaB\v\n" +
+	"\t_for_nodeB\n" +
+	"\n" +
+	"\b_versionB\f\n" +
+	"\n" +
+	"_expire_atB\x11\n" +
+	"\x0f_data_expire_atB\b\n" +
+	"\x06_realmB\t\n" +
+	"\a_editorBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_edit_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_edit_proto_goTypes = []any{
@@ -379,9 +666,10 @@ func file_turboci_graph_orchestrator_v1_edit_proto_init() {
 	file_turboci_graph_orchestrator_v1_stage_delta_proto_init()
 	file_turboci_graph_orchestrator_v1_value_proto_init()
 	file_turboci_graph_orchestrator_v1_edit_proto_msgTypes[0].OneofWrappers = []any{
-		(*Edit_Check)(nil),
-		(*Edit_Stage)(nil),
+		(*edit_Check)(nil),
+		(*edit_Stage)(nil),
 	}
+	file_turboci_graph_orchestrator_v1_edit_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

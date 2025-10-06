@@ -15,7 +15,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -30,28 +29,15 @@ const (
 //
 // Fields are unset when the edit did not change that aspect of the Check.
 type CheckDelta struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// If set, the new state that was set as part of this edit.
-	State *CheckState `protobuf:"varint,1,opt,name=state,enum=turboci.graph.orchestrator.v1.CheckState" json:"state,omitempty"`
-	// Dependencies written as part of this edit.
-	//
-	// Contains the FULL dependencies data (e.g. if the edit 'added' a new
-	// dependency to one of these EdgeGroups, or added a new EdgeGroup, etc., you
-	// would see the entire set of EdgeGroups here, not just the added/changed
-	// one(s)).
-	Dependencies []*EdgeGroup `protobuf:"bytes,2,rep,name=dependencies" json:"dependencies,omitempty"`
-	// Options written as part of this edit.
-	Options []*v1.CheckOption `protobuf:"bytes,3,rep,name=options" json:"options,omitempty"`
-	// Result data written as part of this edit.
-	//
-	// This is repeated to allow for the Orchestrator to make a single edit
-	// which e.g. finalizes all Results in a single edit, but *typically* this
-	// will only contain a single Result.
-	//
-	// Unique and sorted on `Result.identifier`.
-	Result        []*CheckDelta_Result `protobuf:"bytes,4,rep,name=result" json:"result,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                   protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_State        CheckState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
+	xxx_hidden_Dependencies *[]*EdgeGroup          `protobuf:"bytes,2,rep,name=dependencies,proto3"`
+	xxx_hidden_Options      *[]*v1.CheckOption     `protobuf:"bytes,3,rep,name=options,proto3"`
+	xxx_hidden_Result       *[]*CheckDelta_Result  `protobuf:"bytes,4,rep,name=result,proto3"`
+	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
+	XXX_presence            [1]uint32
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *CheckDelta) Reset() {
@@ -79,57 +65,120 @@ func (x *CheckDelta) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CheckDelta.ProtoReflect.Descriptor instead.
-func (*CheckDelta) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_check_delta_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *CheckDelta) GetState() CheckState {
-	if x != nil && x.State != nil {
-		return *x.State
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
+			return x.xxx_hidden_State
+		}
 	}
 	return CheckState_CHECK_STATE_UNKNOWN
 }
 
 func (x *CheckDelta) GetDependencies() []*EdgeGroup {
 	if x != nil {
-		return x.Dependencies
+		if x.xxx_hidden_Dependencies != nil {
+			return *x.xxx_hidden_Dependencies
+		}
 	}
 	return nil
 }
 
 func (x *CheckDelta) GetOptions() []*v1.CheckOption {
 	if x != nil {
-		return x.Options
+		if x.xxx_hidden_Options != nil {
+			return *x.xxx_hidden_Options
+		}
 	}
 	return nil
 }
 
 func (x *CheckDelta) GetResult() []*CheckDelta_Result {
 	if x != nil {
-		return x.Result
+		if x.xxx_hidden_Result != nil {
+			return *x.xxx_hidden_Result
+		}
 	}
 	return nil
 }
 
+func (x *CheckDelta) SetState(v CheckState) {
+	x.xxx_hidden_State = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
+}
+
+func (x *CheckDelta) SetDependencies(v []*EdgeGroup) {
+	x.xxx_hidden_Dependencies = &v
+}
+
+func (x *CheckDelta) SetOptions(v []*v1.CheckOption) {
+	x.xxx_hidden_Options = &v
+}
+
+func (x *CheckDelta) SetResult(v []*CheckDelta_Result) {
+	x.xxx_hidden_Result = &v
+}
+
+func (x *CheckDelta) HasState() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *CheckDelta) ClearState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_State = CheckState_CHECK_STATE_UNKNOWN
+}
+
+type CheckDelta_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// If set, the new state that was set as part of this edit.
+	State *CheckState
+	// Dependencies written as part of this edit.
+	//
+	// Contains the FULL dependencies data (e.g. if the edit 'added' a new
+	// dependency to one of these EdgeGroups, or added a new EdgeGroup, etc., you
+	// would see the entire set of EdgeGroups here, not just the added/changed
+	// one(s)).
+	Dependencies []*EdgeGroup
+	// Options written as part of this edit.
+	Options []*v1.CheckOption
+	// Result data written as part of this edit.
+	//
+	// This is repeated to allow for the Orchestrator to make a single edit
+	// which e.g. finalizes all Results in a single edit, but *typically* this
+	// will only contain a single Result.
+	//
+	// Unique and sorted on `Result.identifier`.
+	Result []*CheckDelta_Result
+}
+
+func (b0 CheckDelta_builder) Build() *CheckDelta {
+	m0 := &CheckDelta{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.State != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
+		x.xxx_hidden_State = *b.State
+	}
+	x.xxx_hidden_Dependencies = &b.Dependencies
+	x.xxx_hidden_Options = &b.Options
+	x.xxx_hidden_Result = &b.Result
+	return m0
+}
+
 // Information about a single Check.Result written as part of this edit.
 type CheckDelta_Result struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The identifier of this Check.Result.
-	Identifier *v1.CheckResult `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
-	// If true, this Check.Result was created by this edit.
-	Created *bool `protobuf:"varint,2,opt,name=created" json:"created,omitempty"`
-	// Reference to the data written as part of this edit.
-	Data []*v1.CheckResultDatum `protobuf:"bytes,3,rep,name=data" json:"data,omitempty"`
-	// If true, this edit finalized the Check.Result.
-	//
-	// This may be true in conjunction with `created` to indicate that a
-	// new Check.Result was created and immediately finalized.
-	//
-	// `Check.Result.finalized_at` will match the timestamp of this Edit.
-	Finalized     *bool `protobuf:"varint,4,opt,name=finalized" json:"finalized,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState  `protogen:"opaque.v1"`
+	xxx_hidden_Identifier  *v1.CheckResult         `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Created     bool                    `protobuf:"varint,2,opt,name=created,proto3,oneof"`
+	xxx_hidden_Data        *[]*v1.CheckResultDatum `protobuf:"bytes,3,rep,name=data,proto3"`
+	xxx_hidden_Finalized   bool                    `protobuf:"varint,4,opt,name=finalized,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *CheckDelta_Result) Reset() {
@@ -157,70 +206,149 @@ func (x *CheckDelta_Result) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CheckDelta_Result.ProtoReflect.Descriptor instead.
-func (*CheckDelta_Result) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_check_delta_proto_rawDescGZIP(), []int{0, 0}
-}
-
 func (x *CheckDelta_Result) GetIdentifier() *v1.CheckResult {
 	if x != nil {
-		return x.Identifier
+		return x.xxx_hidden_Identifier
 	}
 	return nil
 }
 
 func (x *CheckDelta_Result) GetCreated() bool {
-	if x != nil && x.Created != nil {
-		return *x.Created
+	if x != nil {
+		return x.xxx_hidden_Created
 	}
 	return false
 }
 
 func (x *CheckDelta_Result) GetData() []*v1.CheckResultDatum {
 	if x != nil {
-		return x.Data
+		if x.xxx_hidden_Data != nil {
+			return *x.xxx_hidden_Data
+		}
 	}
 	return nil
 }
 
 func (x *CheckDelta_Result) GetFinalized() bool {
-	if x != nil && x.Finalized != nil {
-		return *x.Finalized
+	if x != nil {
+		return x.xxx_hidden_Finalized
 	}
 	return false
+}
+
+func (x *CheckDelta_Result) SetIdentifier(v *v1.CheckResult) {
+	x.xxx_hidden_Identifier = v
+}
+
+func (x *CheckDelta_Result) SetCreated(v bool) {
+	x.xxx_hidden_Created = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
+}
+
+func (x *CheckDelta_Result) SetData(v []*v1.CheckResultDatum) {
+	x.xxx_hidden_Data = &v
+}
+
+func (x *CheckDelta_Result) SetFinalized(v bool) {
+	x.xxx_hidden_Finalized = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
+}
+
+func (x *CheckDelta_Result) HasIdentifier() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Identifier != nil
+}
+
+func (x *CheckDelta_Result) HasCreated() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *CheckDelta_Result) HasFinalized() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+}
+
+func (x *CheckDelta_Result) ClearIdentifier() {
+	x.xxx_hidden_Identifier = nil
+}
+
+func (x *CheckDelta_Result) ClearCreated() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Created = false
+}
+
+func (x *CheckDelta_Result) ClearFinalized() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_Finalized = false
+}
+
+type CheckDelta_Result_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The identifier of this Check.Result.
+	Identifier *v1.CheckResult
+	// If true, this Check.Result was created by this edit.
+	Created *bool
+	// Reference to the data written as part of this edit.
+	Data []*v1.CheckResultDatum
+	// If true, this edit finalized the Check.Result.
+	//
+	// This may be true in conjunction with `created` to indicate that a
+	// new Check.Result was created and immediately finalized.
+	//
+	// `Check.Result.finalized_at` will match the timestamp of this Edit.
+	Finalized *bool
+}
+
+func (b0 CheckDelta_Result_builder) Build() *CheckDelta_Result {
+	m0 := &CheckDelta_Result{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Identifier = b.Identifier
+	if b.Created != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
+		x.xxx_hidden_Created = *b.Created
+	}
+	x.xxx_hidden_Data = &b.Data
+	if b.Finalized != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
+		x.xxx_hidden_Finalized = *b.Finalized
+	}
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_check_delta_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_check_delta_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/check_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a.turboci/graph/orchestrator/v1/edge_group.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\"\xf1\x03\n" +
+	"/turboci/graph/orchestrator/v1/check_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a.turboci/graph/orchestrator/v1/edge_group.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\"\xb8\x04\n" +
 	"\n" +
-	"CheckDelta\x12?\n" +
-	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateR\x05state\x12Y\n" +
+	"CheckDelta\x12D\n" +
+	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\x05state\x88\x01\x01\x12Y\n" +
 	"\fdependencies\x18\x02 \x03(\v2(.turboci.graph.orchestrator.v1.EdgeGroupB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
 	"\x01\x02R\fdependencies\x12;\n" +
 	"\aoptions\x18\x03 \x03(\v2!.turboci.graph.ids.v1.CheckOptionR\aoptions\x12H\n" +
-	"\x06result\x18\x04 \x03(\v20.turboci.graph.orchestrator.v1.CheckDelta.ResultR\x06result\x1a\xbf\x01\n" +
-	"\x06Result\x12A\n" +
+	"\x06result\x18\x04 \x03(\v20.turboci.graph.orchestrator.v1.CheckDelta.ResultR\x06result\x1a\xf7\x01\n" +
+	"\x06Result\x12F\n" +
 	"\n" +
-	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckResultR\n" +
-	"identifier\x12\x18\n" +
-	"\acreated\x18\x02 \x01(\bR\acreated\x12:\n" +
-	"\x04data\x18\x03 \x03(\v2&.turboci.graph.ids.v1.CheckResultDatumR\x04data\x12\x1c\n" +
-	"\tfinalized\x18\x04 \x01(\bR\tfinalizedBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_check_delta_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_check_delta_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_check_delta_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_check_delta_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_check_delta_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_check_delta_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_check_delta_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_check_delta_proto_rawDescData
-}
+	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckResultH\x00R\n" +
+	"identifier\x88\x01\x01\x12\x1d\n" +
+	"\acreated\x18\x02 \x01(\bH\x01R\acreated\x88\x01\x01\x12:\n" +
+	"\x04data\x18\x03 \x03(\v2&.turboci.graph.ids.v1.CheckResultDatumR\x04data\x12!\n" +
+	"\tfinalized\x18\x04 \x01(\bH\x02R\tfinalized\x88\x01\x01B\r\n" +
+	"\v_identifierB\n" +
+	"\n" +
+	"\b_createdB\f\n" +
+	"\n" +
+	"_finalizedB\b\n" +
+	"\x06_stateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_check_delta_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_check_delta_proto_goTypes = []any{
@@ -254,6 +382,8 @@ func file_turboci_graph_orchestrator_v1_check_delta_proto_init() {
 	file_turboci_graph_orchestrator_v1_check_state_proto_init()
 	file_turboci_graph_orchestrator_v1_edge_group_proto_init()
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
+	file_turboci_graph_orchestrator_v1_check_delta_proto_msgTypes[0].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_check_delta_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

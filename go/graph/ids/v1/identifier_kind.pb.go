@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -109,11 +108,6 @@ func (x IdentifierKind) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use IdentifierKind.Descriptor instead.
-func (IdentifierKind) EnumDescriptor() ([]byte, []int) {
-	return file_turboci_graph_ids_v1_identifier_kind_proto_rawDescGZIP(), []int{0}
-}
-
 var File_turboci_graph_ids_v1_identifier_kind_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_ids_v1_identifier_kind_proto_rawDesc = "" +
@@ -131,19 +125,7 @@ const file_turboci_graph_ids_v1_identifier_kind_proto_rawDesc = "" +
 	"\x15IDENTIFIER_KIND_STAGE\x10\b\x12!\n" +
 	"\x1dIDENTIFIER_KIND_STAGE_ATTEMPT\x10\t\x12\x1e\n" +
 	"\x1aIDENTIFIER_KIND_STAGE_EDIT\x10\n" +
-	"B7P\x01Z3go.chromium.org/turboci/proto/go/graph/ids/v1;idspbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_ids_v1_identifier_kind_proto_rawDescOnce sync.Once
-	file_turboci_graph_ids_v1_identifier_kind_proto_rawDescData []byte
-)
-
-func file_turboci_graph_ids_v1_identifier_kind_proto_rawDescGZIP() []byte {
-	file_turboci_graph_ids_v1_identifier_kind_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_ids_v1_identifier_kind_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_ids_v1_identifier_kind_proto_rawDesc), len(file_turboci_graph_ids_v1_identifier_kind_proto_rawDesc)))
-	})
-	return file_turboci_graph_ids_v1_identifier_kind_proto_rawDescData
-}
+	"B7P\x01Z3go.chromium.org/turboci/proto/go/graph/ids/v1;idspbb\x06proto3"
 
 var file_turboci_graph_ids_v1_identifier_kind_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_ids_v1_identifier_kind_proto_goTypes = []any{

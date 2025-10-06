@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -28,7 +28,7 @@ message Datum {
   //
   // This is used to map the Datum to the appropriate object (e.g. CheckOption,
   // CheckResult, etc.).
-  ids.v1.Identifier identifier = 1 [
+  optional ids.v1.Identifier identifier = 1 [
     (turboci).id.allowed = IDENTIFIER_KIND_CHECK_OPTION,
     (turboci).id.allowed = IDENTIFIER_KIND_CHECK_RESULT_DATUM,
     (turboci).id.allowed = IDENTIFIER_KIND_CHECK_EDIT_OPTION
@@ -38,10 +38,10 @@ message Datum {
   //
   // If omitted, this Datum inherits the realm of the object that it belongs to
   // (i.e. Check or Check Result).
-  string realm = 2 [(google.api.field_behavior) = IMMUTABLE];
+  optional string realm = 2 [(google.api.field_behavior) = IMMUTABLE];
 
   // The version of this Datum in the database.
-  Revision version = 3;
+  optional Revision version = 3;
 
   // The actual value of this Datum.
   //
@@ -59,7 +59,7 @@ message Datum {
   // need to land and deploy schema changes ahead of time.
   //
   // The `type_url` of this value is immutable.
-  Value value = 4;
+  optional Value value = 4;
 
   // TBD: An additional disambiguator/key in addition to value.type_url?
 

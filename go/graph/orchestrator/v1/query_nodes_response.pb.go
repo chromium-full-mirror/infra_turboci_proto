@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -27,11 +26,10 @@ const (
 
 // Response message for TurboCIGraphService.QueryNodes.
 type QueryNodesResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The graph view of the nodes matching the query.
-	Graph         *GraphView `protobuf:"bytes,1,opt,name=graph" json:"graph,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Graph *GraphView             `protobuf:"bytes,1,opt,name=graph,proto3,oneof"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *QueryNodesResponse) Reset() {
@@ -59,37 +57,51 @@ func (x *QueryNodesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use QueryNodesResponse.ProtoReflect.Descriptor instead.
-func (*QueryNodesResponse) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *QueryNodesResponse) GetGraph() *GraphView {
 	if x != nil {
-		return x.Graph
+		return x.xxx_hidden_Graph
 	}
 	return nil
+}
+
+func (x *QueryNodesResponse) SetGraph(v *GraphView) {
+	x.xxx_hidden_Graph = v
+}
+
+func (x *QueryNodesResponse) HasGraph() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Graph != nil
+}
+
+func (x *QueryNodesResponse) ClearGraph() {
+	x.xxx_hidden_Graph = nil
+}
+
+type QueryNodesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The graph view of the nodes matching the query.
+	Graph *GraphView
+}
+
+func (b0 QueryNodesResponse_builder) Build() *QueryNodesResponse {
+	m0 := &QueryNodesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Graph = b.Graph
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_query_nodes_response_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDesc = "" +
 	"\n" +
-	"8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a.turboci/graph/orchestrator/v1/graph_view.proto\"T\n" +
-	"\x12QueryNodesResponse\x12>\n" +
-	"\x05graph\x18\x01 \x01(\v2(.turboci.graph.orchestrator.v1.GraphViewR\x05graphBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDescData
-}
+	"8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a.turboci/graph/orchestrator/v1/graph_view.proto\"c\n" +
+	"\x12QueryNodesResponse\x12C\n" +
+	"\x05graph\x18\x01 \x01(\v2(.turboci.graph.orchestrator.v1.GraphViewH\x00R\x05graph\x88\x01\x01B\b\n" +
+	"\x06_graphBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_goTypes = []any{
@@ -111,6 +123,7 @@ func file_turboci_graph_orchestrator_v1_query_nodes_response_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_graph_view_proto_init()
+	file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -58,7 +58,7 @@ message Query {
       // duplicated to each WorkNode, not a property of WorkPlan.
     }
     // Which WorkPlans to search across.
-    WorkPlanConstraint workplan = 1;
+    optional WorkPlanConstraint workplan = 1;
 
     // The identifiers of specific nodes to select.
     //
@@ -73,10 +73,10 @@ message Query {
     // Select one or more Checks which match this pattern.
     message CheckPattern {
       // Find Checks of this kind (unset means all kinds).
-      CheckKind kind = 1;
+      optional CheckKind kind = 1;
 
       // Find Checks whose `Identifier.Check.id` matches this re2 regex.
-      string id_regex = 2;
+      optional string id_regex = 2;
 
       // Find Checks with *any* of these options. Note that you still must set
       // follow.check_options.type_urls to actually get the CheckOptions in the
@@ -95,7 +95,7 @@ message Query {
     repeated StagePattern stage_patterns = 4;
   }
   // Select an arbitrary set of nodes.
-  Select select = 2;
+  optional Select select = 2;
 
   // Expand takes the selected node set and 'expands' it by following edges in
   // the graph from those nodes.
@@ -108,7 +108,7 @@ message Query {
       // 0 means "do not follow dependents".
       //
       // Must be >= 0.
-      int32 dependents_depth = 1;
+      optional int32 dependents_depth = 1;
 
       // Follow this many dependencies (so for some node, follow it's
       // `dependencies` fields up to this distance away).
@@ -116,21 +116,21 @@ message Query {
       // 0 means "do not follow dependencies".
       //
       // Must be >= 0.
-      int32 dependencies_depth = 2;
+      optional int32 dependencies_depth = 2;
 
       // Includes only resolved edges during traversal.
-      bool only_resolved = 3;
+      optional bool only_resolved = 3;
 
       // TBD: Other selection criteria (e.g. only checks of kind X or with
       // option type Y)
     }
     // Instructs the query to follow dependencies of the selected node(s).
-    Dependencies dependencies = 1;
+    optional Dependencies dependencies = 1;
 
     // TBD: Other edge types, such as created_by or written_by.
   }
   // Expand that set of nodes by following their edges.
-  Expand expand = 3;
+  optional Expand expand = 3;
 
   // Collect retrieves data from the expanded node set.
   message Collect {
@@ -140,13 +140,13 @@ message Query {
       // Describes what data the caller wants to see for Checks.
       message Check {
         // Include CheckOptions filtered by `type_urls` for any selected Checks.
-        bool options = 1;
+        optional bool options = 1;
 
         // Include Result data filtered by `type_urls` for any selected Checks.
-        bool result_data = 2;
+        optional bool result_data = 2;
       }
       // Describes what data the caller wants to see for Checks.
-      Check check = 2;
+      optional Check check = 2;
 
       // Describes what data the caller wants to see for Stages.
       message Stage {
@@ -154,25 +154,25 @@ message Query {
         // attempt(s) to include it).
       }
       // Describes what data the caller wants to see for Stages.
-      Stage stage = 3;
+      optional Stage stage = 3;
     }
     // Collect options/results/progress data.
-    Data data = 1;
+    optional Data data = 1;
 
     // Edits describes which edit records we want want to collect.
     message Edits {
       // Include edits only within this range of Revisions.
-      RevisionRange range = 1;
+      optional RevisionRange range = 1;
 
       // Include Check Edits for any selected Checks in this range.
-      bool check = 2;
+      optional bool check = 2;
 
       // Include Stage Edits for any selected Stages in this range.
-      bool stage = 3;
+      optional bool stage = 3;
     }
     // Collect edit records.
-    Edits edits = 2;
+    optional Edits edits = 2;
   }
   // The data to collect from the expanded node set.
-  Collect collect = 4;
+  optional Collect collect = 4;
 }

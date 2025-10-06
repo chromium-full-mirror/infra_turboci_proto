@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-edition = "2023";
+syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
@@ -29,15 +29,15 @@ option java_multiple_files = true;
 // populated.
 message Value {
   // The actual value.
-  google.protobuf.Any value = 1;
+  optional google.protobuf.Any value = 1;
 
   // If true the server knows that `value` contains unknown fields according to
   // the current proto descriptor loaded on the server.
   //
   // This can happen if the server's copy of the proto descriptor for `value` is
   // out of date vs the descriptor used by the writer for this Datum.
-  bool has_unknown_fields = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+  optional bool has_unknown_fields = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // A ProtoJSON-serialized version of `value`.
-  string value_json = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+  optional string value_json = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 }

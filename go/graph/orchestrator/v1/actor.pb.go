@@ -15,7 +15,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -28,16 +27,10 @@ const (
 
 // Represents an actor which owns/created/edited a node.
 type Actor struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The kind of editor which edited this node.
-	//
-	// Types that are valid to be assigned to Kind:
-	//
-	//	*Actor_StageAttempt
-	//	*Actor_Orchestrator_
-	Kind          isActor_Kind `protobuf_oneof:"kind"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Kind isActor_Kind           `protobuf_oneof:"kind"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *Actor) Reset() {
@@ -65,21 +58,9 @@ func (x *Actor) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Actor.ProtoReflect.Descriptor instead.
-func (*Actor) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_actor_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *Actor) GetKind() isActor_Kind {
-	if x != nil {
-		return x.Kind
-	}
-	return nil
-}
-
 func (x *Actor) GetStageAttempt() *v1.StageAttempt {
 	if x != nil {
-		if x, ok := x.Kind.(*Actor_StageAttempt); ok {
+		if x, ok := x.xxx_hidden_Kind.(*actor_StageAttempt); ok {
 			return x.StageAttempt
 		}
 	}
@@ -88,36 +69,147 @@ func (x *Actor) GetStageAttempt() *v1.StageAttempt {
 
 func (x *Actor) GetOrchestrator() *Actor_Orchestrator {
 	if x != nil {
-		if x, ok := x.Kind.(*Actor_Orchestrator_); ok {
+		if x, ok := x.xxx_hidden_Kind.(*actor_Orchestrator_); ok {
 			return x.Orchestrator
 		}
 	}
 	return nil
 }
 
+func (x *Actor) SetStageAttempt(v *v1.StageAttempt) {
+	if v == nil {
+		x.xxx_hidden_Kind = nil
+		return
+	}
+	x.xxx_hidden_Kind = &actor_StageAttempt{v}
+}
+
+func (x *Actor) SetOrchestrator(v *Actor_Orchestrator) {
+	if v == nil {
+		x.xxx_hidden_Kind = nil
+		return
+	}
+	x.xxx_hidden_Kind = &actor_Orchestrator_{v}
+}
+
+func (x *Actor) HasKind() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Kind != nil
+}
+
+func (x *Actor) HasStageAttempt() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Kind.(*actor_StageAttempt)
+	return ok
+}
+
+func (x *Actor) HasOrchestrator() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Kind.(*actor_Orchestrator_)
+	return ok
+}
+
+func (x *Actor) ClearKind() {
+	x.xxx_hidden_Kind = nil
+}
+
+func (x *Actor) ClearStageAttempt() {
+	if _, ok := x.xxx_hidden_Kind.(*actor_StageAttempt); ok {
+		x.xxx_hidden_Kind = nil
+	}
+}
+
+func (x *Actor) ClearOrchestrator() {
+	if _, ok := x.xxx_hidden_Kind.(*actor_Orchestrator_); ok {
+		x.xxx_hidden_Kind = nil
+	}
+}
+
+const Actor_Kind_not_set_case case_Actor_Kind = 0
+const Actor_StageAttempt_case case_Actor_Kind = 1
+const Actor_Orchestrator_case case_Actor_Kind = 2
+
+func (x *Actor) WhichKind() case_Actor_Kind {
+	if x == nil {
+		return Actor_Kind_not_set_case
+	}
+	switch x.xxx_hidden_Kind.(type) {
+	case *actor_StageAttempt:
+		return Actor_StageAttempt_case
+	case *actor_Orchestrator_:
+		return Actor_Orchestrator_case
+	default:
+		return Actor_Kind_not_set_case
+	}
+}
+
+type Actor_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The kind of editor which edited this node.
+
+	// Fields of oneof xxx_hidden_Kind:
+	// The StageAttempt which generated this Edit.
+	//
+	// This is the most common case.
+	StageAttempt *v1.StageAttempt
+	// The Orchestrator generated this Edit.
+	Orchestrator *Actor_Orchestrator
+	// -- end of xxx_hidden_Kind
+}
+
+func (b0 Actor_builder) Build() *Actor {
+	m0 := &Actor{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.StageAttempt != nil {
+		x.xxx_hidden_Kind = &actor_StageAttempt{b.StageAttempt}
+	}
+	if b.Orchestrator != nil {
+		x.xxx_hidden_Kind = &actor_Orchestrator_{b.Orchestrator}
+	}
+	return m0
+}
+
+type case_Actor_Kind protoreflect.FieldNumber
+
+func (x case_Actor_Kind) String() string {
+	md := file_turboci_graph_orchestrator_v1_actor_proto_msgTypes[0].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isActor_Kind interface {
 	isActor_Kind()
 }
 
-type Actor_StageAttempt struct {
+type actor_StageAttempt struct {
 	// The StageAttempt which generated this Edit.
 	//
 	// This is the most common case.
-	StageAttempt *v1.StageAttempt `protobuf:"bytes,1,opt,name=stage_attempt,json=stageAttempt,oneof"`
+	StageAttempt *v1.StageAttempt `protobuf:"bytes,1,opt,name=stage_attempt,json=stageAttempt,proto3,oneof"`
 }
 
-type Actor_Orchestrator_ struct {
+type actor_Orchestrator_ struct {
 	// The Orchestrator generated this Edit.
-	Orchestrator *Actor_Orchestrator `protobuf:"bytes,2,opt,name=orchestrator,oneof"`
+	Orchestrator *Actor_Orchestrator `protobuf:"bytes,2,opt,name=orchestrator,proto3,oneof"`
 }
 
-func (*Actor_StageAttempt) isActor_Kind() {}
+func (*actor_StageAttempt) isActor_Kind() {}
 
-func (*Actor_Orchestrator_) isActor_Kind() {}
+func (*actor_Orchestrator_) isActor_Kind() {}
 
 // Placeholder type for when the Orchestrator itself makes this edit.
 type Actor_Orchestrator struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -147,9 +239,16 @@ func (x *Actor_Orchestrator) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Actor_Orchestrator.ProtoReflect.Descriptor instead.
-func (*Actor_Orchestrator) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_actor_proto_rawDescGZIP(), []int{0, 0}
+type Actor_Orchestrator_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 Actor_Orchestrator_builder) Build() *Actor_Orchestrator {
+	m0 := &Actor_Orchestrator{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_actor_proto protoreflect.FileDescriptor
@@ -161,19 +260,7 @@ const file_turboci_graph_orchestrator_v1_actor_proto_rawDesc = "" +
 	"\rstage_attempt\x18\x01 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\fstageAttempt\x12W\n" +
 	"\forchestrator\x18\x02 \x01(\v21.turboci.graph.orchestrator.v1.Actor.OrchestratorH\x00R\forchestrator\x1a\x0e\n" +
 	"\fOrchestratorB\x06\n" +
-	"\x04kindBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_actor_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_actor_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_actor_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_actor_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_actor_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_actor_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_actor_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_actor_proto_rawDescData
-}
+	"\x04kindBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_actor_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_actor_proto_goTypes = []any{
@@ -197,8 +284,8 @@ func file_turboci_graph_orchestrator_v1_actor_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_actor_proto_msgTypes[0].OneofWrappers = []any{
-		(*Actor_StageAttempt)(nil),
-		(*Actor_Orchestrator_)(nil),
+		(*actor_StageAttempt)(nil),
+		(*actor_Orchestrator_)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

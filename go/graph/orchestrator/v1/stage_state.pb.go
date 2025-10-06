@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -106,11 +105,6 @@ func (x StageState) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use StageState.Descriptor instead.
-func (StageState) EnumDescriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_stage_state_proto_rawDescGZIP(), []int{0}
-}
-
 var File_turboci_graph_orchestrator_v1_stage_state_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_stage_state_proto_rawDesc = "" +
@@ -123,19 +117,7 @@ const file_turboci_graph_orchestrator_v1_stage_state_proto_rawDesc = "" +
 	"\x12\x1a\n" +
 	"\x16STAGE_STATE_ATTEMPTING\x10\x14\x12\x1e\n" +
 	"\x1aSTAGE_STATE_AWAITING_GROUP\x10\x1e\x12\x15\n" +
-	"\x11STAGE_STATE_FINAL\x10(BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_stage_state_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_stage_state_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_stage_state_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_stage_state_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_stage_state_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_stage_state_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_stage_state_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_stage_state_proto_rawDescData
-}
+	"\x11STAGE_STATE_FINAL\x10(BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_stage_state_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_stage_state_proto_goTypes = []any{

@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -32,56 +31,15 @@ const (
 // sub-groups to be resolved. With a threshold of 1, any edge or sub-group will
 // resolve this EdgeGroup, etc.
 type EdgeGroup struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Singular edges in this group.
-	//
-	// This is kept ordered by edges[].target.id.
-	// There can only be one edge per target.id in this list.
-	Edges []*Edge `protobuf:"bytes,1,rep,name=edges" json:"edges,omitempty"`
-	// Sub-groups in this group.
-	Groups []*EdgeGroup `protobuf:"bytes,2,rep,name=groups" json:"groups,omitempty"`
-	// If unset, all `edges` and `groups` must be resolved for this EdgeGroup to
-	// be resolved (effectively 'AND' of edges and groups).
-	//
-	// If set, indicates the number of edges and groups needed to resolve this
-	// EdgeGroup. For example, if this EdgeGroup is
-	//
-	//	{ edges: [a, b, c], groups: [GROUP], threshold: 2}
-	//
-	// Then this EdgeGroup could be resolved on the first of any:
-	//   - a b
-	//   - b c
-	//   - a c
-	//   - a GROUP
-	//   - b GROUP
-	//   - c GROUP
-	//
-	// Setting this to `1` effectively means 'the first resolved entry in
-	// edges or groups resolves this group' (effectively making this an OR).
-	//
-	// A value greater than one could be useful if you want to depend on the first
-	// N of multiple possible edges.
-	//
-	// A zero or negative threshold will be normalized to `unset`.
-	Threshold *int32 `protobuf:"varint,3,opt,name=threshold" json:"threshold,omitempty"`
-	// A bubbling up of the resolution from the child edges of this group. Used to
-	// easily identify which branch of the edge tree was resolved.
-	//
-	// Once `resolution` is set, `edges` and `groups` are frozen (so to see which
-	// Edge objects caused this group to be resolved, recurse into edges and
-	// groups). This is true even if after `resolution.at` some additional edges
-	// became resolved. If you want to see if any of these extra edges were
-	// resolved, you can just directly query for them at the time you want to
-	// check for them.
-	//
-	// This can be set with `satisfied = false` if the Orchestrator can prove that
-	// no additional evolution of `edges` and `groups` could satisfy this
-	// EdgeGroup. For example, if `threshold` is set to 5 and this EdgeGroup has 5
-	// entries, one of which is marked as `satisfied = false`, then we know this
-	// EdgeGroup must also be unsatisfiable.
-	Resolution    *Edge_Resolution `protobuf:"bytes,4,opt,name=resolution" json:"resolution,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Edges       *[]*Edge               `protobuf:"bytes,1,rep,name=edges,proto3"`
+	xxx_hidden_Groups      *[]*EdgeGroup          `protobuf:"bytes,2,rep,name=groups,proto3"`
+	xxx_hidden_Threshold   int32                  `protobuf:"varint,3,opt,name=threshold,proto3,oneof"`
+	xxx_hidden_Resolution  *Edge_Resolution       `protobuf:"bytes,4,opt,name=resolution,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *EdgeGroup) Reset() {
@@ -109,63 +67,159 @@ func (x *EdgeGroup) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EdgeGroup.ProtoReflect.Descriptor instead.
-func (*EdgeGroup) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_edge_group_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *EdgeGroup) GetEdges() []*Edge {
 	if x != nil {
-		return x.Edges
+		if x.xxx_hidden_Edges != nil {
+			return *x.xxx_hidden_Edges
+		}
 	}
 	return nil
 }
 
 func (x *EdgeGroup) GetGroups() []*EdgeGroup {
 	if x != nil {
-		return x.Groups
+		if x.xxx_hidden_Groups != nil {
+			return *x.xxx_hidden_Groups
+		}
 	}
 	return nil
 }
 
 func (x *EdgeGroup) GetThreshold() int32 {
-	if x != nil && x.Threshold != nil {
-		return *x.Threshold
+	if x != nil {
+		return x.xxx_hidden_Threshold
 	}
 	return 0
 }
 
 func (x *EdgeGroup) GetResolution() *Edge_Resolution {
 	if x != nil {
-		return x.Resolution
+		return x.xxx_hidden_Resolution
 	}
 	return nil
+}
+
+func (x *EdgeGroup) SetEdges(v []*Edge) {
+	x.xxx_hidden_Edges = &v
+}
+
+func (x *EdgeGroup) SetGroups(v []*EdgeGroup) {
+	x.xxx_hidden_Groups = &v
+}
+
+func (x *EdgeGroup) SetThreshold(v int32) {
+	x.xxx_hidden_Threshold = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
+}
+
+func (x *EdgeGroup) SetResolution(v *Edge_Resolution) {
+	x.xxx_hidden_Resolution = v
+}
+
+func (x *EdgeGroup) HasThreshold() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *EdgeGroup) HasResolution() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Resolution != nil
+}
+
+func (x *EdgeGroup) ClearThreshold() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Threshold = 0
+}
+
+func (x *EdgeGroup) ClearResolution() {
+	x.xxx_hidden_Resolution = nil
+}
+
+type EdgeGroup_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Singular edges in this group.
+	//
+	// This is kept ordered by edges[].target.id.
+	// There can only be one edge per target.id in this list.
+	Edges []*Edge
+	// Sub-groups in this group.
+	Groups []*EdgeGroup
+	// If unset, all `edges` and `groups` must be resolved for this EdgeGroup to
+	// be resolved (effectively 'AND' of edges and groups).
+	//
+	// If set, indicates the number of edges and groups needed to resolve this
+	// EdgeGroup. For example, if this EdgeGroup is
+	//
+	//	{ edges: [a, b, c], groups: [GROUP], threshold: 2}
+	//
+	// Then this EdgeGroup could be resolved on the first of any:
+	//   - a b
+	//   - b c
+	//   - a c
+	//   - a GROUP
+	//   - b GROUP
+	//   - c GROUP
+	//
+	// Setting this to `1` effectively means 'the first resolved entry in
+	// edges or groups resolves this group' (effectively making this an OR).
+	//
+	// A value greater than one could be useful if you want to depend on the first
+	// N of multiple possible edges.
+	//
+	// A zero or negative threshold will be normalized to `unset`.
+	Threshold *int32
+	// A bubbling up of the resolution from the child edges of this group. Used to
+	// easily identify which branch of the edge tree was resolved.
+	//
+	// Once `resolution` is set, `edges` and `groups` are frozen (so to see which
+	// Edge objects caused this group to be resolved, recurse into edges and
+	// groups). This is true even if after `resolution.at` some additional edges
+	// became resolved. If you want to see if any of these extra edges were
+	// resolved, you can just directly query for them at the time you want to
+	// check for them.
+	//
+	// This can be set with `satisfied = false` if the Orchestrator can prove that
+	// no additional evolution of `edges` and `groups` could satisfy this
+	// EdgeGroup. For example, if `threshold` is set to 5 and this EdgeGroup has 5
+	// entries, one of which is marked as `satisfied = false`, then we know this
+	// EdgeGroup must also be unsatisfiable.
+	Resolution *Edge_Resolution
+}
+
+func (b0 EdgeGroup_builder) Build() *EdgeGroup {
+	m0 := &EdgeGroup{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Edges = &b.Edges
+	x.xxx_hidden_Groups = &b.Groups
+	if b.Threshold != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
+		x.xxx_hidden_Threshold = *b.Threshold
+	}
+	x.xxx_hidden_Resolution = b.Resolution
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_edge_group_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_edge_group_proto_rawDesc = "" +
 	"\n" +
-	".turboci/graph/orchestrator/v1/edge_group.proto\x12\x1dturboci.graph.orchestrator.v1\x1a(turboci/graph/orchestrator/v1/edge.proto\"\xf6\x01\n" +
+	".turboci/graph/orchestrator/v1/edge_group.proto\x12\x1dturboci.graph.orchestrator.v1\x1a(turboci/graph/orchestrator/v1/edge.proto\"\x9d\x02\n" +
 	"\tEdgeGroup\x129\n" +
 	"\x05edges\x18\x01 \x03(\v2#.turboci.graph.orchestrator.v1.EdgeR\x05edges\x12@\n" +
-	"\x06groups\x18\x02 \x03(\v2(.turboci.graph.orchestrator.v1.EdgeGroupR\x06groups\x12\x1c\n" +
-	"\tthreshold\x18\x03 \x01(\x05R\tthreshold\x12N\n" +
+	"\x06groups\x18\x02 \x03(\v2(.turboci.graph.orchestrator.v1.EdgeGroupR\x06groups\x12!\n" +
+	"\tthreshold\x18\x03 \x01(\x05H\x00R\tthreshold\x88\x01\x01\x12S\n" +
 	"\n" +
-	"resolution\x18\x04 \x01(\v2..turboci.graph.orchestrator.v1.Edge.ResolutionR\n" +
-	"resolutionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_edge_group_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_edge_group_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_edge_group_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_edge_group_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_edge_group_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_edge_group_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_edge_group_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_edge_group_proto_rawDescData
-}
+	"resolution\x18\x04 \x01(\v2..turboci.graph.orchestrator.v1.Edge.ResolutionH\x01R\n" +
+	"resolution\x88\x01\x01B\f\n" +
+	"\n" +
+	"_thresholdB\r\n" +
+	"\v_resolutionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_edge_group_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_edge_group_proto_goTypes = []any{
@@ -190,6 +244,7 @@ func file_turboci_graph_orchestrator_v1_edge_group_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_edge_proto_init()
+	file_turboci_graph_orchestrator_v1_edge_group_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

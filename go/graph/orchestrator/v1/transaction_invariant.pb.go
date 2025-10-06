@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -31,7 +30,7 @@ const (
 // If your client receives an rpc status with this message in it, it means that
 // the client needs to retry its transaction from the beginning.
 type TransactionConflictFailure struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -61,9 +60,16 @@ func (x *TransactionConflictFailure) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TransactionConflictFailure.ProtoReflect.Descriptor instead.
-func (*TransactionConflictFailure) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_transaction_invariant_proto_rawDescGZIP(), []int{0}
+type TransactionConflictFailure_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 TransactionConflictFailure_builder) Build() *TransactionConflictFailure {
+	m0 := &TransactionConflictFailure{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_transaction_invariant_proto protoreflect.FileDescriptor
@@ -71,19 +77,7 @@ var File_turboci_graph_orchestrator_v1_transaction_invariant_proto protoreflect.
 const file_turboci_graph_orchestrator_v1_transaction_invariant_proto_rawDesc = "" +
 	"\n" +
 	"9turboci/graph/orchestrator/v1/transaction_invariant.proto\x12\x1dturboci.graph.orchestrator.v1\"\x1c\n" +
-	"\x1aTransactionConflictFailureBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_transaction_invariant_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_transaction_invariant_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_transaction_invariant_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_transaction_invariant_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_transaction_invariant_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_transaction_invariant_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_transaction_invariant_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_transaction_invariant_proto_rawDescData
-}
+	"\x1aTransactionConflictFailureBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_transaction_invariant_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_transaction_invariant_proto_goTypes = []any{

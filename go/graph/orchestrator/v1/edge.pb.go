@@ -16,7 +16,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -32,17 +31,11 @@ const (
 // Typically Edges must always point to nodes in the same graph, though this may
 // be lifted in the future.
 type Edge struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Target indicates the node that this Edge points to.
-	//
-	// Currently only Checks and Stages are supported.
-	Target *v1.Identifier `protobuf:"bytes,1,opt,name=target" json:"target,omitempty"`
-	// Indicates if this Edge was resolved yet.
-	//
-	// If this is absent, then this Edge has not yet been resolved.
-	Resolution    *Edge_Resolution `protobuf:"bytes,2,opt,name=resolution" json:"resolution,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Target     *v1.Identifier         `protobuf:"bytes,1,opt,name=target,proto3,oneof"`
+	xxx_hidden_Resolution *Edge_Resolution       `protobuf:"bytes,2,opt,name=resolution,proto3,oneof"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *Edge) Reset() {
@@ -70,23 +63,70 @@ func (x *Edge) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Edge.ProtoReflect.Descriptor instead.
-func (*Edge) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_edge_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Edge) GetTarget() *v1.Identifier {
 	if x != nil {
-		return x.Target
+		return x.xxx_hidden_Target
 	}
 	return nil
 }
 
 func (x *Edge) GetResolution() *Edge_Resolution {
 	if x != nil {
-		return x.Resolution
+		return x.xxx_hidden_Resolution
 	}
 	return nil
+}
+
+func (x *Edge) SetTarget(v *v1.Identifier) {
+	x.xxx_hidden_Target = v
+}
+
+func (x *Edge) SetResolution(v *Edge_Resolution) {
+	x.xxx_hidden_Resolution = v
+}
+
+func (x *Edge) HasTarget() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Target != nil
+}
+
+func (x *Edge) HasResolution() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Resolution != nil
+}
+
+func (x *Edge) ClearTarget() {
+	x.xxx_hidden_Target = nil
+}
+
+func (x *Edge) ClearResolution() {
+	x.xxx_hidden_Resolution = nil
+}
+
+type Edge_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Target indicates the node that this Edge points to.
+	//
+	// Currently only Checks and Stages are supported.
+	Target *v1.Identifier
+	// Indicates if this Edge was resolved yet.
+	//
+	// If this is absent, then this Edge has not yet been resolved.
+	Resolution *Edge_Resolution
+}
+
+func (b0 Edge_builder) Build() *Edge {
+	m0 := &Edge{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Target = b.Target
+	x.xxx_hidden_Resolution = b.Resolution
+	return m0
 }
 
 // The Orchestrator logically attempts to resolve an Edge any time the target
@@ -99,27 +139,14 @@ func (x *Edge) GetResolution() *Edge_Resolution {
 // satisfied cannot be 'reversed' (and vice-versa; an edge resolved as
 // satisfied == false cannot later become satisfiable).
 type Edge_Resolution struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// If this is `true`, then this Edge's condition is satisfied.
-	// If this is `false`, then this Edge's condition is unsatisfiable.
-	Satisfied *bool `protobuf:"varint,1,opt,name=satisfied" json:"satisfied,omitempty"`
-	// The version of the target node which caused this Edge (or EdgeGroup) to
-	// be satisfied/unsatisfiable.
-	//
-	// This will always be less than or equal to the version in `at`.
-	TargetVersion *Revision `protobuf:"bytes,2,opt,name=target_version,json=targetVersion" json:"target_version,omitempty"`
-	// The database revsision (commit timestamp) at which this resolution was
-	// made.
-	//
-	// Edges in the Orchestrator MAY be resolved in an eventually-consistent
-	// fashion, which means that it's possible to observe the target of this
-	// edge in a satisfying state for this edge, but the edge is still not
-	// marked as resolved.
-	//
-	// This will always be greater than or equal to the version in `target_version`.
-	At            *Revision `protobuf:"bytes,3,opt,name=at" json:"at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                    protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Satisfied     bool                   `protobuf:"varint,1,opt,name=satisfied,proto3,oneof"`
+	xxx_hidden_TargetVersion *Revision              `protobuf:"bytes,2,opt,name=target_version,json=targetVersion,proto3,oneof"`
+	xxx_hidden_At            *Revision              `protobuf:"bytes,3,opt,name=at,proto3,oneof"`
+	XXX_raceDetectHookData   protoimpl.RaceDetectHookData
+	XXX_presence             [1]uint32
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *Edge_Resolution) Reset() {
@@ -147,59 +174,131 @@ func (x *Edge_Resolution) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Edge_Resolution.ProtoReflect.Descriptor instead.
-func (*Edge_Resolution) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_edge_proto_rawDescGZIP(), []int{0, 0}
-}
-
 func (x *Edge_Resolution) GetSatisfied() bool {
-	if x != nil && x.Satisfied != nil {
-		return *x.Satisfied
+	if x != nil {
+		return x.xxx_hidden_Satisfied
 	}
 	return false
 }
 
 func (x *Edge_Resolution) GetTargetVersion() *Revision {
 	if x != nil {
-		return x.TargetVersion
+		return x.xxx_hidden_TargetVersion
 	}
 	return nil
 }
 
 func (x *Edge_Resolution) GetAt() *Revision {
 	if x != nil {
-		return x.At
+		return x.xxx_hidden_At
 	}
 	return nil
+}
+
+func (x *Edge_Resolution) SetSatisfied(v bool) {
+	x.xxx_hidden_Satisfied = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+}
+
+func (x *Edge_Resolution) SetTargetVersion(v *Revision) {
+	x.xxx_hidden_TargetVersion = v
+}
+
+func (x *Edge_Resolution) SetAt(v *Revision) {
+	x.xxx_hidden_At = v
+}
+
+func (x *Edge_Resolution) HasSatisfied() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Edge_Resolution) HasTargetVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_TargetVersion != nil
+}
+
+func (x *Edge_Resolution) HasAt() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_At != nil
+}
+
+func (x *Edge_Resolution) ClearSatisfied() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Satisfied = false
+}
+
+func (x *Edge_Resolution) ClearTargetVersion() {
+	x.xxx_hidden_TargetVersion = nil
+}
+
+func (x *Edge_Resolution) ClearAt() {
+	x.xxx_hidden_At = nil
+}
+
+type Edge_Resolution_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// If this is `true`, then this Edge's condition is satisfied.
+	// If this is `false`, then this Edge's condition is unsatisfiable.
+	Satisfied *bool
+	// The version of the target node which caused this Edge (or EdgeGroup) to
+	// be satisfied/unsatisfiable.
+	//
+	// This will always be less than or equal to the version in `at`.
+	TargetVersion *Revision
+	// The database revsision (commit timestamp) at which this resolution was
+	// made.
+	//
+	// Edges in the Orchestrator MAY be resolved in an eventually-consistent
+	// fashion, which means that it's possible to observe the target of this
+	// edge in a satisfying state for this edge, but the edge is still not
+	// marked as resolved.
+	//
+	// This will always be greater than or equal to the version in `target_version`.
+	At *Revision
+}
+
+func (b0 Edge_Resolution_builder) Build() *Edge_Resolution {
+	m0 := &Edge_Resolution{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Satisfied != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		x.xxx_hidden_Satisfied = *b.Satisfied
+	}
+	x.xxx_hidden_TargetVersion = b.TargetVersion
+	x.xxx_hidden_At = b.At
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_edge_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_edge_proto_rawDesc = "" +
 	"\n" +
-	"(turboci/graph/orchestrator/v1/edge.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xd5\x02\n" +
-	"\x04Edge\x128\n" +
-	"\x06target\x18\x01 \x01(\v2 .turboci.graph.ids.v1.IdentifierR\x06target\x12N\n" +
+	"(turboci/graph/orchestrator/v1/edge.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xb0\x03\n" +
+	"\x04Edge\x12=\n" +
+	"\x06target\x18\x01 \x01(\v2 .turboci.graph.ids.v1.IdentifierH\x00R\x06target\x88\x01\x01\x12S\n" +
 	"\n" +
-	"resolution\x18\x02 \x01(\v2..turboci.graph.orchestrator.v1.Edge.ResolutionR\n" +
-	"resolution\x1a\xc2\x01\n" +
+	"resolution\x18\x02 \x01(\v2..turboci.graph.orchestrator.v1.Edge.ResolutionH\x01R\n" +
+	"resolution\x88\x01\x01\x1a\xf9\x01\n" +
 	"\n" +
-	"Resolution\x12!\n" +
-	"\tsatisfied\x18\x01 \x01(\bB\x03\xe0A\x05R\tsatisfied\x12S\n" +
-	"\x0etarget_version\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05R\rtargetVersion\x12<\n" +
-	"\x02at\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05R\x02atBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_edge_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_edge_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_edge_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_edge_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_edge_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_edge_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_edge_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_edge_proto_rawDescData
-}
+	"Resolution\x12&\n" +
+	"\tsatisfied\x18\x01 \x01(\bB\x03\xe0A\x05H\x00R\tsatisfied\x88\x01\x01\x12X\n" +
+	"\x0etarget_version\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05H\x01R\rtargetVersion\x88\x01\x01\x12A\n" +
+	"\x02at\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05H\x02R\x02at\x88\x01\x01B\f\n" +
+	"\n" +
+	"_satisfiedB\x11\n" +
+	"\x0f_target_versionB\x05\n" +
+	"\x03_atB\t\n" +
+	"\a_targetB\r\n" +
+	"\v_resolutionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_edge_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_edge_proto_goTypes = []any{
@@ -226,6 +325,8 @@ func file_turboci_graph_orchestrator_v1_edge_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
+	file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[0].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

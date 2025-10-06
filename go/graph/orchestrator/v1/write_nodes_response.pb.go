@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -27,21 +26,10 @@ const (
 
 // Response message for TurboCIGraphService.WriteNodes.
 type WriteNodesResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The committed revision of this write.
-	//
-	// This can be used to read back e.g. Edits from the graph or otherwise
-	// communicate to other readers what version they must observe to see the
-	// writes done in this RPC.
-	//
-	// You can, technically, chain Writes together with this - however if a Write
-	// finds a transaction conflict, you will have to restart the chain from that
-	// write (not from the beginning of the chain).
-	//
-	// See WriteNodesRequest.TransactionDetails.
-	WrittenVersion *Revision `protobuf:"bytes,1,opt,name=written_version,json=writtenVersion" json:"written_version,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state                     protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_WrittenVersion *Revision              `protobuf:"bytes,1,opt,name=written_version,json=writtenVersion,proto3,oneof"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
 }
 
 func (x *WriteNodesResponse) Reset() {
@@ -69,37 +57,61 @@ func (x *WriteNodesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WriteNodesResponse.ProtoReflect.Descriptor instead.
-func (*WriteNodesResponse) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_write_nodes_response_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *WriteNodesResponse) GetWrittenVersion() *Revision {
 	if x != nil {
-		return x.WrittenVersion
+		return x.xxx_hidden_WrittenVersion
 	}
 	return nil
+}
+
+func (x *WriteNodesResponse) SetWrittenVersion(v *Revision) {
+	x.xxx_hidden_WrittenVersion = v
+}
+
+func (x *WriteNodesResponse) HasWrittenVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_WrittenVersion != nil
+}
+
+func (x *WriteNodesResponse) ClearWrittenVersion() {
+	x.xxx_hidden_WrittenVersion = nil
+}
+
+type WriteNodesResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The committed revision of this write.
+	//
+	// This can be used to read back e.g. Edits from the graph or otherwise
+	// communicate to other readers what version they must observe to see the
+	// writes done in this RPC.
+	//
+	// You can, technically, chain Writes together with this - however if a Write
+	// finds a transaction conflict, you will have to restart the chain from that
+	// write (not from the beginning of the chain).
+	//
+	// See WriteNodesRequest.TransactionDetails.
+	WrittenVersion *Revision
+}
+
+func (b0 WriteNodesResponse_builder) Build() *WriteNodesResponse {
+	m0 := &WriteNodesResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_WrittenVersion = b.WrittenVersion
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_write_nodes_response_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_write_nodes_response_proto_rawDesc = "" +
 	"\n" +
-	"8turboci/graph/orchestrator/v1/write_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a,turboci/graph/orchestrator/v1/revision.proto\"f\n" +
-	"\x12WriteNodesResponse\x12P\n" +
-	"\x0fwritten_version\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionR\x0ewrittenVersionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_write_nodes_response_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_write_nodes_response_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_write_nodes_response_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_write_nodes_response_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_write_nodes_response_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_write_nodes_response_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_write_nodes_response_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_write_nodes_response_proto_rawDescData
-}
+	"8turboci/graph/orchestrator/v1/write_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a,turboci/graph/orchestrator/v1/revision.proto\"\x7f\n" +
+	"\x12WriteNodesResponse\x12U\n" +
+	"\x0fwritten_version\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\x0ewrittenVersion\x88\x01\x01B\x12\n" +
+	"\x10_written_versionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_write_nodes_response_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_write_nodes_response_proto_goTypes = []any{
@@ -121,6 +133,7 @@ func file_turboci_graph_orchestrator_v1_write_nodes_response_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
+	file_turboci_graph_orchestrator_v1_write_nodes_response_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

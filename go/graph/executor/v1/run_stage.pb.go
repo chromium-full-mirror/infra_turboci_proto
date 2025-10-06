@@ -16,7 +16,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -29,18 +28,11 @@ const (
 
 // Request to run a stage attempt.
 type RunStageRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Stage to run.
-	Stage *v1.Stage `protobuf:"bytes,1,opt,name=stage" json:"stage,omitempty"`
-	// Mutually exclusive fields for each request mode.
-	//
-	// Types that are valid to be assigned to Mode:
-	//
-	//	*RunStageRequest_ValidateOnly
-	//	*RunStageRequest_Run
-	Mode          isRunStageRequest_Mode `protobuf_oneof:"mode"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Stage *v1.Stage              `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`
+	xxx_hidden_Mode  isRunStageRequest_Mode `protobuf_oneof:"mode"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *RunStageRequest) Reset() {
@@ -68,28 +60,16 @@ func (x *RunStageRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RunStageRequest.ProtoReflect.Descriptor instead.
-func (*RunStageRequest) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_executor_v1_run_stage_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *RunStageRequest) GetStage() *v1.Stage {
 	if x != nil {
-		return x.Stage
-	}
-	return nil
-}
-
-func (x *RunStageRequest) GetMode() isRunStageRequest_Mode {
-	if x != nil {
-		return x.Mode
+		return x.xxx_hidden_Stage
 	}
 	return nil
 }
 
 func (x *RunStageRequest) GetValidateOnly() *RunStageRequest_ValidateOnlyMode {
 	if x != nil {
-		if x, ok := x.Mode.(*RunStageRequest_ValidateOnly); ok {
+		if x, ok := x.xxx_hidden_Mode.(*runStageRequest_ValidateOnly); ok {
 			return x.ValidateOnly
 		}
 	}
@@ -98,45 +78,166 @@ func (x *RunStageRequest) GetValidateOnly() *RunStageRequest_ValidateOnlyMode {
 
 func (x *RunStageRequest) GetRun() *RunStageRequest_RunMode {
 	if x != nil {
-		if x, ok := x.Mode.(*RunStageRequest_Run); ok {
+		if x, ok := x.xxx_hidden_Mode.(*runStageRequest_Run); ok {
 			return x.Run
 		}
 	}
 	return nil
 }
 
+func (x *RunStageRequest) SetStage(v *v1.Stage) {
+	x.xxx_hidden_Stage = v
+}
+
+func (x *RunStageRequest) SetValidateOnly(v *RunStageRequest_ValidateOnlyMode) {
+	if v == nil {
+		x.xxx_hidden_Mode = nil
+		return
+	}
+	x.xxx_hidden_Mode = &runStageRequest_ValidateOnly{v}
+}
+
+func (x *RunStageRequest) SetRun(v *RunStageRequest_RunMode) {
+	if v == nil {
+		x.xxx_hidden_Mode = nil
+		return
+	}
+	x.xxx_hidden_Mode = &runStageRequest_Run{v}
+}
+
+func (x *RunStageRequest) HasStage() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Stage != nil
+}
+
+func (x *RunStageRequest) HasMode() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Mode != nil
+}
+
+func (x *RunStageRequest) HasValidateOnly() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Mode.(*runStageRequest_ValidateOnly)
+	return ok
+}
+
+func (x *RunStageRequest) HasRun() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Mode.(*runStageRequest_Run)
+	return ok
+}
+
+func (x *RunStageRequest) ClearStage() {
+	x.xxx_hidden_Stage = nil
+}
+
+func (x *RunStageRequest) ClearMode() {
+	x.xxx_hidden_Mode = nil
+}
+
+func (x *RunStageRequest) ClearValidateOnly() {
+	if _, ok := x.xxx_hidden_Mode.(*runStageRequest_ValidateOnly); ok {
+		x.xxx_hidden_Mode = nil
+	}
+}
+
+func (x *RunStageRequest) ClearRun() {
+	if _, ok := x.xxx_hidden_Mode.(*runStageRequest_Run); ok {
+		x.xxx_hidden_Mode = nil
+	}
+}
+
+const RunStageRequest_Mode_not_set_case case_RunStageRequest_Mode = 0
+const RunStageRequest_ValidateOnly_case case_RunStageRequest_Mode = 2
+const RunStageRequest_Run_case case_RunStageRequest_Mode = 3
+
+func (x *RunStageRequest) WhichMode() case_RunStageRequest_Mode {
+	if x == nil {
+		return RunStageRequest_Mode_not_set_case
+	}
+	switch x.xxx_hidden_Mode.(type) {
+	case *runStageRequest_ValidateOnly:
+		return RunStageRequest_ValidateOnly_case
+	case *runStageRequest_Run:
+		return RunStageRequest_Run_case
+	default:
+		return RunStageRequest_Mode_not_set_case
+	}
+}
+
+type RunStageRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Stage to run.
+	Stage *v1.Stage
+	// Mutually exclusive fields for each request mode.
+
+	// Fields of oneof xxx_hidden_Mode:
+	// If set, performs the preflight ACL checks and validations, but does not
+	// actually run the stage.
+	ValidateOnly *RunStageRequest_ValidateOnlyMode
+	// If set, runs the stage attempt.
+	Run *RunStageRequest_RunMode
+	// -- end of xxx_hidden_Mode
+}
+
+func (b0 RunStageRequest_builder) Build() *RunStageRequest {
+	m0 := &RunStageRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Stage = b.Stage
+	if b.ValidateOnly != nil {
+		x.xxx_hidden_Mode = &runStageRequest_ValidateOnly{b.ValidateOnly}
+	}
+	if b.Run != nil {
+		x.xxx_hidden_Mode = &runStageRequest_Run{b.Run}
+	}
+	return m0
+}
+
+type case_RunStageRequest_Mode protoreflect.FieldNumber
+
+func (x case_RunStageRequest_Mode) String() string {
+	md := file_turboci_graph_executor_v1_run_stage_proto_msgTypes[0].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isRunStageRequest_Mode interface {
 	isRunStageRequest_Mode()
 }
 
-type RunStageRequest_ValidateOnly struct {
+type runStageRequest_ValidateOnly struct {
 	// If set, performs the preflight ACL checks and validations, but does not
 	// actually run the stage.
-	ValidateOnly *RunStageRequest_ValidateOnlyMode `protobuf:"bytes,2,opt,name=validate_only,json=validateOnly,oneof"`
+	ValidateOnly *RunStageRequest_ValidateOnlyMode `protobuf:"bytes,2,opt,name=validate_only,json=validateOnly,proto3,oneof"`
 }
 
-type RunStageRequest_Run struct {
+type runStageRequest_Run struct {
 	// If set, runs the stage attempt.
-	Run *RunStageRequest_RunMode `protobuf:"bytes,3,opt,name=run,oneof"`
+	Run *RunStageRequest_RunMode `protobuf:"bytes,3,opt,name=run,proto3,oneof"`
 }
 
-func (*RunStageRequest_ValidateOnly) isRunStageRequest_Mode() {}
+func (*runStageRequest_ValidateOnly) isRunStageRequest_Mode() {}
 
-func (*RunStageRequest_Run) isRunStageRequest_Mode() {}
+func (*runStageRequest_Run) isRunStageRequest_Mode() {}
 
 // Response to run a stage attempt.
 type RunStageResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Response to run a stage.
-	//
-	// Types that are valid to be assigned to Response:
-	//
-	//	*RunStageResponse_AsyncStage_
-	//	*RunStageResponse_SyncStage_
-	//	*RunStageResponse_ValidateOnly_
-	Response      isRunStageResponse_Response `protobuf_oneof:"response"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState      `protogen:"opaque.v1"`
+	xxx_hidden_Response isRunStageResponse_Response `protobuf_oneof:"response"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *RunStageResponse) Reset() {
@@ -164,21 +265,9 @@ func (x *RunStageResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RunStageResponse.ProtoReflect.Descriptor instead.
-func (*RunStageResponse) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_executor_v1_run_stage_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *RunStageResponse) GetResponse() isRunStageResponse_Response {
-	if x != nil {
-		return x.Response
-	}
-	return nil
-}
-
 func (x *RunStageResponse) GetAsyncStage() *RunStageResponse_AsyncStage {
 	if x != nil {
-		if x, ok := x.Response.(*RunStageResponse_AsyncStage_); ok {
+		if x, ok := x.xxx_hidden_Response.(*runStageResponse_AsyncStage_); ok {
 			return x.AsyncStage
 		}
 	}
@@ -187,7 +276,7 @@ func (x *RunStageResponse) GetAsyncStage() *RunStageResponse_AsyncStage {
 
 func (x *RunStageResponse) GetSyncStage() *RunStageResponse_SyncStage {
 	if x != nil {
-		if x, ok := x.Response.(*RunStageResponse_SyncStage_); ok {
+		if x, ok := x.xxx_hidden_Response.(*runStageResponse_SyncStage_); ok {
 			return x.SyncStage
 		}
 	}
@@ -196,43 +285,182 @@ func (x *RunStageResponse) GetSyncStage() *RunStageResponse_SyncStage {
 
 func (x *RunStageResponse) GetValidateOnly() *RunStageResponse_ValidateOnly {
 	if x != nil {
-		if x, ok := x.Response.(*RunStageResponse_ValidateOnly_); ok {
+		if x, ok := x.xxx_hidden_Response.(*runStageResponse_ValidateOnly_); ok {
 			return x.ValidateOnly
 		}
 	}
 	return nil
 }
 
+func (x *RunStageResponse) SetAsyncStage(v *RunStageResponse_AsyncStage) {
+	if v == nil {
+		x.xxx_hidden_Response = nil
+		return
+	}
+	x.xxx_hidden_Response = &runStageResponse_AsyncStage_{v}
+}
+
+func (x *RunStageResponse) SetSyncStage(v *RunStageResponse_SyncStage) {
+	if v == nil {
+		x.xxx_hidden_Response = nil
+		return
+	}
+	x.xxx_hidden_Response = &runStageResponse_SyncStage_{v}
+}
+
+func (x *RunStageResponse) SetValidateOnly(v *RunStageResponse_ValidateOnly) {
+	if v == nil {
+		x.xxx_hidden_Response = nil
+		return
+	}
+	x.xxx_hidden_Response = &runStageResponse_ValidateOnly_{v}
+}
+
+func (x *RunStageResponse) HasResponse() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Response != nil
+}
+
+func (x *RunStageResponse) HasAsyncStage() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Response.(*runStageResponse_AsyncStage_)
+	return ok
+}
+
+func (x *RunStageResponse) HasSyncStage() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Response.(*runStageResponse_SyncStage_)
+	return ok
+}
+
+func (x *RunStageResponse) HasValidateOnly() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Response.(*runStageResponse_ValidateOnly_)
+	return ok
+}
+
+func (x *RunStageResponse) ClearResponse() {
+	x.xxx_hidden_Response = nil
+}
+
+func (x *RunStageResponse) ClearAsyncStage() {
+	if _, ok := x.xxx_hidden_Response.(*runStageResponse_AsyncStage_); ok {
+		x.xxx_hidden_Response = nil
+	}
+}
+
+func (x *RunStageResponse) ClearSyncStage() {
+	if _, ok := x.xxx_hidden_Response.(*runStageResponse_SyncStage_); ok {
+		x.xxx_hidden_Response = nil
+	}
+}
+
+func (x *RunStageResponse) ClearValidateOnly() {
+	if _, ok := x.xxx_hidden_Response.(*runStageResponse_ValidateOnly_); ok {
+		x.xxx_hidden_Response = nil
+	}
+}
+
+const RunStageResponse_Response_not_set_case case_RunStageResponse_Response = 0
+const RunStageResponse_AsyncStage_case case_RunStageResponse_Response = 1
+const RunStageResponse_SyncStage_case case_RunStageResponse_Response = 2
+const RunStageResponse_ValidateOnly_case case_RunStageResponse_Response = 3
+
+func (x *RunStageResponse) WhichResponse() case_RunStageResponse_Response {
+	if x == nil {
+		return RunStageResponse_Response_not_set_case
+	}
+	switch x.xxx_hidden_Response.(type) {
+	case *runStageResponse_AsyncStage_:
+		return RunStageResponse_AsyncStage_case
+	case *runStageResponse_SyncStage_:
+		return RunStageResponse_SyncStage_case
+	case *runStageResponse_ValidateOnly_:
+		return RunStageResponse_ValidateOnly_case
+	default:
+		return RunStageResponse_Response_not_set_case
+	}
+}
+
+type RunStageResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Response to run a stage.
+
+	// Fields of oneof xxx_hidden_Response:
+	// Response of running an asynchronous stage.
+	AsyncStage *RunStageResponse_AsyncStage
+	// Response of running a synchronous stage.
+	SyncStage *RunStageResponse_SyncStage
+	// Response of running a stage in validate_only mode.
+	ValidateOnly *RunStageResponse_ValidateOnly
+	// -- end of xxx_hidden_Response
+}
+
+func (b0 RunStageResponse_builder) Build() *RunStageResponse {
+	m0 := &RunStageResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.AsyncStage != nil {
+		x.xxx_hidden_Response = &runStageResponse_AsyncStage_{b.AsyncStage}
+	}
+	if b.SyncStage != nil {
+		x.xxx_hidden_Response = &runStageResponse_SyncStage_{b.SyncStage}
+	}
+	if b.ValidateOnly != nil {
+		x.xxx_hidden_Response = &runStageResponse_ValidateOnly_{b.ValidateOnly}
+	}
+	return m0
+}
+
+type case_RunStageResponse_Response protoreflect.FieldNumber
+
+func (x case_RunStageResponse_Response) String() string {
+	md := file_turboci_graph_executor_v1_run_stage_proto_msgTypes[1].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isRunStageResponse_Response interface {
 	isRunStageResponse_Response()
 }
 
-type RunStageResponse_AsyncStage_ struct {
+type runStageResponse_AsyncStage_ struct {
 	// Response of running an asynchronous stage.
-	AsyncStage *RunStageResponse_AsyncStage `protobuf:"bytes,1,opt,name=async_stage,json=asyncStage,oneof"`
+	AsyncStage *RunStageResponse_AsyncStage `protobuf:"bytes,1,opt,name=async_stage,json=asyncStage,proto3,oneof"`
 }
 
-type RunStageResponse_SyncStage_ struct {
+type runStageResponse_SyncStage_ struct {
 	// Response of running a synchronous stage.
-	SyncStage *RunStageResponse_SyncStage `protobuf:"bytes,2,opt,name=sync_stage,json=syncStage,oneof"`
+	SyncStage *RunStageResponse_SyncStage `protobuf:"bytes,2,opt,name=sync_stage,json=syncStage,proto3,oneof"`
 }
 
-type RunStageResponse_ValidateOnly_ struct {
+type runStageResponse_ValidateOnly_ struct {
 	// Response of running a stage in validate_only mode.
-	ValidateOnly *RunStageResponse_ValidateOnly `protobuf:"bytes,3,opt,name=validate_only,json=validateOnly,oneof"`
+	ValidateOnly *RunStageResponse_ValidateOnly `protobuf:"bytes,3,opt,name=validate_only,json=validateOnly,proto3,oneof"`
 }
 
-func (*RunStageResponse_AsyncStage_) isRunStageResponse_Response() {}
+func (*runStageResponse_AsyncStage_) isRunStageResponse_Response() {}
 
-func (*RunStageResponse_SyncStage_) isRunStageResponse_Response() {}
+func (*runStageResponse_SyncStage_) isRunStageResponse_Response() {}
 
-func (*RunStageResponse_ValidateOnly_) isRunStageResponse_Response() {}
+func (*runStageResponse_ValidateOnly_) isRunStageResponse_Response() {}
 
 // Extra fields for validate_only mode.
 //
 // Make it empty for now for forward compatibility.
 type RunStageRequest_ValidateOnlyMode struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -262,22 +490,27 @@ func (x *RunStageRequest_ValidateOnlyMode) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RunStageRequest_ValidateOnlyMode.ProtoReflect.Descriptor instead.
-func (*RunStageRequest_ValidateOnlyMode) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_executor_v1_run_stage_proto_rawDescGZIP(), []int{0, 0}
+type RunStageRequest_ValidateOnlyMode_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 RunStageRequest_ValidateOnlyMode_builder) Build() *RunStageRequest_ValidateOnlyMode {
+	m0 := &RunStageRequest_ValidateOnlyMode{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 // Extra fields for run mode.
 type RunStageRequest_RunMode struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// ID of the stage attempt to run.
-	Attempt *v11.StageAttempt `protobuf:"bytes,1,opt,name=attempt" json:"attempt,omitempty"`
-	// A token generated by the orchestrator.
-	// The executor should pass this token to the stage for it to
-	// perform updates to the workflow resources (checks and/or stages).
-	StageAttemptToken *string `protobuf:"bytes,2,opt,name=stage_attempt_token,json=stageAttemptToken" json:"stage_attempt_token,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state                        protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Attempt           *v11.StageAttempt      `protobuf:"bytes,1,opt,name=attempt,proto3,oneof"`
+	xxx_hidden_StageAttemptToken *string                `protobuf:"bytes,2,opt,name=stage_attempt_token,json=stageAttemptToken,proto3,oneof"`
+	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
+	XXX_presence                 [1]uint32
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
 }
 
 func (x *RunStageRequest_RunMode) Reset() {
@@ -305,30 +538,83 @@ func (x *RunStageRequest_RunMode) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RunStageRequest_RunMode.ProtoReflect.Descriptor instead.
-func (*RunStageRequest_RunMode) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_executor_v1_run_stage_proto_rawDescGZIP(), []int{0, 1}
-}
-
 func (x *RunStageRequest_RunMode) GetAttempt() *v11.StageAttempt {
 	if x != nil {
-		return x.Attempt
+		return x.xxx_hidden_Attempt
 	}
 	return nil
 }
 
 func (x *RunStageRequest_RunMode) GetStageAttemptToken() string {
-	if x != nil && x.StageAttemptToken != nil {
-		return *x.StageAttemptToken
+	if x != nil {
+		if x.xxx_hidden_StageAttemptToken != nil {
+			return *x.xxx_hidden_StageAttemptToken
+		}
+		return ""
 	}
 	return ""
+}
+
+func (x *RunStageRequest_RunMode) SetAttempt(v *v11.StageAttempt) {
+	x.xxx_hidden_Attempt = v
+}
+
+func (x *RunStageRequest_RunMode) SetStageAttemptToken(v string) {
+	x.xxx_hidden_StageAttemptToken = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *RunStageRequest_RunMode) HasAttempt() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Attempt != nil
+}
+
+func (x *RunStageRequest_RunMode) HasStageAttemptToken() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *RunStageRequest_RunMode) ClearAttempt() {
+	x.xxx_hidden_Attempt = nil
+}
+
+func (x *RunStageRequest_RunMode) ClearStageAttemptToken() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_StageAttemptToken = nil
+}
+
+type RunStageRequest_RunMode_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// ID of the stage attempt to run.
+	Attempt *v11.StageAttempt
+	// A token generated by the orchestrator.
+	// The executor should pass this token to the stage for it to
+	// perform updates to the workflow resources (checks and/or stages).
+	StageAttemptToken *string
+}
+
+func (b0 RunStageRequest_RunMode_builder) Build() *RunStageRequest_RunMode {
+	m0 := &RunStageRequest_RunMode{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Attempt = b.Attempt
+	if b.StageAttemptToken != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_StageAttemptToken = b.StageAttemptToken
+	}
+	return m0
 }
 
 // Response of running an asynchronous stage.
 //
 // Make it empty for now for forward compatibility.
 type RunStageResponse_AsyncStage struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -358,16 +644,23 @@ func (x *RunStageResponse_AsyncStage) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RunStageResponse_AsyncStage.ProtoReflect.Descriptor instead.
-func (*RunStageResponse_AsyncStage) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_executor_v1_run_stage_proto_rawDescGZIP(), []int{1, 0}
+type RunStageResponse_AsyncStage_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 RunStageResponse_AsyncStage_builder) Build() *RunStageResponse_AsyncStage {
+	m0 := &RunStageResponse_AsyncStage{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 // Response of running a synchronous stage.
 //
 // Make it empty for now for forward compatibility.
 type RunStageResponse_SyncStage struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -397,18 +690,24 @@ func (x *RunStageResponse_SyncStage) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RunStageResponse_SyncStage.ProtoReflect.Descriptor instead.
-func (*RunStageResponse_SyncStage) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_executor_v1_run_stage_proto_rawDescGZIP(), []int{1, 1}
+type RunStageResponse_SyncStage_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 RunStageResponse_SyncStage_builder) Build() *RunStageResponse_SyncStage {
+	m0 := &RunStageResponse_SyncStage{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 // Response of running a stage in validate_only mode.
 type RunStageResponse_ValidateOnly struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Validated execution policy for the stage.
-	ExecutionPolicy *v1.ExecutionPolicy `protobuf:"bytes,1,opt,name=execution_policy,json=executionPolicy" json:"execution_policy,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state                      protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_ExecutionPolicy *v1.ExecutionPolicy    `protobuf:"bytes,1,opt,name=execution_policy,json=executionPolicy,proto3,oneof"`
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
 }
 
 func (x *RunStageResponse_ValidateOnly) Reset() {
@@ -436,32 +735,61 @@ func (x *RunStageResponse_ValidateOnly) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RunStageResponse_ValidateOnly.ProtoReflect.Descriptor instead.
-func (*RunStageResponse_ValidateOnly) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_executor_v1_run_stage_proto_rawDescGZIP(), []int{1, 2}
-}
-
 func (x *RunStageResponse_ValidateOnly) GetExecutionPolicy() *v1.ExecutionPolicy {
 	if x != nil {
-		return x.ExecutionPolicy
+		return x.xxx_hidden_ExecutionPolicy
 	}
 	return nil
+}
+
+func (x *RunStageResponse_ValidateOnly) SetExecutionPolicy(v *v1.ExecutionPolicy) {
+	x.xxx_hidden_ExecutionPolicy = v
+}
+
+func (x *RunStageResponse_ValidateOnly) HasExecutionPolicy() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_ExecutionPolicy != nil
+}
+
+func (x *RunStageResponse_ValidateOnly) ClearExecutionPolicy() {
+	x.xxx_hidden_ExecutionPolicy = nil
+}
+
+type RunStageResponse_ValidateOnly_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Validated execution policy for the stage.
+	ExecutionPolicy *v1.ExecutionPolicy
+}
+
+func (b0 RunStageResponse_ValidateOnly_builder) Build() *RunStageResponse_ValidateOnly {
+	m0 := &RunStageResponse_ValidateOnly{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_ExecutionPolicy = b.ExecutionPolicy
+	return m0
 }
 
 var File_turboci_graph_executor_v1_run_stage_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_executor_v1_run_stage_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/executor/v1/run_stage.proto\x12\x19turboci.graph.executor.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a4turboci/graph/orchestrator/v1/execution_policy.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\x8e\x03\n" +
-	"\x0fRunStageRequest\x12:\n" +
-	"\x05stage\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.StageR\x05stage\x12b\n" +
+	")turboci/graph/executor/v1/run_stage.proto\x12\x19turboci.graph.executor.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a4turboci/graph/orchestrator/v1/execution_policy.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\xcc\x03\n" +
+	"\x0fRunStageRequest\x12?\n" +
+	"\x05stage\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.StageH\x01R\x05stage\x88\x01\x01\x12b\n" +
 	"\rvalidate_only\x18\x02 \x01(\v2;.turboci.graph.executor.v1.RunStageRequest.ValidateOnlyModeH\x00R\fvalidateOnly\x12F\n" +
 	"\x03run\x18\x03 \x01(\v22.turboci.graph.executor.v1.RunStageRequest.RunModeH\x00R\x03run\x1a\x12\n" +
-	"\x10ValidateOnlyMode\x1aw\n" +
-	"\aRunMode\x12<\n" +
-	"\aattempt\x18\x01 \x01(\v2\".turboci.graph.ids.v1.StageAttemptR\aattempt\x12.\n" +
-	"\x13stage_attempt_token\x18\x02 \x01(\tR\x11stageAttemptTokenB\x06\n" +
-	"\x04mode\"\xb8\x03\n" +
+	"\x10ValidateOnlyMode\x1a\xa5\x01\n" +
+	"\aRunMode\x12A\n" +
+	"\aattempt\x18\x01 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\aattempt\x88\x01\x01\x123\n" +
+	"\x13stage_attempt_token\x18\x02 \x01(\tH\x01R\x11stageAttemptToken\x88\x01\x01B\n" +
+	"\n" +
+	"\b_attemptB\x16\n" +
+	"\x14_stage_attempt_tokenB\x06\n" +
+	"\x04modeB\b\n" +
+	"\x06_stage\"\xd3\x03\n" +
 	"\x10RunStageResponse\x12Y\n" +
 	"\vasync_stage\x18\x01 \x01(\v26.turboci.graph.executor.v1.RunStageResponse.AsyncStageH\x00R\n" +
 	"asyncStage\x12V\n" +
@@ -470,23 +798,12 @@ const file_turboci_graph_executor_v1_run_stage_proto_rawDesc = "" +
 	"\rvalidate_only\x18\x03 \x01(\v28.turboci.graph.executor.v1.RunStageResponse.ValidateOnlyH\x00R\fvalidateOnly\x1a\f\n" +
 	"\n" +
 	"AsyncStage\x1a\v\n" +
-	"\tSyncStage\x1ai\n" +
-	"\fValidateOnly\x12Y\n" +
-	"\x10execution_policy\x18\x01 \x01(\v2..turboci.graph.orchestrator.v1.ExecutionPolicyR\x0fexecutionPolicyB\n" +
+	"\tSyncStage\x1a\x83\x01\n" +
+	"\fValidateOnly\x12^\n" +
+	"\x10execution_policy\x18\x01 \x01(\v2..turboci.graph.orchestrator.v1.ExecutionPolicyH\x00R\x0fexecutionPolicy\x88\x01\x01B\x13\n" +
+	"\x11_execution_policyB\n" +
 	"\n" +
-	"\bresponseBAP\x01Z=go.chromium.org/turboci/proto/go/graph/executor/v1;executorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_executor_v1_run_stage_proto_rawDescOnce sync.Once
-	file_turboci_graph_executor_v1_run_stage_proto_rawDescData []byte
-)
-
-func file_turboci_graph_executor_v1_run_stage_proto_rawDescGZIP() []byte {
-	file_turboci_graph_executor_v1_run_stage_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_executor_v1_run_stage_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_executor_v1_run_stage_proto_rawDesc), len(file_turboci_graph_executor_v1_run_stage_proto_rawDesc)))
-	})
-	return file_turboci_graph_executor_v1_run_stage_proto_rawDescData
-}
+	"\bresponseBAP\x01Z=go.chromium.org/turboci/proto/go/graph/executor/v1;executorpbb\x06proto3"
 
 var file_turboci_graph_executor_v1_run_stage_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_turboci_graph_executor_v1_run_stage_proto_goTypes = []any{
@@ -523,14 +840,16 @@ func file_turboci_graph_executor_v1_run_stage_proto_init() {
 		return
 	}
 	file_turboci_graph_executor_v1_run_stage_proto_msgTypes[0].OneofWrappers = []any{
-		(*RunStageRequest_ValidateOnly)(nil),
-		(*RunStageRequest_Run)(nil),
+		(*runStageRequest_ValidateOnly)(nil),
+		(*runStageRequest_Run)(nil),
 	}
 	file_turboci_graph_executor_v1_run_stage_proto_msgTypes[1].OneofWrappers = []any{
-		(*RunStageResponse_AsyncStage_)(nil),
-		(*RunStageResponse_SyncStage_)(nil),
-		(*RunStageResponse_ValidateOnly_)(nil),
+		(*runStageResponse_AsyncStage_)(nil),
+		(*runStageResponse_SyncStage_)(nil),
+		(*runStageResponse_ValidateOnly_)(nil),
 	}
+	file_turboci_graph_executor_v1_run_stage_proto_msgTypes[3].OneofWrappers = []any{}
+	file_turboci_graph_executor_v1_run_stage_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

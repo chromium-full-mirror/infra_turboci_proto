@@ -34,7 +34,7 @@ const file_turboci_graph_orchestrator_v1_turbo_ci_orchestrator_service_proto_raw
 	"\n" +
 	"WriteNodes\x120.turboci.graph.orchestrator.v1.WriteNodesRequest\x1a1.turboci.graph.orchestrator.v1.WriteNodesResponse\"\x06\xd2\xd5\xdb\xd2\x0f\x00\x12y\n" +
 	"\n" +
-	"QueryNodes\x120.turboci.graph.orchestrator.v1.QueryNodesRequest\x1a1.turboci.graph.orchestrator.v1.QueryNodesResponse\"\x06\xd2\xd5\xdb\xd2\x0f\x00BTP\x01ZPgo.chromium.org/turboci/proto/go/graph/orchestrator/v1/grpcpb;orchestratorgrpcpbb\beditionsp\xe8\a"
+	"QueryNodes\x120.turboci.graph.orchestrator.v1.QueryNodesRequest\x1a1.turboci.graph.orchestrator.v1.QueryNodesResponse\"\x06\xd2\xd5\xdb\xd2\x0f\x00BTP\x01ZPgo.chromium.org/turboci/proto/go/graph/orchestrator/v1/grpcpb;orchestratorgrpcpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_turbo_ci_orchestrator_service_proto_goTypes = []any{
 	(*v1.WriteNodesRequest)(nil),  // 0: turboci.graph.orchestrator.v1.WriteNodesRequest

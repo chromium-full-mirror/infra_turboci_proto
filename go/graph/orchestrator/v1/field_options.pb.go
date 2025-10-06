@@ -16,7 +16,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	descriptorpb "google.golang.org/protobuf/types/descriptorpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -29,18 +28,14 @@ const (
 
 // FieldOptions are field options which apply to TurboCI message fields.
 type FieldOptions struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Field options which apply to Check messages.
-	Check *FieldOptions_CheckFieldOptions `protobuf:"bytes,1,opt,name=check" json:"check,omitempty"`
-	// Field options which apply to fields containing Identifiers.
-	Id *FieldOptions_IdentifierOptions `protobuf:"bytes,2,opt,name=id" json:"id,omitempty"`
-	// True if this field only applies during creation of the target node.
-	//
-	// If this field is supplied and the target node already exists, its value
-	// must match the target's value for this field.
-	CreationOnly  *bool `protobuf:"varint,3,opt,name=creation_only,json=creationOnly" json:"creation_only,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                   protoimpl.MessageState          `protogen:"opaque.v1"`
+	xxx_hidden_Check        *FieldOptions_CheckFieldOptions `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
+	xxx_hidden_Id           *FieldOptions_IdentifierOptions `protobuf:"bytes,2,opt,name=id,proto3,oneof"`
+	xxx_hidden_CreationOnly bool                            `protobuf:"varint,3,opt,name=creation_only,json=creationOnly,proto3,oneof"`
+	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
+	XXX_presence            [1]uint32
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *FieldOptions) Reset() {
@@ -68,51 +63,109 @@ func (x *FieldOptions) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FieldOptions.ProtoReflect.Descriptor instead.
-func (*FieldOptions) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_field_options_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *FieldOptions) GetCheck() *FieldOptions_CheckFieldOptions {
 	if x != nil {
-		return x.Check
+		return x.xxx_hidden_Check
 	}
 	return nil
 }
 
 func (x *FieldOptions) GetId() *FieldOptions_IdentifierOptions {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return nil
 }
 
 func (x *FieldOptions) GetCreationOnly() bool {
-	if x != nil && x.CreationOnly != nil {
-		return *x.CreationOnly
+	if x != nil {
+		return x.xxx_hidden_CreationOnly
 	}
 	return false
 }
 
+func (x *FieldOptions) SetCheck(v *FieldOptions_CheckFieldOptions) {
+	x.xxx_hidden_Check = v
+}
+
+func (x *FieldOptions) SetId(v *FieldOptions_IdentifierOptions) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *FieldOptions) SetCreationOnly(v bool) {
+	x.xxx_hidden_CreationOnly = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
+}
+
+func (x *FieldOptions) HasCheck() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Check != nil
+}
+
+func (x *FieldOptions) HasId() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Id != nil
+}
+
+func (x *FieldOptions) HasCreationOnly() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *FieldOptions) ClearCheck() {
+	x.xxx_hidden_Check = nil
+}
+
+func (x *FieldOptions) ClearId() {
+	x.xxx_hidden_Id = nil
+}
+
+func (x *FieldOptions) ClearCreationOnly() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_CreationOnly = false
+}
+
+type FieldOptions_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Field options which apply to Check messages.
+	Check *FieldOptions_CheckFieldOptions
+	// Field options which apply to fields containing Identifiers.
+	Id *FieldOptions_IdentifierOptions
+	// True if this field only applies during creation of the target node.
+	//
+	// If this field is supplied and the target node already exists, its value
+	// must match the target's value for this field.
+	CreationOnly *bool
+}
+
+func (b0 FieldOptions_builder) Build() *FieldOptions {
+	m0 := &FieldOptions{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Check = b.Check
+	x.xxx_hidden_Id = b.Id
+	if b.CreationOnly != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		x.xxx_hidden_CreationOnly = *b.CreationOnly
+	}
+	return m0
+}
+
 // CheckFieldOptions are field options which apply to Check messages.
 type FieldOptions_CheckFieldOptions struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Indicates that this field is mutable at this CheckState or earlier.
-	//
-	// We use `editable` here (instead of `mutable`) to avoid name mangling in
-	// C++.
-	//
-	// Example (this indicates that `foo` is mutable during the PLANNING
-	// state):
-	//
-	//	message Check {
-	//	  string foo = 1 [
-	//	    (turboci).check.editable = CHECK_STATE_PLANNING
-	//	  ];
-	//	}
-	Editable      *CheckState `protobuf:"varint,1,opt,name=editable,enum=turboci.graph.orchestrator.v1.CheckState" json:"editable,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Editable    CheckState             `protobuf:"varint,1,opt,name=editable,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *FieldOptions_CheckFieldOptions) Reset() {
@@ -140,37 +193,69 @@ func (x *FieldOptions_CheckFieldOptions) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FieldOptions_CheckFieldOptions.ProtoReflect.Descriptor instead.
-func (*FieldOptions_CheckFieldOptions) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_field_options_proto_rawDescGZIP(), []int{0, 0}
-}
-
 func (x *FieldOptions_CheckFieldOptions) GetEditable() CheckState {
-	if x != nil && x.Editable != nil {
-		return *x.Editable
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
+			return x.xxx_hidden_Editable
+		}
 	}
 	return CheckState_CHECK_STATE_UNKNOWN
+}
+
+func (x *FieldOptions_CheckFieldOptions) SetEditable(v CheckState) {
+	x.xxx_hidden_Editable = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
+}
+
+func (x *FieldOptions_CheckFieldOptions) HasEditable() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *FieldOptions_CheckFieldOptions) ClearEditable() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Editable = CheckState_CHECK_STATE_UNKNOWN
+}
+
+type FieldOptions_CheckFieldOptions_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Indicates that this field is mutable at this CheckState or earlier.
+	//
+	// We use `editable` here (instead of `mutable`) to avoid name mangling in
+	// C++.
+	//
+	// Example (this indicates that `foo` is mutable during the PLANNING
+	// state):
+	//
+	//	message Check {
+	//	  string foo = 1 [
+	//	    (turboci).check.editable = CHECK_STATE_PLANNING
+	//	  ];
+	//	}
+	Editable *CheckState
+}
+
+func (b0 FieldOptions_CheckFieldOptions_builder) Build() *FieldOptions_CheckFieldOptions {
+	m0 := &FieldOptions_CheckFieldOptions{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Editable != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		x.xxx_hidden_Editable = *b.Editable
+	}
+	return m0
 }
 
 // IdentifierOptions are field options which apply to message containing
 // Identifiers.
 type FieldOptions_IdentifierOptions struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Indicates a list of allowed target types for Identifiers within this
-	// field. Commonly used with Edge messages, but may also directly annotate
-	// Identifier fields.
-	//
-	// Example:
-	//
-	//	message Foo {
-	//	  repeated Edge dependencies = 1 [
-	//	    (turboci).id.allowed: IDENTIFIER_KIND_STAGE,
-	//	    (turboci).id.allowed: IDENTIFIER_KIND_CHECK
-	//	  ];
-	//	}
-	Allowed       []v1.IdentifierKind `protobuf:"varint,1,rep,packed,name=allowed,enum=turboci.graph.ids.v1.IdentifierKind" json:"allowed,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Allowed []v1.IdentifierKind    `protobuf:"varint,1,rep,packed,name=allowed,proto3,enum=turboci.graph.ids.v1.IdentifierKind"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *FieldOptions_IdentifierOptions) Reset() {
@@ -198,16 +283,41 @@ func (x *FieldOptions_IdentifierOptions) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FieldOptions_IdentifierOptions.ProtoReflect.Descriptor instead.
-func (*FieldOptions_IdentifierOptions) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_field_options_proto_rawDescGZIP(), []int{0, 1}
-}
-
 func (x *FieldOptions_IdentifierOptions) GetAllowed() []v1.IdentifierKind {
 	if x != nil {
-		return x.Allowed
+		return x.xxx_hidden_Allowed
 	}
 	return nil
+}
+
+func (x *FieldOptions_IdentifierOptions) SetAllowed(v []v1.IdentifierKind) {
+	x.xxx_hidden_Allowed = v
+}
+
+type FieldOptions_IdentifierOptions_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Indicates a list of allowed target types for Identifiers within this
+	// field. Commonly used with Edge messages, but may also directly annotate
+	// Identifier fields.
+	//
+	// Example:
+	//
+	//	message Foo {
+	//	  repeated Edge dependencies = 1 [
+	//	    (turboci).id.allowed: IDENTIFIER_KIND_STAGE,
+	//	    (turboci).id.allowed: IDENTIFIER_KIND_CHECK
+	//	  ];
+	//	}
+	Allowed []v1.IdentifierKind
+}
+
+func (b0 FieldOptions_IdentifierOptions_builder) Build() *FieldOptions_IdentifierOptions {
+	m0 := &FieldOptions_IdentifierOptions{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Allowed = b.Allowed
+	return m0
 }
 
 var file_turboci_graph_orchestrator_v1_field_options_proto_extTypes = []protoimpl.ExtensionInfo{
@@ -233,28 +343,20 @@ var File_turboci_graph_orchestrator_v1_field_options_proto protoreflect.FileDesc
 
 const file_turboci_graph_orchestrator_v1_field_options_proto_rawDesc = "" +
 	"\n" +
-	"1turboci/graph/orchestrator/v1/field_options.proto\x12\x1dturboci.graph.orchestrator.v1\x1a google/protobuf/descriptor.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\"\x88\x03\n" +
-	"\fFieldOptions\x12S\n" +
-	"\x05check\x18\x01 \x01(\v2=.turboci.graph.orchestrator.v1.FieldOptions.CheckFieldOptionsR\x05check\x12M\n" +
-	"\x02id\x18\x02 \x01(\v2=.turboci.graph.orchestrator.v1.FieldOptions.IdentifierOptionsR\x02id\x12#\n" +
-	"\rcreation_only\x18\x03 \x01(\bR\fcreationOnly\x1aZ\n" +
-	"\x11CheckFieldOptions\x12E\n" +
-	"\beditable\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateR\beditable\x1aS\n" +
-	"\x11IdentifierOptions\x12>\n" +
-	"\aallowed\x18\x01 \x03(\x0e2$.turboci.graph.ids.v1.IdentifierKindR\aallowed:h\n" +
-	"\aturboci\x12\x1d.google.protobuf.FieldOptions\x18\xe0\xe0\xbe\xff\x01 \x01(\v2+.turboci.graph.orchestrator.v1.FieldOptionsR\aturbociBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_field_options_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_field_options_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_field_options_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_field_options_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_field_options_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_field_options_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_field_options_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_field_options_proto_rawDescData
-}
+	"1turboci/graph/orchestrator/v1/field_options.proto\x12\x1dturboci.graph.orchestrator.v1\x1a google/protobuf/descriptor.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\"\xd0\x03\n" +
+	"\fFieldOptions\x12X\n" +
+	"\x05check\x18\x01 \x01(\v2=.turboci.graph.orchestrator.v1.FieldOptions.CheckFieldOptionsH\x00R\x05check\x88\x01\x01\x12R\n" +
+	"\x02id\x18\x02 \x01(\v2=.turboci.graph.orchestrator.v1.FieldOptions.IdentifierOptionsH\x01R\x02id\x88\x01\x01\x12(\n" +
+	"\rcreation_only\x18\x03 \x01(\bH\x02R\fcreationOnly\x88\x01\x01\x1al\n" +
+	"\x11CheckFieldOptions\x12J\n" +
+	"\beditable\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\beditable\x88\x01\x01B\v\n" +
+	"\t_editable\x1aW\n" +
+	"\x11IdentifierOptions\x12B\n" +
+	"\aallowed\x18\x01 \x03(\x0e2$.turboci.graph.ids.v1.IdentifierKindB\x02\x10\x01R\aallowedB\b\n" +
+	"\x06_checkB\x05\n" +
+	"\x03_idB\x10\n" +
+	"\x0e_creation_only:k\n" +
+	"\aturboci\x12\x1d.google.protobuf.FieldOptions\x18\xe0\xe0\xbe\xff\x01 \x01(\v2+.turboci.graph.orchestrator.v1.FieldOptionsR\aturboci\x88\x01\x01BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_field_options_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_turboci_graph_orchestrator_v1_field_options_proto_goTypes = []any{
@@ -285,6 +387,8 @@ func file_turboci_graph_orchestrator_v1_field_options_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_check_state_proto_init()
+	file_turboci_graph_orchestrator_v1_field_options_proto_msgTypes[0].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_field_options_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

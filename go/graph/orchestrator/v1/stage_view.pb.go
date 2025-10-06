@@ -14,7 +14,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -28,15 +27,11 @@ const (
 // StageView is a collated, partial, view of a single Stage and the nodes
 // which belong to it.
 type StageView struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The Stage itself - always present.
-	Stage *Stage `protobuf:"bytes,1,opt,name=stage" json:"stage,omitempty"`
-	// StageEdits for this Stage which are being read.
-	//
-	// Some StageEdits may be omitted if the user did not request them.
-	Edits         []*StageEditView `protobuf:"bytes,3,rep,name=edits" json:"edits,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Stage *Stage                 `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`
+	xxx_hidden_Edits *[]*StageEditView      `protobuf:"bytes,3,rep,name=edits,proto3"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *StageView) Reset() {
@@ -64,45 +59,70 @@ func (x *StageView) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StageView.ProtoReflect.Descriptor instead.
-func (*StageView) Descriptor() ([]byte, []int) {
-	return file_turboci_graph_orchestrator_v1_stage_view_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *StageView) GetStage() *Stage {
 	if x != nil {
-		return x.Stage
+		return x.xxx_hidden_Stage
 	}
 	return nil
 }
 
 func (x *StageView) GetEdits() []*StageEditView {
 	if x != nil {
-		return x.Edits
+		if x.xxx_hidden_Edits != nil {
+			return *x.xxx_hidden_Edits
+		}
 	}
 	return nil
+}
+
+func (x *StageView) SetStage(v *Stage) {
+	x.xxx_hidden_Stage = v
+}
+
+func (x *StageView) SetEdits(v []*StageEditView) {
+	x.xxx_hidden_Edits = &v
+}
+
+func (x *StageView) HasStage() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Stage != nil
+}
+
+func (x *StageView) ClearStage() {
+	x.xxx_hidden_Stage = nil
+}
+
+type StageView_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The Stage itself - always present.
+	Stage *Stage
+	// StageEdits for this Stage which are being read.
+	//
+	// Some StageEdits may be omitted if the user did not request them.
+	Edits []*StageEditView
+}
+
+func (b0 StageView_builder) Build() *StageView {
+	m0 := &StageView{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Stage = b.Stage
+	x.xxx_hidden_Edits = &b.Edits
+	return m0
 }
 
 var File_turboci_graph_orchestrator_v1_stage_view_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_stage_view_proto_rawDesc = "" +
 	"\n" +
-	".turboci/graph/orchestrator/v1/stage_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a3turboci/graph/orchestrator/v1/stage_edit_view.proto\"\x91\x01\n" +
-	"\tStageView\x12:\n" +
-	"\x05stage\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.StageR\x05stage\x12B\n" +
-	"\x05edits\x18\x03 \x03(\v2,.turboci.graph.orchestrator.v1.StageEditViewR\x05editsJ\x04\b\x02\x10\x03BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\beditionsp\xe8\a"
-
-var (
-	file_turboci_graph_orchestrator_v1_stage_view_proto_rawDescOnce sync.Once
-	file_turboci_graph_orchestrator_v1_stage_view_proto_rawDescData []byte
-)
-
-func file_turboci_graph_orchestrator_v1_stage_view_proto_rawDescGZIP() []byte {
-	file_turboci_graph_orchestrator_v1_stage_view_proto_rawDescOnce.Do(func() {
-		file_turboci_graph_orchestrator_v1_stage_view_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_stage_view_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_stage_view_proto_rawDesc)))
-	})
-	return file_turboci_graph_orchestrator_v1_stage_view_proto_rawDescData
-}
+	".turboci/graph/orchestrator/v1/stage_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a3turboci/graph/orchestrator/v1/stage_edit_view.proto\"\xa0\x01\n" +
+	"\tStageView\x12?\n" +
+	"\x05stage\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.StageH\x00R\x05stage\x88\x01\x01\x12B\n" +
+	"\x05edits\x18\x03 \x03(\v2,.turboci.graph.orchestrator.v1.StageEditViewR\x05editsB\b\n" +
+	"\x06_stageJ\x04\b\x02\x10\x03BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_stage_view_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_stage_view_proto_goTypes = []any{
@@ -127,6 +147,7 @@ func file_turboci_graph_orchestrator_v1_stage_view_proto_init() {
 	}
 	file_turboci_graph_orchestrator_v1_stage_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_edit_view_proto_init()
+	file_turboci_graph_orchestrator_v1_stage_view_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

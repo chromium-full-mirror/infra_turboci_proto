@@ -21,7 +21,11 @@ import textwrap
 from pathlib import Path
 from typing import NoReturn
 
-from google.protobuf.descriptor_pb2 import FileDescriptorSet
+from google.protobuf.descriptor_pb2 import (
+    DescriptorProto,
+    FieldDescriptorProto,
+    FileDescriptorSet,
+)
 
 _RepoRoot = Path(__file__).absolute().parent
 
@@ -207,6 +211,47 @@ def _task_check_go_package(desc: FileDescriptorSet):
     sys.exit(1)
 
 
+def _check_message_fields(
+    file_name: str, message: DescriptorProto, errors: list[str]
+):
+  """Recursively checks fields in a message and its nested types."""
+  for field in message.field:
+    # Check if the field is not repeated and not part of a oneof.
+    is_repeated = field.label == FieldDescriptorProto.Label.LABEL_REPEATED
+    is_oneof = field.HasField('oneof_index')
+
+    if not is_repeated and not is_oneof:
+      # In proto3, the presence of `proto3_optional` means the `optional`
+      # keyword was used.
+      if not field.proto3_optional:
+        errors.append(
+            f'{file_name}: {message.name}.{field.name}: '
+            'Non-repeated, non-oneof field must use the `optional` keyword.'
+        )
+
+  for nested_message in message.nested_type:
+    _check_message_fields(file_name, nested_message, errors)
+
+
+def _task_check_all_fields_optional(desc: FileDescriptorSet):
+  """Checks that every non-repeated, non-oneof field uses the 'optional' keyword."""
+  errors = []
+  for file in desc.file:
+    for message in file.message_type:
+      _check_message_fields(file.name, message, errors)
+
+  if errors:
+    for error in errors:
+      print(error)
+    sys.exit(1)
+
+
+def task_check_all_fields_optional():
+  """Checks that every non-repeated, non-oneof field uses the 'optional' keyword."""
+  with _fds() as fds:
+    _task_check_all_fields_optional(fds)
+
+
 def protoc(*args: str):
   with tempfile.NamedTemporaryFile() as argfile:
     argfile.writelines((arg + '\n').encode() for arg in args)
@@ -280,6 +325,7 @@ def task_compile_go(mode: None | str = None):
         f'--go_opt=module={module}',
         f'--go-grpc_out={tdir}',
         f'--go-grpc_opt=module={module}',
+        f'--go_opt=default_api_level=API_OPAQUE',
     )
 
     newFiles = []
@@ -334,10 +380,14 @@ def task_all():
     def check_go_package():
       _task_check_go_package(fds)
 
+    def check_all_fields_optional():
+      _task_check_all_fields_optional(fds)
+
     allTasks = (
         task_format,
         check_service_definitions,
         check_go_package,
+        check_all_fields_optional,
         task_lint,
         task_breaking,
         task_compile_go,
