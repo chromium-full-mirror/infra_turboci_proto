@@ -181,3 +181,8 @@ annotations:
 
 [depot_tools]: https://chromium.googlesource.com/chromium/tools/depot_tools.git
 [backwards incompatible changes]: https://protobuf.dev/programming-guides/editions/#updating
+
+## Bugs and Feature Requests
+
+Please file a go/turbo-ci-bug for any bugs or feature requests related to the
+protobuf definitions in this repository.
