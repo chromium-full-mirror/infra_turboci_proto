@@ -217,6 +217,7 @@ def _check_message_fields(
   """Recursively checks fields in a message and its nested types."""
   for field in message.field:
     # Check if the field is not repeated and not part of a oneof.
+    # Note that map fields are also repeated fields.
     is_repeated = field.label == FieldDescriptorProto.Label.LABEL_REPEATED
     is_oneof = field.HasField('oneof_index')
 
@@ -230,7 +231,8 @@ def _check_message_fields(
         )
 
   for nested_message in message.nested_type:
-    _check_message_fields(file_name, nested_message, errors)
+    if not nested_message.options.map_entry:
+      _check_message_fields(file_name, nested_message, errors)
 
 
 def _task_check_all_fields_optional(desc: FileDescriptorSet):
