@@ -208,7 +208,7 @@ var File_turboci_graph_executor_v1_run_stage_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_executor_v1_run_stage_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/executor/v1/run_stage.proto\x12\x19turboci.graph.executor.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a4turboci/graph/orchestrator/v1/execution_policy.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\xf8\x01\n" +
+	")turboci/graph/executor/v1/run_stage.proto\x12\x19turboci.graph.executor.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\xf8\x01\n" +
 	"\x0fRunStageRequest\x12?\n" +
 	"\x05stage\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.StageH\x00R\x05stage\x88\x01\x01\x12A\n" +
 	"\aattempt\x18\x02 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x01R\aattempt\x88\x01\x01\x123\n" +
