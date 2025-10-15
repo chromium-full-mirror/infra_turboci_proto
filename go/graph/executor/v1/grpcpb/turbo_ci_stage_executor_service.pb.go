@@ -29,24 +29,29 @@ var File_turboci_graph_executor_v1_turbo_ci_stage_executor_service_proto protore
 
 const file_turboci_graph_executor_v1_turbo_ci_stage_executor_service_proto_rawDesc = "" +
 	"\n" +
-	"?turboci/graph/executor/v1/turbo_ci_stage_executor_service.proto\x12\x19turboci.graph.executor.v1\x1a,turboci/graph/executor/v1/cancel_stage.proto\x1a)turboci/graph/executor/v1/run_stage.proto2\xed\x01\n" +
-	"\x14TurboCIStageExecutor\x12e\n" +
+	"?turboci/graph/executor/v1/turbo_ci_stage_executor_service.proto\x12\x19turboci.graph.executor.v1\x1a,turboci/graph/executor/v1/cancel_stage.proto\x1a)turboci/graph/executor/v1/run_stage.proto\x1a.turboci/graph/executor/v1/validate_stage.proto2\xe3\x02\n" +
+	"\x14TurboCIStageExecutor\x12t\n" +
+	"\rValidateStage\x12/.turboci.graph.executor.v1.ValidateStageRequest\x1a0.turboci.graph.executor.v1.ValidateStageResponse\"\x00\x12e\n" +
 	"\bRunStage\x12*.turboci.graph.executor.v1.RunStageRequest\x1a+.turboci.graph.executor.v1.RunStageResponse\"\x00\x12n\n" +
 	"\vCancelStage\x12-.turboci.graph.executor.v1.CancelStageRequest\x1a..turboci.graph.executor.v1.CancelStageResponse\"\x00BLP\x01ZHgo.chromium.org/turboci/proto/go/graph/executor/v1/grpcpb;executorgrpcpbb\x06proto3"
 
 var file_turboci_graph_executor_v1_turbo_ci_stage_executor_service_proto_goTypes = []any{
-	(*v1.RunStageRequest)(nil),     // 0: turboci.graph.executor.v1.RunStageRequest
-	(*v1.CancelStageRequest)(nil),  // 1: turboci.graph.executor.v1.CancelStageRequest
-	(*v1.RunStageResponse)(nil),    // 2: turboci.graph.executor.v1.RunStageResponse
-	(*v1.CancelStageResponse)(nil), // 3: turboci.graph.executor.v1.CancelStageResponse
+	(*v1.ValidateStageRequest)(nil),  // 0: turboci.graph.executor.v1.ValidateStageRequest
+	(*v1.RunStageRequest)(nil),       // 1: turboci.graph.executor.v1.RunStageRequest
+	(*v1.CancelStageRequest)(nil),    // 2: turboci.graph.executor.v1.CancelStageRequest
+	(*v1.ValidateStageResponse)(nil), // 3: turboci.graph.executor.v1.ValidateStageResponse
+	(*v1.RunStageResponse)(nil),      // 4: turboci.graph.executor.v1.RunStageResponse
+	(*v1.CancelStageResponse)(nil),   // 5: turboci.graph.executor.v1.CancelStageResponse
 }
 var file_turboci_graph_executor_v1_turbo_ci_stage_executor_service_proto_depIdxs = []int32{
-	0, // 0: turboci.graph.executor.v1.TurboCIStageExecutor.RunStage:input_type -> turboci.graph.executor.v1.RunStageRequest
-	1, // 1: turboci.graph.executor.v1.TurboCIStageExecutor.CancelStage:input_type -> turboci.graph.executor.v1.CancelStageRequest
-	2, // 2: turboci.graph.executor.v1.TurboCIStageExecutor.RunStage:output_type -> turboci.graph.executor.v1.RunStageResponse
-	3, // 3: turboci.graph.executor.v1.TurboCIStageExecutor.CancelStage:output_type -> turboci.graph.executor.v1.CancelStageResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	0, // 0: turboci.graph.executor.v1.TurboCIStageExecutor.ValidateStage:input_type -> turboci.graph.executor.v1.ValidateStageRequest
+	1, // 1: turboci.graph.executor.v1.TurboCIStageExecutor.RunStage:input_type -> turboci.graph.executor.v1.RunStageRequest
+	2, // 2: turboci.graph.executor.v1.TurboCIStageExecutor.CancelStage:input_type -> turboci.graph.executor.v1.CancelStageRequest
+	3, // 3: turboci.graph.executor.v1.TurboCIStageExecutor.ValidateStage:output_type -> turboci.graph.executor.v1.ValidateStageResponse
+	4, // 4: turboci.graph.executor.v1.TurboCIStageExecutor.RunStage:output_type -> turboci.graph.executor.v1.RunStageResponse
+	5, // 5: turboci.graph.executor.v1.TurboCIStageExecutor.CancelStage:output_type -> turboci.graph.executor.v1.CancelStageResponse
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

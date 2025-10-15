@@ -24,24 +24,40 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TurboCIStageExecutor_RunStage_FullMethodName    = "/turboci.graph.executor.v1.TurboCIStageExecutor/RunStage"
-	TurboCIStageExecutor_CancelStage_FullMethodName = "/turboci.graph.executor.v1.TurboCIStageExecutor/CancelStage"
+	TurboCIStageExecutor_ValidateStage_FullMethodName = "/turboci.graph.executor.v1.TurboCIStageExecutor/ValidateStage"
+	TurboCIStageExecutor_RunStage_FullMethodName      = "/turboci.graph.executor.v1.TurboCIStageExecutor/RunStage"
+	TurboCIStageExecutor_CancelStage_FullMethodName   = "/turboci.graph.executor.v1.TurboCIStageExecutor/CancelStage"
 )
 
 // TurboCIStageExecutorClient is the client API for TurboCIStageExecutor service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
+// TurboCIStageExecutor defines the interface that all stage executors must
+// implement.
+//
 // The TurboCI Orchestrator can be configured to use many different services
 // which implement TurboCIStageExecutor to execute stages of different types.
+//
+// TBD: Explain end-user-credential propagation.
 type TurboCIStageExecutorClient interface {
-	// RunStage instructs the executor to run the given stage attempt.
+	// ValidateStage instructs the executor to validate the stage.
 	//
-	// This RPC supports both "validate_only" mode and "run" mode.
+	// It is called once (i.e. not per attempt) when the stage is being inserted
+	// into the graph. It should check the executor can run the stage at all (this
+	// includes checking ACLs if appropriate).
 	//
-	// * In the "validate_only" mode, the RPC performs pre-flight checks,
-	// including ACL checks and validation on the stage. It either returns
-	// the validated execution policy if the validation passes, or an error.
+	// If the stage looks good (i.e. this RPC returns OK), the executor has
+	// opportunity to adjust some of stages parameters before the stage is
+	// inserted into the graph by returning them in ValidateStageResponse
+	// (currently contains only turboci.orchestrator.v1.ExecutionPolicy).
+	//
+	// If the stage doesn't look good (i.e. this RPC returns an error), the entire
+	// WriteNodes transaction that was attempting to insert the stage will be
+	// aborted. The graph will be left unchanged.
+	//
+	// RunStage RPC is generally expected to redo the validation, since the stage
+	// parameters may change after the stage is inserted.
 	//
 	// TBD: Formalize how the error will be propagated back to the client
 	// attempting to insert this stage. How would we allow details in the
@@ -50,8 +66,22 @@ type TurboCIStageExecutorClient interface {
 	// Sidenote - do we need to record this failed node insertion somewhere
 	// in the graph/ledger for observability?
 	//
-	// * In the "run" mode, the RPC redoes the ACL checks and stage validation,
-	// then runs the stage if validation passes.
+	// Must have no side effects, since it observes stages that potentially will
+	// never exist in the graph for real.
+	ValidateStage(ctx context.Context, in *v1.ValidateStageRequest, opts ...grpc.CallOption) (*v1.ValidateStageResponse, error)
+	// RunStage instructs the executor to run the given stage attempt.
+	//
+	// This is called per attempt to either run the stage to completion (for
+	// "synchronous" stages) or to dispatch it to execute elsewhere (for
+	// "asynchronous" stages).
+	//
+	// RunStage RPC is generally expected to redo the validation done by
+	// ValidateStage, since the stage parameters may change after the stage is
+	// inserted. If the stage is no longer passing the validation, RunStage should
+	// essentially finish it as failed by calling TurboCIOrchestrator.WriteNodes
+	// (see below).
+	//
+	// Expected behavior:
 	//   - If the stage is synchronous, at the end of this RPC the executor must
 	//     call TurboCIOrchestrator.WriteNodes with StageAttemptToken to do all
 	//     the writes in one transaction, including a CurrentStageWrite to mark
@@ -62,6 +92,14 @@ type TurboCIStageExecutorClient interface {
 	//   - the executor must also write the validated execution policy for the
 	//     StageAttempt for the updated state (See
 	//     turboci.orchestrator.v1.ExecutionPolicy for details).
+	//
+	// RunStage return value and even status code are essentially ignored.
+	// The orchestrator always looks at the state of the stage attempt after
+	// RunStage finishes (successfully or not) to decide if the request succeeded
+	// or should be retried. This is needed to unify handling of synchronous and
+	// asynchronous stages and to simplify handling of a class of race conditions
+	// related to RPC peers (or network between them) dying midway through
+	// execution.
 	RunStage(ctx context.Context, in *v1.RunStageRequest, opts ...grpc.CallOption) (*v1.RunStageResponse, error)
 	// CancelStage instructs the executor to cancel the given stage attempt.
 	//
@@ -89,6 +127,16 @@ func NewTurboCIStageExecutorClient(cc grpc.ClientConnInterface) TurboCIStageExec
 	return &turboCIStageExecutorClient{cc}
 }
 
+func (c *turboCIStageExecutorClient) ValidateStage(ctx context.Context, in *v1.ValidateStageRequest, opts ...grpc.CallOption) (*v1.ValidateStageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(v1.ValidateStageResponse)
+	err := c.cc.Invoke(ctx, TurboCIStageExecutor_ValidateStage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *turboCIStageExecutorClient) RunStage(ctx context.Context, in *v1.RunStageRequest, opts ...grpc.CallOption) (*v1.RunStageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(v1.RunStageResponse)
@@ -113,16 +161,31 @@ func (c *turboCIStageExecutorClient) CancelStage(ctx context.Context, in *v1.Can
 // All implementations must embed UnimplementedTurboCIStageExecutorServer
 // for forward compatibility.
 //
+// TurboCIStageExecutor defines the interface that all stage executors must
+// implement.
+//
 // The TurboCI Orchestrator can be configured to use many different services
 // which implement TurboCIStageExecutor to execute stages of different types.
+//
+// TBD: Explain end-user-credential propagation.
 type TurboCIStageExecutorServer interface {
-	// RunStage instructs the executor to run the given stage attempt.
+	// ValidateStage instructs the executor to validate the stage.
 	//
-	// This RPC supports both "validate_only" mode and "run" mode.
+	// It is called once (i.e. not per attempt) when the stage is being inserted
+	// into the graph. It should check the executor can run the stage at all (this
+	// includes checking ACLs if appropriate).
 	//
-	// * In the "validate_only" mode, the RPC performs pre-flight checks,
-	// including ACL checks and validation on the stage. It either returns
-	// the validated execution policy if the validation passes, or an error.
+	// If the stage looks good (i.e. this RPC returns OK), the executor has
+	// opportunity to adjust some of stages parameters before the stage is
+	// inserted into the graph by returning them in ValidateStageResponse
+	// (currently contains only turboci.orchestrator.v1.ExecutionPolicy).
+	//
+	// If the stage doesn't look good (i.e. this RPC returns an error), the entire
+	// WriteNodes transaction that was attempting to insert the stage will be
+	// aborted. The graph will be left unchanged.
+	//
+	// RunStage RPC is generally expected to redo the validation, since the stage
+	// parameters may change after the stage is inserted.
 	//
 	// TBD: Formalize how the error will be propagated back to the client
 	// attempting to insert this stage. How would we allow details in the
@@ -131,8 +194,22 @@ type TurboCIStageExecutorServer interface {
 	// Sidenote - do we need to record this failed node insertion somewhere
 	// in the graph/ledger for observability?
 	//
-	// * In the "run" mode, the RPC redoes the ACL checks and stage validation,
-	// then runs the stage if validation passes.
+	// Must have no side effects, since it observes stages that potentially will
+	// never exist in the graph for real.
+	ValidateStage(context.Context, *v1.ValidateStageRequest) (*v1.ValidateStageResponse, error)
+	// RunStage instructs the executor to run the given stage attempt.
+	//
+	// This is called per attempt to either run the stage to completion (for
+	// "synchronous" stages) or to dispatch it to execute elsewhere (for
+	// "asynchronous" stages).
+	//
+	// RunStage RPC is generally expected to redo the validation done by
+	// ValidateStage, since the stage parameters may change after the stage is
+	// inserted. If the stage is no longer passing the validation, RunStage should
+	// essentially finish it as failed by calling TurboCIOrchestrator.WriteNodes
+	// (see below).
+	//
+	// Expected behavior:
 	//   - If the stage is synchronous, at the end of this RPC the executor must
 	//     call TurboCIOrchestrator.WriteNodes with StageAttemptToken to do all
 	//     the writes in one transaction, including a CurrentStageWrite to mark
@@ -143,6 +220,14 @@ type TurboCIStageExecutorServer interface {
 	//   - the executor must also write the validated execution policy for the
 	//     StageAttempt for the updated state (See
 	//     turboci.orchestrator.v1.ExecutionPolicy for details).
+	//
+	// RunStage return value and even status code are essentially ignored.
+	// The orchestrator always looks at the state of the stage attempt after
+	// RunStage finishes (successfully or not) to decide if the request succeeded
+	// or should be retried. This is needed to unify handling of synchronous and
+	// asynchronous stages and to simplify handling of a class of race conditions
+	// related to RPC peers (or network between them) dying midway through
+	// execution.
 	RunStage(context.Context, *v1.RunStageRequest) (*v1.RunStageResponse, error)
 	// CancelStage instructs the executor to cancel the given stage attempt.
 	//
@@ -170,6 +255,9 @@ type TurboCIStageExecutorServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTurboCIStageExecutorServer struct{}
 
+func (UnimplementedTurboCIStageExecutorServer) ValidateStage(context.Context, *v1.ValidateStageRequest) (*v1.ValidateStageResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ValidateStage not implemented")
+}
 func (UnimplementedTurboCIStageExecutorServer) RunStage(context.Context, *v1.RunStageRequest) (*v1.RunStageResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RunStage not implemented")
 }
@@ -195,6 +283,24 @@ func RegisterTurboCIStageExecutorServer(s grpc.ServiceRegistrar, srv TurboCIStag
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&TurboCIStageExecutor_ServiceDesc, srv)
+}
+
+func _TurboCIStageExecutor_ValidateStage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.ValidateStageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TurboCIStageExecutorServer).ValidateStage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TurboCIStageExecutor_ValidateStage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TurboCIStageExecutorServer).ValidateStage(ctx, req.(*v1.ValidateStageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _TurboCIStageExecutor_RunStage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -240,6 +346,10 @@ var TurboCIStageExecutor_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "turboci.graph.executor.v1.TurboCIStageExecutor",
 	HandlerType: (*TurboCIStageExecutorServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ValidateStage",
+			Handler:    _TurboCIStageExecutor_ValidateStage_Handler,
+		},
 		{
 			MethodName: "RunStage",
 			Handler:    _TurboCIStageExecutor_RunStage_Handler,
