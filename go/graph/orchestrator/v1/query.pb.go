@@ -383,8 +383,8 @@ func (b0 Query_Expand_builder) Build() *Query_Expand {
 // Collect retrieves data from the expanded node set.
 type Query_Collect struct {
 	state            protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Data  *Query_Collect_Data    `protobuf:"bytes,1,opt,name=data,proto3,oneof"`
-	xxx_hidden_Edits *Query_Collect_Edits   `protobuf:"bytes,2,opt,name=edits,proto3,oneof"`
+	xxx_hidden_Check *Query_Collect_Check   `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
+	xxx_hidden_Stage *Query_Collect_Stage   `protobuf:"bytes,2,opt,name=stage,proto3,oneof"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -414,65 +414,65 @@ func (x *Query_Collect) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *Query_Collect) GetData() *Query_Collect_Data {
+func (x *Query_Collect) GetCheck() *Query_Collect_Check {
 	if x != nil {
-		return x.xxx_hidden_Data
+		return x.xxx_hidden_Check
 	}
 	return nil
 }
 
-func (x *Query_Collect) GetEdits() *Query_Collect_Edits {
+func (x *Query_Collect) GetStage() *Query_Collect_Stage {
 	if x != nil {
-		return x.xxx_hidden_Edits
+		return x.xxx_hidden_Stage
 	}
 	return nil
 }
 
-func (x *Query_Collect) SetData(v *Query_Collect_Data) {
-	x.xxx_hidden_Data = v
+func (x *Query_Collect) SetCheck(v *Query_Collect_Check) {
+	x.xxx_hidden_Check = v
 }
 
-func (x *Query_Collect) SetEdits(v *Query_Collect_Edits) {
-	x.xxx_hidden_Edits = v
+func (x *Query_Collect) SetStage(v *Query_Collect_Stage) {
+	x.xxx_hidden_Stage = v
 }
 
-func (x *Query_Collect) HasData() bool {
+func (x *Query_Collect) HasCheck() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_Data != nil
+	return x.xxx_hidden_Check != nil
 }
 
-func (x *Query_Collect) HasEdits() bool {
+func (x *Query_Collect) HasStage() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_Edits != nil
+	return x.xxx_hidden_Stage != nil
 }
 
-func (x *Query_Collect) ClearData() {
-	x.xxx_hidden_Data = nil
+func (x *Query_Collect) ClearCheck() {
+	x.xxx_hidden_Check = nil
 }
 
-func (x *Query_Collect) ClearEdits() {
-	x.xxx_hidden_Edits = nil
+func (x *Query_Collect) ClearStage() {
+	x.xxx_hidden_Stage = nil
 }
 
 type Query_Collect_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Collect options/results/progress data.
-	Data *Query_Collect_Data
-	// Collect edit records.
-	Edits *Query_Collect_Edits
+	// Describes what data the caller wants to see for Checks.
+	Check *Query_Collect_Check
+	// Describes what data the caller wants to see for Stages.
+	Stage *Query_Collect_Stage
 }
 
 func (b0 Query_Collect_builder) Build() *Query_Collect {
 	m0 := &Query_Collect{}
 	b, x := &b0, m0
 	_, _ = b, x
-	x.xxx_hidden_Data = b.Data
-	x.xxx_hidden_Edits = b.Edits
+	x.xxx_hidden_Check = b.Check
+	x.xxx_hidden_Stage = b.Stage
 	return m0
 }
 
@@ -540,14 +540,16 @@ func (b0 Query_Select_WorkPlanConstraint_builder) Build() *Query_Select_WorkPlan
 
 // Select one or more Checks which match this pattern.
 type Query_Select_CheckPattern struct {
-	state                      protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Kind            CheckKind              `protobuf:"varint,1,opt,name=kind,proto3,enum=turboci.graph.orchestrator.v1.CheckKind,oneof"`
-	xxx_hidden_IdRegex         *string                `protobuf:"bytes,2,opt,name=id_regex,json=idRegex,proto3,oneof"`
-	xxx_hidden_WithOptionTypes []string               `protobuf:"bytes,3,rep,name=with_option_types,json=withOptionTypes,proto3"`
-	XXX_raceDetectHookData     protoimpl.RaceDetectHookData
-	XXX_presence               [1]uint32
-	unknownFields              protoimpl.UnknownFields
-	sizeCache                  protoimpl.SizeCache
+	state                          protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Kind                CheckKind              `protobuf:"varint,1,opt,name=kind,proto3,enum=turboci.graph.orchestrator.v1.CheckKind,oneof"`
+	xxx_hidden_IdRegex             *string                `protobuf:"bytes,2,opt,name=id_regex,json=idRegex,proto3,oneof"`
+	xxx_hidden_WithOptionTypes     []string               `protobuf:"bytes,3,rep,name=with_option_types,json=withOptionTypes,proto3"`
+	xxx_hidden_State               CheckState             `protobuf:"varint,4,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
+	xxx_hidden_WithResultDataTypes []string               `protobuf:"bytes,5,rep,name=with_result_data_types,json=withResultDataTypes,proto3"`
+	XXX_raceDetectHookData         protoimpl.RaceDetectHookData
+	XXX_presence                   [1]uint32
+	unknownFields                  protoimpl.UnknownFields
+	sizeCache                      protoimpl.SizeCache
 }
 
 func (x *Query_Select_CheckPattern) Reset() {
@@ -601,18 +603,43 @@ func (x *Query_Select_CheckPattern) GetWithOptionTypes() []string {
 	return nil
 }
 
+func (x *Query_Select_CheckPattern) GetState() CheckState {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 3) {
+			return x.xxx_hidden_State
+		}
+	}
+	return CheckState_CHECK_STATE_UNKNOWN
+}
+
+func (x *Query_Select_CheckPattern) GetWithResultDataTypes() []string {
+	if x != nil {
+		return x.xxx_hidden_WithResultDataTypes
+	}
+	return nil
+}
+
 func (x *Query_Select_CheckPattern) SetKind(v CheckKind) {
 	x.xxx_hidden_Kind = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 5)
 }
 
 func (x *Query_Select_CheckPattern) SetIdRegex(v string) {
 	x.xxx_hidden_IdRegex = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 5)
 }
 
 func (x *Query_Select_CheckPattern) SetWithOptionTypes(v []string) {
 	x.xxx_hidden_WithOptionTypes = v
+}
+
+func (x *Query_Select_CheckPattern) SetState(v CheckState) {
+	x.xxx_hidden_State = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 5)
+}
+
+func (x *Query_Select_CheckPattern) SetWithResultDataTypes(v []string) {
+	x.xxx_hidden_WithResultDataTypes = v
 }
 
 func (x *Query_Select_CheckPattern) HasKind() bool {
@@ -629,6 +656,13 @@ func (x *Query_Select_CheckPattern) HasIdRegex() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
+func (x *Query_Select_CheckPattern) HasState() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+}
+
 func (x *Query_Select_CheckPattern) ClearKind() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Kind = CheckKind_CHECK_KIND_UNKNOWN
@@ -639,6 +673,11 @@ func (x *Query_Select_CheckPattern) ClearIdRegex() {
 	x.xxx_hidden_IdRegex = nil
 }
 
+func (x *Query_Select_CheckPattern) ClearState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_State = CheckState_CHECK_STATE_UNKNOWN
+}
+
 type Query_Select_CheckPattern_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
@@ -647,9 +686,15 @@ type Query_Select_CheckPattern_builder struct {
 	// Find Checks whose `Identifier.Check.id` matches this re2 regex.
 	IdRegex *string
 	// Find Checks with *any* of these options. Note that you still must set
-	// follow.check_options.type_urls to actually get the CheckOptions in the
-	// result set.
+	// type_urls and collect.data.check.options to actually get the
+	// Check Option data in the result set.
 	WithOptionTypes []string
+	// Find Checks in this state.
+	State *CheckState
+	// Find Checks with *any* of these result data types. Note that you still
+	// must set type_urls and collect.data.check.result_data to actually get the
+	// Check Result data in the result set.
+	WithResultDataTypes []string
 }
 
 func (b0 Query_Select_CheckPattern_builder) Build() *Query_Select_CheckPattern {
@@ -657,14 +702,19 @@ func (b0 Query_Select_CheckPattern_builder) Build() *Query_Select_CheckPattern {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Kind != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 5)
 		x.xxx_hidden_Kind = *b.Kind
 	}
 	if b.IdRegex != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 5)
 		x.xxx_hidden_IdRegex = b.IdRegex
 	}
 	x.xxx_hidden_WithOptionTypes = b.WithOptionTypes
+	if b.State != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 5)
+		x.xxx_hidden_State = *b.State
+	}
+	x.xxx_hidden_WithResultDataTypes = b.WithResultDataTypes
 	return m0
 }
 
@@ -717,7 +767,7 @@ type Query_Expand_Dependencies struct {
 	state                        protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_DependentsDepth   int32                  `protobuf:"varint,1,opt,name=dependents_depth,json=dependentsDepth,proto3,oneof"`
 	xxx_hidden_DependenciesDepth int32                  `protobuf:"varint,2,opt,name=dependencies_depth,json=dependenciesDepth,proto3,oneof"`
-	xxx_hidden_OnlyResolved      bool                   `protobuf:"varint,3,opt,name=only_resolved,json=onlyResolved,proto3,oneof"`
+	xxx_hidden_Satisfied         bool                   `protobuf:"varint,3,opt,name=satisfied,proto3,oneof"`
 	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
 	XXX_presence                 [1]uint32
 	unknownFields                protoimpl.UnknownFields
@@ -763,9 +813,9 @@ func (x *Query_Expand_Dependencies) GetDependenciesDepth() int32 {
 	return 0
 }
 
-func (x *Query_Expand_Dependencies) GetOnlyResolved() bool {
+func (x *Query_Expand_Dependencies) GetSatisfied() bool {
 	if x != nil {
-		return x.xxx_hidden_OnlyResolved
+		return x.xxx_hidden_Satisfied
 	}
 	return false
 }
@@ -780,8 +830,8 @@ func (x *Query_Expand_Dependencies) SetDependenciesDepth(v int32) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
 }
 
-func (x *Query_Expand_Dependencies) SetOnlyResolved(v bool) {
-	x.xxx_hidden_OnlyResolved = v
+func (x *Query_Expand_Dependencies) SetSatisfied(v bool) {
+	x.xxx_hidden_Satisfied = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
 }
 
@@ -799,7 +849,7 @@ func (x *Query_Expand_Dependencies) HasDependenciesDepth() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *Query_Expand_Dependencies) HasOnlyResolved() bool {
+func (x *Query_Expand_Dependencies) HasSatisfied() bool {
 	if x == nil {
 		return false
 	}
@@ -816,9 +866,9 @@ func (x *Query_Expand_Dependencies) ClearDependenciesDepth() {
 	x.xxx_hidden_DependenciesDepth = 0
 }
 
-func (x *Query_Expand_Dependencies) ClearOnlyResolved() {
+func (x *Query_Expand_Dependencies) ClearSatisfied() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
-	x.xxx_hidden_OnlyResolved = false
+	x.xxx_hidden_Satisfied = false
 }
 
 type Query_Expand_Dependencies_builder struct {
@@ -838,8 +888,16 @@ type Query_Expand_Dependencies_builder struct {
 	//
 	// Must be >= 0.
 	DependenciesDepth *int32
-	// Includes only resolved edges during traversal.
-	OnlyResolved *bool
+	// If unset, includes all edges.
+	// If True, only includes resolved, satisfied, edges.
+	// If False, only includes resolved, unsatisfied, edges.
+	//
+	// NOTE: Edges which are frozen because they are part of a resolved
+	// EdgeGroup on a node will not show up as either true or false here, but
+	// will continue to show up with an unset `satisfied` filter.
+	//
+	// See the documentation on `EdgeGroup.resolution`.
+	Satisfied *bool
 }
 
 func (b0 Query_Expand_Dependencies_builder) Build() *Query_Expand_Dependencies {
@@ -854,270 +912,40 @@ func (b0 Query_Expand_Dependencies_builder) Build() *Query_Expand_Dependencies {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
 		x.xxx_hidden_DependenciesDepth = *b.DependenciesDepth
 	}
-	if b.OnlyResolved != nil {
+	if b.Satisfied != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
-		x.xxx_hidden_OnlyResolved = *b.OnlyResolved
-	}
-	return m0
-}
-
-// Data describes what options/results/progress data we want to retrieve
-// from the selected checks/stages.
-type Query_Collect_Data struct {
-	state            protoimpl.MessageState    `protogen:"opaque.v1"`
-	xxx_hidden_Check *Query_Collect_Data_Check `protobuf:"bytes,2,opt,name=check,proto3,oneof"`
-	xxx_hidden_Stage *Query_Collect_Data_Stage `protobuf:"bytes,3,opt,name=stage,proto3,oneof"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *Query_Collect_Data) Reset() {
-	*x = Query_Collect_Data{}
-	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Query_Collect_Data) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Query_Collect_Data) ProtoMessage() {}
-
-func (x *Query_Collect_Data) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *Query_Collect_Data) GetCheck() *Query_Collect_Data_Check {
-	if x != nil {
-		return x.xxx_hidden_Check
-	}
-	return nil
-}
-
-func (x *Query_Collect_Data) GetStage() *Query_Collect_Data_Stage {
-	if x != nil {
-		return x.xxx_hidden_Stage
-	}
-	return nil
-}
-
-func (x *Query_Collect_Data) SetCheck(v *Query_Collect_Data_Check) {
-	x.xxx_hidden_Check = v
-}
-
-func (x *Query_Collect_Data) SetStage(v *Query_Collect_Data_Stage) {
-	x.xxx_hidden_Stage = v
-}
-
-func (x *Query_Collect_Data) HasCheck() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Check != nil
-}
-
-func (x *Query_Collect_Data) HasStage() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Stage != nil
-}
-
-func (x *Query_Collect_Data) ClearCheck() {
-	x.xxx_hidden_Check = nil
-}
-
-func (x *Query_Collect_Data) ClearStage() {
-	x.xxx_hidden_Stage = nil
-}
-
-type Query_Collect_Data_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// Describes what data the caller wants to see for Checks.
-	Check *Query_Collect_Data_Check
-	// Describes what data the caller wants to see for Stages.
-	Stage *Query_Collect_Data_Stage
-}
-
-func (b0 Query_Collect_Data_builder) Build() *Query_Collect_Data {
-	m0 := &Query_Collect_Data{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_Check = b.Check
-	x.xxx_hidden_Stage = b.Stage
-	return m0
-}
-
-// Edits describes which edit records we want want to collect.
-type Query_Collect_Edits struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Range       *RevisionRange         `protobuf:"bytes,1,opt,name=range,proto3,oneof"`
-	xxx_hidden_Check       bool                   `protobuf:"varint,2,opt,name=check,proto3,oneof"`
-	xxx_hidden_Stage       bool                   `protobuf:"varint,3,opt,name=stage,proto3,oneof"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
-}
-
-func (x *Query_Collect_Edits) Reset() {
-	*x = Query_Collect_Edits{}
-	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Query_Collect_Edits) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Query_Collect_Edits) ProtoMessage() {}
-
-func (x *Query_Collect_Edits) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *Query_Collect_Edits) GetRange() *RevisionRange {
-	if x != nil {
-		return x.xxx_hidden_Range
-	}
-	return nil
-}
-
-func (x *Query_Collect_Edits) GetCheck() bool {
-	if x != nil {
-		return x.xxx_hidden_Check
-	}
-	return false
-}
-
-func (x *Query_Collect_Edits) GetStage() bool {
-	if x != nil {
-		return x.xxx_hidden_Stage
-	}
-	return false
-}
-
-func (x *Query_Collect_Edits) SetRange(v *RevisionRange) {
-	x.xxx_hidden_Range = v
-}
-
-func (x *Query_Collect_Edits) SetCheck(v bool) {
-	x.xxx_hidden_Check = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
-}
-
-func (x *Query_Collect_Edits) SetStage(v bool) {
-	x.xxx_hidden_Stage = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
-}
-
-func (x *Query_Collect_Edits) HasRange() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Range != nil
-}
-
-func (x *Query_Collect_Edits) HasCheck() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *Query_Collect_Edits) HasStage() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
-}
-
-func (x *Query_Collect_Edits) ClearRange() {
-	x.xxx_hidden_Range = nil
-}
-
-func (x *Query_Collect_Edits) ClearCheck() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Check = false
-}
-
-func (x *Query_Collect_Edits) ClearStage() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
-	x.xxx_hidden_Stage = false
-}
-
-type Query_Collect_Edits_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// Include edits only within this range of Revisions.
-	Range *RevisionRange
-	// Include Check Edits for any selected Checks in this range.
-	Check *bool
-	// Include Stage Edits for any selected Stages in this range.
-	Stage *bool
-}
-
-func (b0 Query_Collect_Edits_builder) Build() *Query_Collect_Edits {
-	m0 := &Query_Collect_Edits{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_Range = b.Range
-	if b.Check != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
-		x.xxx_hidden_Check = *b.Check
-	}
-	if b.Stage != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
-		x.xxx_hidden_Stage = *b.Stage
+		x.xxx_hidden_Satisfied = *b.Satisfied
 	}
 	return m0
 }
 
 // Describes what data the caller wants to see for Checks.
-type Query_Collect_Data_Check struct {
+type Query_Collect_Check struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Options     bool                   `protobuf:"varint,1,opt,name=options,proto3,oneof"`
 	xxx_hidden_ResultData  bool                   `protobuf:"varint,2,opt,name=result_data,json=resultData,proto3,oneof"`
+	xxx_hidden_Edits       *RevisionRange         `protobuf:"bytes,3,opt,name=edits,proto3,oneof"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
 
-func (x *Query_Collect_Data_Check) Reset() {
-	*x = Query_Collect_Data_Check{}
-	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[10]
+func (x *Query_Collect_Check) Reset() {
+	*x = Query_Collect_Check{}
+	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Query_Collect_Data_Check) String() string {
+func (x *Query_Collect_Check) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Query_Collect_Data_Check) ProtoMessage() {}
+func (*Query_Collect_Check) ProtoMessage() {}
 
-func (x *Query_Collect_Data_Check) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[10]
+func (x *Query_Collect_Check) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1128,100 +956,128 @@ func (x *Query_Collect_Data_Check) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *Query_Collect_Data_Check) GetOptions() bool {
+func (x *Query_Collect_Check) GetOptions() bool {
 	if x != nil {
 		return x.xxx_hidden_Options
 	}
 	return false
 }
 
-func (x *Query_Collect_Data_Check) GetResultData() bool {
+func (x *Query_Collect_Check) GetResultData() bool {
 	if x != nil {
 		return x.xxx_hidden_ResultData
 	}
 	return false
 }
 
-func (x *Query_Collect_Data_Check) SetOptions(v bool) {
+func (x *Query_Collect_Check) GetEdits() *RevisionRange {
+	if x != nil {
+		return x.xxx_hidden_Edits
+	}
+	return nil
+}
+
+func (x *Query_Collect_Check) SetOptions(v bool) {
 	x.xxx_hidden_Options = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
 }
 
-func (x *Query_Collect_Data_Check) SetResultData(v bool) {
+func (x *Query_Collect_Check) SetResultData(v bool) {
 	x.xxx_hidden_ResultData = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
 }
 
-func (x *Query_Collect_Data_Check) HasOptions() bool {
+func (x *Query_Collect_Check) SetEdits(v *RevisionRange) {
+	x.xxx_hidden_Edits = v
+}
+
+func (x *Query_Collect_Check) HasOptions() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *Query_Collect_Data_Check) HasResultData() bool {
+func (x *Query_Collect_Check) HasResultData() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *Query_Collect_Data_Check) ClearOptions() {
+func (x *Query_Collect_Check) HasEdits() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Edits != nil
+}
+
+func (x *Query_Collect_Check) ClearOptions() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Options = false
 }
 
-func (x *Query_Collect_Data_Check) ClearResultData() {
+func (x *Query_Collect_Check) ClearResultData() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
 	x.xxx_hidden_ResultData = false
 }
 
-type Query_Collect_Data_Check_builder struct {
+func (x *Query_Collect_Check) ClearEdits() {
+	x.xxx_hidden_Edits = nil
+}
+
+type Query_Collect_Check_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// Include CheckOptions filtered by `type_urls` for any selected Checks.
 	Options *bool
 	// Include Result data filtered by `type_urls` for any selected Checks.
 	ResultData *bool
+	// Include edits only within this range of Revisions.
+	//
+	// An empty RevisionRange (e.g. {0, 0}) means `all edits`.
+	Edits *RevisionRange
 }
 
-func (b0 Query_Collect_Data_Check_builder) Build() *Query_Collect_Data_Check {
-	m0 := &Query_Collect_Data_Check{}
+func (b0 Query_Collect_Check_builder) Build() *Query_Collect_Check {
+	m0 := &Query_Collect_Check{}
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Options != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
 		x.xxx_hidden_Options = *b.Options
 	}
 	if b.ResultData != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
 		x.xxx_hidden_ResultData = *b.ResultData
 	}
+	x.xxx_hidden_Edits = b.Edits
 	return m0
 }
 
 // Describes what data the caller wants to see for Stages.
-type Query_Collect_Data_Stage struct {
-	state         protoimpl.MessageState `protogen:"opaque.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+type Query_Collect_Stage struct {
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Edits *RevisionRange         `protobuf:"bytes,1,opt,name=edits,proto3,oneof"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
-func (x *Query_Collect_Data_Stage) Reset() {
-	*x = Query_Collect_Data_Stage{}
-	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[11]
+func (x *Query_Collect_Stage) Reset() {
+	*x = Query_Collect_Stage{}
+	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Query_Collect_Data_Stage) String() string {
+func (x *Query_Collect_Stage) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Query_Collect_Data_Stage) ProtoMessage() {}
+func (*Query_Collect_Stage) ProtoMessage() {}
 
-func (x *Query_Collect_Data_Stage) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[11]
+func (x *Query_Collect_Stage) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1232,15 +1088,42 @@ func (x *Query_Collect_Data_Stage) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-type Query_Collect_Data_Stage_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
+func (x *Query_Collect_Stage) GetEdits() *RevisionRange {
+	if x != nil {
+		return x.xxx_hidden_Edits
+	}
+	return nil
 }
 
-func (b0 Query_Collect_Data_Stage_builder) Build() *Query_Collect_Data_Stage {
-	m0 := &Query_Collect_Data_Stage{}
+func (x *Query_Collect_Stage) SetEdits(v *RevisionRange) {
+	x.xxx_hidden_Edits = v
+}
+
+func (x *Query_Collect_Stage) HasEdits() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Edits != nil
+}
+
+func (x *Query_Collect_Stage) ClearEdits() {
+	x.xxx_hidden_Edits = nil
+}
+
+type Query_Collect_Stage_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Include edits only within this range of Revisions.
+	//
+	// An empty RevisionRange (e.g. {0, 0}) means `all edits`.
+	Edits *RevisionRange
+}
+
+func (b0 Query_Collect_Stage_builder) Build() *Query_Collect_Stage {
+	m0 := &Query_Collect_Stage{}
 	b, x := &b0, m0
 	_, _ = b, x
+	x.xxx_hidden_Edits = b.Edits
 	return m0
 }
 
@@ -1248,12 +1131,12 @@ var File_turboci_graph_orchestrator_v1_query_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_query_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/query.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a2turboci/graph/orchestrator/v1/revision_range.proto\"\xbc\x0f\n" +
+	")turboci/graph/orchestrator/v1/query.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a2turboci/graph/orchestrator/v1/revision_range.proto\"\xf5\x0e\n" +
 	"\x05Query\x12\x1b\n" +
 	"\ttype_urls\x18\x01 \x03(\tR\btypeUrls\x12H\n" +
 	"\x06select\x18\x02 \x01(\v2+.turboci.graph.orchestrator.v1.Query.SelectH\x00R\x06select\x88\x01\x01\x12H\n" +
 	"\x06expand\x18\x03 \x01(\v2+.turboci.graph.orchestrator.v1.Query.ExpandH\x01R\x06expand\x88\x01\x01\x12K\n" +
-	"\acollect\x18\x04 \x01(\v2,.turboci.graph.orchestrator.v1.Query.CollectH\x02R\acollect\x88\x01\x01\x1a\x9d\x05\n" +
+	"\acollect\x18\x04 \x01(\v2,.turboci.graph.orchestrator.v1.Query.CollectH\x02R\acollect\x88\x01\x01\x1a\xa2\x06\n" +
 	"\x06Select\x12_\n" +
 	"\bworkplan\x18\x01 \x01(\v2>.turboci.graph.orchestrator.v1.Query.Select.WorkPlanConstraintH\x00R\bworkplan\x88\x01\x01\x12D\n" +
 	"\x05nodes\x18\x02 \x03(\v2 .turboci.graph.ids.v1.IdentifierB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
@@ -1261,56 +1144,52 @@ const file_turboci_graph_orchestrator_v1_query_proto_rawDesc = "" +
 	"\x0echeck_patterns\x18\x03 \x03(\v28.turboci.graph.orchestrator.v1.Query.Select.CheckPatternR\rcheckPatterns\x12_\n" +
 	"\x0estage_patterns\x18\x04 \x03(\v28.turboci.graph.orchestrator.v1.Query.Select.StagePatternR\rstagePatterns\x1aW\n" +
 	"\x12WorkPlanConstraint\x12A\n" +
-	"\fin_workplans\x18\x01 \x03(\v2\x1e.turboci.graph.ids.v1.WorkPlanR\vinWorkplans\x1a\xb3\x01\n" +
+	"\fin_workplans\x18\x01 \x03(\v2\x1e.turboci.graph.ids.v1.WorkPlanR\vinWorkplans\x1a\xb8\x02\n" +
 	"\fCheckPattern\x12A\n" +
 	"\x04kind\x18\x01 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindH\x00R\x04kind\x88\x01\x01\x12\x1e\n" +
 	"\bid_regex\x18\x02 \x01(\tH\x01R\aidRegex\x88\x01\x01\x12*\n" +
-	"\x11with_option_types\x18\x03 \x03(\tR\x0fwithOptionTypesB\a\n" +
+	"\x11with_option_types\x18\x03 \x03(\tR\x0fwithOptionTypes\x12D\n" +
+	"\x05state\x18\x04 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x02R\x05state\x88\x01\x01\x123\n" +
+	"\x16with_result_data_types\x18\x05 \x03(\tR\x13withResultDataTypesB\a\n" +
 	"\x05_kindB\v\n" +
-	"\t_id_regex\x1a\x0e\n" +
+	"\t_id_regexB\b\n" +
+	"\x06_state\x1a\x0e\n" +
 	"\fStagePatternB\v\n" +
-	"\t_workplan\x1a\xd9\x02\n" +
+	"\t_workplan\x1a\xce\x02\n" +
 	"\x06Expand\x12a\n" +
-	"\fdependencies\x18\x01 \x01(\v28.turboci.graph.orchestrator.v1.Query.Expand.DependenciesH\x00R\fdependencies\x88\x01\x01\x1a\xda\x01\n" +
+	"\fdependencies\x18\x01 \x01(\v28.turboci.graph.orchestrator.v1.Query.Expand.DependenciesH\x00R\fdependencies\x88\x01\x01\x1a\xcf\x01\n" +
 	"\fDependencies\x12.\n" +
 	"\x10dependents_depth\x18\x01 \x01(\x05H\x00R\x0fdependentsDepth\x88\x01\x01\x122\n" +
-	"\x12dependencies_depth\x18\x02 \x01(\x05H\x01R\x11dependenciesDepth\x88\x01\x01\x12(\n" +
-	"\ronly_resolved\x18\x03 \x01(\bH\x02R\fonlyResolved\x88\x01\x01B\x13\n" +
+	"\x12dependencies_depth\x18\x02 \x01(\x05H\x01R\x11dependenciesDepth\x88\x01\x01\x12!\n" +
+	"\tsatisfied\x18\x03 \x01(\bH\x02R\tsatisfied\x88\x01\x01B\x13\n" +
 	"\x11_dependents_depthB\x15\n" +
-	"\x13_dependencies_depthB\x10\n" +
-	"\x0e_only_resolvedB\x0f\n" +
-	"\r_dependencies\x1a\x96\x05\n" +
-	"\aCollect\x12J\n" +
-	"\x04data\x18\x01 \x01(\v21.turboci.graph.orchestrator.v1.Query.Collect.DataH\x00R\x04data\x88\x01\x01\x12M\n" +
-	"\x05edits\x18\x02 \x01(\v22.turboci.graph.orchestrator.v1.Query.Collect.EditsH\x01R\x05edits\x88\x01\x01\x1a\xb5\x02\n" +
-	"\x04Data\x12R\n" +
-	"\x05check\x18\x02 \x01(\v27.turboci.graph.orchestrator.v1.Query.Collect.Data.CheckH\x00R\x05check\x88\x01\x01\x12R\n" +
-	"\x05stage\x18\x03 \x01(\v27.turboci.graph.orchestrator.v1.Query.Collect.Data.StageH\x01R\x05stage\x88\x01\x01\x1ah\n" +
+	"\x13_dependencies_depthB\f\n" +
+	"\n" +
+	"_satisfiedB\x0f\n" +
+	"\r_dependencies\x1a\xd5\x03\n" +
+	"\aCollect\x12M\n" +
+	"\x05check\x18\x01 \x01(\v22.turboci.graph.orchestrator.v1.Query.Collect.CheckH\x00R\x05check\x88\x01\x01\x12M\n" +
+	"\x05stage\x18\x02 \x01(\v22.turboci.graph.orchestrator.v1.Query.Collect.StageH\x01R\x05stage\x88\x01\x01\x1a\xbb\x01\n" +
 	"\x05Check\x12\x1d\n" +
 	"\aoptions\x18\x01 \x01(\bH\x00R\aoptions\x88\x01\x01\x12$\n" +
 	"\vresult_data\x18\x02 \x01(\bH\x01R\n" +
-	"resultData\x88\x01\x01B\n" +
+	"resultData\x88\x01\x01\x12G\n" +
+	"\x05edits\x18\x03 \x01(\v2,.turboci.graph.orchestrator.v1.RevisionRangeH\x02R\x05edits\x88\x01\x01B\n" +
 	"\n" +
 	"\b_optionsB\x0e\n" +
-	"\f_result_data\x1a\a\n" +
-	"\x05StageB\b\n" +
+	"\f_result_dataB\b\n" +
+	"\x06_edits\x1aZ\n" +
+	"\x05Stage\x12G\n" +
+	"\x05edits\x18\x01 \x01(\v2,.turboci.graph.orchestrator.v1.RevisionRangeH\x00R\x05edits\x88\x01\x01B\b\n" +
+	"\x06_editsB\b\n" +
 	"\x06_checkB\b\n" +
-	"\x06_stage\x1a\xa4\x01\n" +
-	"\x05Edits\x12G\n" +
-	"\x05range\x18\x01 \x01(\v2,.turboci.graph.orchestrator.v1.RevisionRangeH\x00R\x05range\x88\x01\x01\x12\x19\n" +
-	"\x05check\x18\x02 \x01(\bH\x01R\x05check\x88\x01\x01\x12\x19\n" +
-	"\x05stage\x18\x03 \x01(\bH\x02R\x05stage\x88\x01\x01B\b\n" +
-	"\x06_rangeB\b\n" +
-	"\x06_checkB\b\n" +
-	"\x06_stageB\a\n" +
-	"\x05_dataB\b\n" +
-	"\x06_editsB\t\n" +
+	"\x06_stageB\t\n" +
 	"\a_selectB\t\n" +
 	"\a_expandB\n" +
 	"\n" +
 	"\b_collectBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_query_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_turboci_graph_orchestrator_v1_query_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_turboci_graph_orchestrator_v1_query_proto_goTypes = []any{
 	(*Query)(nil),                           // 0: turboci.graph.orchestrator.v1.Query
 	(*Query_Select)(nil),                    // 1: turboci.graph.orchestrator.v1.Query.Select
@@ -1320,31 +1199,30 @@ var file_turboci_graph_orchestrator_v1_query_proto_goTypes = []any{
 	(*Query_Select_CheckPattern)(nil),       // 5: turboci.graph.orchestrator.v1.Query.Select.CheckPattern
 	(*Query_Select_StagePattern)(nil),       // 6: turboci.graph.orchestrator.v1.Query.Select.StagePattern
 	(*Query_Expand_Dependencies)(nil),       // 7: turboci.graph.orchestrator.v1.Query.Expand.Dependencies
-	(*Query_Collect_Data)(nil),              // 8: turboci.graph.orchestrator.v1.Query.Collect.Data
-	(*Query_Collect_Edits)(nil),             // 9: turboci.graph.orchestrator.v1.Query.Collect.Edits
-	(*Query_Collect_Data_Check)(nil),        // 10: turboci.graph.orchestrator.v1.Query.Collect.Data.Check
-	(*Query_Collect_Data_Stage)(nil),        // 11: turboci.graph.orchestrator.v1.Query.Collect.Data.Stage
-	(*v1.Identifier)(nil),                   // 12: turboci.graph.ids.v1.Identifier
-	(*v1.WorkPlan)(nil),                     // 13: turboci.graph.ids.v1.WorkPlan
-	(CheckKind)(0),                          // 14: turboci.graph.orchestrator.v1.CheckKind
-	(*RevisionRange)(nil),                   // 15: turboci.graph.orchestrator.v1.RevisionRange
+	(*Query_Collect_Check)(nil),             // 8: turboci.graph.orchestrator.v1.Query.Collect.Check
+	(*Query_Collect_Stage)(nil),             // 9: turboci.graph.orchestrator.v1.Query.Collect.Stage
+	(*v1.Identifier)(nil),                   // 10: turboci.graph.ids.v1.Identifier
+	(*v1.WorkPlan)(nil),                     // 11: turboci.graph.ids.v1.WorkPlan
+	(CheckKind)(0),                          // 12: turboci.graph.orchestrator.v1.CheckKind
+	(CheckState)(0),                         // 13: turboci.graph.orchestrator.v1.CheckState
+	(*RevisionRange)(nil),                   // 14: turboci.graph.orchestrator.v1.RevisionRange
 }
 var file_turboci_graph_orchestrator_v1_query_proto_depIdxs = []int32{
 	1,  // 0: turboci.graph.orchestrator.v1.Query.select:type_name -> turboci.graph.orchestrator.v1.Query.Select
 	2,  // 1: turboci.graph.orchestrator.v1.Query.expand:type_name -> turboci.graph.orchestrator.v1.Query.Expand
 	3,  // 2: turboci.graph.orchestrator.v1.Query.collect:type_name -> turboci.graph.orchestrator.v1.Query.Collect
 	4,  // 3: turboci.graph.orchestrator.v1.Query.Select.workplan:type_name -> turboci.graph.orchestrator.v1.Query.Select.WorkPlanConstraint
-	12, // 4: turboci.graph.orchestrator.v1.Query.Select.nodes:type_name -> turboci.graph.ids.v1.Identifier
+	10, // 4: turboci.graph.orchestrator.v1.Query.Select.nodes:type_name -> turboci.graph.ids.v1.Identifier
 	5,  // 5: turboci.graph.orchestrator.v1.Query.Select.check_patterns:type_name -> turboci.graph.orchestrator.v1.Query.Select.CheckPattern
 	6,  // 6: turboci.graph.orchestrator.v1.Query.Select.stage_patterns:type_name -> turboci.graph.orchestrator.v1.Query.Select.StagePattern
 	7,  // 7: turboci.graph.orchestrator.v1.Query.Expand.dependencies:type_name -> turboci.graph.orchestrator.v1.Query.Expand.Dependencies
-	8,  // 8: turboci.graph.orchestrator.v1.Query.Collect.data:type_name -> turboci.graph.orchestrator.v1.Query.Collect.Data
-	9,  // 9: turboci.graph.orchestrator.v1.Query.Collect.edits:type_name -> turboci.graph.orchestrator.v1.Query.Collect.Edits
-	13, // 10: turboci.graph.orchestrator.v1.Query.Select.WorkPlanConstraint.in_workplans:type_name -> turboci.graph.ids.v1.WorkPlan
-	14, // 11: turboci.graph.orchestrator.v1.Query.Select.CheckPattern.kind:type_name -> turboci.graph.orchestrator.v1.CheckKind
-	10, // 12: turboci.graph.orchestrator.v1.Query.Collect.Data.check:type_name -> turboci.graph.orchestrator.v1.Query.Collect.Data.Check
-	11, // 13: turboci.graph.orchestrator.v1.Query.Collect.Data.stage:type_name -> turboci.graph.orchestrator.v1.Query.Collect.Data.Stage
-	15, // 14: turboci.graph.orchestrator.v1.Query.Collect.Edits.range:type_name -> turboci.graph.orchestrator.v1.RevisionRange
+	8,  // 8: turboci.graph.orchestrator.v1.Query.Collect.check:type_name -> turboci.graph.orchestrator.v1.Query.Collect.Check
+	9,  // 9: turboci.graph.orchestrator.v1.Query.Collect.stage:type_name -> turboci.graph.orchestrator.v1.Query.Collect.Stage
+	11, // 10: turboci.graph.orchestrator.v1.Query.Select.WorkPlanConstraint.in_workplans:type_name -> turboci.graph.ids.v1.WorkPlan
+	12, // 11: turboci.graph.orchestrator.v1.Query.Select.CheckPattern.kind:type_name -> turboci.graph.orchestrator.v1.CheckKind
+	13, // 12: turboci.graph.orchestrator.v1.Query.Select.CheckPattern.state:type_name -> turboci.graph.orchestrator.v1.CheckState
+	14, // 13: turboci.graph.orchestrator.v1.Query.Collect.Check.edits:type_name -> turboci.graph.orchestrator.v1.RevisionRange
+	14, // 14: turboci.graph.orchestrator.v1.Query.Collect.Stage.edits:type_name -> turboci.graph.orchestrator.v1.RevisionRange
 	15, // [15:15] is the sub-list for method output_type
 	15, // [15:15] is the sub-list for method input_type
 	15, // [15:15] is the sub-list for extension type_name
@@ -1358,6 +1236,7 @@ func file_turboci_graph_orchestrator_v1_query_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_check_kind_proto_init()
+	file_turboci_graph_orchestrator_v1_check_state_proto_init()
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_range_proto_init()
 	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[0].OneofWrappers = []any{}
@@ -1368,14 +1247,13 @@ func file_turboci_graph_orchestrator_v1_query_proto_init() {
 	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[7].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[8].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[9].OneofWrappers = []any{}
-	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[10].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_query_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_query_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

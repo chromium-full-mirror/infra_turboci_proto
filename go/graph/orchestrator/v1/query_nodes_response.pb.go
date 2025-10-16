@@ -11,6 +11,7 @@
 package orchestratorpb
 
 import (
+	v1 "go.chromium.org/turboci/proto/go/graph/ids/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -26,10 +27,11 @@ const (
 
 // Response message for TurboCIGraphService.QueryNodes.
 type QueryNodesResponse struct {
-	state            protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Graph *GraphView             `protobuf:"bytes,1,opt,name=graph,proto3,oneof"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Graph  *GraphView             `protobuf:"bytes,1,opt,name=graph,proto3,oneof"`
+	xxx_hidden_Absent *[]*v1.Identifier      `protobuf:"bytes,2,rep,name=absent,proto3"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *QueryNodesResponse) Reset() {
@@ -64,8 +66,21 @@ func (x *QueryNodesResponse) GetGraph() *GraphView {
 	return nil
 }
 
+func (x *QueryNodesResponse) GetAbsent() []*v1.Identifier {
+	if x != nil {
+		if x.xxx_hidden_Absent != nil {
+			return *x.xxx_hidden_Absent
+		}
+	}
+	return nil
+}
+
 func (x *QueryNodesResponse) SetGraph(v *GraphView) {
 	x.xxx_hidden_Graph = v
+}
+
+func (x *QueryNodesResponse) SetAbsent(v []*v1.Identifier) {
+	x.xxx_hidden_Absent = &v
 }
 
 func (x *QueryNodesResponse) HasGraph() bool {
@@ -84,6 +99,8 @@ type QueryNodesResponse_builder struct {
 
 	// The graph view of the nodes matching the query.
 	Graph *GraphView
+	// A list of explicitly-selected nodes which were not found in the graph.
+	Absent []*v1.Identifier
 }
 
 func (b0 QueryNodesResponse_builder) Build() *QueryNodesResponse {
@@ -91,6 +108,7 @@ func (b0 QueryNodesResponse_builder) Build() *QueryNodesResponse {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Graph = b.Graph
+	x.xxx_hidden_Absent = &b.Absent
 	return m0
 }
 
@@ -98,23 +116,26 @@ var File_turboci_graph_orchestrator_v1_query_nodes_response_proto protoreflect.F
 
 const file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDesc = "" +
 	"\n" +
-	"8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a.turboci/graph/orchestrator/v1/graph_view.proto\"c\n" +
+	"8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/graph_view.proto\"\x9d\x01\n" +
 	"\x12QueryNodesResponse\x12C\n" +
-	"\x05graph\x18\x01 \x01(\v2(.turboci.graph.orchestrator.v1.GraphViewH\x00R\x05graph\x88\x01\x01B\b\n" +
+	"\x05graph\x18\x01 \x01(\v2(.turboci.graph.orchestrator.v1.GraphViewH\x00R\x05graph\x88\x01\x01\x128\n" +
+	"\x06absent\x18\x02 \x03(\v2 .turboci.graph.ids.v1.IdentifierR\x06absentB\b\n" +
 	"\x06_graphBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_goTypes = []any{
 	(*QueryNodesResponse)(nil), // 0: turboci.graph.orchestrator.v1.QueryNodesResponse
 	(*GraphView)(nil),          // 1: turboci.graph.orchestrator.v1.GraphView
+	(*v1.Identifier)(nil),      // 2: turboci.graph.ids.v1.Identifier
 }
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_depIdxs = []int32{
 	1, // 0: turboci.graph.orchestrator.v1.QueryNodesResponse.graph:type_name -> turboci.graph.orchestrator.v1.GraphView
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 1: turboci.graph.orchestrator.v1.QueryNodesResponse.absent:type_name -> turboci.graph.ids.v1.Identifier
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_query_nodes_response_proto_init() }

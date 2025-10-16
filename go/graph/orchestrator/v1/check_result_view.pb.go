@@ -11,6 +11,7 @@
 package orchestratorpb
 
 import (
+	v1 "go.chromium.org/turboci/proto/go/graph/ids/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -26,10 +27,11 @@ const (
 
 // A view of the data for a single Check.Result.
 type CheckResultView struct {
-	state           protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Data *[]*Datum              `protobuf:"bytes,1,rep,name=data,proto3"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier *v1.CheckResult        `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Data       *[]*Datum              `protobuf:"bytes,2,rep,name=data,proto3"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *CheckResultView) Reset() {
@@ -57,6 +59,13 @@ func (x *CheckResultView) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
+func (x *CheckResultView) GetIdentifier() *v1.CheckResult {
+	if x != nil {
+		return x.xxx_hidden_Identifier
+	}
+	return nil
+}
+
 func (x *CheckResultView) GetData() []*Datum {
 	if x != nil {
 		if x.xxx_hidden_Data != nil {
@@ -66,13 +75,30 @@ func (x *CheckResultView) GetData() []*Datum {
 	return nil
 }
 
+func (x *CheckResultView) SetIdentifier(v *v1.CheckResult) {
+	x.xxx_hidden_Identifier = v
+}
+
 func (x *CheckResultView) SetData(v []*Datum) {
 	x.xxx_hidden_Data = &v
+}
+
+func (x *CheckResultView) HasIdentifier() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Identifier != nil
+}
+
+func (x *CheckResultView) ClearIdentifier() {
+	x.xxx_hidden_Identifier = nil
 }
 
 type CheckResultView_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
+	// Which CheckResult this belongs to.
+	Identifier *v1.CheckResult
 	// The current data for each data type in this Result.
 	Data []*Datum
 }
@@ -81,6 +107,7 @@ func (b0 CheckResultView_builder) Build() *CheckResultView {
 	m0 := &CheckResultView{}
 	b, x := &b0, m0
 	_, _ = b, x
+	x.xxx_hidden_Identifier = b.Identifier
 	x.xxx_hidden_Data = &b.Data
 	return m0
 }
@@ -89,22 +116,28 @@ var File_turboci_graph_orchestrator_v1_check_result_view_proto protoreflect.File
 
 const file_turboci_graph_orchestrator_v1_check_result_view_proto_rawDesc = "" +
 	"\n" +
-	"5turboci/graph/orchestrator/v1/check_result_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/datum.proto\"K\n" +
-	"\x0fCheckResultView\x128\n" +
-	"\x04data\x18\x01 \x03(\v2$.turboci.graph.orchestrator.v1.DatumR\x04dataBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"5turboci/graph/orchestrator/v1/check_result_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/datum.proto\"\xa2\x01\n" +
+	"\x0fCheckResultView\x12F\n" +
+	"\n" +
+	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckResultH\x00R\n" +
+	"identifier\x88\x01\x01\x128\n" +
+	"\x04data\x18\x02 \x03(\v2$.turboci.graph.orchestrator.v1.DatumR\x04dataB\r\n" +
+	"\v_identifierBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_check_result_view_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_check_result_view_proto_goTypes = []any{
 	(*CheckResultView)(nil), // 0: turboci.graph.orchestrator.v1.CheckResultView
-	(*Datum)(nil),           // 1: turboci.graph.orchestrator.v1.Datum
+	(*v1.CheckResult)(nil),  // 1: turboci.graph.ids.v1.CheckResult
+	(*Datum)(nil),           // 2: turboci.graph.orchestrator.v1.Datum
 }
 var file_turboci_graph_orchestrator_v1_check_result_view_proto_depIdxs = []int32{
-	1, // 0: turboci.graph.orchestrator.v1.CheckResultView.data:type_name -> turboci.graph.orchestrator.v1.Datum
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	1, // 0: turboci.graph.orchestrator.v1.CheckResultView.identifier:type_name -> turboci.graph.ids.v1.CheckResult
+	2, // 1: turboci.graph.orchestrator.v1.CheckResultView.data:type_name -> turboci.graph.orchestrator.v1.Datum
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_check_result_view_proto_init() }
@@ -113,6 +146,7 @@ func file_turboci_graph_orchestrator_v1_check_result_view_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_datum_proto_init()
+	file_turboci_graph_orchestrator_v1_check_result_view_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

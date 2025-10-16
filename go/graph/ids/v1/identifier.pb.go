@@ -1124,7 +1124,7 @@ func (b0 CheckResultDatum_builder) Build() *CheckResultDatum {
 // Serialized as "<check>:E<version>".
 //
 // E.g.
-// "L<check.work_plan.id>:C<check.id>:ET<version.ts.seconds>/<version.ts.nanos>"
+// "L<check.work_plan.id>:C<check.id>:V<version.seconds>/<version.nanos>"
 type CheckEdit struct {
 	state              protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Check   *Check                 `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
@@ -1222,21 +1222,21 @@ func (b0 CheckEdit_builder) Build() *CheckEdit {
 
 // Identifies a CheckEditOption within a WorkPlan.
 //
-// Serialized as "<check_edit>:D<idx>".
+// Serialized as "<check_edit>:O<idx>".
 //
 // E.g.
-// "L<check_edit.check.work_plan.id>:C<check_edit.check.id>:ET<check_edit.version.ts.seconds>/<check_edit.version.ts.nanos>:D<idx>"
+// "L<check_edit.check.work_plan.id>:C<check_edit.check.id>:V<check_edit.version.seconds>/<check_edit.version.nanos>:D<idx>"
 //
 // This is separate from `CheckEdit` because it may reside in a different
 // realm than the CheckEdit itself.
 type CheckEditOption struct {
-	state                           protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_CheckEdit            *CheckEdit             `protobuf:"bytes,1,opt,name=check_edit,json=checkEdit,proto3,oneof"`
-	xxx_hidden_CheckDeltaOptionsIdx int32                  `protobuf:"varint,2,opt,name=check_delta_options_idx,json=checkDeltaOptionsIdx,proto3,oneof"`
-	XXX_raceDetectHookData          protoimpl.RaceDetectHookData
-	XXX_presence                    [1]uint32
-	unknownFields                   protoimpl.UnknownFields
-	sizeCache                       protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_CheckEdit   *CheckEdit             `protobuf:"bytes,1,opt,name=check_edit,json=checkEdit,proto3,oneof"`
+	xxx_hidden_Idx         int32                  `protobuf:"varint,2,opt,name=idx,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *CheckEditOption) Reset() {
@@ -1271,9 +1271,9 @@ func (x *CheckEditOption) GetCheckEdit() *CheckEdit {
 	return nil
 }
 
-func (x *CheckEditOption) GetCheckDeltaOptionsIdx() int32 {
+func (x *CheckEditOption) GetIdx() int32 {
 	if x != nil {
-		return x.xxx_hidden_CheckDeltaOptionsIdx
+		return x.xxx_hidden_Idx
 	}
 	return 0
 }
@@ -1282,8 +1282,8 @@ func (x *CheckEditOption) SetCheckEdit(v *CheckEdit) {
 	x.xxx_hidden_CheckEdit = v
 }
 
-func (x *CheckEditOption) SetCheckDeltaOptionsIdx(v int32) {
-	x.xxx_hidden_CheckDeltaOptionsIdx = v
+func (x *CheckEditOption) SetIdx(v int32) {
+	x.xxx_hidden_Idx = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
 }
 
@@ -1294,7 +1294,7 @@ func (x *CheckEditOption) HasCheckEdit() bool {
 	return x.xxx_hidden_CheckEdit != nil
 }
 
-func (x *CheckEditOption) HasCheckDeltaOptionsIdx() bool {
+func (x *CheckEditOption) HasIdx() bool {
 	if x == nil {
 		return false
 	}
@@ -1305,9 +1305,9 @@ func (x *CheckEditOption) ClearCheckEdit() {
 	x.xxx_hidden_CheckEdit = nil
 }
 
-func (x *CheckEditOption) ClearCheckDeltaOptionsIdx() {
+func (x *CheckEditOption) ClearIdx() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_CheckDeltaOptionsIdx = 0
+	x.xxx_hidden_Idx = 0
 }
 
 type CheckEditOption_builder struct {
@@ -1315,11 +1315,10 @@ type CheckEditOption_builder struct {
 
 	// The check that this edit belongs to.
 	CheckEdit *CheckEdit
-	// The 1-based index of this datum within the Edit.check.delta.options
-	// list.
+	// The 1-based index of this datum within the check.options list.
 	//
 	// This is 1-based to distinguish it from 0/unset (which is invalid).
-	CheckDeltaOptionsIdx *int32
+	Idx *int32
 }
 
 func (b0 CheckEditOption_builder) Build() *CheckEditOption {
@@ -1327,9 +1326,9 @@ func (b0 CheckEditOption_builder) Build() *CheckEditOption {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_CheckEdit = b.CheckEdit
-	if b.CheckDeltaOptionsIdx != nil {
+	if b.Idx != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
-		x.xxx_hidden_CheckDeltaOptionsIdx = *b.CheckDeltaOptionsIdx
+		x.xxx_hidden_Idx = *b.Idx
 	}
 	return m0
 }
@@ -1491,7 +1490,7 @@ func (b0 Stage_builder) Build() *Stage {
 type StageAttempt struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Stage       *Stage                 `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`
-	xxx_hidden_AttemptsIdx int32                  `protobuf:"varint,2,opt,name=attempts_idx,json=attemptsIdx,proto3,oneof"`
+	xxx_hidden_Idx         int32                  `protobuf:"varint,2,opt,name=idx,proto3,oneof"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -1530,9 +1529,9 @@ func (x *StageAttempt) GetStage() *Stage {
 	return nil
 }
 
-func (x *StageAttempt) GetAttemptsIdx() int32 {
+func (x *StageAttempt) GetIdx() int32 {
 	if x != nil {
-		return x.xxx_hidden_AttemptsIdx
+		return x.xxx_hidden_Idx
 	}
 	return 0
 }
@@ -1541,8 +1540,8 @@ func (x *StageAttempt) SetStage(v *Stage) {
 	x.xxx_hidden_Stage = v
 }
 
-func (x *StageAttempt) SetAttemptsIdx(v int32) {
-	x.xxx_hidden_AttemptsIdx = v
+func (x *StageAttempt) SetIdx(v int32) {
+	x.xxx_hidden_Idx = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
 }
 
@@ -1553,7 +1552,7 @@ func (x *StageAttempt) HasStage() bool {
 	return x.xxx_hidden_Stage != nil
 }
 
-func (x *StageAttempt) HasAttemptsIdx() bool {
+func (x *StageAttempt) HasIdx() bool {
 	if x == nil {
 		return false
 	}
@@ -1564,9 +1563,9 @@ func (x *StageAttempt) ClearStage() {
 	x.xxx_hidden_Stage = nil
 }
 
-func (x *StageAttempt) ClearAttemptsIdx() {
+func (x *StageAttempt) ClearIdx() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_AttemptsIdx = 0
+	x.xxx_hidden_Idx = 0
 }
 
 type StageAttempt_builder struct {
@@ -1577,7 +1576,7 @@ type StageAttempt_builder struct {
 	// The 1-based index of this attempt within the Stage.attempts list.
 	//
 	// This is 1-based to distinguish it from 0/unset (which is invalid).
-	AttemptsIdx *int32
+	Idx *int32
 }
 
 func (b0 StageAttempt_builder) Build() *StageAttempt {
@@ -1585,9 +1584,9 @@ func (b0 StageAttempt_builder) Build() *StageAttempt {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Stage = b.Stage
-	if b.AttemptsIdx != nil {
+	if b.Idx != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
-		x.xxx_hidden_AttemptsIdx = *b.AttemptsIdx
+		x.xxx_hidden_Idx = *b.Idx
 	}
 	return m0
 }
@@ -1597,7 +1596,7 @@ func (b0 StageAttempt_builder) Build() *StageAttempt {
 // Serialized as "<stage>:E<version>".
 //
 // E.g.
-// "<stage.work_plan.id>:<stage.id>:ET<version.ts.seconds>/<version.ts.nanos>"
+// "<stage.work_plan.id>:<stage.id>:V<version.seconds>/<version.nanos>"
 type StageEdit struct {
 	state              protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Stage   *Stage                 `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`
@@ -1743,24 +1742,24 @@ const file_turboci_graph_ids_v1_identifier_proto_rawDesc = "" +
 	"\aversion\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\aversion\x88\x01\x01B\b\n" +
 	"\x06_checkB\n" +
 	"\n" +
-	"\b_version\"\xbd\x01\n" +
+	"\b_version\"\x84\x01\n" +
 	"\x0fCheckEditOption\x12C\n" +
 	"\n" +
-	"check_edit\x18\x01 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\tcheckEdit\x88\x01\x01\x12:\n" +
-	"\x17check_delta_options_idx\x18\x02 \x01(\x05H\x01R\x14checkDeltaOptionsIdx\x88\x01\x01B\r\n" +
-	"\v_check_editB\x1a\n" +
-	"\x18_check_delta_options_idx\"s\n" +
+	"check_edit\x18\x01 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\tcheckEdit\x88\x01\x01\x12\x15\n" +
+	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\r\n" +
+	"\v_check_editB\x06\n" +
+	"\x04_idx\"s\n" +
 	"\x05Stage\x12@\n" +
 	"\twork_plan\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x00R\bworkPlan\x88\x01\x01\x12\x13\n" +
 	"\x02id\x18\x03 \x01(\tH\x01R\x02id\x88\x01\x01B\f\n" +
 	"\n" +
 	"_work_planB\x05\n" +
-	"\x03_id\"\x89\x01\n" +
+	"\x03_id\"o\n" +
 	"\fStageAttempt\x126\n" +
-	"\x05stage\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageH\x00R\x05stage\x88\x01\x01\x12&\n" +
-	"\fattempts_idx\x18\x02 \x01(\x05H\x01R\vattemptsIdx\x88\x01\x01B\b\n" +
-	"\x06_stageB\x0f\n" +
-	"\r_attempts_idx\"\x94\x01\n" +
+	"\x05stage\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageH\x00R\x05stage\x88\x01\x01\x12\x15\n" +
+	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\b\n" +
+	"\x06_stageB\x06\n" +
+	"\x04_idx\"\x94\x01\n" +
 	"\tStageEdit\x126\n" +
 	"\x05stage\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageH\x00R\x05stage\x88\x01\x01\x129\n" +
 	"\aversion\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\aversion\x88\x01\x01B\b\n" +
