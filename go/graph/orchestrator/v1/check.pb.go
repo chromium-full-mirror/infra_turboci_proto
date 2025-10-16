@@ -288,11 +288,13 @@ type Check_builder struct {
 	State *CheckState
 	// Dependencies on other objects in the graph.
 	//
-	// All of these dependencies must be satisfied for this Check to be unblocked
-	// and advance from the PLANNED to WAITING state.
+	// All of these dependencies must be resolved and satisfied for this Check to
+	// be unblocked and advance from the PLANNED to WAITING state.
 	//
 	// If the dependencies are unsatisfiable, then the Check will be immediately
 	// moved to FINAL state and a single Result will be added with type `TBD`.
+	//
+	// Once the Check is WAITING, this field is immutable.
 	//
 	// Currently Checks may only depend on other Checks in the same workflow.
 	Dependencies []*EdgeGroup

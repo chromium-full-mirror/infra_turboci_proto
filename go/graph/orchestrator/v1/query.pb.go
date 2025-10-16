@@ -768,6 +768,7 @@ type Query_Expand_Dependencies struct {
 	xxx_hidden_DependentsDepth   int32                  `protobuf:"varint,1,opt,name=dependents_depth,json=dependentsDepth,proto3,oneof"`
 	xxx_hidden_DependenciesDepth int32                  `protobuf:"varint,2,opt,name=dependencies_depth,json=dependenciesDepth,proto3,oneof"`
 	xxx_hidden_Satisfied         bool                   `protobuf:"varint,3,opt,name=satisfied,proto3,oneof"`
+	xxx_hidden_Current           bool                   `protobuf:"varint,4,opt,name=current,proto3,oneof"`
 	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
 	XXX_presence                 [1]uint32
 	unknownFields                protoimpl.UnknownFields
@@ -820,19 +821,31 @@ func (x *Query_Expand_Dependencies) GetSatisfied() bool {
 	return false
 }
 
+func (x *Query_Expand_Dependencies) GetCurrent() bool {
+	if x != nil {
+		return x.xxx_hidden_Current
+	}
+	return false
+}
+
 func (x *Query_Expand_Dependencies) SetDependentsDepth(v int32) {
 	x.xxx_hidden_DependentsDepth = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
 }
 
 func (x *Query_Expand_Dependencies) SetDependenciesDepth(v int32) {
 	x.xxx_hidden_DependenciesDepth = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
 }
 
 func (x *Query_Expand_Dependencies) SetSatisfied(v bool) {
 	x.xxx_hidden_Satisfied = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
+}
+
+func (x *Query_Expand_Dependencies) SetCurrent(v bool) {
+	x.xxx_hidden_Current = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
 }
 
 func (x *Query_Expand_Dependencies) HasDependentsDepth() bool {
@@ -856,6 +869,13 @@ func (x *Query_Expand_Dependencies) HasSatisfied() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
+func (x *Query_Expand_Dependencies) HasCurrent() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+}
+
 func (x *Query_Expand_Dependencies) ClearDependentsDepth() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_DependentsDepth = 0
@@ -869,6 +889,11 @@ func (x *Query_Expand_Dependencies) ClearDependenciesDepth() {
 func (x *Query_Expand_Dependencies) ClearSatisfied() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
 	x.xxx_hidden_Satisfied = false
+}
+
+func (x *Query_Expand_Dependencies) ClearCurrent() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_Current = false
 }
 
 type Query_Expand_Dependencies_builder struct {
@@ -888,16 +913,32 @@ type Query_Expand_Dependencies_builder struct {
 	//
 	// Must be >= 0.
 	DependenciesDepth *int32
-	// If unset, includes all edges.
+	// If unset, includes ALL edges, regardless of resolution. Implies
+	// `current = true`.
+	//
 	// If True, only includes resolved, satisfied, edges.
 	// If False, only includes resolved, unsatisfied, edges.
 	//
-	// NOTE: Edges which are frozen because they are part of a resolved
-	// EdgeGroup on a node will not show up as either true or false here, but
-	// will continue to show up with an unset `satisfied` filter.
-	//
 	// See the documentation on `EdgeGroup.resolution`.
 	Satisfied *bool
+	// If true, ignores the `resolution` field of the node's EdgeGroups.
+	//
+	// If false (or unset), only follows edges to nodes which have the
+	// `resolution` field set.
+	//
+	// For example:
+	//
+	//	A -> {B, C, threshold=1}
+	//
+	//	A->B becomes resolved, and A moves to WAITING. A will forever show
+	//	a resolution on B, but not on C.
+	//
+	//	If A->C later resolves (e.g. C becomes FINAL), and a stage wants to
+	//	find "ALL resolved dependencies of A", it would do this query with
+	//	`current=true`. If the stage only wants "Dependencies of A which were
+	//	the set that actually unblocked A", then it would do this query with
+	//	`current=false`.
+	Current *bool
 }
 
 func (b0 Query_Expand_Dependencies_builder) Build() *Query_Expand_Dependencies {
@@ -905,16 +946,20 @@ func (b0 Query_Expand_Dependencies_builder) Build() *Query_Expand_Dependencies {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.DependentsDepth != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
 		x.xxx_hidden_DependentsDepth = *b.DependentsDepth
 	}
 	if b.DependenciesDepth != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
 		x.xxx_hidden_DependenciesDepth = *b.DependenciesDepth
 	}
 	if b.Satisfied != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
 		x.xxx_hidden_Satisfied = *b.Satisfied
+	}
+	if b.Current != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
+		x.xxx_hidden_Current = *b.Current
 	}
 	return m0
 }
@@ -1131,7 +1176,7 @@ var File_turboci_graph_orchestrator_v1_query_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_query_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/query.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a2turboci/graph/orchestrator/v1/revision_range.proto\"\xf5\x0e\n" +
+	")turboci/graph/orchestrator/v1/query.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a2turboci/graph/orchestrator/v1/revision_range.proto\"\xa0\x0f\n" +
 	"\x05Query\x12\x1b\n" +
 	"\ttype_urls\x18\x01 \x03(\tR\btypeUrls\x12H\n" +
 	"\x06select\x18\x02 \x01(\v2+.turboci.graph.orchestrator.v1.Query.SelectH\x00R\x06select\x88\x01\x01\x12H\n" +
@@ -1155,17 +1200,20 @@ const file_turboci_graph_orchestrator_v1_query_proto_rawDesc = "" +
 	"\t_id_regexB\b\n" +
 	"\x06_state\x1a\x0e\n" +
 	"\fStagePatternB\v\n" +
-	"\t_workplan\x1a\xce\x02\n" +
+	"\t_workplan\x1a\xf9\x02\n" +
 	"\x06Expand\x12a\n" +
-	"\fdependencies\x18\x01 \x01(\v28.turboci.graph.orchestrator.v1.Query.Expand.DependenciesH\x00R\fdependencies\x88\x01\x01\x1a\xcf\x01\n" +
+	"\fdependencies\x18\x01 \x01(\v28.turboci.graph.orchestrator.v1.Query.Expand.DependenciesH\x00R\fdependencies\x88\x01\x01\x1a\xfa\x01\n" +
 	"\fDependencies\x12.\n" +
 	"\x10dependents_depth\x18\x01 \x01(\x05H\x00R\x0fdependentsDepth\x88\x01\x01\x122\n" +
 	"\x12dependencies_depth\x18\x02 \x01(\x05H\x01R\x11dependenciesDepth\x88\x01\x01\x12!\n" +
-	"\tsatisfied\x18\x03 \x01(\bH\x02R\tsatisfied\x88\x01\x01B\x13\n" +
+	"\tsatisfied\x18\x03 \x01(\bH\x02R\tsatisfied\x88\x01\x01\x12\x1d\n" +
+	"\acurrent\x18\x04 \x01(\bH\x03R\acurrent\x88\x01\x01B\x13\n" +
 	"\x11_dependents_depthB\x15\n" +
 	"\x13_dependencies_depthB\f\n" +
 	"\n" +
-	"_satisfiedB\x0f\n" +
+	"_satisfiedB\n" +
+	"\n" +
+	"\b_currentB\x0f\n" +
 	"\r_dependencies\x1a\xd5\x03\n" +
 	"\aCollect\x12M\n" +
 	"\x05check\x18\x01 \x01(\v22.turboci.graph.orchestrator.v1.Query.Collect.CheckH\x00R\x05check\x88\x01\x01\x12M\n" +

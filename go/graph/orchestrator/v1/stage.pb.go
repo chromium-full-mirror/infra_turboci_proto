@@ -342,6 +342,8 @@ type Stage_builder struct {
 	State *StageState
 	// Stages are allowed to depend on other Checks and Stages, and will not be
 	// sent to an Executor until these dependencies are resolved.
+	//
+	// Once the Stage is ATTEMPTING, this field is immutable.
 	Dependencies []*EdgeGroup
 	// Execution policy for this Stage.
 	ExecutionPolicy *Stage_ExecutionPolicyState
