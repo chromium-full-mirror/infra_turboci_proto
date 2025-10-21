@@ -26,9 +26,9 @@ const (
 
 // Encapsulates data changes to a Stage object.
 type StageDelta struct {
-	state                        protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_State             StageState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
-	xxx_hidden_ExecutionPolicies *[]*ExecutionPolicy    `protobuf:"bytes,2,rep,name=execution_policies,json=executionPolicies,proto3"`
+	state                        protoimpl.MessageState   `protogen:"opaque.v1"`
+	xxx_hidden_State             StageState               `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
+	xxx_hidden_ExecutionPolicies *[]*StageExecutionPolicy `protobuf:"bytes,2,rep,name=execution_policies,json=executionPolicies,proto3"`
 	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
 	XXX_presence                 [1]uint32
 	unknownFields                protoimpl.UnknownFields
@@ -69,7 +69,7 @@ func (x *StageDelta) GetState() StageState {
 	return StageState_STAGE_STATE_UNKNOWN
 }
 
-func (x *StageDelta) GetExecutionPolicies() []*ExecutionPolicy {
+func (x *StageDelta) GetExecutionPolicies() []*StageExecutionPolicy {
 	if x != nil {
 		if x.xxx_hidden_ExecutionPolicies != nil {
 			return *x.xxx_hidden_ExecutionPolicies
@@ -83,7 +83,7 @@ func (x *StageDelta) SetState(v StageState) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
 }
 
-func (x *StageDelta) SetExecutionPolicies(v []*ExecutionPolicy) {
+func (x *StageDelta) SetExecutionPolicies(v []*StageExecutionPolicy) {
 	x.xxx_hidden_ExecutionPolicies = &v
 }
 
@@ -110,8 +110,8 @@ type StageDelta_builder struct {
 	// possible for a single write to affect multiple policies.
 	//
 	// Like Stage.execution_policies, this will be sorted and unique on
-	// ExecutionPolicy.source.
-	ExecutionPolicies []*ExecutionPolicy
+	// StageExecutionPolicy.source.
+	ExecutionPolicies []*StageExecutionPolicy
 }
 
 func (b0 StageDelta_builder) Build() *StageDelta {
@@ -130,22 +130,22 @@ var File_turboci_graph_orchestrator_v1_stage_delta_proto protoreflect.FileDescri
 
 const file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/stage_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a4turboci/graph/orchestrator/v1/execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\"\xbb\x01\n" +
+	"/turboci/graph/orchestrator/v1/stage_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\"\xc0\x01\n" +
 	"\n" +
 	"StageDelta\x12D\n" +
-	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x00R\x05state\x88\x01\x01\x12]\n" +
-	"\x12execution_policies\x18\x02 \x03(\v2..turboci.graph.orchestrator.v1.ExecutionPolicyR\x11executionPoliciesB\b\n" +
+	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x00R\x05state\x88\x01\x01\x12b\n" +
+	"\x12execution_policies\x18\x02 \x03(\v23.turboci.graph.orchestrator.v1.StageExecutionPolicyR\x11executionPoliciesB\b\n" +
 	"\x06_stateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_stage_delta_proto_goTypes = []any{
-	(*StageDelta)(nil),      // 0: turboci.graph.orchestrator.v1.StageDelta
-	(StageState)(0),         // 1: turboci.graph.orchestrator.v1.StageState
-	(*ExecutionPolicy)(nil), // 2: turboci.graph.orchestrator.v1.ExecutionPolicy
+	(*StageDelta)(nil),           // 0: turboci.graph.orchestrator.v1.StageDelta
+	(StageState)(0),              // 1: turboci.graph.orchestrator.v1.StageState
+	(*StageExecutionPolicy)(nil), // 2: turboci.graph.orchestrator.v1.StageExecutionPolicy
 }
 var file_turboci_graph_orchestrator_v1_stage_delta_proto_depIdxs = []int32{
 	1, // 0: turboci.graph.orchestrator.v1.StageDelta.state:type_name -> turboci.graph.orchestrator.v1.StageState
-	2, // 1: turboci.graph.orchestrator.v1.StageDelta.execution_policies:type_name -> turboci.graph.orchestrator.v1.ExecutionPolicy
+	2, // 1: turboci.graph.orchestrator.v1.StageDelta.execution_policies:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -158,7 +158,7 @@ func file_turboci_graph_orchestrator_v1_stage_delta_proto_init() {
 	if File_turboci_graph_orchestrator_v1_stage_delta_proto != nil {
 		return
 	}
-	file_turboci_graph_orchestrator_v1_execution_policy_proto_init()
+	file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_state_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}

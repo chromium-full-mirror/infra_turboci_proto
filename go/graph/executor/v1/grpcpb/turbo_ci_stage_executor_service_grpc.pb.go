@@ -50,7 +50,7 @@ type TurboCIStageExecutorClient interface {
 	// If the stage looks good (i.e. this RPC returns OK), the executor has
 	// opportunity to adjust some of stages parameters before the stage is
 	// inserted into the graph by returning them in ValidateStageResponse
-	// (currently contains only turboci.orchestrator.v1.ExecutionPolicy).
+	// (currently contains only turboci.orchestrator.v1.StageExecutionPolicy).
 	//
 	// If the stage doesn't look good (i.e. this RPC returns an error), the entire
 	// WriteNodes transaction that was attempting to insert the stage will be
@@ -91,7 +91,7 @@ type TurboCIStageExecutorClient interface {
 	//     StageAttempt as SCHEDULED or RUNNING.
 	//   - the executor must also write the validated execution policy for the
 	//     StageAttempt for the updated state (See
-	//     turboci.orchestrator.v1.ExecutionPolicy for details).
+	//     turboci.orchestrator.v1.StageAttemptExecutionPolicy for details).
 	//
 	// RunStage return value and even status code are essentially ignored.
 	// The orchestrator always looks at the state of the stage attempt after
@@ -178,7 +178,7 @@ type TurboCIStageExecutorServer interface {
 	// If the stage looks good (i.e. this RPC returns OK), the executor has
 	// opportunity to adjust some of stages parameters before the stage is
 	// inserted into the graph by returning them in ValidateStageResponse
-	// (currently contains only turboci.orchestrator.v1.ExecutionPolicy).
+	// (currently contains only turboci.orchestrator.v1.StageExecutionPolicy).
 	//
 	// If the stage doesn't look good (i.e. this RPC returns an error), the entire
 	// WriteNodes transaction that was attempting to insert the stage will be
@@ -219,7 +219,7 @@ type TurboCIStageExecutorServer interface {
 	//     StageAttempt as SCHEDULED or RUNNING.
 	//   - the executor must also write the validated execution policy for the
 	//     StageAttempt for the updated state (See
-	//     turboci.orchestrator.v1.ExecutionPolicy for details).
+	//     turboci.orchestrator.v1.StageAttemptExecutionPolicy for details).
 	//
 	// RunStage return value and even status code are essentially ignored.
 	// The orchestrator always looks at the state of the stage attempt after

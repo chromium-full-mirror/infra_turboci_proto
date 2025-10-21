@@ -97,10 +97,10 @@ func (b0 ValidateStageRequest_builder) Build() *ValidateStageRequest {
 
 // Response to a stage validation request.
 type ValidateStageResponse struct {
-	state                      protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_ExecutionPolicy *v1.ExecutionPolicy    `protobuf:"bytes,1,opt,name=execution_policy,json=executionPolicy,proto3,oneof"`
-	unknownFields              protoimpl.UnknownFields
-	sizeCache                  protoimpl.SizeCache
+	state                           protoimpl.MessageState   `protogen:"opaque.v1"`
+	xxx_hidden_StageExecutionPolicy *v1.StageExecutionPolicy `protobuf:"bytes,1,opt,name=stage_execution_policy,json=stageExecutionPolicy,proto3,oneof"`
+	unknownFields                   protoimpl.UnknownFields
+	sizeCache                       protoimpl.SizeCache
 }
 
 func (x *ValidateStageResponse) Reset() {
@@ -128,40 +128,40 @@ func (x *ValidateStageResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *ValidateStageResponse) GetExecutionPolicy() *v1.ExecutionPolicy {
+func (x *ValidateStageResponse) GetStageExecutionPolicy() *v1.StageExecutionPolicy {
 	if x != nil {
-		return x.xxx_hidden_ExecutionPolicy
+		return x.xxx_hidden_StageExecutionPolicy
 	}
 	return nil
 }
 
-func (x *ValidateStageResponse) SetExecutionPolicy(v *v1.ExecutionPolicy) {
-	x.xxx_hidden_ExecutionPolicy = v
+func (x *ValidateStageResponse) SetStageExecutionPolicy(v *v1.StageExecutionPolicy) {
+	x.xxx_hidden_StageExecutionPolicy = v
 }
 
-func (x *ValidateStageResponse) HasExecutionPolicy() bool {
+func (x *ValidateStageResponse) HasStageExecutionPolicy() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_ExecutionPolicy != nil
+	return x.xxx_hidden_StageExecutionPolicy != nil
 }
 
-func (x *ValidateStageResponse) ClearExecutionPolicy() {
-	x.xxx_hidden_ExecutionPolicy = nil
+func (x *ValidateStageResponse) ClearStageExecutionPolicy() {
+	x.xxx_hidden_StageExecutionPolicy = nil
 }
 
 type ValidateStageResponse_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// Validated execution policy for the stage.
-	ExecutionPolicy *v1.ExecutionPolicy
+	StageExecutionPolicy *v1.StageExecutionPolicy
 }
 
 func (b0 ValidateStageResponse_builder) Build() *ValidateStageResponse {
 	m0 := &ValidateStageResponse{}
 	b, x := &b0, m0
 	_, _ = b, x
-	x.xxx_hidden_ExecutionPolicy = b.ExecutionPolicy
+	x.xxx_hidden_StageExecutionPolicy = b.StageExecutionPolicy
 	return m0
 }
 
@@ -169,24 +169,24 @@ var File_turboci_graph_executor_v1_validate_stage_proto protoreflect.FileDescrip
 
 const file_turboci_graph_executor_v1_validate_stage_proto_rawDesc = "" +
 	"\n" +
-	".turboci/graph/executor/v1/validate_stage.proto\x12\x19turboci.graph.executor.v1\x1a4turboci/graph/orchestrator/v1/execution_policy.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"a\n" +
+	".turboci/graph/executor/v1/validate_stage.proto\x12\x19turboci.graph.executor.v1\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\"a\n" +
 	"\x14ValidateStageRequest\x12?\n" +
 	"\x05stage\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.StageH\x00R\x05stage\x88\x01\x01B\b\n" +
-	"\x06_stage\"\x8c\x01\n" +
-	"\x15ValidateStageResponse\x12^\n" +
-	"\x10execution_policy\x18\x01 \x01(\v2..turboci.graph.orchestrator.v1.ExecutionPolicyH\x00R\x0fexecutionPolicy\x88\x01\x01B\x13\n" +
-	"\x11_execution_policyBAP\x01Z=go.chromium.org/turboci/proto/go/graph/executor/v1;executorpbb\x06proto3"
+	"\x06_stage\"\xa2\x01\n" +
+	"\x15ValidateStageResponse\x12n\n" +
+	"\x16stage_execution_policy\x18\x01 \x01(\v23.turboci.graph.orchestrator.v1.StageExecutionPolicyH\x00R\x14stageExecutionPolicy\x88\x01\x01B\x19\n" +
+	"\x17_stage_execution_policyBAP\x01Z=go.chromium.org/turboci/proto/go/graph/executor/v1;executorpbb\x06proto3"
 
 var file_turboci_graph_executor_v1_validate_stage_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_executor_v1_validate_stage_proto_goTypes = []any{
-	(*ValidateStageRequest)(nil),  // 0: turboci.graph.executor.v1.ValidateStageRequest
-	(*ValidateStageResponse)(nil), // 1: turboci.graph.executor.v1.ValidateStageResponse
-	(*v1.Stage)(nil),              // 2: turboci.graph.orchestrator.v1.Stage
-	(*v1.ExecutionPolicy)(nil),    // 3: turboci.graph.orchestrator.v1.ExecutionPolicy
+	(*ValidateStageRequest)(nil),    // 0: turboci.graph.executor.v1.ValidateStageRequest
+	(*ValidateStageResponse)(nil),   // 1: turboci.graph.executor.v1.ValidateStageResponse
+	(*v1.Stage)(nil),                // 2: turboci.graph.orchestrator.v1.Stage
+	(*v1.StageExecutionPolicy)(nil), // 3: turboci.graph.orchestrator.v1.StageExecutionPolicy
 }
 var file_turboci_graph_executor_v1_validate_stage_proto_depIdxs = []int32{
 	2, // 0: turboci.graph.executor.v1.ValidateStageRequest.stage:type_name -> turboci.graph.orchestrator.v1.Stage
-	3, // 1: turboci.graph.executor.v1.ValidateStageResponse.execution_policy:type_name -> turboci.graph.orchestrator.v1.ExecutionPolicy
+	3, // 1: turboci.graph.executor.v1.ValidateStageResponse.stage_execution_policy:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
