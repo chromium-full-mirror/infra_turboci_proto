@@ -99,9 +99,9 @@ type StageView_builder struct {
 
 	// The Stage itself - always present.
 	Stage *Stage
-	// StageEdits for this Stage which are being read.
+	// StageEdits for this Stage.
 	//
-	// Some StageEdits may be omitted if the user did not request them.
+	// Sorted by `edit.version`.
 	Edits []*StageEditView
 }
 

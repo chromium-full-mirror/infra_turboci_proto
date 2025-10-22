@@ -11,6 +11,7 @@
 package orchestratorpb
 
 import (
+	v1 "go.chromium.org/turboci/proto/go/graph/ids/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -44,12 +45,13 @@ const (
 // belong to this Check (but you WOULD see the full content of the Check.options
 // field).
 type GraphView struct {
-	state              protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Version *Revision              `protobuf:"bytes,1,opt,name=version,proto3,oneof"`
-	xxx_hidden_Checks  *[]*CheckView          `protobuf:"bytes,2,rep,name=checks,proto3"`
-	xxx_hidden_Stages  *[]*StageView          `protobuf:"bytes,3,rep,name=stages,proto3"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Version    *Revision              `protobuf:"bytes,1,opt,name=version,proto3,oneof"`
+	xxx_hidden_Identifier *v1.WorkPlan           `protobuf:"bytes,2,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Checks     map[string]*CheckView  `protobuf:"bytes,3,rep,name=checks,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	xxx_hidden_Stages     map[string]*StageView  `protobuf:"bytes,4,rep,name=stages,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *GraphView) Reset() {
@@ -84,20 +86,23 @@ func (x *GraphView) GetVersion() *Revision {
 	return nil
 }
 
-func (x *GraphView) GetChecks() []*CheckView {
+func (x *GraphView) GetIdentifier() *v1.WorkPlan {
 	if x != nil {
-		if x.xxx_hidden_Checks != nil {
-			return *x.xxx_hidden_Checks
-		}
+		return x.xxx_hidden_Identifier
 	}
 	return nil
 }
 
-func (x *GraphView) GetStages() []*StageView {
+func (x *GraphView) GetChecks() map[string]*CheckView {
 	if x != nil {
-		if x.xxx_hidden_Stages != nil {
-			return *x.xxx_hidden_Stages
-		}
+		return x.xxx_hidden_Checks
+	}
+	return nil
+}
+
+func (x *GraphView) GetStages() map[string]*StageView {
+	if x != nil {
+		return x.xxx_hidden_Stages
 	}
 	return nil
 }
@@ -106,12 +111,16 @@ func (x *GraphView) SetVersion(v *Revision) {
 	x.xxx_hidden_Version = v
 }
 
-func (x *GraphView) SetChecks(v []*CheckView) {
-	x.xxx_hidden_Checks = &v
+func (x *GraphView) SetIdentifier(v *v1.WorkPlan) {
+	x.xxx_hidden_Identifier = v
 }
 
-func (x *GraphView) SetStages(v []*StageView) {
-	x.xxx_hidden_Stages = &v
+func (x *GraphView) SetChecks(v map[string]*CheckView) {
+	x.xxx_hidden_Checks = v
+}
+
+func (x *GraphView) SetStages(v map[string]*StageView) {
+	x.xxx_hidden_Stages = v
 }
 
 func (x *GraphView) HasVersion() bool {
@@ -121,8 +130,19 @@ func (x *GraphView) HasVersion() bool {
 	return x.xxx_hidden_Version != nil
 }
 
+func (x *GraphView) HasIdentifier() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Identifier != nil
+}
+
 func (x *GraphView) ClearVersion() {
 	x.xxx_hidden_Version = nil
+}
+
+func (x *GraphView) ClearIdentifier() {
+	x.xxx_hidden_Identifier = nil
 }
 
 type GraphView_builder struct {
@@ -132,16 +152,21 @@ type GraphView_builder struct {
 	// will be the version of the snapshot of the graph used to prepare this
 	// GraphView.
 	Version *Revision
-	// Checks in the graph.
+	// The WorkPlan to which all nodes in this GraphView belong.
+	Identifier *v1.WorkPlan
+	// Checks in the graph, addressed by `check.identifier.id`.
 	//
 	// Checks may be omitted if the user does not have permission to view them,
 	// or if the user did not request them.
-	Checks []*CheckView
-	// Stages in the graph.
+	Checks map[string]*CheckView
+	// Stages in the graph, addressed by `stage.identifier.id`.
+	//
+	// Note that for the same reason ids.v1.Stage.id contains the 'S' or 'N'
+	// prefix, that prefix appears in the key here as well.
 	//
 	// Stages may be omitted if the user does not have permission to view them,
 	// or if the user did not request them.
-	Stages []*StageView
+	Stages map[string]*StageView
 }
 
 func (b0 GraphView_builder) Build() *GraphView {
@@ -149,8 +174,9 @@ func (b0 GraphView_builder) Build() *GraphView {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Version = b.Version
-	x.xxx_hidden_Checks = &b.Checks
-	x.xxx_hidden_Stages = &b.Stages
+	x.xxx_hidden_Identifier = b.Identifier
+	x.xxx_hidden_Checks = b.Checks
+	x.xxx_hidden_Stages = b.Stages
 	return m0
 }
 
@@ -158,30 +184,46 @@ var File_turboci_graph_orchestrator_v1_graph_view_proto protoreflect.FileDescrip
 
 const file_turboci_graph_orchestrator_v1_graph_view_proto_rawDesc = "" +
 	"\n" +
-	".turboci/graph/orchestrator/v1/graph_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a.turboci/graph/orchestrator/v1/check_view.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a.turboci/graph/orchestrator/v1/stage_view.proto\"\xe3\x01\n" +
+	".turboci/graph/orchestrator/v1/graph_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_view.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a.turboci/graph/orchestrator/v1/stage_view.proto\"\x99\x04\n" +
 	"\tGraphView\x12F\n" +
-	"\aversion\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\aversion\x88\x01\x01\x12@\n" +
-	"\x06checks\x18\x02 \x03(\v2(.turboci.graph.orchestrator.v1.CheckViewR\x06checks\x12@\n" +
-	"\x06stages\x18\x03 \x03(\v2(.turboci.graph.orchestrator.v1.StageViewR\x06stagesB\n" +
+	"\aversion\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\aversion\x88\x01\x01\x12C\n" +
 	"\n" +
-	"\b_versionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"identifier\x18\x02 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x01R\n" +
+	"identifier\x88\x01\x01\x12L\n" +
+	"\x06checks\x18\x03 \x03(\v24.turboci.graph.orchestrator.v1.GraphView.ChecksEntryR\x06checks\x12L\n" +
+	"\x06stages\x18\x04 \x03(\v24.turboci.graph.orchestrator.v1.GraphView.StagesEntryR\x06stages\x1ac\n" +
+	"\vChecksEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12>\n" +
+	"\x05value\x18\x02 \x01(\v2(.turboci.graph.orchestrator.v1.CheckViewR\x05value:\x028\x01\x1ac\n" +
+	"\vStagesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12>\n" +
+	"\x05value\x18\x02 \x01(\v2(.turboci.graph.orchestrator.v1.StageViewR\x05value:\x028\x01B\n" +
+	"\n" +
+	"\b_versionB\r\n" +
+	"\v_identifierBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_graph_view_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_turboci_graph_orchestrator_v1_graph_view_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_turboci_graph_orchestrator_v1_graph_view_proto_goTypes = []any{
-	(*GraphView)(nil), // 0: turboci.graph.orchestrator.v1.GraphView
-	(*Revision)(nil),  // 1: turboci.graph.orchestrator.v1.Revision
-	(*CheckView)(nil), // 2: turboci.graph.orchestrator.v1.CheckView
-	(*StageView)(nil), // 3: turboci.graph.orchestrator.v1.StageView
+	(*GraphView)(nil),   // 0: turboci.graph.orchestrator.v1.GraphView
+	nil,                 // 1: turboci.graph.orchestrator.v1.GraphView.ChecksEntry
+	nil,                 // 2: turboci.graph.orchestrator.v1.GraphView.StagesEntry
+	(*Revision)(nil),    // 3: turboci.graph.orchestrator.v1.Revision
+	(*v1.WorkPlan)(nil), // 4: turboci.graph.ids.v1.WorkPlan
+	(*CheckView)(nil),   // 5: turboci.graph.orchestrator.v1.CheckView
+	(*StageView)(nil),   // 6: turboci.graph.orchestrator.v1.StageView
 }
 var file_turboci_graph_orchestrator_v1_graph_view_proto_depIdxs = []int32{
-	1, // 0: turboci.graph.orchestrator.v1.GraphView.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	2, // 1: turboci.graph.orchestrator.v1.GraphView.checks:type_name -> turboci.graph.orchestrator.v1.CheckView
-	3, // 2: turboci.graph.orchestrator.v1.GraphView.stages:type_name -> turboci.graph.orchestrator.v1.StageView
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	3, // 0: turboci.graph.orchestrator.v1.GraphView.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	4, // 1: turboci.graph.orchestrator.v1.GraphView.identifier:type_name -> turboci.graph.ids.v1.WorkPlan
+	1, // 2: turboci.graph.orchestrator.v1.GraphView.checks:type_name -> turboci.graph.orchestrator.v1.GraphView.ChecksEntry
+	2, // 3: turboci.graph.orchestrator.v1.GraphView.stages:type_name -> turboci.graph.orchestrator.v1.GraphView.StagesEntry
+	5, // 4: turboci.graph.orchestrator.v1.GraphView.ChecksEntry.value:type_name -> turboci.graph.orchestrator.v1.CheckView
+	6, // 5: turboci.graph.orchestrator.v1.GraphView.StagesEntry.value:type_name -> turboci.graph.orchestrator.v1.StageView
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_graph_view_proto_init() }
@@ -199,7 +241,7 @@ func file_turboci_graph_orchestrator_v1_graph_view_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_graph_view_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_graph_view_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
