@@ -628,16 +628,23 @@ type WriteNodesRequest_TransactionDetails_builder struct {
 	// didn't find it, so I'm doing a write based on that information. If X DOES
 	// exist at the time of the write, I want to abort and try again.").
 	//
-	// NOTE: If you are writing what you THINK is a new node, the safe thing to
-	// do is to query for that node before doing the write (to confirm it
-	// doesn't exist) and then also include that node ID in this list (to
-	// confirm it didn't start existing before your write).
+	// NOTE: If you are writing what you THINK are all new nodes, but haven't
+	// done a query to verify this, just providing `txn` with `nodes_observed`
+	// and `snapshot_version` left unset is sufficient to guard against the
+	// nodes already being written. However, if you get
+	// a TransactionConflictFailure because the nodes already exist, when you
+	// recover make sure to do the query before you try the write again! You may
+	// be conflicting with a previous incarnation of your own process!
 	NodesObserved []*v1.Identifier
 	// The 'version' of the GraphView returned from QueryNodes.
 	//
 	// If multiple queries were made in this transaction, this revision MUST be
 	// the first revision observed. Providing version.require to QueryNodes will
 	// help enforce this.
+	//
+	// If `snapshot_version` is unset, it is treated as a 0 value (which means
+	// that all `nodes_observed` plus all nodes being written in this request
+	// must not already exist).
 	SnapshotVersion *Revision
 }
 
