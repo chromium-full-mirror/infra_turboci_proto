@@ -1,0 +1,161 @@
+// Copyright 2025 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+syntax = "proto3";
+
+package turboci.graph.orchestrator.v1;
+
+import "turboci/graph/orchestrator/v1/edge.proto";
+import "turboci/graph/orchestrator/v1/revision.proto";
+
+option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
+option java_multiple_files = true;
+
+// Dependencies represents a group of edges needed to unblock a containing node
+// (a Check or a Stage), as well as timestamps and satisfaction of those edges,
+// and finally the group of edges which resolved the Dependencies and unblocked
+// the containing node.
+//
+// During PLANNING, the `edges` and `predicate` fields are mutable. These
+// contains all dependency targets and any criteria for them, plus the boolean
+// logic of which subset of these edges are necessary to unblock the node.
+// The orchestrator will convert WriteNodesRequest.DependencyGroup into `edges`
+// and `predicate` for the client.
+//
+// As soon as the containing node is PLANNED, the orchestrator will begin
+// tracking resolution of the edges. As they resolved, these are recorded to the
+// the `resolution_events` field.
+//
+// Finally, once enough resolution_events are present such that the `predicate`
+// Group can be resolved, the orchestrator will advance the containing node to
+// the next state (i.e. CHECK_STATE_WAITING or STAGE_STATE_ATTEMPTING), and will
+// populate `resolved` with only the groups/edges which actually participated in
+// unblocked the containing node (this may be a subset of the propagated
+// events). At this point, no more events will be added to `resolution_events`
+// and this Dependencies message will be fully immutable.
+message Dependencies {
+  // A group of dependencies, containing edges and/or other groups, plus
+  // a minimum threshold to meet to consider this Group satisfied.
+  message Group {
+    // Singular edges in this group.
+    //
+    // Kept sorted; values are indexes into `Dependencies.edges`.
+    repeated int32 edges = 1;
+
+    // Sub-groups in this group.
+    repeated Group groups = 2;
+
+    // If unset, all `edges` and `groups` must be satisfied for this Group to
+    // be satisfied (effectively 'AND' of edges and groups).
+    //
+    // If set, indicates the number of edges and groups needed to resolve this
+    // Group.
+    //
+    // Setting threshold to `1` effectively means 'the first satisfied entry in
+    // edges or groups satisfies this group' (effectively making this an OR).
+    //
+    // A value greater than one could be useful if you want to depend on the first
+    // N of multiple possible edges.
+    //
+    // For example, if this Group is
+    //
+    //    { edges: [a, b, c], groups: [GROUP], threshold: 2 }
+    //
+    // Then this Group could be satisfied on the first of any:
+    //   * a b
+    //   * b c
+    //   * a c
+    //   * a GROUP
+    //   * b GROUP
+    //   * c GROUP
+    //
+    // This is also equivalent to the much more verbose disjunctive normal form:
+    //
+    //   { groups: [
+    //     { edges: [a, b] },
+    //     { edges: [b, c] },
+    //     { edges: [a, c] },
+    //     { edges: [a], groups: [GROUP] },
+    //     { edges: [b], groups: [GROUP] },
+    //     { edges: [c], groups: [GROUP] },
+    //     threshold = 1,
+    //   }
+    //
+    // NOTE: It is possible for a Group in `Dependencies.resolved` to contain
+    // more edges/groups than `threshold` if all of those Edges were satisfied
+    // at the time the Dependencies were resolved.
+    //
+    // A zero threshold will be normalized to `unset`.
+    // A negative threshold is an error.
+    optional int32 threshold = 3;
+  }
+
+  // The set of all edges from the containing node to other nodes in the graph.
+  //
+  // These are unique by `target` and criteria.
+  //
+  // See `predicate` and `resolved` which refer to these.
+  repeated Edge edges = 1;
+
+  // The logical predicate that the containing node depends on.
+  //
+  // The Group is a compact expression of a logical rule of which edges must be
+  // satisfied before the node can be unblocked.
+  //
+  // Once this Group is satisfied, the node will be unblocked and move from
+  // PLANNED to CHECK_STATE_WAITING or STAGE_STATE_ATTEMPTING, depending on the
+  // containing node type.
+  //
+  // If the Group is unsatisfiable, then the Check will be immediately moved to
+  // the FINAL state and a single Result will be added with type `TBD`.
+  //
+  // Once the containing node is CHECK_STATE_WAITING/STAGE_STATE_ATTEMPTING,
+  // this field is immutable.
+  //
+  // Empty Groups (including the top level one here) are normalized to unset.
+  optional Group predicate = 2;
+
+  // ResolutionEvent is a detail of when a specific target Edge in `edges`
+  // was resolved for the containing node.
+  //
+  // This MAY include non-zero propagation time from the time that the target of
+  // Edge entered a satisfying state for this Edge.
+  message ResolutionEvent {
+    // The version of the containing node which included this event.
+    //
+    // This MAY be substantially after the target of the edge is FINAL, e.g. if
+    // the containing node was created or became PLANNED far after the target
+    // was FINAL.
+    optional Revision version = 1;
+
+    // Was the criteria for this edge satisfied or not?
+    //
+    // By default, Edges without explicit criteria (i.e. just 'is target
+    // FINAL?') will always see this as true.
+    optional bool satisfied = 2;
+  }
+  // While containing node is in the PLANNED state, this will accumulate all
+  // incoming resolution events.
+  //
+  // The key is an index into the Dependencies.edges table.
+  //
+  // When the containing node enters PLANNED for the first time, there may be
+  // several events which show up here immediately (i.e. the targets of these
+  // Edges were already in a satisfying state).
+  //
+  // This will include a superset of edges in `resolved`.
+  map<int32, ResolutionEvent> resolution_events = 3;
+
+  // The actual group of resolved dependencies which unblocked the containing
+  // node.
+  //
+  // When the orchestrator recognizes that the events in `resolution_events`
+  // satisfies the dependencies in `predicate`, it will advance the containing
+  // node to the next state (i.e. CHECK_STATE_WAITING, STAGE_STATE_ATTEMPTING),
+  // and will populate this field with just the groups and edges which
+  // ultimately caused the containing node to be unblocked.
+  //
+  // Once written, this is immutable.
+  optional Group resolved = 4;
+}

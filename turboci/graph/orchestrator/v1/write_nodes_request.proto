@@ -11,7 +11,6 @@ import "turboci/graph/ids/v1/identifier.proto";
 import "turboci/graph/orchestrator/v1/check_kind.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/edge.proto";
-import "turboci/graph/orchestrator/v1/edge_group.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 import "turboci/graph/orchestrator/v1/stage.proto";
@@ -41,6 +40,26 @@ message WriteNodesRequest {
 
     // The value to set.
     optional google.protobuf.Any value = 2;
+  }
+
+  // An in-line representation of Dependencies.Group.
+  //
+  // The Orchestrator will deduplicate edges into Dependencies.edges in the
+  // Check or Stage.
+  //
+  // Otherwise this has the same meaning as Dependencies.Group.
+  message DependencyGroup {
+    // Singular edges in this group.
+    repeated Edge edges = 1;
+
+    // Sub-groups in this group.
+    repeated DependencyGroup groups = 2;
+
+    // Number of edges and/or groups which need to be satisfied for this
+    // DependencyGroup to be satisfied.
+    //
+    // See `Dependencies.Group.threshold`.
+    optional int32 threshold = 3;
   }
 
   // The token of the Stage Attempt which is performing this write.
@@ -213,17 +232,11 @@ message WriteNodesRequest {
     // Must be unique on `RealmValue.value.type_url`.
     repeated RealmValue options = 4 [(turboci).check.editable = CHECK_STATE_PLANNING];
 
-    // Dependencies for this Check.
+    // Dependency predicate for this Check.
     //
-    // If set, fully overwrites the dependencies field in the target Check.
-    //
-    // Empty groups will be pruned from this. You can remove all dependencies by
-    // providing a single, empty, EdgeGroup.
-    //
-    // If this Write transitions the Check to PLANNED and also provides
-    // dependencies, these must match identically to the already-written
-    // dependencies.
-    repeated EdgeGroup dependencies = 5 [
+    // If set, used to populate the dependencies.edges and
+    // dependencies.predicate fields in the target Check.
+    optional DependencyGroup dependencies = 5 [
       (turboci).id.allowed = IDENTIFIER_KIND_CHECK,
       (turboci).check.editable = CHECK_STATE_PLANNING
     ];
@@ -302,11 +315,14 @@ message WriteNodesRequest {
     // be rejected.
     optional string realm = 3 [(turboci).creation_only = true];
 
-    // Dependencies for this Stage.
+    // Dependency predicate for this Stage.
+    //
+    // If set, used to populate the dependencies.edges and
+    // dependencies.predicate fields in the target Check.
     //
     // If the Stage already exists, this will only result in an error if it
     // doesn't match the existing dependencies identically.
-    repeated EdgeGroup dependencies = 4 [
+    optional DependencyGroup dependencies = 4 [
       (turboci).id.allowed = IDENTIFIER_KIND_STAGE,
       (turboci).id.allowed = IDENTIFIER_KIND_CHECK,
       (turboci).creation_only = true

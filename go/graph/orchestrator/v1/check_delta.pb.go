@@ -31,7 +31,7 @@ const (
 type CheckDelta struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_State        CheckState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
-	xxx_hidden_Dependencies *[]*EdgeGroup          `protobuf:"bytes,2,rep,name=dependencies,proto3"`
+	xxx_hidden_Dependencies *Dependencies          `protobuf:"bytes,2,opt,name=dependencies,proto3,oneof"`
 	xxx_hidden_Options      *[]*v1.CheckOption     `protobuf:"bytes,3,rep,name=options,proto3"`
 	xxx_hidden_Result       *[]*CheckDelta_Result  `protobuf:"bytes,4,rep,name=result,proto3"`
 	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
@@ -74,11 +74,9 @@ func (x *CheckDelta) GetState() CheckState {
 	return CheckState_CHECK_STATE_UNKNOWN
 }
 
-func (x *CheckDelta) GetDependencies() []*EdgeGroup {
+func (x *CheckDelta) GetDependencies() *Dependencies {
 	if x != nil {
-		if x.xxx_hidden_Dependencies != nil {
-			return *x.xxx_hidden_Dependencies
-		}
+		return x.xxx_hidden_Dependencies
 	}
 	return nil
 }
@@ -106,8 +104,8 @@ func (x *CheckDelta) SetState(v CheckState) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
 }
 
-func (x *CheckDelta) SetDependencies(v []*EdgeGroup) {
-	x.xxx_hidden_Dependencies = &v
+func (x *CheckDelta) SetDependencies(v *Dependencies) {
+	x.xxx_hidden_Dependencies = v
 }
 
 func (x *CheckDelta) SetOptions(v []*v1.CheckOption) {
@@ -125,9 +123,20 @@ func (x *CheckDelta) HasState() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
+func (x *CheckDelta) HasDependencies() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Dependencies != nil
+}
+
 func (x *CheckDelta) ClearState() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_State = CheckState_CHECK_STATE_UNKNOWN
+}
+
+func (x *CheckDelta) ClearDependencies() {
+	x.xxx_hidden_Dependencies = nil
 }
 
 type CheckDelta_builder struct {
@@ -137,11 +146,11 @@ type CheckDelta_builder struct {
 	State *CheckState
 	// Dependencies written as part of this edit.
 	//
-	// Contains the FULL dependencies data (e.g. if the edit 'added' a new
-	// dependency to one of these EdgeGroups, or added a new EdgeGroup, etc., you
-	// would see the entire set of EdgeGroups here, not just the added/changed
-	// one(s)).
-	Dependencies []*EdgeGroup
+	// The fields within reflect what was changed in this edit:
+	//   - `edges`, `to_unblock` and `resolved` are included in-whole, and mean
+	//     that this edit modified those fields.
+	//   - `resolution_events` reflects just new events resolved in this edit.
+	Dependencies *Dependencies
 	// Options written as part of this edit.
 	Options []*v1.CheckOption
 	// Result data written as part of this edit.
@@ -162,7 +171,7 @@ func (b0 CheckDelta_builder) Build() *CheckDelta {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
 		x.xxx_hidden_State = *b.State
 	}
-	x.xxx_hidden_Dependencies = &b.Dependencies
+	x.xxx_hidden_Dependencies = b.Dependencies
 	x.xxx_hidden_Options = &b.Options
 	x.xxx_hidden_Result = &b.Result
 	return m0
@@ -328,12 +337,12 @@ var File_turboci_graph_orchestrator_v1_check_delta_proto protoreflect.FileDescri
 
 const file_turboci_graph_orchestrator_v1_check_delta_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/check_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a.turboci/graph/orchestrator/v1/edge_group.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\"\xb8\x04\n" +
+	"/turboci/graph/orchestrator/v1/check_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\"\xd1\x04\n" +
 	"\n" +
 	"CheckDelta\x12D\n" +
-	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\x05state\x88\x01\x01\x12Y\n" +
-	"\fdependencies\x18\x02 \x03(\v2(.turboci.graph.orchestrator.v1.EdgeGroupB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\x02R\fdependencies\x12;\n" +
+	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\x05state\x88\x01\x01\x12a\n" +
+	"\fdependencies\x18\x02 \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
+	"\x01\x02H\x01R\fdependencies\x88\x01\x01\x12;\n" +
 	"\aoptions\x18\x03 \x03(\v2!.turboci.graph.ids.v1.CheckOptionR\aoptions\x12H\n" +
 	"\x06result\x18\x04 \x03(\v20.turboci.graph.orchestrator.v1.CheckDelta.ResultR\x06result\x1a\xf7\x01\n" +
 	"\x06Result\x12F\n" +
@@ -348,21 +357,22 @@ const file_turboci_graph_orchestrator_v1_check_delta_proto_rawDesc = "" +
 	"\b_createdB\f\n" +
 	"\n" +
 	"_finalizedB\b\n" +
-	"\x06_stateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x06_stateB\x0f\n" +
+	"\r_dependenciesBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_check_delta_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_check_delta_proto_goTypes = []any{
 	(*CheckDelta)(nil),          // 0: turboci.graph.orchestrator.v1.CheckDelta
 	(*CheckDelta_Result)(nil),   // 1: turboci.graph.orchestrator.v1.CheckDelta.Result
 	(CheckState)(0),             // 2: turboci.graph.orchestrator.v1.CheckState
-	(*EdgeGroup)(nil),           // 3: turboci.graph.orchestrator.v1.EdgeGroup
+	(*Dependencies)(nil),        // 3: turboci.graph.orchestrator.v1.Dependencies
 	(*v1.CheckOption)(nil),      // 4: turboci.graph.ids.v1.CheckOption
 	(*v1.CheckResult)(nil),      // 5: turboci.graph.ids.v1.CheckResult
 	(*v1.CheckResultDatum)(nil), // 6: turboci.graph.ids.v1.CheckResultDatum
 }
 var file_turboci_graph_orchestrator_v1_check_delta_proto_depIdxs = []int32{
 	2, // 0: turboci.graph.orchestrator.v1.CheckDelta.state:type_name -> turboci.graph.orchestrator.v1.CheckState
-	3, // 1: turboci.graph.orchestrator.v1.CheckDelta.dependencies:type_name -> turboci.graph.orchestrator.v1.EdgeGroup
+	3, // 1: turboci.graph.orchestrator.v1.CheckDelta.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
 	4, // 2: turboci.graph.orchestrator.v1.CheckDelta.options:type_name -> turboci.graph.ids.v1.CheckOption
 	1, // 3: turboci.graph.orchestrator.v1.CheckDelta.result:type_name -> turboci.graph.orchestrator.v1.CheckDelta.Result
 	5, // 4: turboci.graph.orchestrator.v1.CheckDelta.Result.identifier:type_name -> turboci.graph.ids.v1.CheckResult
@@ -380,7 +390,7 @@ func file_turboci_graph_orchestrator_v1_check_delta_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_check_state_proto_init()
-	file_turboci_graph_orchestrator_v1_edge_group_proto_init()
+	file_turboci_graph_orchestrator_v1_dependencies_proto_init()
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_check_delta_proto_msgTypes[0].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_check_delta_proto_msgTypes[1].OneofWrappers = []any{}

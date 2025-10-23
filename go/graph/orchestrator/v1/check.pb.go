@@ -60,7 +60,7 @@ type Check struct {
 	xxx_hidden_Realm        *string                `protobuf:"bytes,3,opt,name=realm,proto3,oneof"`
 	xxx_hidden_Version      *Revision              `protobuf:"bytes,4,opt,name=version,proto3,oneof"`
 	xxx_hidden_State        CheckState             `protobuf:"varint,5,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
-	xxx_hidden_Dependencies *[]*EdgeGroup          `protobuf:"bytes,6,rep,name=dependencies,proto3"`
+	xxx_hidden_Dependencies *Dependencies          `protobuf:"bytes,6,opt,name=dependencies,proto3,oneof"`
 	xxx_hidden_Options      *[]*Check_OptionRef    `protobuf:"bytes,7,rep,name=options,proto3"`
 	xxx_hidden_Results      *[]*Check_Result       `protobuf:"bytes,8,rep,name=results,proto3"`
 	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
@@ -136,11 +136,9 @@ func (x *Check) GetState() CheckState {
 	return CheckState_CHECK_STATE_UNKNOWN
 }
 
-func (x *Check) GetDependencies() []*EdgeGroup {
+func (x *Check) GetDependencies() *Dependencies {
 	if x != nil {
-		if x.xxx_hidden_Dependencies != nil {
-			return *x.xxx_hidden_Dependencies
-		}
+		return x.xxx_hidden_Dependencies
 	}
 	return nil
 }
@@ -186,8 +184,8 @@ func (x *Check) SetState(v CheckState) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 8)
 }
 
-func (x *Check) SetDependencies(v []*EdgeGroup) {
-	x.xxx_hidden_Dependencies = &v
+func (x *Check) SetDependencies(v *Dependencies) {
+	x.xxx_hidden_Dependencies = v
 }
 
 func (x *Check) SetOptions(v []*Check_OptionRef) {
@@ -233,6 +231,13 @@ func (x *Check) HasState() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
 }
 
+func (x *Check) HasDependencies() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Dependencies != nil
+}
+
 func (x *Check) ClearIdentifier() {
 	x.xxx_hidden_Identifier = nil
 }
@@ -254,6 +259,10 @@ func (x *Check) ClearVersion() {
 func (x *Check) ClearState() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
 	x.xxx_hidden_State = CheckState_CHECK_STATE_UNKNOWN
+}
+
+func (x *Check) ClearDependencies() {
+	x.xxx_hidden_Dependencies = nil
 }
 
 type Check_builder struct {
@@ -288,16 +297,10 @@ type Check_builder struct {
 	State *CheckState
 	// Dependencies on other objects in the graph.
 	//
-	// All of these dependencies must be resolved and satisfied for this Check to
-	// be unblocked and advance from the PLANNED to WAITING state.
-	//
-	// If the dependencies are unsatisfiable, then the Check will be immediately
-	// moved to FINAL state and a single Result will be added with type `TBD`.
+	// Checks may only depend on other Checks.
 	//
 	// Once the Check is WAITING, this field is immutable.
-	//
-	// Currently Checks may only depend on other Checks in the same workflow.
-	Dependencies []*EdgeGroup
+	Dependencies *Dependencies
 	// Options form the bulk of 'how to answer this Check'.
 	//
 	// It is expected that small details (like assignments to specific
@@ -356,7 +359,7 @@ func (b0 Check_builder) Build() *Check {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 8)
 		x.xxx_hidden_State = *b.State
 	}
-	x.xxx_hidden_Dependencies = &b.Dependencies
+	x.xxx_hidden_Dependencies = b.Dependencies
 	x.xxx_hidden_Options = &b.Options
 	x.xxx_hidden_Results = &b.Results
 	return m0
@@ -768,8 +771,7 @@ var File_turboci_graph_orchestrator_v1_check_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a.turboci/graph/orchestrator/v1/edge_group.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xfa\n" +
-	"\n" +
+	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\x8f\v\n" +
 	"\x05Check\x12E\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckB\x03\xe0A\x05H\x00R\n" +
@@ -777,11 +779,9 @@ const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\x04kind\x18\x02 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\x03\xe0A\x05H\x01R\x04kind\x88\x01\x01\x12\x1e\n" +
 	"\x05realm\x18\x03 \x01(\tB\x03\xe0A\x05H\x02R\x05realm\x88\x01\x01\x12F\n" +
 	"\aversion\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x03R\aversion\x88\x01\x01\x12D\n" +
-	"\x05state\x18\x05 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x04R\x05state\x88\x01\x01\x12]\n" +
-	"\fdependencies\x18\x06 \x03(\v2(.turboci.graph.orchestrator.v1.EdgeGroupB\x0f\x82\x86\xf6\xfb\x0f\t\n" +
-	"\x02\b\n" +
-	"\x12\x03\n" +
-	"\x01\x02R\fdependencies\x12T\n" +
+	"\x05state\x18\x05 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x04R\x05state\x88\x01\x01\x12a\n" +
+	"\fdependencies\x18\x06 \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
+	"\x01\x02H\x05R\fdependencies\x88\x01\x01\x12T\n" +
 	"\aoptions\x18\a \x03(\v2..turboci.graph.orchestrator.v1.Check.OptionRefB\n" +
 	"\x82\x86\xf6\xfb\x0f\x04\n" +
 	"\x02\b\n" +
@@ -820,7 +820,8 @@ const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\x06_realmB\n" +
 	"\n" +
 	"\b_versionB\b\n" +
-	"\x06_stateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x06_stateB\x0f\n" +
+	"\r_dependenciesBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_check_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_turboci_graph_orchestrator_v1_check_proto_goTypes = []any{
@@ -832,7 +833,7 @@ var file_turboci_graph_orchestrator_v1_check_proto_goTypes = []any{
 	(CheckKind)(0),                      // 5: turboci.graph.orchestrator.v1.CheckKind
 	(*Revision)(nil),                    // 6: turboci.graph.orchestrator.v1.Revision
 	(CheckState)(0),                     // 7: turboci.graph.orchestrator.v1.CheckState
-	(*EdgeGroup)(nil),                   // 8: turboci.graph.orchestrator.v1.EdgeGroup
+	(*Dependencies)(nil),                // 8: turboci.graph.orchestrator.v1.Dependencies
 	(*v1.CheckOption)(nil),              // 9: turboci.graph.ids.v1.CheckOption
 	(*v1.CheckResult)(nil),              // 10: turboci.graph.ids.v1.CheckResult
 	(*Actor)(nil),                       // 11: turboci.graph.orchestrator.v1.Actor
@@ -843,7 +844,7 @@ var file_turboci_graph_orchestrator_v1_check_proto_depIdxs = []int32{
 	5,  // 1: turboci.graph.orchestrator.v1.Check.kind:type_name -> turboci.graph.orchestrator.v1.CheckKind
 	6,  // 2: turboci.graph.orchestrator.v1.Check.version:type_name -> turboci.graph.orchestrator.v1.Revision
 	7,  // 3: turboci.graph.orchestrator.v1.Check.state:type_name -> turboci.graph.orchestrator.v1.CheckState
-	8,  // 4: turboci.graph.orchestrator.v1.Check.dependencies:type_name -> turboci.graph.orchestrator.v1.EdgeGroup
+	8,  // 4: turboci.graph.orchestrator.v1.Check.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
 	1,  // 5: turboci.graph.orchestrator.v1.Check.options:type_name -> turboci.graph.orchestrator.v1.Check.OptionRef
 	2,  // 6: turboci.graph.orchestrator.v1.Check.results:type_name -> turboci.graph.orchestrator.v1.Check.Result
 	9,  // 7: turboci.graph.orchestrator.v1.Check.OptionRef.identifier:type_name -> turboci.graph.ids.v1.CheckOption
@@ -868,7 +869,7 @@ func file_turboci_graph_orchestrator_v1_check_proto_init() {
 	file_turboci_graph_orchestrator_v1_actor_proto_init()
 	file_turboci_graph_orchestrator_v1_check_kind_proto_init()
 	file_turboci_graph_orchestrator_v1_check_state_proto_init()
-	file_turboci_graph_orchestrator_v1_edge_group_proto_init()
+	file_turboci_graph_orchestrator_v1_dependencies_proto_init()
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
 	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[0].OneofWrappers = []any{}

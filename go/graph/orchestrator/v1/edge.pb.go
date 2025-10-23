@@ -12,7 +12,6 @@ package orchestratorpb
 
 import (
 	v1 "go.chromium.org/turboci/proto/go/graph/ids/v1"
-	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -31,11 +30,10 @@ const (
 // Typically Edges must always point to nodes in the same graph, though this may
 // be lifted in the future.
 type Edge struct {
-	state                 protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Target     *v1.Identifier         `protobuf:"bytes,1,opt,name=target,proto3,oneof"`
-	xxx_hidden_Resolution *Edge_Resolution       `protobuf:"bytes,2,opt,name=resolution,proto3,oneof"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Target *v1.Identifier         `protobuf:"bytes,1,opt,name=target,proto3,oneof"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *Edge) Reset() {
@@ -70,19 +68,8 @@ func (x *Edge) GetTarget() *v1.Identifier {
 	return nil
 }
 
-func (x *Edge) GetResolution() *Edge_Resolution {
-	if x != nil {
-		return x.xxx_hidden_Resolution
-	}
-	return nil
-}
-
 func (x *Edge) SetTarget(v *v1.Identifier) {
 	x.xxx_hidden_Target = v
-}
-
-func (x *Edge) SetResolution(v *Edge_Resolution) {
-	x.xxx_hidden_Resolution = v
 }
 
 func (x *Edge) HasTarget() bool {
@@ -92,19 +79,8 @@ func (x *Edge) HasTarget() bool {
 	return x.xxx_hidden_Target != nil
 }
 
-func (x *Edge) HasResolution() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Resolution != nil
-}
-
 func (x *Edge) ClearTarget() {
 	x.xxx_hidden_Target = nil
-}
-
-func (x *Edge) ClearResolution() {
-	x.xxx_hidden_Resolution = nil
 }
 
 type Edge_builder struct {
@@ -114,10 +90,6 @@ type Edge_builder struct {
 	//
 	// Currently only Checks and Stages are supported.
 	Target *v1.Identifier
-	// Indicates if this Edge was resolved yet.
-	//
-	// If this is absent, then this Edge has not yet been resolved.
-	Resolution *Edge_Resolution
 }
 
 func (b0 Edge_builder) Build() *Edge {
@@ -125,156 +97,6 @@ func (b0 Edge_builder) Build() *Edge {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Target = b.Target
-	x.xxx_hidden_Resolution = b.Resolution
-	return m0
-}
-
-// The Orchestrator logically attempts to resolve an Edge any time the target
-// it points to changes - in practice, the Orchestrator will make various
-// optimizations to avoid this becoming resource intensive.
-//
-// Once a resolution is recorded, the Edge is never evaluated again. TurboCI
-// graph is structured such that data evolves in an append-only fashion, so
-// that once an Edge is resolved as satisfied, the data which caused it to be
-// satisfied cannot be 'reversed' (and vice-versa; an edge resolved as
-// satisfied == false cannot later become satisfiable).
-type Edge_Resolution struct {
-	state                    protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Satisfied     bool                   `protobuf:"varint,1,opt,name=satisfied,proto3,oneof"`
-	xxx_hidden_TargetVersion *Revision              `protobuf:"bytes,2,opt,name=target_version,json=targetVersion,proto3,oneof"`
-	xxx_hidden_At            *Revision              `protobuf:"bytes,3,opt,name=at,proto3,oneof"`
-	XXX_raceDetectHookData   protoimpl.RaceDetectHookData
-	XXX_presence             [1]uint32
-	unknownFields            protoimpl.UnknownFields
-	sizeCache                protoimpl.SizeCache
-}
-
-func (x *Edge_Resolution) Reset() {
-	*x = Edge_Resolution{}
-	mi := &file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Edge_Resolution) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Edge_Resolution) ProtoMessage() {}
-
-func (x *Edge_Resolution) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *Edge_Resolution) GetSatisfied() bool {
-	if x != nil {
-		return x.xxx_hidden_Satisfied
-	}
-	return false
-}
-
-func (x *Edge_Resolution) GetTargetVersion() *Revision {
-	if x != nil {
-		return x.xxx_hidden_TargetVersion
-	}
-	return nil
-}
-
-func (x *Edge_Resolution) GetAt() *Revision {
-	if x != nil {
-		return x.xxx_hidden_At
-	}
-	return nil
-}
-
-func (x *Edge_Resolution) SetSatisfied(v bool) {
-	x.xxx_hidden_Satisfied = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
-}
-
-func (x *Edge_Resolution) SetTargetVersion(v *Revision) {
-	x.xxx_hidden_TargetVersion = v
-}
-
-func (x *Edge_Resolution) SetAt(v *Revision) {
-	x.xxx_hidden_At = v
-}
-
-func (x *Edge_Resolution) HasSatisfied() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
-}
-
-func (x *Edge_Resolution) HasTargetVersion() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_TargetVersion != nil
-}
-
-func (x *Edge_Resolution) HasAt() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_At != nil
-}
-
-func (x *Edge_Resolution) ClearSatisfied() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Satisfied = false
-}
-
-func (x *Edge_Resolution) ClearTargetVersion() {
-	x.xxx_hidden_TargetVersion = nil
-}
-
-func (x *Edge_Resolution) ClearAt() {
-	x.xxx_hidden_At = nil
-}
-
-type Edge_Resolution_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// If this is `true`, then this Edge's condition is satisfied.
-	// If this is `false`, then this Edge's condition is unsatisfiable.
-	Satisfied *bool
-	// The version of the target node which caused this Edge (or EdgeGroup) to
-	// be satisfied/unsatisfiable.
-	//
-	// This will always be less than or equal to the version in `at`.
-	TargetVersion *Revision
-	// The database revsision (commit timestamp) at which this resolution was
-	// made.
-	//
-	// Edges in the Orchestrator MAY be resolved in an eventually-consistent
-	// fashion, which means that it's possible to observe the target of this
-	// edge in a satisfying state for this edge, but the edge is still not
-	// marked as resolved.
-	//
-	// This will always be greater than or equal to the version in `target_version`.
-	At *Revision
-}
-
-func (b0 Edge_Resolution_builder) Build() *Edge_Resolution {
-	m0 := &Edge_Resolution{}
-	b, x := &b0, m0
-	_, _ = b, x
-	if b.Satisfied != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
-		x.xxx_hidden_Satisfied = *b.Satisfied
-	}
-	x.xxx_hidden_TargetVersion = b.TargetVersion
-	x.xxx_hidden_At = b.At
 	return m0
 }
 
@@ -282,41 +104,23 @@ var File_turboci_graph_orchestrator_v1_edge_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_edge_proto_rawDesc = "" +
 	"\n" +
-	"(turboci/graph/orchestrator/v1/edge.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xb0\x03\n" +
+	"(turboci/graph/orchestrator/v1/edge.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\"P\n" +
 	"\x04Edge\x12=\n" +
-	"\x06target\x18\x01 \x01(\v2 .turboci.graph.ids.v1.IdentifierH\x00R\x06target\x88\x01\x01\x12S\n" +
-	"\n" +
-	"resolution\x18\x02 \x01(\v2..turboci.graph.orchestrator.v1.Edge.ResolutionH\x01R\n" +
-	"resolution\x88\x01\x01\x1a\xf9\x01\n" +
-	"\n" +
-	"Resolution\x12&\n" +
-	"\tsatisfied\x18\x01 \x01(\bB\x03\xe0A\x05H\x00R\tsatisfied\x88\x01\x01\x12X\n" +
-	"\x0etarget_version\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05H\x01R\rtargetVersion\x88\x01\x01\x12A\n" +
-	"\x02at\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05H\x02R\x02at\x88\x01\x01B\f\n" +
-	"\n" +
-	"_satisfiedB\x11\n" +
-	"\x0f_target_versionB\x05\n" +
-	"\x03_atB\t\n" +
-	"\a_targetB\r\n" +
-	"\v_resolutionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x06target\x18\x01 \x01(\v2 .turboci.graph.ids.v1.IdentifierH\x00R\x06target\x88\x01\x01B\t\n" +
+	"\a_targetBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_edge_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_turboci_graph_orchestrator_v1_edge_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_edge_proto_goTypes = []any{
-	(*Edge)(nil),            // 0: turboci.graph.orchestrator.v1.Edge
-	(*Edge_Resolution)(nil), // 1: turboci.graph.orchestrator.v1.Edge.Resolution
-	(*v1.Identifier)(nil),   // 2: turboci.graph.ids.v1.Identifier
-	(*Revision)(nil),        // 3: turboci.graph.orchestrator.v1.Revision
+	(*Edge)(nil),          // 0: turboci.graph.orchestrator.v1.Edge
+	(*v1.Identifier)(nil), // 1: turboci.graph.ids.v1.Identifier
 }
 var file_turboci_graph_orchestrator_v1_edge_proto_depIdxs = []int32{
-	2, // 0: turboci.graph.orchestrator.v1.Edge.target:type_name -> turboci.graph.ids.v1.Identifier
-	1, // 1: turboci.graph.orchestrator.v1.Edge.resolution:type_name -> turboci.graph.orchestrator.v1.Edge.Resolution
-	3, // 2: turboci.graph.orchestrator.v1.Edge.Resolution.target_version:type_name -> turboci.graph.orchestrator.v1.Revision
-	3, // 3: turboci.graph.orchestrator.v1.Edge.Resolution.at:type_name -> turboci.graph.orchestrator.v1.Revision
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	1, // 0: turboci.graph.orchestrator.v1.Edge.target:type_name -> turboci.graph.ids.v1.Identifier
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_edge_proto_init() }
@@ -324,16 +128,14 @@ func file_turboci_graph_orchestrator_v1_edge_proto_init() {
 	if File_turboci_graph_orchestrator_v1_edge_proto != nil {
 		return
 	}
-	file_turboci_graph_orchestrator_v1_revision_proto_init()
 	file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[0].OneofWrappers = []any{}
-	file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_edge_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_edge_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

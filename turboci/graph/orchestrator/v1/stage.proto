@@ -9,8 +9,8 @@ package turboci.graph.orchestrator.v1;
 import "google/api/field_behavior.proto";
 import "turboci/graph/ids/v1/identifier.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
+import "turboci/graph/orchestrator/v1/dependencies.proto";
 import "turboci/graph/orchestrator/v1/edge.proto";
-import "turboci/graph/orchestrator/v1/edge_group.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto";
@@ -81,11 +81,13 @@ message Stage {
   // The current state of the Stage.
   optional StageState state = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
 
+  // Dependencies on other objects in the graph.
+  //
   // Stages are allowed to depend on other Checks and Stages, and will not be
-  // sent to an Executor until these dependencies are resolved.
+  // sent to an Executor until dependencies is resolved.
   //
   // Once the Stage is ATTEMPTING, this field is immutable.
-  repeated EdgeGroup dependencies = 7 [
+  optional Dependencies dependencies = 7 [
     (turboci).id.allowed = IDENTIFIER_KIND_CHECK,
     (turboci).id.allowed = IDENTIFIER_KIND_STAGE
   ];
