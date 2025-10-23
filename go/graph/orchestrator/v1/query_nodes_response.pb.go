@@ -89,6 +89,8 @@ type QueryNodesResponse_builder struct {
 	// The graph view of the nodes matching the query.
 	//
 	// Indexed by WorkPlan id.
+	//
+	// The `version` field of each GraphView will always be identical.
 	Graph map[string]*GraphView
 	// A list of explicitly-selected nodes which were not found in the graph.
 	Absent []*v1.Identifier
