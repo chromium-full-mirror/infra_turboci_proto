@@ -26,11 +26,11 @@ enum QueryExpandDepsMode {
   // Expand to deps which are listed in dependencies.edges.
   QUERY_EXPAND_DEPS_MODE_EDGES = 1;
 
-  // Expand to deps which are listed (transitively) in dependencies.resolved.
+  // Expand to deps which are listed (transitively) in dependencies.satisfied.
   //
   // Note that this will be the empty set for nodes which are not already past
-  // the PLANNED state.
-  QUERY_EXPAND_DEPS_MODE_RESOLVED = 2;
+  // the PLANNED state, and for nodes which have unsatisfiable dependencies.
+  QUERY_EXPAND_DEPS_MODE_SATISFIED = 2;
 }
 
 // Query describes a simple graph query.
@@ -59,6 +59,9 @@ message Query {
   // URLs, but this requires an extra permission. Extra permission is needed
   // to encourage clients to be explicit about what they want to reduce
   // bandwidth, coupling and increase auditability.
+  //
+  // TBD: Allow limited wildcards to include everything under some package
+  // namespace.
   repeated string type_urls = 1;
 
   // Select picks some set of nodes out of the graph.
@@ -131,7 +134,7 @@ message Query {
     message Dependencies {
       // How to expand dependencies.
       //
-      // Defaults to QUERY_EXPAND_DEPS_MODE_REQUESTED.
+      // Defaults to QUERY_EXPAND_DEPS_MODE_EDGES.
       optional QueryExpandDepsMode mode = 1;
 
       // TBD: Allow walking more than one dependency down?
@@ -148,7 +151,7 @@ message Query {
     message Dependants {
       // How to expand dependants.
       //
-      // Defaults to QUERY_EXPAND_DEPS_MODE_REQUESTED.
+      // Defaults to QUERY_EXPAND_DEPS_MODE_EDGES.
       optional QueryExpandDepsMode mode = 1;
 
       // TBD: Allow walking more than one dependant up?

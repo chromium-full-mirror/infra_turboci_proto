@@ -36,11 +36,11 @@ const (
 	QueryExpandDepsMode_QUERY_EXPAND_DEPS_MODE_UNKNOWN QueryExpandDepsMode = 0
 	// Expand to deps which are listed in dependencies.edges.
 	QueryExpandDepsMode_QUERY_EXPAND_DEPS_MODE_EDGES QueryExpandDepsMode = 1
-	// Expand to deps which are listed (transitively) in dependencies.resolved.
+	// Expand to deps which are listed (transitively) in dependencies.satisfied.
 	//
 	// Note that this will be the empty set for nodes which are not already past
-	// the PLANNED state.
-	QueryExpandDepsMode_QUERY_EXPAND_DEPS_MODE_RESOLVED QueryExpandDepsMode = 2
+	// the PLANNED state, and for nodes which have unsatisfiable dependencies.
+	QueryExpandDepsMode_QUERY_EXPAND_DEPS_MODE_SATISFIED QueryExpandDepsMode = 2
 )
 
 // Enum value maps for QueryExpandDepsMode.
@@ -48,12 +48,12 @@ var (
 	QueryExpandDepsMode_name = map[int32]string{
 		0: "QUERY_EXPAND_DEPS_MODE_UNKNOWN",
 		1: "QUERY_EXPAND_DEPS_MODE_EDGES",
-		2: "QUERY_EXPAND_DEPS_MODE_RESOLVED",
+		2: "QUERY_EXPAND_DEPS_MODE_SATISFIED",
 	}
 	QueryExpandDepsMode_value = map[string]int32{
-		"QUERY_EXPAND_DEPS_MODE_UNKNOWN":  0,
-		"QUERY_EXPAND_DEPS_MODE_EDGES":    1,
-		"QUERY_EXPAND_DEPS_MODE_RESOLVED": 2,
+		"QUERY_EXPAND_DEPS_MODE_UNKNOWN":   0,
+		"QUERY_EXPAND_DEPS_MODE_EDGES":     1,
+		"QUERY_EXPAND_DEPS_MODE_SATISFIED": 2,
 	}
 )
 
@@ -219,6 +219,9 @@ type Query_builder struct {
 	// URLs, but this requires an extra permission. Extra permission is needed
 	// to encourage clients to be explicit about what they want to reduce
 	// bandwidth, coupling and increase auditability.
+	//
+	// TBD: Allow limited wildcards to include everything under some package
+	// namespace.
 	TypeUrls []string
 	// Select an arbitrary set of nodes.
 	Select *Query_Select
@@ -921,7 +924,7 @@ type Query_Expand_Dependencies_builder struct {
 
 	// How to expand dependencies.
 	//
-	// Defaults to QUERY_EXPAND_DEPS_MODE_REQUESTED.
+	// Defaults to QUERY_EXPAND_DEPS_MODE_EDGES.
 	Mode *QueryExpandDepsMode
 }
 
@@ -1002,7 +1005,7 @@ type Query_Expand_Dependants_builder struct {
 
 	// How to expand dependants.
 	//
-	// Defaults to QUERY_EXPAND_DEPS_MODE_REQUESTED.
+	// Defaults to QUERY_EXPAND_DEPS_MODE_EDGES.
 	Mode *QueryExpandDepsMode
 }
 
@@ -1288,11 +1291,11 @@ const file_turboci_graph_orchestrator_v1_query_proto_rawDesc = "" +
 	"\a_selectB\t\n" +
 	"\a_expandB\n" +
 	"\n" +
-	"\b_collect*\x80\x01\n" +
+	"\b_collect*\x81\x01\n" +
 	"\x13QueryExpandDepsMode\x12\"\n" +
 	"\x1eQUERY_EXPAND_DEPS_MODE_UNKNOWN\x10\x00\x12 \n" +
-	"\x1cQUERY_EXPAND_DEPS_MODE_EDGES\x10\x01\x12#\n" +
-	"\x1fQUERY_EXPAND_DEPS_MODE_RESOLVED\x10\x02BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x1cQUERY_EXPAND_DEPS_MODE_EDGES\x10\x01\x12$\n" +
+	" QUERY_EXPAND_DEPS_MODE_SATISFIED\x10\x02BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_query_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_query_proto_msgTypes = make([]protoimpl.MessageInfo, 11)

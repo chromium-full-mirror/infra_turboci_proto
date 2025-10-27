@@ -24,34 +24,33 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Dependencies represents a group of edges needed to unblock a containing node
-// (a Check or a Stage), as well as timestamps and satisfaction of those edges,
-// and finally the group of edges which resolved the Dependencies and unblocked
-// the containing node.
+// Dependencies represents a group of edges (the predicate) needed to unblock
+// a containing node (a Check or a Stage), as well as timestamps and
+// satisfaction of those edges, and finally the group of edges which satisfied
+// the predicate and unblocked the containing node (or an indicator that the
+// predicate is unsatisfiable).
 //
 // During PLANNING, the `edges` and `predicate` fields are mutable. These
-// contains all dependency targets and any criteria for them, plus the boolean
-// logic of which subset of these edges are necessary to unblock the node.
-// The orchestrator will convert WriteNodesRequest.DependencyGroup into `edges`
-// and `predicate` for the client.
+// contain all dependency targets and any criteria for them, plus the boolean
+// logic of which subset of these edges are necessary to unblock the node. The
+// orchestrator will convert WriteNodesRequest.DependencyGroup into `edges` and
+// `predicate` for the client.
 //
 // As soon as the containing node is PLANNED, the orchestrator will begin
-// tracking resolution of the edges. As they resolved, these are recorded to the
-// the `resolution_events` field.
+// tracking resolution of the edges. As they are resolved, these 'resolution
+// events' are recorded to the the `resolution_events` field.
 //
-// Finally, once enough resolution_events are present such that the `predicate`
-// Group can be resolved, the orchestrator will advance the containing node to
-// the next state (i.e. CHECK_STATE_WAITING or STAGE_STATE_ATTEMPTING), and will
-// populate `resolved` with only the groups/edges which actually participated in
-// unblocked the containing node (this may be a subset of the propagated
-// events). At this point, no more events will be added to `resolution_events`
-// and this Dependencies message will be fully immutable.
+// Finally, once enough resolution events are present such that the `predicate`
+// Group can be resolved, the orchestrator will populate either `satisfied` or
+// `unsatisfiable`, and will advance the containing node to the next state (i.e.
+// CHECK_STATE_WAITING or STAGE_STATE_ATTEMPTING in the case of statisfied,
+// FINAL in the case of unsatisfiable).
 type Dependencies struct {
 	state                       protoimpl.MessageState                  `protogen:"opaque.v1"`
 	xxx_hidden_Edges            *[]*Edge                                `protobuf:"bytes,1,rep,name=edges,proto3"`
 	xxx_hidden_Predicate        *Dependencies_Group                     `protobuf:"bytes,2,opt,name=predicate,proto3,oneof"`
 	xxx_hidden_ResolutionEvents map[int32]*Dependencies_ResolutionEvent `protobuf:"bytes,3,rep,name=resolution_events,json=resolutionEvents,proto3" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	xxx_hidden_Resolved         *Dependencies_Group                     `protobuf:"bytes,4,opt,name=resolved,proto3,oneof"`
+	xxx_hidden_Resolution       isDependencies_Resolution               `protobuf_oneof:"resolution"`
 	unknownFields               protoimpl.UnknownFields
 	sizeCache                   protoimpl.SizeCache
 }
@@ -104,11 +103,22 @@ func (x *Dependencies) GetResolutionEvents() map[int32]*Dependencies_ResolutionE
 	return nil
 }
 
-func (x *Dependencies) GetResolved() *Dependencies_Group {
+func (x *Dependencies) GetSatisfied() *Dependencies_Group {
 	if x != nil {
-		return x.xxx_hidden_Resolved
+		if x, ok := x.xxx_hidden_Resolution.(*dependencies_Satisfied); ok {
+			return x.Satisfied
+		}
 	}
 	return nil
+}
+
+func (x *Dependencies) GetUnsatisfiable() bool {
+	if x != nil {
+		if x, ok := x.xxx_hidden_Resolution.(*dependencies_Unsatisfiable); ok {
+			return x.Unsatisfiable
+		}
+	}
+	return false
 }
 
 func (x *Dependencies) SetEdges(v []*Edge) {
@@ -123,8 +133,16 @@ func (x *Dependencies) SetResolutionEvents(v map[int32]*Dependencies_ResolutionE
 	x.xxx_hidden_ResolutionEvents = v
 }
 
-func (x *Dependencies) SetResolved(v *Dependencies_Group) {
-	x.xxx_hidden_Resolved = v
+func (x *Dependencies) SetSatisfied(v *Dependencies_Group) {
+	if v == nil {
+		x.xxx_hidden_Resolution = nil
+		return
+	}
+	x.xxx_hidden_Resolution = &dependencies_Satisfied{v}
+}
+
+func (x *Dependencies) SetUnsatisfiable(v bool) {
+	x.xxx_hidden_Resolution = &dependencies_Unsatisfiable{v}
 }
 
 func (x *Dependencies) HasPredicate() bool {
@@ -134,19 +152,65 @@ func (x *Dependencies) HasPredicate() bool {
 	return x.xxx_hidden_Predicate != nil
 }
 
-func (x *Dependencies) HasResolved() bool {
+func (x *Dependencies) HasResolution() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_Resolved != nil
+	return x.xxx_hidden_Resolution != nil
+}
+
+func (x *Dependencies) HasSatisfied() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Resolution.(*dependencies_Satisfied)
+	return ok
+}
+
+func (x *Dependencies) HasUnsatisfiable() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Resolution.(*dependencies_Unsatisfiable)
+	return ok
 }
 
 func (x *Dependencies) ClearPredicate() {
 	x.xxx_hidden_Predicate = nil
 }
 
-func (x *Dependencies) ClearResolved() {
-	x.xxx_hidden_Resolved = nil
+func (x *Dependencies) ClearResolution() {
+	x.xxx_hidden_Resolution = nil
+}
+
+func (x *Dependencies) ClearSatisfied() {
+	if _, ok := x.xxx_hidden_Resolution.(*dependencies_Satisfied); ok {
+		x.xxx_hidden_Resolution = nil
+	}
+}
+
+func (x *Dependencies) ClearUnsatisfiable() {
+	if _, ok := x.xxx_hidden_Resolution.(*dependencies_Unsatisfiable); ok {
+		x.xxx_hidden_Resolution = nil
+	}
+}
+
+const Dependencies_Resolution_not_set_case case_Dependencies_Resolution = 0
+const Dependencies_Satisfied_case case_Dependencies_Resolution = 4
+const Dependencies_Unsatisfiable_case case_Dependencies_Resolution = 5
+
+func (x *Dependencies) WhichResolution() case_Dependencies_Resolution {
+	if x == nil {
+		return Dependencies_Resolution_not_set_case
+	}
+	switch x.xxx_hidden_Resolution.(type) {
+	case *dependencies_Satisfied:
+		return Dependencies_Satisfied_case
+	case *dependencies_Unsatisfiable:
+		return Dependencies_Unsatisfiable_case
+	default:
+		return Dependencies_Resolution_not_set_case
+	}
 }
 
 type Dependencies_builder struct {
@@ -156,7 +220,7 @@ type Dependencies_builder struct {
 	//
 	// These are unique by `target` and criteria.
 	//
-	// See `predicate` and `resolved` which refer to these.
+	// See `predicate` and `satisfied` which refer to these.
 	Edges []*Edge
 	// The logical predicate that the containing node depends on.
 	//
@@ -167,8 +231,9 @@ type Dependencies_builder struct {
 	// PLANNED to CHECK_STATE_WAITING or STAGE_STATE_ATTEMPTING, depending on the
 	// containing node type.
 	//
-	// If the Group is unsatisfiable, then the Check will be immediately moved to
-	// the FINAL state and a single Result will be added with type `TBD`.
+	// If the Group is unsatisfiable, then the containing node will be immediately
+	// moved to its FINAL state. For Checks, a single Result will be added with
+	// type `TBD`.
 	//
 	// Once the containing node is CHECK_STATE_WAITING/STAGE_STATE_ATTEMPTING,
 	// this field is immutable.
@@ -184,19 +249,34 @@ type Dependencies_builder struct {
 	// several events which show up here immediately (i.e. the targets of these
 	// Edges were already in a satisfying state).
 	//
-	// This will include a superset of edges in `resolved`.
+	// This will include a superset of edges in `satisfied`.
 	ResolutionEvents map[int32]*Dependencies_ResolutionEvent
-	// The actual group of resolved dependencies which unblocked the containing
-	// node.
+	// When the orchestrator recognizes that the events in `resolution_events` can
+	// resolve the `predicate` Group, it will either set `satisfied` or
+	// `unsatisfiable` and stop accumulating `resolution_events`.
 	//
-	// When the orchestrator recognizes that the events in `resolution_events`
-	// satisfies the dependencies in `predicate`, it will advance the containing
-	// node to the next state (i.e. CHECK_STATE_WAITING, STAGE_STATE_ATTEMPTING),
-	// and will populate this field with just the groups and edges which
-	// ultimately caused the containing node to be unblocked.
+	// If the `predicate` is satisfied, the `satisfied` field here will be set to
+	// a Group with just the groups and edges which ultimately caused
+	// the containing node to be unblocked. The orchestrator will advance the
+	// containing node to the next state (i.e. CHECK_STATE_WAITING,
+	// STAGE_STATE_ATTEMPTING).
+	//
+	// If the `predicate` is unsatisfiable, `unsatisfiable` will be set to true.
+	// The orchestrator will advance the containing node to its FINAL state. For
+	// Checks, the orchestrator will also synthesize a result of type `TBD`.
 	//
 	// Once written, this is immutable.
-	Resolved *Dependencies_Group
+
+	// Fields of oneof xxx_hidden_Resolution:
+	// The actual group of resolved dependencies which satisfied the
+	// dependencies predicate.
+	Satisfied *Dependencies_Group
+	// If the predicate can never be satisfied, this is `true`.
+	//
+	// The orchestrator will never populate this field with a value other than
+	// `true`.
+	Unsatisfiable *bool
+	// -- end of xxx_hidden_Resolution
 }
 
 func (b0 Dependencies_builder) Build() *Dependencies {
@@ -206,12 +286,54 @@ func (b0 Dependencies_builder) Build() *Dependencies {
 	x.xxx_hidden_Edges = &b.Edges
 	x.xxx_hidden_Predicate = b.Predicate
 	x.xxx_hidden_ResolutionEvents = b.ResolutionEvents
-	x.xxx_hidden_Resolved = b.Resolved
+	if b.Satisfied != nil {
+		x.xxx_hidden_Resolution = &dependencies_Satisfied{b.Satisfied}
+	}
+	if b.Unsatisfiable != nil {
+		x.xxx_hidden_Resolution = &dependencies_Unsatisfiable{*b.Unsatisfiable}
+	}
 	return m0
 }
 
+type case_Dependencies_Resolution protoreflect.FieldNumber
+
+func (x case_Dependencies_Resolution) String() string {
+	md := file_turboci_graph_orchestrator_v1_dependencies_proto_msgTypes[0].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
+type isDependencies_Resolution interface {
+	isDependencies_Resolution()
+}
+
+type dependencies_Satisfied struct {
+	// The actual group of resolved dependencies which satisfied the
+	// dependencies predicate.
+	Satisfied *Dependencies_Group `protobuf:"bytes,4,opt,name=satisfied,proto3,oneof"`
+}
+
+type dependencies_Unsatisfiable struct {
+	// If the predicate can never be satisfied, this is `true`.
+	//
+	// The orchestrator will never populate this field with a value other than
+	// `true`.
+	Unsatisfiable bool `protobuf:"varint,5,opt,name=unsatisfiable,proto3,oneof"`
+}
+
+func (*dependencies_Satisfied) isDependencies_Resolution() {}
+
+func (*dependencies_Unsatisfiable) isDependencies_Resolution() {}
+
 // A group of dependencies, containing edges and/or other groups, plus
 // a minimum threshold to meet to consider this Group satisfied.
+//
+// A Group forms a boolean logic expression of edge satisfiability (e.g. `(A
+// && B) || C`). In the basic case with `threshold` unset, a Group is an `AND`
+// of all contained edges/groups. With threshold == 1, a Group is an `OR` of
+// all contained edges/groups.
 type Dependencies_Group struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Edges       []int32                `protobuf:"varint,1,rep,packed,name=edges,proto3"`
@@ -314,8 +436,8 @@ type Dependencies_Group_builder struct {
 	// Setting threshold to `1` effectively means 'the first satisfied entry in
 	// edges or groups satisfies this group' (effectively making this an OR).
 	//
-	// A value greater than one could be useful if you want to depend on the first
-	// N of multiple possible edges.
+	// A value greater than `1` could be useful if you want to depend on the
+	// first N of multiple possible edges.
 	//
 	// For example, if this Group is
 	//
@@ -341,12 +463,15 @@ type Dependencies_Group_builder struct {
 	//	  threshold = 1,
 	//	}
 	//
-	// NOTE: It is possible for a Group in `Dependencies.resolved` to contain
+	// NOTE: It is possible for a Group in `Dependencies.satisfied` to contain
 	// more edges/groups than `threshold` if all of those Edges were satisfied
 	// at the time the Dependencies were resolved.
 	//
-	// A zero threshold will be normalized to `unset`.
-	// A negative threshold is an error.
+	// A threshold less than zero is an error.
+	// A threshold greater than `len(edges) + len(groups)` is an error.
+	//
+	// A threshold equal to zero or a threshold equal to `len(edges)
+	// + len(groups)` will be normalized to `unset`.
 	Threshold *int32
 }
 
@@ -481,12 +606,13 @@ var File_turboci_graph_orchestrator_v1_dependencies_proto protoreflect.FileDescr
 
 const file_turboci_graph_orchestrator_v1_dependencies_proto_rawDesc = "" +
 	"\n" +
-	"0turboci/graph/orchestrator/v1/dependencies.proto\x12\x1dturboci.graph.orchestrator.v1\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xb6\x06\n" +
+	"0turboci/graph/orchestrator/v1/dependencies.proto\x12\x1dturboci.graph.orchestrator.v1\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xde\x06\n" +
 	"\fDependencies\x129\n" +
 	"\x05edges\x18\x01 \x03(\v2#.turboci.graph.orchestrator.v1.EdgeR\x05edges\x12T\n" +
-	"\tpredicate\x18\x02 \x01(\v21.turboci.graph.orchestrator.v1.Dependencies.GroupH\x00R\tpredicate\x88\x01\x01\x12n\n" +
-	"\x11resolution_events\x18\x03 \x03(\v2A.turboci.graph.orchestrator.v1.Dependencies.ResolutionEventsEntryR\x10resolutionEvents\x12R\n" +
-	"\bresolved\x18\x04 \x01(\v21.turboci.graph.orchestrator.v1.Dependencies.GroupH\x01R\bresolved\x88\x01\x01\x1a\x99\x01\n" +
+	"\tpredicate\x18\x02 \x01(\v21.turboci.graph.orchestrator.v1.Dependencies.GroupH\x01R\tpredicate\x88\x01\x01\x12n\n" +
+	"\x11resolution_events\x18\x03 \x03(\v2A.turboci.graph.orchestrator.v1.Dependencies.ResolutionEventsEntryR\x10resolutionEvents\x12Q\n" +
+	"\tsatisfied\x18\x04 \x01(\v21.turboci.graph.orchestrator.v1.Dependencies.GroupH\x00R\tsatisfied\x12&\n" +
+	"\runsatisfiable\x18\x05 \x01(\bH\x00R\runsatisfiable\x1a\x99\x01\n" +
 	"\x05Group\x12\x14\n" +
 	"\x05edges\x18\x01 \x03(\x05R\x05edges\x12I\n" +
 	"\x06groups\x18\x02 \x03(\v21.turboci.graph.orchestrator.v1.Dependencies.GroupR\x06groups\x12!\n" +
@@ -504,8 +630,9 @@ const file_turboci_graph_orchestrator_v1_dependencies_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\x05R\x03key\x12Q\n" +
 	"\x05value\x18\x02 \x01(\v2;.turboci.graph.orchestrator.v1.Dependencies.ResolutionEventR\x05value:\x028\x01B\f\n" +
 	"\n" +
-	"_predicateB\v\n" +
-	"\t_resolvedBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"resolutionB\f\n" +
+	"\n" +
+	"_predicateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_dependencies_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_turboci_graph_orchestrator_v1_dependencies_proto_goTypes = []any{
@@ -520,7 +647,7 @@ var file_turboci_graph_orchestrator_v1_dependencies_proto_depIdxs = []int32{
 	4, // 0: turboci.graph.orchestrator.v1.Dependencies.edges:type_name -> turboci.graph.orchestrator.v1.Edge
 	1, // 1: turboci.graph.orchestrator.v1.Dependencies.predicate:type_name -> turboci.graph.orchestrator.v1.Dependencies.Group
 	3, // 2: turboci.graph.orchestrator.v1.Dependencies.resolution_events:type_name -> turboci.graph.orchestrator.v1.Dependencies.ResolutionEventsEntry
-	1, // 3: turboci.graph.orchestrator.v1.Dependencies.resolved:type_name -> turboci.graph.orchestrator.v1.Dependencies.Group
+	1, // 3: turboci.graph.orchestrator.v1.Dependencies.satisfied:type_name -> turboci.graph.orchestrator.v1.Dependencies.Group
 	1, // 4: turboci.graph.orchestrator.v1.Dependencies.Group.groups:type_name -> turboci.graph.orchestrator.v1.Dependencies.Group
 	5, // 5: turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent.version:type_name -> turboci.graph.orchestrator.v1.Revision
 	2, // 6: turboci.graph.orchestrator.v1.Dependencies.ResolutionEventsEntry.value:type_name -> turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent
@@ -538,7 +665,10 @@ func file_turboci_graph_orchestrator_v1_dependencies_proto_init() {
 	}
 	file_turboci_graph_orchestrator_v1_edge_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
-	file_turboci_graph_orchestrator_v1_dependencies_proto_msgTypes[0].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_dependencies_proto_msgTypes[0].OneofWrappers = []any{
+		(*dependencies_Satisfied)(nil),
+		(*dependencies_Unsatisfiable)(nil),
+	}
 	file_turboci_graph_orchestrator_v1_dependencies_proto_msgTypes[1].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_dependencies_proto_msgTypes[2].OneofWrappers = []any{}
 	type x struct{}
