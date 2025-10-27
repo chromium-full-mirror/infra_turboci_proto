@@ -54,6 +54,8 @@ message WriteNodesRequest {
     repeated Edge edges = 1;
 
     // Sub-groups in this group.
+    //
+    // May not contain empty groups.
     repeated DependencyGroup groups = 2;
 
     // Number of edges and/or groups which need to be satisfied for this
@@ -248,6 +250,8 @@ message WriteNodesRequest {
     //
     // If set, used to populate the dependencies.edges and
     // dependencies.predicate fields in the target Check.
+    //
+    // To clear dependencies, set this to an empty DependencyGroup.
     optional DependencyGroup dependencies = 5 [
       (turboci).id.allowed = IDENTIFIER_KIND_CHECK,
       (turboci).check.editable = CHECK_STATE_PLANNING

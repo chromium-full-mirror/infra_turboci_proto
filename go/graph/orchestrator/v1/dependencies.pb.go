@@ -237,8 +237,6 @@ type Dependencies_builder struct {
 	//
 	// Once the containing node is CHECK_STATE_WAITING/STAGE_STATE_ATTEMPTING,
 	// this field is immutable.
-	//
-	// Empty Groups (including the top level one here) are normalized to unset.
 	Predicate *Dependencies_Group
 	// While containing node is in the PLANNED state, this will accumulate all
 	// incoming resolution events.
@@ -426,6 +424,8 @@ type Dependencies_Group_builder struct {
 	// Kept sorted; values are indexes into `Dependencies.edges`.
 	Edges []int32
 	// Sub-groups in this group.
+	//
+	// May not contain empty groups.
 	Groups []*Dependencies_Group
 	// If unset, all `edges` and `groups` must be satisfied for this Group to
 	// be satisfied (effectively 'AND' of edges and groups).

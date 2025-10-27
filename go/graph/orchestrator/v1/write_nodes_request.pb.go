@@ -464,6 +464,8 @@ type WriteNodesRequest_DependencyGroup_builder struct {
 	// Singular edges in this group.
 	Edges []*Edge
 	// Sub-groups in this group.
+	//
+	// May not contain empty groups.
 	Groups []*WriteNodesRequest_DependencyGroup
 	// Number of edges and/or groups which need to be satisfied for this
 	// DependencyGroup to be satisfied.
@@ -1126,6 +1128,8 @@ type WriteNodesRequest_CheckWrite_builder struct {
 	//
 	// If set, used to populate the dependencies.edges and
 	// dependencies.predicate fields in the target Check.
+	//
+	// To clear dependencies, set this to an empty DependencyGroup.
 	Dependencies *WriteNodesRequest_DependencyGroup
 	// Write data to a Result for this Check.
 	//

@@ -48,6 +48,8 @@ message Dependencies {
     repeated int32 edges = 1;
 
     // Sub-groups in this group.
+    //
+    // May not contain empty groups.
     repeated Group groups = 2;
 
     // If unset, all `edges` and `groups` must be satisfied for this Group to
@@ -120,8 +122,6 @@ message Dependencies {
   //
   // Once the containing node is CHECK_STATE_WAITING/STAGE_STATE_ATTEMPTING,
   // this field is immutable.
-  //
-  // Empty Groups (including the top level one here) are normalized to unset.
   optional Group predicate = 2;
 
   // ResolutionEvent is a detail of when a specific target Edge in `edges`
