@@ -14,7 +14,6 @@ import (
 	v1 "go.chromium.org/turboci/proto/go/graph/ids/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	anypb "google.golang.org/protobuf/types/known/anypb"
 	reflect "reflect"
 	unsafe "unsafe"
 )
@@ -253,12 +252,13 @@ func (b0 WriteNodesRequest_builder) Build() *WriteNodesRequest {
 	return m0
 }
 
-// RealmValue describes a standard Any which resides in a given security
-// realm.
+// RealmValue describes a Value which resides in a given security realm.
+//
+// This is used to write objects which appear in the graph as Datum messages.
 type WriteNodesRequest_RealmValue struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Realm       *string                `protobuf:"bytes,1,opt,name=realm,proto3,oneof"`
-	xxx_hidden_Value       *anypb.Any             `protobuf:"bytes,2,opt,name=value,proto3,oneof"`
+	xxx_hidden_Value       *Value                 `protobuf:"bytes,2,opt,name=value,proto3,oneof"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -300,7 +300,7 @@ func (x *WriteNodesRequest_RealmValue) GetRealm() string {
 	return ""
 }
 
-func (x *WriteNodesRequest_RealmValue) GetValue() *anypb.Any {
+func (x *WriteNodesRequest_RealmValue) GetValue() *Value {
 	if x != nil {
 		return x.xxx_hidden_Value
 	}
@@ -312,7 +312,7 @@ func (x *WriteNodesRequest_RealmValue) SetRealm(v string) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
 }
 
-func (x *WriteNodesRequest_RealmValue) SetValue(v *anypb.Any) {
+func (x *WriteNodesRequest_RealmValue) SetValue(v *Value) {
 	x.xxx_hidden_Value = v
 }
 
@@ -351,7 +351,7 @@ type WriteNodesRequest_RealmValue_builder struct {
 	// the already-written value's realm.
 	Realm *string
 	// The value to set.
-	Value *anypb.Any
+	Value *Value
 }
 
 func (b0 WriteNodesRequest_RealmValue_builder) Build() *WriteNodesRequest_RealmValue {
@@ -485,12 +485,111 @@ func (b0 WriteNodesRequest_DependencyGroup_builder) Build() *WriteNodesRequest_D
 	return m0
 }
 
+// A single Stage.Attempt.Progress write message.
+type WriteNodesRequest_StageAttemptProgress struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Msg         *string                `protobuf:"bytes,1,opt,name=msg,proto3,oneof"`
+	xxx_hidden_Details     *[]*Value              `protobuf:"bytes,2,rep,name=details,proto3"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *WriteNodesRequest_StageAttemptProgress) Reset() {
+	*x = WriteNodesRequest_StageAttemptProgress{}
+	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WriteNodesRequest_StageAttemptProgress) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WriteNodesRequest_StageAttemptProgress) ProtoMessage() {}
+
+func (x *WriteNodesRequest_StageAttemptProgress) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *WriteNodesRequest_StageAttemptProgress) GetMsg() string {
+	if x != nil {
+		if x.xxx_hidden_Msg != nil {
+			return *x.xxx_hidden_Msg
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *WriteNodesRequest_StageAttemptProgress) GetDetails() []*Value {
+	if x != nil {
+		if x.xxx_hidden_Details != nil {
+			return *x.xxx_hidden_Details
+		}
+	}
+	return nil
+}
+
+func (x *WriteNodesRequest_StageAttemptProgress) SetMsg(v string) {
+	x.xxx_hidden_Msg = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *WriteNodesRequest_StageAttemptProgress) SetDetails(v []*Value) {
+	x.xxx_hidden_Details = &v
+}
+
+func (x *WriteNodesRequest_StageAttemptProgress) HasMsg() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *WriteNodesRequest_StageAttemptProgress) ClearMsg() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Msg = nil
+}
+
+type WriteNodesRequest_StageAttemptProgress_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Low-effort/human-readable progress information.
+	//
+	// Better than nothing, but not good for machines to parse.
+	Msg *string
+	// Machine-readable details for this progress item.
+	Details []*Value
+}
+
+func (b0 WriteNodesRequest_StageAttemptProgress_builder) Build() *WriteNodesRequest_StageAttemptProgress {
+	m0 := &WriteNodesRequest_StageAttemptProgress{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Msg != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_Msg = b.Msg
+	}
+	x.xxx_hidden_Details = &b.Details
+	return m0
+}
+
 // Reason is the write-request analogue of Edit.Reason.
 type WriteNodesRequest_Reason struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Realm       *string                `protobuf:"bytes,1,opt,name=realm,proto3,oneof"`
 	xxx_hidden_Reason      *string                `protobuf:"bytes,2,opt,name=reason,proto3,oneof"`
-	xxx_hidden_Details     *[]*anypb.Any          `protobuf:"bytes,3,rep,name=details,proto3"`
+	xxx_hidden_Details     *[]*Value              `protobuf:"bytes,3,rep,name=details,proto3"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -499,7 +598,7 @@ type WriteNodesRequest_Reason struct {
 
 func (x *WriteNodesRequest_Reason) Reset() {
 	*x = WriteNodesRequest_Reason{}
-	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[3]
+	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -511,7 +610,7 @@ func (x *WriteNodesRequest_Reason) String() string {
 func (*WriteNodesRequest_Reason) ProtoMessage() {}
 
 func (x *WriteNodesRequest_Reason) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[3]
+	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -542,7 +641,7 @@ func (x *WriteNodesRequest_Reason) GetReason() string {
 	return ""
 }
 
-func (x *WriteNodesRequest_Reason) GetDetails() []*anypb.Any {
+func (x *WriteNodesRequest_Reason) GetDetails() []*Value {
 	if x != nil {
 		if x.xxx_hidden_Details != nil {
 			return *x.xxx_hidden_Details
@@ -561,7 +660,7 @@ func (x *WriteNodesRequest_Reason) SetReason(v string) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
 }
 
-func (x *WriteNodesRequest_Reason) SetDetails(v []*anypb.Any) {
+func (x *WriteNodesRequest_Reason) SetDetails(v []*Value) {
 	x.xxx_hidden_Details = &v
 }
 
@@ -606,7 +705,7 @@ type WriteNodesRequest_Reason_builder struct {
 	// This is repeated to allow for standardized reason message types in
 	// conjunction with workflow-specific details as part of the same write
 	// record.
-	Details []*anypb.Any
+	Details []*Value
 }
 
 func (b0 WriteNodesRequest_Reason_builder) Build() *WriteNodesRequest_Reason {
@@ -674,7 +773,7 @@ type WriteNodesRequest_TransactionDetails struct {
 
 func (x *WriteNodesRequest_TransactionDetails) Reset() {
 	*x = WriteNodesRequest_TransactionDetails{}
-	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[4]
+	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -686,7 +785,7 @@ func (x *WriteNodesRequest_TransactionDetails) String() string {
 func (*WriteNodesRequest_TransactionDetails) ProtoMessage() {}
 
 func (x *WriteNodesRequest_TransactionDetails) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[4]
+	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -795,7 +894,7 @@ type WriteNodesRequest_CheckWrite struct {
 
 func (x *WriteNodesRequest_CheckWrite) Reset() {
 	*x = WriteNodesRequest_CheckWrite{}
-	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[5]
+	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -807,7 +906,7 @@ func (x *WriteNodesRequest_CheckWrite) String() string {
 func (*WriteNodesRequest_CheckWrite) ProtoMessage() {}
 
 func (x *WriteNodesRequest_CheckWrite) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[5]
+	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1090,7 +1189,7 @@ func (b0 WriteNodesRequest_CheckWrite_builder) Build() *WriteNodesRequest_CheckW
 type WriteNodesRequest_StageWrite struct {
 	state                                    protoimpl.MessageState             `protogen:"opaque.v1"`
 	xxx_hidden_Identifier                    *v1.Stage                          `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
-	xxx_hidden_Args                          *anypb.Any                         `protobuf:"bytes,2,opt,name=args,proto3,oneof"`
+	xxx_hidden_Args                          *Value                             `protobuf:"bytes,2,opt,name=args,proto3,oneof"`
 	xxx_hidden_Realm                         *string                            `protobuf:"bytes,3,opt,name=realm,proto3,oneof"`
 	xxx_hidden_Dependencies                  *WriteNodesRequest_DependencyGroup `protobuf:"bytes,4,opt,name=dependencies,proto3,oneof"`
 	xxx_hidden_RequestedStageExecutionPolicy *StageExecutionPolicy              `protobuf:"bytes,5,opt,name=requested_stage_execution_policy,json=requestedStageExecutionPolicy,proto3,oneof"`
@@ -1104,7 +1203,7 @@ type WriteNodesRequest_StageWrite struct {
 
 func (x *WriteNodesRequest_StageWrite) Reset() {
 	*x = WriteNodesRequest_StageWrite{}
-	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[6]
+	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1116,7 +1215,7 @@ func (x *WriteNodesRequest_StageWrite) String() string {
 func (*WriteNodesRequest_StageWrite) ProtoMessage() {}
 
 func (x *WriteNodesRequest_StageWrite) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[6]
+	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1134,7 +1233,7 @@ func (x *WriteNodesRequest_StageWrite) GetIdentifier() *v1.Stage {
 	return nil
 }
 
-func (x *WriteNodesRequest_StageWrite) GetArgs() *anypb.Any {
+func (x *WriteNodesRequest_StageWrite) GetArgs() *Value {
 	if x != nil {
 		return x.xxx_hidden_Args
 	}
@@ -1185,7 +1284,7 @@ func (x *WriteNodesRequest_StageWrite) SetIdentifier(v *v1.Stage) {
 	x.xxx_hidden_Identifier = v
 }
 
-func (x *WriteNodesRequest_StageWrite) SetArgs(v *anypb.Any) {
+func (x *WriteNodesRequest_StageWrite) SetArgs(v *Value) {
 	x.xxx_hidden_Args = v
 }
 
@@ -1305,7 +1404,7 @@ type WriteNodesRequest_StageWrite_builder struct {
 	//
 	// We could just accept 'same type' == OK and ignore the value, but this
 	// feels a bit wishy-washy.
-	Args *anypb.Any
+	Args *Value
 	// Realm to assign to this Stage.
 	//
 	// If the Stage already exists, this will only result in an error if it
@@ -1377,10 +1476,13 @@ func (b0 WriteNodesRequest_StageWrite_builder) Build() *WriteNodesRequest_StageW
 // These aspects come from either the Executor which owns this Stage Attempt,
 // or the running Stage Attempt process.
 type WriteNodesRequest_CurrentStageWrite struct {
-	state                                protoimpl.MessageState       `protogen:"opaque.v1"`
-	xxx_hidden_State                     StageAttemptState            `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
-	xxx_hidden_EnsureInContinuationGroup *[]*Edge                     `protobuf:"bytes,3,rep,name=ensure_in_continuation_group,json=ensureInContinuationGroup,proto3"`
-	xxx_hidden_AttemptExecutionPolicy    *StageAttemptExecutionPolicy `protobuf:"bytes,4,opt,name=attempt_execution_policy,json=attemptExecutionPolicy,proto3,oneof"`
+	state                                protoimpl.MessageState                     `protogen:"opaque.v1"`
+	xxx_hidden_State                     StageAttemptState                          `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
+	xxx_hidden_ProcessUid                *string                                    `protobuf:"bytes,2,opt,name=process_uid,json=processUid,proto3,oneof"`
+	xxx_hidden_EnsureInContinuationGroup *[]*Edge                                   `protobuf:"bytes,3,rep,name=ensure_in_continuation_group,json=ensureInContinuationGroup,proto3"`
+	xxx_hidden_AttemptExecutionPolicy    *StageAttemptExecutionPolicy               `protobuf:"bytes,4,opt,name=attempt_execution_policy,json=attemptExecutionPolicy,proto3,oneof"`
+	xxx_hidden_Details                   *[]*Value                                  `protobuf:"bytes,5,rep,name=details,proto3"`
+	xxx_hidden_Progress                  *[]*WriteNodesRequest_StageAttemptProgress `protobuf:"bytes,6,rep,name=progress,proto3"`
 	XXX_raceDetectHookData               protoimpl.RaceDetectHookData
 	XXX_presence                         [1]uint32
 	unknownFields                        protoimpl.UnknownFields
@@ -1389,7 +1491,7 @@ type WriteNodesRequest_CurrentStageWrite struct {
 
 func (x *WriteNodesRequest_CurrentStageWrite) Reset() {
 	*x = WriteNodesRequest_CurrentStageWrite{}
-	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[7]
+	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1401,7 +1503,7 @@ func (x *WriteNodesRequest_CurrentStageWrite) String() string {
 func (*WriteNodesRequest_CurrentStageWrite) ProtoMessage() {}
 
 func (x *WriteNodesRequest_CurrentStageWrite) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[7]
+	mi := &file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1421,6 +1523,16 @@ func (x *WriteNodesRequest_CurrentStageWrite) GetState() StageAttemptState {
 	return StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
 }
 
+func (x *WriteNodesRequest_CurrentStageWrite) GetProcessUid() string {
+	if x != nil {
+		if x.xxx_hidden_ProcessUid != nil {
+			return *x.xxx_hidden_ProcessUid
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *WriteNodesRequest_CurrentStageWrite) GetEnsureInContinuationGroup() []*Edge {
 	if x != nil {
 		if x.xxx_hidden_EnsureInContinuationGroup != nil {
@@ -1437,9 +1549,32 @@ func (x *WriteNodesRequest_CurrentStageWrite) GetAttemptExecutionPolicy() *Stage
 	return nil
 }
 
+func (x *WriteNodesRequest_CurrentStageWrite) GetDetails() []*Value {
+	if x != nil {
+		if x.xxx_hidden_Details != nil {
+			return *x.xxx_hidden_Details
+		}
+	}
+	return nil
+}
+
+func (x *WriteNodesRequest_CurrentStageWrite) GetProgress() []*WriteNodesRequest_StageAttemptProgress {
+	if x != nil {
+		if x.xxx_hidden_Progress != nil {
+			return *x.xxx_hidden_Progress
+		}
+	}
+	return nil
+}
+
 func (x *WriteNodesRequest_CurrentStageWrite) SetState(v StageAttemptState) {
 	x.xxx_hidden_State = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 6)
+}
+
+func (x *WriteNodesRequest_CurrentStageWrite) SetProcessUid(v string) {
+	x.xxx_hidden_ProcessUid = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 6)
 }
 
 func (x *WriteNodesRequest_CurrentStageWrite) SetEnsureInContinuationGroup(v []*Edge) {
@@ -1450,11 +1585,26 @@ func (x *WriteNodesRequest_CurrentStageWrite) SetAttemptExecutionPolicy(v *Stage
 	x.xxx_hidden_AttemptExecutionPolicy = v
 }
 
+func (x *WriteNodesRequest_CurrentStageWrite) SetDetails(v []*Value) {
+	x.xxx_hidden_Details = &v
+}
+
+func (x *WriteNodesRequest_CurrentStageWrite) SetProgress(v []*WriteNodesRequest_StageAttemptProgress) {
+	x.xxx_hidden_Progress = &v
+}
+
 func (x *WriteNodesRequest_CurrentStageWrite) HasState() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *WriteNodesRequest_CurrentStageWrite) HasProcessUid() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
 func (x *WriteNodesRequest_CurrentStageWrite) HasAttemptExecutionPolicy() bool {
@@ -1467,6 +1617,11 @@ func (x *WriteNodesRequest_CurrentStageWrite) HasAttemptExecutionPolicy() bool {
 func (x *WriteNodesRequest_CurrentStageWrite) ClearState() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_State = StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
+}
+
+func (x *WriteNodesRequest_CurrentStageWrite) ClearProcessUid() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_ProcessUid = nil
 }
 
 func (x *WriteNodesRequest_CurrentStageWrite) ClearAttemptExecutionPolicy() {
@@ -1491,6 +1646,16 @@ type WriteNodesRequest_CurrentStageWrite_builder struct {
 	//   - RUNNING -> COMPLETE
 	//   - RUNNING -> INCOMPLETE
 	State *StageAttemptState
+	// Sets the StageAttempt.process_uid field.
+	//
+	// MUST be supplied when transitioning a StageAttempt to RUNNING.
+	//
+	// If the field is already populated in the StageAttempt, this value must
+	// match - otherwise the write is rejected with an error detail of
+	// StageAttemptClaimedFailure.
+	//
+	// Refer to Stage.Attempt.process_uid.
+	ProcessUid *string
 	// Ensure all provided edges are included in `Stage.continuation_group`.
 	//
 	// Edges are deduplicated with `Stage.continuation_group` if they have the
@@ -1500,11 +1665,21 @@ type WriteNodesRequest_CurrentStageWrite_builder struct {
 	// with `and` instead? Or just reject multiple conditional Edges with the
 	// same target? Or replace the condition in the existing Edge?
 	EnsureInContinuationGroup []*Edge
-	// The modified execution policy for this StageAttempt.
+	// The modified execution policy for this Stage Attempt.
 	//
 	// This field can only be set by the stage executor when advancing the
 	// stage attempt state PENDING -> (SCHEDULED|RUNNING).
 	AttemptExecutionPolicy *StageAttemptExecutionPolicy
+	// Adds details to the Stage Attempt.details field.
+	//
+	// If a data type here is already present in the database, the data here
+	// must exactly equal the existing data; Otherwise the write is rejected.
+	Details []*Value
+	// Progress messages to add to the current StageAttempt.
+	//
+	// It is a good idea to do these progress updates transactionally, otherwise
+	// it's possible to double-append them.
+	Progress []*WriteNodesRequest_StageAttemptProgress
 }
 
 func (b0 WriteNodesRequest_CurrentStageWrite_builder) Build() *WriteNodesRequest_CurrentStageWrite {
@@ -1512,11 +1687,17 @@ func (b0 WriteNodesRequest_CurrentStageWrite_builder) Build() *WriteNodesRequest
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.State != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 6)
 		x.xxx_hidden_State = *b.State
+	}
+	if b.ProcessUid != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 6)
+		x.xxx_hidden_ProcessUid = b.ProcessUid
 	}
 	x.xxx_hidden_EnsureInContinuationGroup = &b.EnsureInContinuationGroup
 	x.xxx_hidden_AttemptExecutionPolicy = b.AttemptExecutionPolicy
+	x.xxx_hidden_Details = &b.Details
+	x.xxx_hidden_Progress = &b.Progress
 	return m0
 }
 
@@ -1524,18 +1705,18 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x19google/protobuf/any.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\"\xdb\x17\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xdc\x1a\n" +
 	"\x11WriteNodesRequest\x123\n" +
 	"\x13stage_attempt_token\x18\x01 \x01(\tH\x00R\x11stageAttemptToken\x88\x01\x01\x12Q\n" +
 	"\areasons\x18\x02 \x03(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonR\areasons\x12Z\n" +
 	"\x03txn\x18\x03 \x01(\v2C.turboci.graph.orchestrator.v1.WriteNodesRequest.TransactionDetailsH\x01R\x03txn\x88\x01\x01\x12S\n" +
 	"\x06checks\x18\x04 \x03(\v2;.turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWriteR\x06checks\x12S\n" +
 	"\x06stages\x18\x05 \x03(\v2;.turboci.graph.orchestrator.v1.WriteNodesRequest.StageWriteR\x06stages\x12l\n" +
-	"\rcurrent_stage\x18\x06 \x01(\v2B.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWriteH\x02R\fcurrentStage\x88\x01\x01\x1av\n" +
+	"\rcurrent_stage\x18\x06 \x01(\v2B.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWriteH\x02R\fcurrentStage\x88\x01\x01\x1a\x86\x01\n" +
 	"\n" +
 	"RealmValue\x12#\n" +
-	"\x05realm\x18\x01 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x00R\x05realm\x88\x01\x01\x12/\n" +
-	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyH\x01R\x05value\x88\x01\x01B\b\n" +
+	"\x05realm\x18\x01 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x00R\x05realm\x88\x01\x01\x12?\n" +
+	"\x05value\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ValueH\x01R\x05value\x88\x01\x01B\b\n" +
 	"\x06_realmB\b\n" +
 	"\x06_value\x1a\xd7\x01\n" +
 	"\x0fDependencyGroup\x129\n" +
@@ -1543,11 +1724,15 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x06groups\x18\x02 \x03(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupR\x06groups\x12!\n" +
 	"\tthreshold\x18\x03 \x01(\x05H\x00R\tthreshold\x88\x01\x01B\f\n" +
 	"\n" +
-	"_threshold\x1a\x85\x01\n" +
+	"_threshold\x1au\n" +
+	"\x14StageAttemptProgress\x12\x15\n" +
+	"\x03msg\x18\x01 \x01(\tH\x00R\x03msg\x88\x01\x01\x12>\n" +
+	"\adetails\x18\x02 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetailsB\x06\n" +
+	"\x04_msg\x1a\x95\x01\n" +
 	"\x06Reason\x12\x19\n" +
 	"\x05realm\x18\x01 \x01(\tH\x00R\x05realm\x88\x01\x01\x12\x1b\n" +
-	"\x06reason\x18\x02 \x01(\tH\x01R\x06reason\x88\x01\x01\x12.\n" +
-	"\adetails\x18\x03 \x03(\v2\x14.google.protobuf.AnyR\adetailsB\b\n" +
+	"\x06reason\x18\x02 \x01(\tH\x01R\x06reason\x88\x01\x01\x12>\n" +
+	"\adetails\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetailsB\b\n" +
 	"\x06_realmB\t\n" +
 	"\a_reason\x1a\xdb\x01\n" +
 	"\x12TransactionDetails\x12W\n" +
@@ -1582,13 +1767,13 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x05_kindB\x0f\n" +
 	"\r_dependenciesB\x13\n" +
 	"\x11_finalize_resultsB\b\n" +
-	"\x06_state\x1a\x9b\x05\n" +
+	"\x06_state\x1a\xab\x05\n" +
 	"\n" +
 	"StageWrite\x12@\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageH\x00R\n" +
-	"identifier\x88\x01\x01\x127\n" +
-	"\x04args\x18\x02 \x01(\v2\x14.google.protobuf.AnyB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x01R\x04args\x88\x01\x01\x12#\n" +
+	"identifier\x88\x01\x01\x12G\n" +
+	"\x04args\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ValueB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x01R\x04args\x88\x01\x01\x12#\n" +
 	"\x05realm\x18\x03 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x02R\x05realm\x88\x01\x01\x12y\n" +
 	"\fdependencies\x18\x04 \x01(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupB\x0e\x82\x86\xf6\xfb\x0f\b\x12\x04\n" +
 	"\x02\b\x02\x18\x01H\x03R\fdependencies\x88\x01\x01\x12\x8b\x01\n" +
@@ -1601,71 +1786,80 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\r_dependenciesB#\n" +
 	"!_requested_stage_execution_policyB\f\n" +
 	"\n" +
-	"_cancelled\x1a\xe8\x02\n" +
+	"_cancelled\x1a\xc1\x04\n" +
 	"\x11CurrentStageWrite\x12K\n" +
-	"\x05state\x18\x01 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x00R\x05state\x88\x01\x01\x12d\n" +
+	"\x05state\x18\x01 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x00R\x05state\x88\x01\x01\x12$\n" +
+	"\vprocess_uid\x18\x02 \x01(\tH\x01R\n" +
+	"processUid\x88\x01\x01\x12d\n" +
 	"\x1censure_in_continuation_group\x18\x03 \x03(\v2#.turboci.graph.orchestrator.v1.EdgeR\x19ensureInContinuationGroup\x12y\n" +
-	"\x18attempt_execution_policy\x18\x04 \x01(\v2:.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicyH\x01R\x16attemptExecutionPolicy\x88\x01\x01B\b\n" +
-	"\x06_stateB\x1b\n" +
+	"\x18attempt_execution_policy\x18\x04 \x01(\v2:.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicyH\x02R\x16attemptExecutionPolicy\x88\x01\x01\x12>\n" +
+	"\adetails\x18\x05 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetails\x12a\n" +
+	"\bprogress\x18\x06 \x03(\v2E.turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttemptProgressR\bprogressB\b\n" +
+	"\x06_stateB\x0e\n" +
+	"\f_process_uidB\x1b\n" +
 	"\x19_attempt_execution_policyB\x16\n" +
 	"\x14_stage_attempt_tokenB\x06\n" +
 	"\x04_txnB\x10\n" +
 	"\x0e_current_stageBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_turboci_graph_orchestrator_v1_write_nodes_request_proto_goTypes = []any{
-	(*WriteNodesRequest)(nil),                    // 0: turboci.graph.orchestrator.v1.WriteNodesRequest
-	(*WriteNodesRequest_RealmValue)(nil),         // 1: turboci.graph.orchestrator.v1.WriteNodesRequest.RealmValue
-	(*WriteNodesRequest_DependencyGroup)(nil),    // 2: turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroup
-	(*WriteNodesRequest_Reason)(nil),             // 3: turboci.graph.orchestrator.v1.WriteNodesRequest.Reason
-	(*WriteNodesRequest_TransactionDetails)(nil), // 4: turboci.graph.orchestrator.v1.WriteNodesRequest.TransactionDetails
-	(*WriteNodesRequest_CheckWrite)(nil),         // 5: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite
-	(*WriteNodesRequest_StageWrite)(nil),         // 6: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite
-	(*WriteNodesRequest_CurrentStageWrite)(nil),  // 7: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite
-	(*anypb.Any)(nil),                            // 8: google.protobuf.Any
-	(*Edge)(nil),                                 // 9: turboci.graph.orchestrator.v1.Edge
-	(*v1.Identifier)(nil),                        // 10: turboci.graph.ids.v1.Identifier
-	(*Revision)(nil),                             // 11: turboci.graph.orchestrator.v1.Revision
-	(*v1.Check)(nil),                             // 12: turboci.graph.ids.v1.Check
-	(CheckKind)(0),                               // 13: turboci.graph.orchestrator.v1.CheckKind
-	(CheckState)(0),                              // 14: turboci.graph.orchestrator.v1.CheckState
-	(*v1.Stage)(nil),                             // 15: turboci.graph.ids.v1.Stage
-	(*StageExecutionPolicy)(nil),                 // 16: turboci.graph.orchestrator.v1.StageExecutionPolicy
-	(*Stage_Assignment)(nil),                     // 17: turboci.graph.orchestrator.v1.Stage.Assignment
-	(StageAttemptState)(0),                       // 18: turboci.graph.orchestrator.v1.StageAttemptState
-	(*StageAttemptExecutionPolicy)(nil),          // 19: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
+	(*WriteNodesRequest)(nil),                      // 0: turboci.graph.orchestrator.v1.WriteNodesRequest
+	(*WriteNodesRequest_RealmValue)(nil),           // 1: turboci.graph.orchestrator.v1.WriteNodesRequest.RealmValue
+	(*WriteNodesRequest_DependencyGroup)(nil),      // 2: turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroup
+	(*WriteNodesRequest_StageAttemptProgress)(nil), // 3: turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttemptProgress
+	(*WriteNodesRequest_Reason)(nil),               // 4: turboci.graph.orchestrator.v1.WriteNodesRequest.Reason
+	(*WriteNodesRequest_TransactionDetails)(nil),   // 5: turboci.graph.orchestrator.v1.WriteNodesRequest.TransactionDetails
+	(*WriteNodesRequest_CheckWrite)(nil),           // 6: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite
+	(*WriteNodesRequest_StageWrite)(nil),           // 7: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite
+	(*WriteNodesRequest_CurrentStageWrite)(nil),    // 8: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite
+	(*Value)(nil),                       // 9: turboci.graph.orchestrator.v1.Value
+	(*Edge)(nil),                        // 10: turboci.graph.orchestrator.v1.Edge
+	(*v1.Identifier)(nil),               // 11: turboci.graph.ids.v1.Identifier
+	(*Revision)(nil),                    // 12: turboci.graph.orchestrator.v1.Revision
+	(*v1.Check)(nil),                    // 13: turboci.graph.ids.v1.Check
+	(CheckKind)(0),                      // 14: turboci.graph.orchestrator.v1.CheckKind
+	(CheckState)(0),                     // 15: turboci.graph.orchestrator.v1.CheckState
+	(*v1.Stage)(nil),                    // 16: turboci.graph.ids.v1.Stage
+	(*StageExecutionPolicy)(nil),        // 17: turboci.graph.orchestrator.v1.StageExecutionPolicy
+	(*Stage_Assignment)(nil),            // 18: turboci.graph.orchestrator.v1.Stage.Assignment
+	(StageAttemptState)(0),              // 19: turboci.graph.orchestrator.v1.StageAttemptState
+	(*StageAttemptExecutionPolicy)(nil), // 20: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
 }
 var file_turboci_graph_orchestrator_v1_write_nodes_request_proto_depIdxs = []int32{
-	3,  // 0: turboci.graph.orchestrator.v1.WriteNodesRequest.reasons:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.Reason
-	4,  // 1: turboci.graph.orchestrator.v1.WriteNodesRequest.txn:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.TransactionDetails
-	5,  // 2: turboci.graph.orchestrator.v1.WriteNodesRequest.checks:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite
-	6,  // 3: turboci.graph.orchestrator.v1.WriteNodesRequest.stages:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite
-	7,  // 4: turboci.graph.orchestrator.v1.WriteNodesRequest.current_stage:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite
-	8,  // 5: turboci.graph.orchestrator.v1.WriteNodesRequest.RealmValue.value:type_name -> google.protobuf.Any
-	9,  // 6: turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroup.edges:type_name -> turboci.graph.orchestrator.v1.Edge
+	4,  // 0: turboci.graph.orchestrator.v1.WriteNodesRequest.reasons:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.Reason
+	5,  // 1: turboci.graph.orchestrator.v1.WriteNodesRequest.txn:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.TransactionDetails
+	6,  // 2: turboci.graph.orchestrator.v1.WriteNodesRequest.checks:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite
+	7,  // 3: turboci.graph.orchestrator.v1.WriteNodesRequest.stages:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite
+	8,  // 4: turboci.graph.orchestrator.v1.WriteNodesRequest.current_stage:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite
+	9,  // 5: turboci.graph.orchestrator.v1.WriteNodesRequest.RealmValue.value:type_name -> turboci.graph.orchestrator.v1.Value
+	10, // 6: turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroup.edges:type_name -> turboci.graph.orchestrator.v1.Edge
 	2,  // 7: turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroup.groups:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroup
-	8,  // 8: turboci.graph.orchestrator.v1.WriteNodesRequest.Reason.details:type_name -> google.protobuf.Any
-	10, // 9: turboci.graph.orchestrator.v1.WriteNodesRequest.TransactionDetails.nodes_observed:type_name -> turboci.graph.ids.v1.Identifier
-	11, // 10: turboci.graph.orchestrator.v1.WriteNodesRequest.TransactionDetails.snapshot_version:type_name -> turboci.graph.orchestrator.v1.Revision
-	12, // 11: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.identifier:type_name -> turboci.graph.ids.v1.Check
-	13, // 12: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.kind:type_name -> turboci.graph.orchestrator.v1.CheckKind
-	1,  // 13: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.options:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.RealmValue
-	2,  // 14: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.dependencies:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroup
-	1,  // 15: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.results:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.RealmValue
-	14, // 16: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.state:type_name -> turboci.graph.orchestrator.v1.CheckState
-	15, // 17: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.identifier:type_name -> turboci.graph.ids.v1.Stage
-	8,  // 18: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.args:type_name -> google.protobuf.Any
-	2,  // 19: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.dependencies:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroup
-	16, // 20: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.requested_stage_execution_policy:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
-	17, // 21: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.assignments:type_name -> turboci.graph.orchestrator.v1.Stage.Assignment
-	18, // 22: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
-	9,  // 23: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.ensure_in_continuation_group:type_name -> turboci.graph.orchestrator.v1.Edge
-	19, // 24: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.attempt_execution_policy:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
-	25, // [25:25] is the sub-list for method output_type
-	25, // [25:25] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	9,  // 8: turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttemptProgress.details:type_name -> turboci.graph.orchestrator.v1.Value
+	9,  // 9: turboci.graph.orchestrator.v1.WriteNodesRequest.Reason.details:type_name -> turboci.graph.orchestrator.v1.Value
+	11, // 10: turboci.graph.orchestrator.v1.WriteNodesRequest.TransactionDetails.nodes_observed:type_name -> turboci.graph.ids.v1.Identifier
+	12, // 11: turboci.graph.orchestrator.v1.WriteNodesRequest.TransactionDetails.snapshot_version:type_name -> turboci.graph.orchestrator.v1.Revision
+	13, // 12: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.identifier:type_name -> turboci.graph.ids.v1.Check
+	14, // 13: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.kind:type_name -> turboci.graph.orchestrator.v1.CheckKind
+	1,  // 14: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.options:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.RealmValue
+	2,  // 15: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.dependencies:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroup
+	1,  // 16: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.results:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.RealmValue
+	15, // 17: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.state:type_name -> turboci.graph.orchestrator.v1.CheckState
+	16, // 18: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.identifier:type_name -> turboci.graph.ids.v1.Stage
+	9,  // 19: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.args:type_name -> turboci.graph.orchestrator.v1.Value
+	2,  // 20: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.dependencies:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroup
+	17, // 21: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.requested_stage_execution_policy:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
+	18, // 22: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.assignments:type_name -> turboci.graph.orchestrator.v1.Stage.Assignment
+	19, // 23: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
+	10, // 24: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.ensure_in_continuation_group:type_name -> turboci.graph.orchestrator.v1.Edge
+	20, // 25: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.attempt_execution_policy:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
+	9,  // 26: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.details:type_name -> turboci.graph.orchestrator.v1.Value
+	3,  // 27: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.progress:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttemptProgress
+	28, // [28:28] is the sub-list for method output_type
+	28, // [28:28] is the sub-list for method input_type
+	28, // [28:28] is the sub-list for extension type_name
+	28, // [28:28] is the sub-list for extension extendee
+	0,  // [0:28] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_write_nodes_request_proto_init() }
@@ -1682,6 +1876,7 @@ func file_turboci_graph_orchestrator_v1_write_nodes_request_proto_init() {
 	file_turboci_graph_orchestrator_v1_stage_attempt_execution_policy_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_init()
+	file_turboci_graph_orchestrator_v1_value_proto_init()
 	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[0].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[1].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[2].OneofWrappers = []any{}
@@ -1690,13 +1885,14 @@ func file_turboci_graph_orchestrator_v1_write_nodes_request_proto_init() {
 	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[5].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[6].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[7].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_write_nodes_request_proto_msgTypes[8].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

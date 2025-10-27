@@ -6,7 +6,6 @@ syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
-import "google/protobuf/any.proto";
 import "turboci/graph/ids/v1/identifier.proto";
 import "turboci/graph/orchestrator/v1/check_kind.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
@@ -17,6 +16,7 @@ import "turboci/graph/orchestrator/v1/stage.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_state.proto";
 import "turboci/graph/orchestrator/v1/stage_execution_policy.proto";
+import "turboci/graph/orchestrator/v1/value.proto";
 
 option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
 option java_multiple_files = true;
@@ -26,8 +26,9 @@ option java_multiple_files = true;
 // Allows atomically writing to multiple nodes (Checks, Stages) in a single
 // transaction.
 message WriteNodesRequest {
-  // RealmValue describes a standard Any which resides in a given security
-  // realm.
+  // RealmValue describes a Value which resides in a given security realm.
+  //
+  // This is used to write objects which appear in the graph as Datum messages.
   message RealmValue {
     // The realm to assign to this value (if the value is being created).
     // If it's unset/empty, it will inherit from the realm of the Stage
@@ -39,7 +40,7 @@ message WriteNodesRequest {
     optional string realm = 1 [(turboci).creation_only = true];
 
     // The value to set.
-    optional google.protobuf.Any value = 2;
+    optional Value value = 2;
   }
 
   // An in-line representation of Dependencies.Group.
@@ -60,6 +61,17 @@ message WriteNodesRequest {
     //
     // See `Dependencies.Group.threshold`.
     optional int32 threshold = 3;
+  }
+
+  // A single Stage.Attempt.Progress write message.
+  message StageAttemptProgress {
+    // Low-effort/human-readable progress information.
+    //
+    // Better than nothing, but not good for machines to parse.
+    optional string msg = 1;
+
+    // Machine-readable details for this progress item.
+    repeated Value details = 2;
   }
 
   // The token of the Stage Attempt which is performing this write.
@@ -89,7 +101,7 @@ message WriteNodesRequest {
     // This is repeated to allow for standardized reason message types in
     // conjunction with workflow-specific details as part of the same write
     // record.
-    repeated google.protobuf.Any details = 3;
+    repeated Value details = 3;
   }
   // The reason for this write operation, as supplied by the entity performing
   // the write.
@@ -302,7 +314,7 @@ message WriteNodesRequest {
     //
     // We could just accept 'same type' == OK and ignore the value, but this
     // feels a bit wishy-washy.
-    optional google.protobuf.Any args = 2 [(turboci).creation_only = true];
+    optional Value args = 2 [(turboci).creation_only = true];
 
     // Realm to assign to this Stage.
     //
@@ -384,6 +396,17 @@ message WriteNodesRequest {
     //   * RUNNING -> INCOMPLETE
     optional StageAttemptState state = 1;
 
+    // Sets the StageAttempt.process_uid field.
+    //
+    // MUST be supplied when transitioning a StageAttempt to RUNNING.
+    //
+    // If the field is already populated in the StageAttempt, this value must
+    // match - otherwise the write is rejected with an error detail of
+    // StageAttemptClaimedFailure.
+    //
+    // Refer to Stage.Attempt.process_uid.
+    optional string process_uid = 2;
+
     // Ensure all provided edges are included in `Stage.continuation_group`.
     //
     // Edges are deduplicated with `Stage.continuation_group` if they have the
@@ -394,21 +417,23 @@ message WriteNodesRequest {
     // same target? Or replace the condition in the existing Edge?
     repeated Edge ensure_in_continuation_group = 3;
 
-    // The modified execution policy for this StageAttempt.
+    // The modified execution policy for this Stage Attempt.
     //
     // This field can only be set by the stage executor when advancing the
     // stage attempt state PENDING -> (SCHEDULED|RUNNING).
     optional StageAttemptExecutionPolicy attempt_execution_policy = 4;
 
-    // TBD: WorkerID/nonce/dedup key to ensure `SCHEDULED -> RUNNING` only
-    // happens for one logical process/thread.
-
-    // TBD: Other StageAttempt trivia (links to underlying system, Any(s) for
-    // structured data about the StageAttempt, build id/task id).
+    // Adds details to the Stage Attempt.details field.
     //
-    // Can we make this immutable once written?
+    // If a data type here is already present in the database, the data here
+    // must exactly equal the existing data; Otherwise the write is rejected.
+    repeated Value details = 5;
 
-    // TBD: Attempt Progress
+    // Progress messages to add to the current StageAttempt.
+    //
+    // It is a good idea to do these progress updates transactionally, otherwise
+    // it's possible to double-append them.
+    repeated StageAttemptProgress progress = 6;
   }
   // State for the current Stage as indicated by `stage_attempt_token`.
   //

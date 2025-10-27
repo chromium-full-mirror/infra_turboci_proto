@@ -93,7 +93,7 @@ message Check {
     // The type_url of the data contained for this CheckOption.
     optional string type_url = 2;
 
-    // TBD: If we add an additional distinguisher key in Datum, we'd add it
+    // TBD: If we add an additional distinguisher key in Value, we'd add it
     // here too (e.g. to allow multiple entries of the same type URL with
     // different keys).
   }
@@ -150,7 +150,7 @@ message Check {
       // The type_url of the data contained for this CheckResultDatum.
       optional string type_url = 2;
 
-      // TBD: If we add an additional distinguisher key in Datum, we'd add it
+      // TBD: If we add an additional distinguisher key in Value, we'd add it
       // here too (e.g. to allow multiple entries of the same type URL with
       // different keys).
     }

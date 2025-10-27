@@ -404,6 +404,94 @@ func (b0 Stage_builder) Build() *Stage {
 	return m0
 }
 
+// StageAttemptClaimedFailure is a gRPC error detail message returned by
+// WriteNodes when attempting to transition a Stage Attempt from
+// PENDING/SCHEDULED to RUNNING with a mismatched process_uid.
+//
+// If your client receives an rpc status with this message in it, it means that
+// another process already claimed this Stage Attempt, and you should stop
+// attempting to execute this Stage Attempt.
+type StageAttemptClaimedFailure struct {
+	state                          protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_ClaimedByProcessUid *string                `protobuf:"bytes,1,opt,name=claimed_by_process_uid,json=claimedByProcessUid,proto3,oneof"`
+	XXX_raceDetectHookData         protoimpl.RaceDetectHookData
+	XXX_presence                   [1]uint32
+	unknownFields                  protoimpl.UnknownFields
+	sizeCache                      protoimpl.SizeCache
+}
+
+func (x *StageAttemptClaimedFailure) Reset() {
+	*x = StageAttemptClaimedFailure{}
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StageAttemptClaimedFailure) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StageAttemptClaimedFailure) ProtoMessage() {}
+
+func (x *StageAttemptClaimedFailure) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *StageAttemptClaimedFailure) GetClaimedByProcessUid() string {
+	if x != nil {
+		if x.xxx_hidden_ClaimedByProcessUid != nil {
+			return *x.xxx_hidden_ClaimedByProcessUid
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *StageAttemptClaimedFailure) SetClaimedByProcessUid(v string) {
+	x.xxx_hidden_ClaimedByProcessUid = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
+}
+
+func (x *StageAttemptClaimedFailure) HasClaimedByProcessUid() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *StageAttemptClaimedFailure) ClearClaimedByProcessUid() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_ClaimedByProcessUid = nil
+}
+
+type StageAttemptClaimedFailure_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The recorded Stage Attempt process_uid - this should only be used for
+	// logging/reporting purposes (typically to help wayward developers see which
+	// other process is *actually* working on this Stage Attempt).
+	ClaimedByProcessUid *string
+}
+
+func (b0 StageAttemptClaimedFailure_builder) Build() *StageAttemptClaimedFailure {
+	m0 := &StageAttemptClaimedFailure{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.ClaimedByProcessUid != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		x.xxx_hidden_ClaimedByProcessUid = b.ClaimedByProcessUid
+	}
+	return m0
+}
+
 // ExecutionPolicyState is the set of execution policies which define the
 // overall execution policy for this Stage.
 //
@@ -422,7 +510,7 @@ type Stage_ExecutionPolicyState struct {
 
 func (x *Stage_ExecutionPolicyState) Reset() {
 	*x = Stage_ExecutionPolicyState{}
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[1]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -434,7 +522,7 @@ func (x *Stage_ExecutionPolicyState) String() string {
 func (*Stage_ExecutionPolicyState) ProtoMessage() {}
 
 func (x *Stage_ExecutionPolicyState) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[1]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -541,7 +629,7 @@ type Stage_Attempt struct {
 
 func (x *Stage_Attempt) Reset() {
 	*x = Stage_Attempt{}
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[2]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -553,7 +641,7 @@ func (x *Stage_Attempt) String() string {
 func (*Stage_Attempt) ProtoMessage() {}
 
 func (x *Stage_Attempt) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[2]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -707,15 +795,18 @@ type Stage_Attempt_builder struct {
 	//
 	// The first thing all of these copycat processes should do is a WriteNodes
 	// RPC where they attempt to set `process_uid` to a value *unique to that
-	// worker thread*, and transition the state to RUNNING.
+	// worker thread*, and transition the state to RUNNING. One of these
+	// processes will succeed, and the Stage Attempt will transition to RUNNING.
+	// All the other processes will fail, and the returned error will have
+	// a gRPC Status detail of StageAttemptClaimedFailure.
 	//
 	// The Orchestrator service will only permit this field to be set while the
-	// Stage Attempt is SCHEDULED. In the case of network failure, multiple
-	// calls of `WriteNodes(token, current={RUNNING, <process_uid>})` with the
-	// same process_uid will all succeed. However, the other worker threads will
-	// produce different process_uid values, and the server will reject their
-	// attempt to transition to the RUNNING state, and they should drop the
-	// task.
+	// Stage Attempt is PENDING or SCHEDULED. In the case of network failure,
+	// multiple calls of `WriteNodes(token, current={RUNNING, <process_uid>})`
+	// with the same process_uid will all succeed. However, the other worker
+	// threads will produce different process_uid values, and the server will
+	// reject their attempt to transition to the RUNNING state, and they should
+	// drop the task.
 	//
 	// There is no specific form for process_uid, but it must be unique per
 	// thread consuming this Stage Attempt. Examples:
@@ -729,12 +820,16 @@ type Stage_Attempt_builder struct {
 	ProcessUid *string
 	// Details provided by the Executor about this Stage Attempt.
 	//
-	// This information is always updated in-whole from the Executor or
-	// StageAttempt and is meant to house critical data like links to the
-	// underlying Executor, build/task ids, etc.
+	// This field is effectively an append-only map. The Executor and/or Stage
+	// Attempt can only write data *of a given type* ONCE to this field, and
+	// that data type must be unique within this field. If you need to add data
+	// here multiple times during the lifecycle of the attempt, use different
+	// types for each stage of that lifecycle.
 	//
-	// It can be set by the Executor or Stage Attempt as long as the Stage
-	// Attempt is not final (i.e. COMPLETE or INCOMPLETE).
+	// It can be updated by the Executor or Stage Attempt as long as the Stage
+	// Attempt is not final (i.e. a state prior to COMPLETE or INCOMPLETE).
+	//
+	// Kept sorted by, and unique on, type_url.
 	Details []*Value
 	// Append-only Executor-specefic progress messages.
 	Progress []*Stage_Attempt_Progress
@@ -782,7 +877,7 @@ type Stage_Assignment struct {
 
 func (x *Stage_Assignment) Reset() {
 	*x = Stage_Assignment{}
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[3]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -794,7 +889,7 @@ func (x *Stage_Assignment) String() string {
 func (*Stage_Assignment) ProtoMessage() {}
 
 func (x *Stage_Assignment) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[3]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -917,7 +1012,7 @@ type Stage_Attempt_Progress struct {
 
 func (x *Stage_Attempt_Progress) Reset() {
 	*x = Stage_Attempt_Progress{}
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[4]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -929,7 +1024,7 @@ func (x *Stage_Attempt_Progress) String() string {
 func (*Stage_Attempt_Progress) ProtoMessage() {}
 
 func (x *Stage_Attempt_Progress) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[4]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1010,6 +1105,8 @@ type Stage_Attempt_Progress_builder struct {
 	// The version of this Stage which added this Progress message.
 	Version *Revision
 	// Machine-readable details for this progress item.
+	//
+	// Kept sorted by, and unique on, type_url.
 	Details []*Value
 }
 
@@ -1091,49 +1188,53 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\b_versionB\b\n" +
 	"\x06_stateB\x0f\n" +
 	"\r_dependenciesB\x13\n" +
-	"\x11_execution_policyBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x11_execution_policy\"q\n" +
+	"\x1aStageAttemptClaimedFailure\x128\n" +
+	"\x16claimed_by_process_uid\x18\x01 \x01(\tH\x00R\x13claimedByProcessUid\x88\x01\x01B\x19\n" +
+	"\x17_claimed_by_process_uidBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_stage_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_turboci_graph_orchestrator_v1_stage_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_turboci_graph_orchestrator_v1_stage_proto_goTypes = []any{
 	(*Stage)(nil),                       // 0: turboci.graph.orchestrator.v1.Stage
-	(*Stage_ExecutionPolicyState)(nil),  // 1: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState
-	(*Stage_Attempt)(nil),               // 2: turboci.graph.orchestrator.v1.Stage.Attempt
-	(*Stage_Assignment)(nil),            // 3: turboci.graph.orchestrator.v1.Stage.Assignment
-	(*Stage_Attempt_Progress)(nil),      // 4: turboci.graph.orchestrator.v1.Stage.Attempt.Progress
-	(*v1.Stage)(nil),                    // 5: turboci.graph.ids.v1.Stage
-	(*Revision)(nil),                    // 6: turboci.graph.orchestrator.v1.Revision
-	(*Value)(nil),                       // 7: turboci.graph.orchestrator.v1.Value
-	(StageState)(0),                     // 8: turboci.graph.orchestrator.v1.StageState
-	(*Dependencies)(nil),                // 9: turboci.graph.orchestrator.v1.Dependencies
-	(*Edge)(nil),                        // 10: turboci.graph.orchestrator.v1.Edge
-	(*StageExecutionPolicy)(nil),        // 11: turboci.graph.orchestrator.v1.StageExecutionPolicy
-	(StageAttemptState)(0),              // 12: turboci.graph.orchestrator.v1.StageAttemptState
-	(*StageAttemptExecutionPolicy)(nil), // 13: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
-	(*v1.Check)(nil),                    // 14: turboci.graph.ids.v1.Check
-	(CheckState)(0),                     // 15: turboci.graph.orchestrator.v1.CheckState
+	(*StageAttemptClaimedFailure)(nil),  // 1: turboci.graph.orchestrator.v1.StageAttemptClaimedFailure
+	(*Stage_ExecutionPolicyState)(nil),  // 2: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState
+	(*Stage_Attempt)(nil),               // 3: turboci.graph.orchestrator.v1.Stage.Attempt
+	(*Stage_Assignment)(nil),            // 4: turboci.graph.orchestrator.v1.Stage.Assignment
+	(*Stage_Attempt_Progress)(nil),      // 5: turboci.graph.orchestrator.v1.Stage.Attempt.Progress
+	(*v1.Stage)(nil),                    // 6: turboci.graph.ids.v1.Stage
+	(*Revision)(nil),                    // 7: turboci.graph.orchestrator.v1.Revision
+	(*Value)(nil),                       // 8: turboci.graph.orchestrator.v1.Value
+	(StageState)(0),                     // 9: turboci.graph.orchestrator.v1.StageState
+	(*Dependencies)(nil),                // 10: turboci.graph.orchestrator.v1.Dependencies
+	(*Edge)(nil),                        // 11: turboci.graph.orchestrator.v1.Edge
+	(*StageExecutionPolicy)(nil),        // 12: turboci.graph.orchestrator.v1.StageExecutionPolicy
+	(StageAttemptState)(0),              // 13: turboci.graph.orchestrator.v1.StageAttemptState
+	(*StageAttemptExecutionPolicy)(nil), // 14: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
+	(*v1.Check)(nil),                    // 15: turboci.graph.ids.v1.Check
+	(CheckState)(0),                     // 16: turboci.graph.orchestrator.v1.CheckState
 }
 var file_turboci_graph_orchestrator_v1_stage_proto_depIdxs = []int32{
-	5,  // 0: turboci.graph.orchestrator.v1.Stage.identifier:type_name -> turboci.graph.ids.v1.Stage
-	6,  // 1: turboci.graph.orchestrator.v1.Stage.create_ts:type_name -> turboci.graph.orchestrator.v1.Revision
-	7,  // 2: turboci.graph.orchestrator.v1.Stage.args:type_name -> turboci.graph.orchestrator.v1.Value
-	6,  // 3: turboci.graph.orchestrator.v1.Stage.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	8,  // 4: turboci.graph.orchestrator.v1.Stage.state:type_name -> turboci.graph.orchestrator.v1.StageState
-	9,  // 5: turboci.graph.orchestrator.v1.Stage.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
-	1,  // 6: turboci.graph.orchestrator.v1.Stage.execution_policy:type_name -> turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState
-	2,  // 7: turboci.graph.orchestrator.v1.Stage.attempts:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt
-	3,  // 8: turboci.graph.orchestrator.v1.Stage.assignments:type_name -> turboci.graph.orchestrator.v1.Stage.Assignment
-	10, // 9: turboci.graph.orchestrator.v1.Stage.continuation_group:type_name -> turboci.graph.orchestrator.v1.Edge
-	11, // 10: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState.requested:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
-	11, // 11: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState.validated:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
-	12, // 12: turboci.graph.orchestrator.v1.Stage.Attempt.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
-	6,  // 13: turboci.graph.orchestrator.v1.Stage.Attempt.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	7,  // 14: turboci.graph.orchestrator.v1.Stage.Attempt.details:type_name -> turboci.graph.orchestrator.v1.Value
-	4,  // 15: turboci.graph.orchestrator.v1.Stage.Attempt.progress:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt.Progress
-	13, // 16: turboci.graph.orchestrator.v1.Stage.Attempt.execution_policy:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
-	14, // 17: turboci.graph.orchestrator.v1.Stage.Assignment.target:type_name -> turboci.graph.ids.v1.Check
-	15, // 18: turboci.graph.orchestrator.v1.Stage.Assignment.goal_state:type_name -> turboci.graph.orchestrator.v1.CheckState
-	6,  // 19: turboci.graph.orchestrator.v1.Stage.Attempt.Progress.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	7,  // 20: turboci.graph.orchestrator.v1.Stage.Attempt.Progress.details:type_name -> turboci.graph.orchestrator.v1.Value
+	6,  // 0: turboci.graph.orchestrator.v1.Stage.identifier:type_name -> turboci.graph.ids.v1.Stage
+	7,  // 1: turboci.graph.orchestrator.v1.Stage.create_ts:type_name -> turboci.graph.orchestrator.v1.Revision
+	8,  // 2: turboci.graph.orchestrator.v1.Stage.args:type_name -> turboci.graph.orchestrator.v1.Value
+	7,  // 3: turboci.graph.orchestrator.v1.Stage.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	9,  // 4: turboci.graph.orchestrator.v1.Stage.state:type_name -> turboci.graph.orchestrator.v1.StageState
+	10, // 5: turboci.graph.orchestrator.v1.Stage.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
+	2,  // 6: turboci.graph.orchestrator.v1.Stage.execution_policy:type_name -> turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState
+	3,  // 7: turboci.graph.orchestrator.v1.Stage.attempts:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt
+	4,  // 8: turboci.graph.orchestrator.v1.Stage.assignments:type_name -> turboci.graph.orchestrator.v1.Stage.Assignment
+	11, // 9: turboci.graph.orchestrator.v1.Stage.continuation_group:type_name -> turboci.graph.orchestrator.v1.Edge
+	12, // 10: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState.requested:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
+	12, // 11: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState.validated:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
+	13, // 12: turboci.graph.orchestrator.v1.Stage.Attempt.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
+	7,  // 13: turboci.graph.orchestrator.v1.Stage.Attempt.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	8,  // 14: turboci.graph.orchestrator.v1.Stage.Attempt.details:type_name -> turboci.graph.orchestrator.v1.Value
+	5,  // 15: turboci.graph.orchestrator.v1.Stage.Attempt.progress:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt.Progress
+	14, // 16: turboci.graph.orchestrator.v1.Stage.Attempt.execution_policy:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
+	15, // 17: turboci.graph.orchestrator.v1.Stage.Assignment.target:type_name -> turboci.graph.ids.v1.Check
+	16, // 18: turboci.graph.orchestrator.v1.Stage.Assignment.goal_state:type_name -> turboci.graph.orchestrator.v1.CheckState
+	7,  // 19: turboci.graph.orchestrator.v1.Stage.Attempt.Progress.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	8,  // 20: turboci.graph.orchestrator.v1.Stage.Attempt.Progress.details:type_name -> turboci.graph.orchestrator.v1.Value
 	21, // [21:21] is the sub-list for method output_type
 	21, // [21:21] is the sub-list for method input_type
 	21, // [21:21] is the sub-list for extension type_name
@@ -1161,13 +1262,14 @@ func file_turboci_graph_orchestrator_v1_stage_proto_init() {
 	file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[2].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[3].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[4].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_stage_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_stage_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
