@@ -371,7 +371,7 @@ func (b0 Query_Select_builder) Build() *Query_Select {
 type Query_Expand struct {
 	state                   protoimpl.MessageState     `protogen:"opaque.v1"`
 	xxx_hidden_Dependencies *Query_Expand_Dependencies `protobuf:"bytes,1,opt,name=dependencies,proto3,oneof"`
-	xxx_hidden_Dependants   *Query_Expand_Dependants   `protobuf:"bytes,2,opt,name=dependants,proto3,oneof"`
+	xxx_hidden_Dependents   *Query_Expand_Dependents   `protobuf:"bytes,2,opt,name=dependents,proto3,oneof"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
 }
@@ -408,9 +408,9 @@ func (x *Query_Expand) GetDependencies() *Query_Expand_Dependencies {
 	return nil
 }
 
-func (x *Query_Expand) GetDependants() *Query_Expand_Dependants {
+func (x *Query_Expand) GetDependents() *Query_Expand_Dependents {
 	if x != nil {
-		return x.xxx_hidden_Dependants
+		return x.xxx_hidden_Dependents
 	}
 	return nil
 }
@@ -419,8 +419,8 @@ func (x *Query_Expand) SetDependencies(v *Query_Expand_Dependencies) {
 	x.xxx_hidden_Dependencies = v
 }
 
-func (x *Query_Expand) SetDependants(v *Query_Expand_Dependants) {
-	x.xxx_hidden_Dependants = v
+func (x *Query_Expand) SetDependents(v *Query_Expand_Dependents) {
+	x.xxx_hidden_Dependents = v
 }
 
 func (x *Query_Expand) HasDependencies() bool {
@@ -430,19 +430,19 @@ func (x *Query_Expand) HasDependencies() bool {
 	return x.xxx_hidden_Dependencies != nil
 }
 
-func (x *Query_Expand) HasDependants() bool {
+func (x *Query_Expand) HasDependents() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_Dependants != nil
+	return x.xxx_hidden_Dependents != nil
 }
 
 func (x *Query_Expand) ClearDependencies() {
 	x.xxx_hidden_Dependencies = nil
 }
 
-func (x *Query_Expand) ClearDependants() {
-	x.xxx_hidden_Dependants = nil
+func (x *Query_Expand) ClearDependents() {
+	x.xxx_hidden_Dependents = nil
 }
 
 type Query_Expand_builder struct {
@@ -463,8 +463,8 @@ type Query_Expand_builder struct {
 	//
 	//	A -> {B, C}
 	//
-	// A is a dependant of B.
-	Dependants *Query_Expand_Dependants
+	// A is a dependent of B.
+	Dependents *Query_Expand_Dependents
 }
 
 func (b0 Query_Expand_builder) Build() *Query_Expand {
@@ -472,7 +472,7 @@ func (b0 Query_Expand_builder) Build() *Query_Expand {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Dependencies = b.Dependencies
-	x.xxx_hidden_Dependants = b.Dependants
+	x.xxx_hidden_Dependents = b.Dependents
 	return m0
 }
 
@@ -939,8 +939,8 @@ func (b0 Query_Expand_Dependencies_builder) Build() *Query_Expand_Dependencies {
 	return m0
 }
 
-// How to expand the dependants for a Check or Stage.
-type Query_Expand_Dependants struct {
+// How to expand the dependents for a Check or Stage.
+type Query_Expand_Dependents struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Mode        QueryExpandDepsMode    `protobuf:"varint,1,opt,name=mode,proto3,enum=turboci.graph.orchestrator.v1.QueryExpandDepsMode,oneof"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
@@ -949,20 +949,20 @@ type Query_Expand_Dependants struct {
 	sizeCache              protoimpl.SizeCache
 }
 
-func (x *Query_Expand_Dependants) Reset() {
-	*x = Query_Expand_Dependants{}
+func (x *Query_Expand_Dependents) Reset() {
+	*x = Query_Expand_Dependents{}
 	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Query_Expand_Dependants) String() string {
+func (x *Query_Expand_Dependents) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Query_Expand_Dependants) ProtoMessage() {}
+func (*Query_Expand_Dependents) ProtoMessage() {}
 
-func (x *Query_Expand_Dependants) ProtoReflect() protoreflect.Message {
+func (x *Query_Expand_Dependents) ProtoReflect() protoreflect.Message {
 	mi := &file_turboci_graph_orchestrator_v1_query_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -974,7 +974,7 @@ func (x *Query_Expand_Dependants) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *Query_Expand_Dependants) GetMode() QueryExpandDepsMode {
+func (x *Query_Expand_Dependents) GetMode() QueryExpandDepsMode {
 	if x != nil {
 		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
 			return x.xxx_hidden_Mode
@@ -983,34 +983,34 @@ func (x *Query_Expand_Dependants) GetMode() QueryExpandDepsMode {
 	return QueryExpandDepsMode_QUERY_EXPAND_DEPS_MODE_UNKNOWN
 }
 
-func (x *Query_Expand_Dependants) SetMode(v QueryExpandDepsMode) {
+func (x *Query_Expand_Dependents) SetMode(v QueryExpandDepsMode) {
 	x.xxx_hidden_Mode = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
 }
 
-func (x *Query_Expand_Dependants) HasMode() bool {
+func (x *Query_Expand_Dependents) HasMode() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *Query_Expand_Dependants) ClearMode() {
+func (x *Query_Expand_Dependents) ClearMode() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Mode = QueryExpandDepsMode_QUERY_EXPAND_DEPS_MODE_UNKNOWN
 }
 
-type Query_Expand_Dependants_builder struct {
+type Query_Expand_Dependents_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// How to expand dependants.
+	// How to expand dependents.
 	//
 	// Defaults to QUERY_EXPAND_DEPS_MODE_EDGES.
 	Mode *QueryExpandDepsMode
 }
 
-func (b0 Query_Expand_Dependants_builder) Build() *Query_Expand_Dependants {
-	m0 := &Query_Expand_Dependants{}
+func (b0 Query_Expand_Dependents_builder) Build() *Query_Expand_Dependents {
+	m0 := &Query_Expand_Dependents{}
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Mode != nil {
@@ -1260,17 +1260,17 @@ const file_turboci_graph_orchestrator_v1_query_proto_rawDesc = "" +
 	"\x06Expand\x12a\n" +
 	"\fdependencies\x18\x01 \x01(\v28.turboci.graph.orchestrator.v1.Query.Expand.DependenciesH\x00R\fdependencies\x88\x01\x01\x12[\n" +
 	"\n" +
-	"dependants\x18\x02 \x01(\v26.turboci.graph.orchestrator.v1.Query.Expand.DependantsH\x01R\n" +
-	"dependants\x88\x01\x01\x1ad\n" +
+	"dependents\x18\x02 \x01(\v26.turboci.graph.orchestrator.v1.Query.Expand.DependentsH\x01R\n" +
+	"dependents\x88\x01\x01\x1ad\n" +
 	"\fDependencies\x12K\n" +
 	"\x04mode\x18\x01 \x01(\x0e22.turboci.graph.orchestrator.v1.QueryExpandDepsModeH\x00R\x04mode\x88\x01\x01B\a\n" +
 	"\x05_mode\x1ab\n" +
 	"\n" +
-	"Dependants\x12K\n" +
+	"Dependents\x12K\n" +
 	"\x04mode\x18\x01 \x01(\x0e22.turboci.graph.orchestrator.v1.QueryExpandDepsModeH\x00R\x04mode\x88\x01\x01B\a\n" +
 	"\x05_modeB\x0f\n" +
 	"\r_dependenciesB\r\n" +
-	"\v_dependants\x1a\xd5\x03\n" +
+	"\v_dependents\x1a\xd5\x03\n" +
 	"\aCollect\x12M\n" +
 	"\x05check\x18\x01 \x01(\v22.turboci.graph.orchestrator.v1.Query.Collect.CheckH\x00R\x05check\x88\x01\x01\x12M\n" +
 	"\x05stage\x18\x02 \x01(\v22.turboci.graph.orchestrator.v1.Query.Collect.StageH\x01R\x05stage\x88\x01\x01\x1a\xbb\x01\n" +
@@ -1309,7 +1309,7 @@ var file_turboci_graph_orchestrator_v1_query_proto_goTypes = []any{
 	(*Query_Select_CheckPattern)(nil),       // 6: turboci.graph.orchestrator.v1.Query.Select.CheckPattern
 	(*Query_Select_StagePattern)(nil),       // 7: turboci.graph.orchestrator.v1.Query.Select.StagePattern
 	(*Query_Expand_Dependencies)(nil),       // 8: turboci.graph.orchestrator.v1.Query.Expand.Dependencies
-	(*Query_Expand_Dependants)(nil),         // 9: turboci.graph.orchestrator.v1.Query.Expand.Dependants
+	(*Query_Expand_Dependents)(nil),         // 9: turboci.graph.orchestrator.v1.Query.Expand.Dependents
 	(*Query_Collect_Check)(nil),             // 10: turboci.graph.orchestrator.v1.Query.Collect.Check
 	(*Query_Collect_Stage)(nil),             // 11: turboci.graph.orchestrator.v1.Query.Collect.Stage
 	(*v1.Identifier)(nil),                   // 12: turboci.graph.ids.v1.Identifier
@@ -1327,14 +1327,14 @@ var file_turboci_graph_orchestrator_v1_query_proto_depIdxs = []int32{
 	6,  // 5: turboci.graph.orchestrator.v1.Query.Select.check_patterns:type_name -> turboci.graph.orchestrator.v1.Query.Select.CheckPattern
 	7,  // 6: turboci.graph.orchestrator.v1.Query.Select.stage_patterns:type_name -> turboci.graph.orchestrator.v1.Query.Select.StagePattern
 	8,  // 7: turboci.graph.orchestrator.v1.Query.Expand.dependencies:type_name -> turboci.graph.orchestrator.v1.Query.Expand.Dependencies
-	9,  // 8: turboci.graph.orchestrator.v1.Query.Expand.dependants:type_name -> turboci.graph.orchestrator.v1.Query.Expand.Dependants
+	9,  // 8: turboci.graph.orchestrator.v1.Query.Expand.dependents:type_name -> turboci.graph.orchestrator.v1.Query.Expand.Dependents
 	10, // 9: turboci.graph.orchestrator.v1.Query.Collect.check:type_name -> turboci.graph.orchestrator.v1.Query.Collect.Check
 	11, // 10: turboci.graph.orchestrator.v1.Query.Collect.stage:type_name -> turboci.graph.orchestrator.v1.Query.Collect.Stage
 	13, // 11: turboci.graph.orchestrator.v1.Query.Select.WorkPlanConstraint.in_workplans:type_name -> turboci.graph.ids.v1.WorkPlan
 	14, // 12: turboci.graph.orchestrator.v1.Query.Select.CheckPattern.kind:type_name -> turboci.graph.orchestrator.v1.CheckKind
 	15, // 13: turboci.graph.orchestrator.v1.Query.Select.CheckPattern.state:type_name -> turboci.graph.orchestrator.v1.CheckState
 	0,  // 14: turboci.graph.orchestrator.v1.Query.Expand.Dependencies.mode:type_name -> turboci.graph.orchestrator.v1.QueryExpandDepsMode
-	0,  // 15: turboci.graph.orchestrator.v1.Query.Expand.Dependants.mode:type_name -> turboci.graph.orchestrator.v1.QueryExpandDepsMode
+	0,  // 15: turboci.graph.orchestrator.v1.Query.Expand.Dependents.mode:type_name -> turboci.graph.orchestrator.v1.QueryExpandDepsMode
 	16, // 16: turboci.graph.orchestrator.v1.Query.Collect.Check.edits:type_name -> turboci.graph.orchestrator.v1.RevisionRange
 	16, // 17: turboci.graph.orchestrator.v1.Query.Collect.Stage.edits:type_name -> turboci.graph.orchestrator.v1.RevisionRange
 	18, // [18:18] is the sub-list for method output_type

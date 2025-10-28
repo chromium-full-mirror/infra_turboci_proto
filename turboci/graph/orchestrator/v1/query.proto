@@ -147,14 +147,14 @@ message Query {
     // (B, C) are dependencies of A.
     optional Dependencies dependencies = 1;
 
-    // How to expand the dependants for a Check or Stage.
-    message Dependants {
-      // How to expand dependants.
+    // How to expand the dependents for a Check or Stage.
+    message Dependents {
+      // How to expand dependents.
       //
       // Defaults to QUERY_EXPAND_DEPS_MODE_EDGES.
       optional QueryExpandDepsMode mode = 1;
 
-      // TBD: Allow walking more than one dependant up?
+      // TBD: Allow walking more than one dependent up?
     }
     // For each selected Check or Stage, include any Checks/Stages which depend
     // on it.
@@ -162,8 +162,8 @@ message Query {
     // So given:
     //   A -> {B, C}
     //
-    // A is a dependant of B.
-    optional Dependants dependants = 2;
+    // A is a dependent of B.
+    optional Dependents dependents = 2;
 
     // TBD: Other edge types, such as created_by or written_by?
     // If we include them, how would we indicate these relationships in GraphView?
