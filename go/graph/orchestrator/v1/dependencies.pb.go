@@ -43,7 +43,7 @@ const (
 // Finally, once enough resolution events are present such that the `predicate`
 // Group can be resolved, the orchestrator will populate either `satisfied` or
 // `unsatisfiable`, and will advance the containing node to the next state (i.e.
-// CHECK_STATE_WAITING or STAGE_STATE_ATTEMPTING in the case of statisfied,
+// CHECK_STATE_WAITING or STAGE_STATE_ATTEMPTING in the case of satisfied,
 // FINAL in the case of unsatisfiable).
 type Dependencies struct {
 	state                       protoimpl.MessageState                  `protogen:"opaque.v1"`
