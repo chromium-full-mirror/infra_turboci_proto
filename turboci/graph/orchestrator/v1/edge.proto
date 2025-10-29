@@ -7,46 +7,112 @@ syntax = "proto3";
 package turboci.graph.orchestrator.v1;
 
 import "turboci/graph/ids/v1/identifier.proto";
+import "turboci/graph/orchestrator/v1/check_state.proto";
+import "turboci/graph/orchestrator/v1/stage_state.proto";
 
 option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
 option java_multiple_files = true;
+
+// A determiniation of the resolution of an Edge.
+//
+// An Edge is resolved when it gets to `on_state`. Its expression is evaluated,
+// and the resolution will be either true (RESOLUTION_SATISFIED) or
+// false (RESOLUTION_UNSATISFIED).
+enum Resolution {
+  // There is not yet enough data in the target of the Edge to determine if it
+  // is satisfied or not.
+  RESOLUTION_UNKNOWN = 0;
+
+  // The target of the Edge satisfied its condition.
+  RESOLUTION_SATISFIED = 1;
+
+  // The target of the Edge did not satisfy its condition.
+  RESOLUTION_UNSATISFIED = 2;
+}
 
 // Edge is a singular pointer to some node with an Identifier.
 //
 // Typically Edges must always point to nodes in the same graph, though this may
 // be lifted in the future.
 message Edge {
-  // Target indicates the node that this Edge points to.
-  //
-  // Currently only Checks and Stages are supported.
-  optional ids.v1.Identifier target = 1;
+  // An edge pointing to a Check.
+  message Check {
+    // The Check that this edge points to.
+    optional ids.v1.Check identifier = 1;
 
-  // TODO: Add a way to set a condition on this edge.
+    // The condition under which this Edge is satisfied.
+    message Condition {
+      // Resolve the expression as soon as the target reaches this state.
+      //
+      // Defaults to CHECK_STATE_FINAL.
+      optional CheckState on_state = 1;
+
+      // A boolean CEL expression to evaluate on the target node when it reaches
+      // `on_state`.
+      //
+      // NOTE: Currently only "true" is supported.
+      //
+      // This expression may only consider data in the target which is immutable
+      // for `on_state`. TBD: Link to reference of how to write these
+      // expressions.
+      //
+      // Defaults to "true".
+      optional string expression = 2;
+    }
+    // The optional condition.
+    //
+    // If omitted, defaults to:
+    //
+    //   * on_state: FINAL
+    //   * expression: "true"
+    //
+    // This means 'the edge is satisfied as soon as the check is FINAL'.
+    optional Condition condition = 2;
+  }
+
+  // An edge pointing to a Stage.
+  message Stage {
+    // The Stage that this edge points to.
+    optional ids.v1.Stage identifier = 1;
+
+    // The condition under which this Edge is satisfied.
+    message Condition {
+      // Resolve the expression as soon as the target reaches this state.
+      //
+      // Defaults to STAGE_STATE_FINAL.
+      optional StageState on_state = 1;
+
+      // A boolean CEL expression to evaluate on the target node when it reaches
+      // `on_state`.
+      //
+      // NOTE: Currently only "true" is supported.
+      //
+      // This expression may only consider data in the target which is immutable
+      // for `on_state`. TBD: Link to reference of how to write these
+      // expressions.
+      //
+      // Defaults to "true".
+      optional string expression = 2;
+    }
+    // The optional condition.
+    //
+    // If omitted, defaults to:
+    //
+    //   * on_state: STAGE_STATE_FINAL
+    //   * expression: "true"
+    //
+    // This means 'the edge is satisfied as soon as the stage is FINAL'.
+    optional Condition condition = 2;
+  }
+
+  // Required: The target of this Edge.
   //
-  // For now let's start with resolving edges when `target.state` is it's FINAL
-  // variant. I suspect that we'll quickly need to at least change which state
-  // we depend on (e.g. for Stages I think we will want to depend on
-  // `STAGE_STATE_WAITING_FOR_GROUP` in order to add Stages which don't start
-  // until after the current Stage finishes execution).
-  //
-  // message Condition {
-  //   // selected minimum state must match the type of `target`.
-  //   // required. Prior to this state this Condition is unfulfilled.
-  //   //
-  //   // At/After this state the Condition will be resolved to either true or
-  //   // false.
-  //   oneof min_state {
-  //     CheckState minimum_check_state = 1;
-  //     StageState minimum_stage_state = 2;
-  //   }
-  //
-  //   // CEL: https://github.com/google/cel-spec
-  //   //
-  //   // Will be statically checked against check/stage fields which are
-  //   // immutable at `min_state`.
-  //   //
-  //   // Will be evaluated exactly once on `target` when it reaches the minimum
-  //   // state.
-  //   string expression = 2;
-  // }
+  // Currently only supports Checks and Stages.
+  oneof target {
+    // This Edge points to a Check.
+    Check check = 1;
+
+    // This Edge points to a Stage.
+    Stage stage = 2;
+  }
 }

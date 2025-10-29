@@ -14,9 +14,8 @@ option java_multiple_files = true;
 
 // Dependencies represents a group of edges (the predicate) needed to unblock
 // a containing node (a Check or a Stage), as well as timestamps and
-// satisfaction of those edges, and finally the group of edges which satisfied
-// the predicate and unblocked the containing node (or an indicator that the
-// predicate is unsatisfiable).
+// satisfaction of those edges, and finally an overall assessment of the
+// resolution of the predicate.
 //
 // During PLANNING, the `edges` and `predicate` fields are mutable. These
 // contain all dependency targets and any criteria for them, plus the boolean
@@ -29,10 +28,7 @@ option java_multiple_files = true;
 // events' are recorded to the the `resolution_events` field.
 //
 // Finally, once enough resolution events are present such that the `predicate`
-// Group can be resolved, the orchestrator will populate either `satisfied` or
-// `unsatisfiable`, and will advance the containing node to the next state (i.e.
-// CHECK_STATE_WAITING or STAGE_STATE_ATTEMPTING in the case of satisfied,
-// FINAL in the case of unsatisfiable).
+// Group can be resolved, the orchestrator will set the `resolution` field.
 message Dependencies {
   // A group of dependencies, containing edges and/or other groups, plus
   // a minimum threshold to meet to consider this Group satisfied.
@@ -102,7 +98,9 @@ message Dependencies {
 
   // The set of all edges from the containing node to other nodes in the graph.
   //
-  // These are unique by `target` and criteria.
+  // These are unique by `target` and `condition` (expressions will be lightly
+  // normalized for e.g. whitespace, comments, but this will not attempt to do
+  // any 'smart' deduplication of semantically equivalent expressions).
   //
   // See `predicate` and `satisfied` which refer to these.
   repeated Edge edges = 1;
@@ -111,14 +109,6 @@ message Dependencies {
   //
   // The Group is a compact expression of a logical rule of which edges must be
   // satisfied before the node can be unblocked.
-  //
-  // Once this Group is satisfied, the node will be unblocked and move from
-  // PLANNED to CHECK_STATE_WAITING or STAGE_STATE_ATTEMPTING, depending on the
-  // containing node type.
-  //
-  // If the Group is unsatisfiable, then the containing node will be immediately
-  // moved to its FINAL state. For Checks, a single Result will be added with
-  // type `TBD`.
   //
   // Once the containing node is CHECK_STATE_WAITING/STAGE_STATE_ATTEMPTING,
   // this field is immutable.
@@ -139,46 +129,57 @@ message Dependencies {
 
     // Was the criteria for this edge satisfied or not?
     //
-    // By default, Edges without explicit criteria (i.e. just 'is target
-    // FINAL?') will always see this as true.
-    optional bool satisfied = 2;
+    // Will never be `UNKNOWN`.
+    optional Resolution resolution = 2;
   }
   // While containing node is in the PLANNED state, this will accumulate all
   // incoming resolution events.
   //
-  // The key is an index into the Dependencies.edges table.
+  // The key is an index into the Dependencies.edges list.
   //
   // When the containing node enters PLANNED for the first time, there may be
   // several events which show up here immediately (i.e. the targets of these
-  // Edges were already in a satisfying state).
+  // Edges were already resolved when the node entered PLANNED).
   //
-  // This will include a superset of edges in `satisfied`.
+  // This field is append-only; once an Edge has a ResolutionEvent, that
+  // resolution will never change.
   map<int32, ResolutionEvent> resolution_events = 3;
 
   // When the orchestrator recognizes that the events in `resolution_events` can
-  // resolve the `predicate` Group, it will either set `satisfied` or
-  // `unsatisfiable` and stop accumulating `resolution_events`.
+  // resolve the `predicate` Group, it will set this field to either
+  // RESOLUTION_SATISFIED or RESOLUTION_UNSATISFIED.
   //
-  // If the `predicate` is satisfied, the `satisfied` field here will be set to
-  // a Group with just the groups and edges which ultimately caused
-  // the containing node to be unblocked. The orchestrator will advance the
-  // containing node to the next state (i.e. CHECK_STATE_WAITING,
-  // STAGE_STATE_ATTEMPTING).
+  // If this is RESOLUTION_SATISFIED, the containing node will move to the
+  // CHECK_STATE_WAITING or STAGE_STATE_ATTEMPTING state, depending on the
+  // containing node type.
   //
-  // If the `predicate` is unsatisfiable, `unsatisfiable` will be set to true.
-  // The orchestrator will advance the containing node to its FINAL state. For
-  // Checks, the orchestrator will also synthesize a result of type `TBD`.
+  // If this is RESOLUTION_UNSATISFIED, then the containing node will be
+  // immediately moved to its FINAL state. For Checks, a single Result will be
+  // added with type `TBD`.
   //
-  // Once written, this is immutable.
-  oneof resolution {
-    // The actual group of resolved dependencies which satisfied the
-    // dependencies predicate.
-    Group satisfied = 4;
-
-    // If the predicate can never be satisfied, this is `true`.
-    //
-    // The orchestrator will never populate this field with a value other than
-    // `true`.
-    bool unsatisfiable = 5;
-  }
+  // Once set, this is immutable.
+  //
+  // The subset of `predicate` which caused these Dependencies to be satisfied
+  // can be recovered like:
+  //
+  //     satisfied_edges = {
+  //       idx
+  //       for idx, event in deps.resolution_events
+  //       if event.resolution == RESOLUTION_SATISFIED
+  //     }
+  //     def visit(group: Dependencies.Group) -> Dependencies.Group|None:
+  //       edges = [idx for idx in group.edges if idx in satisfied_edges]
+  //       groups = [
+  //         visited for subgroup in group.groups
+  //         if (visited := visit(subgroup))
+  //       ]
+  //       threshold = group.threshold or (len(group.edges) + len(group.groups))
+  //       if len(edges) + len(groups) < threshold:
+  //         return None
+  //       return Dependencies.Group(
+  //         edges=edges, groups=groups,
+  //         threshold=group.threshold
+  //       )
+  //     predicate_subset = visit(deps.predicate)
+  optional Resolution resolution = 4;
 }

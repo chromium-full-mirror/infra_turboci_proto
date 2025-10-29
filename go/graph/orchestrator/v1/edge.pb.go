@@ -25,13 +25,66 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// A determiniation of the resolution of an Edge.
+//
+// An Edge is resolved when it gets to `on_state`. Its expression is evaluated,
+// and the resolution will be either true (RESOLUTION_SATISFIED) or
+// false (RESOLUTION_UNSATISFIED).
+type Resolution int32
+
+const (
+	// There is not yet enough data in the target of the Edge to determine if it
+	// is satisfied or not.
+	Resolution_RESOLUTION_UNKNOWN Resolution = 0
+	// The target of the Edge satisfied its condition.
+	Resolution_RESOLUTION_SATISFIED Resolution = 1
+	// The target of the Edge did not satisfy its condition.
+	Resolution_RESOLUTION_UNSATISFIED Resolution = 2
+)
+
+// Enum value maps for Resolution.
+var (
+	Resolution_name = map[int32]string{
+		0: "RESOLUTION_UNKNOWN",
+		1: "RESOLUTION_SATISFIED",
+		2: "RESOLUTION_UNSATISFIED",
+	}
+	Resolution_value = map[string]int32{
+		"RESOLUTION_UNKNOWN":     0,
+		"RESOLUTION_SATISFIED":   1,
+		"RESOLUTION_UNSATISFIED": 2,
+	}
+)
+
+func (x Resolution) Enum() *Resolution {
+	p := new(Resolution)
+	*p = x
+	return p
+}
+
+func (x Resolution) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Resolution) Descriptor() protoreflect.EnumDescriptor {
+	return file_turboci_graph_orchestrator_v1_edge_proto_enumTypes[0].Descriptor()
+}
+
+func (Resolution) Type() protoreflect.EnumType {
+	return &file_turboci_graph_orchestrator_v1_edge_proto_enumTypes[0]
+}
+
+func (x Resolution) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
 // Edge is a singular pointer to some node with an Identifier.
 //
 // Typically Edges must always point to nodes in the same graph, though this may
 // be lifted in the future.
 type Edge struct {
 	state             protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Target *v1.Identifier         `protobuf:"bytes,1,opt,name=target,proto3,oneof"`
+	xxx_hidden_Target isEdge_Target          `protobuf_oneof:"target"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -61,15 +114,38 @@ func (x *Edge) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *Edge) GetTarget() *v1.Identifier {
+func (x *Edge) GetCheck() *Edge_Check {
 	if x != nil {
-		return x.xxx_hidden_Target
+		if x, ok := x.xxx_hidden_Target.(*edge_Check_); ok {
+			return x.Check
+		}
 	}
 	return nil
 }
 
-func (x *Edge) SetTarget(v *v1.Identifier) {
-	x.xxx_hidden_Target = v
+func (x *Edge) GetStage() *Edge_Stage {
+	if x != nil {
+		if x, ok := x.xxx_hidden_Target.(*edge_Stage_); ok {
+			return x.Stage
+		}
+	}
+	return nil
+}
+
+func (x *Edge) SetCheck(v *Edge_Check) {
+	if v == nil {
+		x.xxx_hidden_Target = nil
+		return
+	}
+	x.xxx_hidden_Target = &edge_Check_{v}
+}
+
+func (x *Edge) SetStage(v *Edge_Stage) {
+	if v == nil {
+		x.xxx_hidden_Target = nil
+		return
+	}
+	x.xxx_hidden_Target = &edge_Stage_{v}
 }
 
 func (x *Edge) HasTarget() bool {
@@ -79,24 +155,563 @@ func (x *Edge) HasTarget() bool {
 	return x.xxx_hidden_Target != nil
 }
 
+func (x *Edge) HasCheck() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Target.(*edge_Check_)
+	return ok
+}
+
+func (x *Edge) HasStage() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Target.(*edge_Stage_)
+	return ok
+}
+
 func (x *Edge) ClearTarget() {
 	x.xxx_hidden_Target = nil
+}
+
+func (x *Edge) ClearCheck() {
+	if _, ok := x.xxx_hidden_Target.(*edge_Check_); ok {
+		x.xxx_hidden_Target = nil
+	}
+}
+
+func (x *Edge) ClearStage() {
+	if _, ok := x.xxx_hidden_Target.(*edge_Stage_); ok {
+		x.xxx_hidden_Target = nil
+	}
+}
+
+const Edge_Target_not_set_case case_Edge_Target = 0
+const Edge_Check_case case_Edge_Target = 1
+const Edge_Stage_case case_Edge_Target = 2
+
+func (x *Edge) WhichTarget() case_Edge_Target {
+	if x == nil {
+		return Edge_Target_not_set_case
+	}
+	switch x.xxx_hidden_Target.(type) {
+	case *edge_Check_:
+		return Edge_Check_case
+	case *edge_Stage_:
+		return Edge_Stage_case
+	default:
+		return Edge_Target_not_set_case
+	}
 }
 
 type Edge_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Target indicates the node that this Edge points to.
+	// Required: The target of this Edge.
 	//
-	// Currently only Checks and Stages are supported.
-	Target *v1.Identifier
+	// Currently only supports Checks and Stages.
+
+	// Fields of oneof xxx_hidden_Target:
+	// This Edge points to a Check.
+	Check *Edge_Check
+	// This Edge points to a Stage.
+	Stage *Edge_Stage
+	// -- end of xxx_hidden_Target
 }
 
 func (b0 Edge_builder) Build() *Edge {
 	m0 := &Edge{}
 	b, x := &b0, m0
 	_, _ = b, x
-	x.xxx_hidden_Target = b.Target
+	if b.Check != nil {
+		x.xxx_hidden_Target = &edge_Check_{b.Check}
+	}
+	if b.Stage != nil {
+		x.xxx_hidden_Target = &edge_Stage_{b.Stage}
+	}
+	return m0
+}
+
+type case_Edge_Target protoreflect.FieldNumber
+
+func (x case_Edge_Target) String() string {
+	md := file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[0].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
+type isEdge_Target interface {
+	isEdge_Target()
+}
+
+type edge_Check_ struct {
+	// This Edge points to a Check.
+	Check *Edge_Check `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
+}
+
+type edge_Stage_ struct {
+	// This Edge points to a Stage.
+	Stage *Edge_Stage `protobuf:"bytes,2,opt,name=stage,proto3,oneof"`
+}
+
+func (*edge_Check_) isEdge_Target() {}
+
+func (*edge_Stage_) isEdge_Target() {}
+
+// An edge pointing to a Check.
+type Edge_Check struct {
+	state                 protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier *v1.Check              `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Condition  *Edge_Check_Condition  `protobuf:"bytes,2,opt,name=condition,proto3,oneof"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *Edge_Check) Reset() {
+	*x = Edge_Check{}
+	mi := &file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Edge_Check) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Edge_Check) ProtoMessage() {}
+
+func (x *Edge_Check) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Edge_Check) GetIdentifier() *v1.Check {
+	if x != nil {
+		return x.xxx_hidden_Identifier
+	}
+	return nil
+}
+
+func (x *Edge_Check) GetCondition() *Edge_Check_Condition {
+	if x != nil {
+		return x.xxx_hidden_Condition
+	}
+	return nil
+}
+
+func (x *Edge_Check) SetIdentifier(v *v1.Check) {
+	x.xxx_hidden_Identifier = v
+}
+
+func (x *Edge_Check) SetCondition(v *Edge_Check_Condition) {
+	x.xxx_hidden_Condition = v
+}
+
+func (x *Edge_Check) HasIdentifier() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Identifier != nil
+}
+
+func (x *Edge_Check) HasCondition() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Condition != nil
+}
+
+func (x *Edge_Check) ClearIdentifier() {
+	x.xxx_hidden_Identifier = nil
+}
+
+func (x *Edge_Check) ClearCondition() {
+	x.xxx_hidden_Condition = nil
+}
+
+type Edge_Check_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The Check that this edge points to.
+	Identifier *v1.Check
+	// The optional condition.
+	//
+	// If omitted, defaults to:
+	//
+	//   - on_state: FINAL
+	//   - expression: "true"
+	//
+	// This means 'the edge is satisfied as soon as the check is FINAL'.
+	Condition *Edge_Check_Condition
+}
+
+func (b0 Edge_Check_builder) Build() *Edge_Check {
+	m0 := &Edge_Check{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Identifier = b.Identifier
+	x.xxx_hidden_Condition = b.Condition
+	return m0
+}
+
+// An edge pointing to a Stage.
+type Edge_Stage struct {
+	state                 protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier *v1.Stage              `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Condition  *Edge_Stage_Condition  `protobuf:"bytes,2,opt,name=condition,proto3,oneof"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *Edge_Stage) Reset() {
+	*x = Edge_Stage{}
+	mi := &file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Edge_Stage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Edge_Stage) ProtoMessage() {}
+
+func (x *Edge_Stage) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Edge_Stage) GetIdentifier() *v1.Stage {
+	if x != nil {
+		return x.xxx_hidden_Identifier
+	}
+	return nil
+}
+
+func (x *Edge_Stage) GetCondition() *Edge_Stage_Condition {
+	if x != nil {
+		return x.xxx_hidden_Condition
+	}
+	return nil
+}
+
+func (x *Edge_Stage) SetIdentifier(v *v1.Stage) {
+	x.xxx_hidden_Identifier = v
+}
+
+func (x *Edge_Stage) SetCondition(v *Edge_Stage_Condition) {
+	x.xxx_hidden_Condition = v
+}
+
+func (x *Edge_Stage) HasIdentifier() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Identifier != nil
+}
+
+func (x *Edge_Stage) HasCondition() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Condition != nil
+}
+
+func (x *Edge_Stage) ClearIdentifier() {
+	x.xxx_hidden_Identifier = nil
+}
+
+func (x *Edge_Stage) ClearCondition() {
+	x.xxx_hidden_Condition = nil
+}
+
+type Edge_Stage_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The Stage that this edge points to.
+	Identifier *v1.Stage
+	// The optional condition.
+	//
+	// If omitted, defaults to:
+	//
+	//   - on_state: STAGE_STATE_FINAL
+	//   - expression: "true"
+	//
+	// This means 'the edge is satisfied as soon as the stage is FINAL'.
+	Condition *Edge_Stage_Condition
+}
+
+func (b0 Edge_Stage_builder) Build() *Edge_Stage {
+	m0 := &Edge_Stage{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Identifier = b.Identifier
+	x.xxx_hidden_Condition = b.Condition
+	return m0
+}
+
+// The condition under which this Edge is satisfied.
+type Edge_Check_Condition struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_OnState     CheckState             `protobuf:"varint,1,opt,name=on_state,json=onState,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
+	xxx_hidden_Expression  *string                `protobuf:"bytes,2,opt,name=expression,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *Edge_Check_Condition) Reset() {
+	*x = Edge_Check_Condition{}
+	mi := &file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Edge_Check_Condition) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Edge_Check_Condition) ProtoMessage() {}
+
+func (x *Edge_Check_Condition) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Edge_Check_Condition) GetOnState() CheckState {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
+			return x.xxx_hidden_OnState
+		}
+	}
+	return CheckState_CHECK_STATE_UNKNOWN
+}
+
+func (x *Edge_Check_Condition) GetExpression() string {
+	if x != nil {
+		if x.xxx_hidden_Expression != nil {
+			return *x.xxx_hidden_Expression
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *Edge_Check_Condition) SetOnState(v CheckState) {
+	x.xxx_hidden_OnState = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *Edge_Check_Condition) SetExpression(v string) {
+	x.xxx_hidden_Expression = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *Edge_Check_Condition) HasOnState() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Edge_Check_Condition) HasExpression() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Edge_Check_Condition) ClearOnState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_OnState = CheckState_CHECK_STATE_UNKNOWN
+}
+
+func (x *Edge_Check_Condition) ClearExpression() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Expression = nil
+}
+
+type Edge_Check_Condition_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Resolve the expression as soon as the target reaches this state.
+	//
+	// Defaults to CHECK_STATE_FINAL.
+	OnState *CheckState
+	// A boolean CEL expression to evaluate on the target node when it reaches
+	// `on_state`.
+	//
+	// NOTE: Currently only "true" is supported.
+	//
+	// This expression may only consider data in the target which is immutable
+	// for `on_state`. TBD: Link to reference of how to write these
+	// expressions.
+	//
+	// Defaults to "true".
+	Expression *string
+}
+
+func (b0 Edge_Check_Condition_builder) Build() *Edge_Check_Condition {
+	m0 := &Edge_Check_Condition{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.OnState != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_OnState = *b.OnState
+	}
+	if b.Expression != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_Expression = b.Expression
+	}
+	return m0
+}
+
+// The condition under which this Edge is satisfied.
+type Edge_Stage_Condition struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_OnState     StageState             `protobuf:"varint,1,opt,name=on_state,json=onState,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
+	xxx_hidden_Expression  *string                `protobuf:"bytes,2,opt,name=expression,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *Edge_Stage_Condition) Reset() {
+	*x = Edge_Stage_Condition{}
+	mi := &file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Edge_Stage_Condition) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Edge_Stage_Condition) ProtoMessage() {}
+
+func (x *Edge_Stage_Condition) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Edge_Stage_Condition) GetOnState() StageState {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
+			return x.xxx_hidden_OnState
+		}
+	}
+	return StageState_STAGE_STATE_UNKNOWN
+}
+
+func (x *Edge_Stage_Condition) GetExpression() string {
+	if x != nil {
+		if x.xxx_hidden_Expression != nil {
+			return *x.xxx_hidden_Expression
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *Edge_Stage_Condition) SetOnState(v StageState) {
+	x.xxx_hidden_OnState = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *Edge_Stage_Condition) SetExpression(v string) {
+	x.xxx_hidden_Expression = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *Edge_Stage_Condition) HasOnState() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Edge_Stage_Condition) HasExpression() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Edge_Stage_Condition) ClearOnState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_OnState = StageState_STAGE_STATE_UNKNOWN
+}
+
+func (x *Edge_Stage_Condition) ClearExpression() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Expression = nil
+}
+
+type Edge_Stage_Condition_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Resolve the expression as soon as the target reaches this state.
+	//
+	// Defaults to STAGE_STATE_FINAL.
+	OnState *StageState
+	// A boolean CEL expression to evaluate on the target node when it reaches
+	// `on_state`.
+	//
+	// NOTE: Currently only "true" is supported.
+	//
+	// This expression may only consider data in the target which is immutable
+	// for `on_state`. TBD: Link to reference of how to write these
+	// expressions.
+	//
+	// Defaults to "true".
+	Expression *string
+}
+
+func (b0 Edge_Stage_Condition_builder) Build() *Edge_Stage_Condition {
+	m0 := &Edge_Stage_Condition{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.OnState != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_OnState = *b.OnState
+	}
+	if b.Expression != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_Expression = b.Expression
+	}
 	return m0
 }
 
@@ -104,23 +719,75 @@ var File_turboci_graph_orchestrator_v1_edge_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_edge_proto_rawDesc = "" +
 	"\n" +
-	"(turboci/graph/orchestrator/v1/edge.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\"P\n" +
-	"\x04Edge\x12=\n" +
-	"\x06target\x18\x01 \x01(\v2 .turboci.graph.ids.v1.IdentifierH\x00R\x06target\x88\x01\x01B\t\n" +
-	"\a_targetBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"(turboci/graph/orchestrator/v1/edge.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\"\xcc\x06\n" +
+	"\x04Edge\x12A\n" +
+	"\x05check\x18\x01 \x01(\v2).turboci.graph.orchestrator.v1.Edge.CheckH\x00R\x05check\x12A\n" +
+	"\x05stage\x18\x02 \x01(\v2).turboci.graph.orchestrator.v1.Edge.StageH\x00R\x05stage\x1a\xd8\x02\n" +
+	"\x05Check\x12@\n" +
+	"\n" +
+	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckH\x00R\n" +
+	"identifier\x88\x01\x01\x12V\n" +
+	"\tcondition\x18\x02 \x01(\v23.turboci.graph.orchestrator.v1.Edge.Check.ConditionH\x01R\tcondition\x88\x01\x01\x1a\x97\x01\n" +
+	"\tCondition\x12I\n" +
+	"\bon_state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\aonState\x88\x01\x01\x12#\n" +
+	"\n" +
+	"expression\x18\x02 \x01(\tH\x01R\n" +
+	"expression\x88\x01\x01B\v\n" +
+	"\t_on_stateB\r\n" +
+	"\v_expressionB\r\n" +
+	"\v_identifierB\f\n" +
+	"\n" +
+	"_condition\x1a\xd8\x02\n" +
+	"\x05Stage\x12@\n" +
+	"\n" +
+	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageH\x00R\n" +
+	"identifier\x88\x01\x01\x12V\n" +
+	"\tcondition\x18\x02 \x01(\v23.turboci.graph.orchestrator.v1.Edge.Stage.ConditionH\x01R\tcondition\x88\x01\x01\x1a\x97\x01\n" +
+	"\tCondition\x12I\n" +
+	"\bon_state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x00R\aonState\x88\x01\x01\x12#\n" +
+	"\n" +
+	"expression\x18\x02 \x01(\tH\x01R\n" +
+	"expression\x88\x01\x01B\v\n" +
+	"\t_on_stateB\r\n" +
+	"\v_expressionB\r\n" +
+	"\v_identifierB\f\n" +
+	"\n" +
+	"_conditionB\b\n" +
+	"\x06target*Z\n" +
+	"\n" +
+	"Resolution\x12\x16\n" +
+	"\x12RESOLUTION_UNKNOWN\x10\x00\x12\x18\n" +
+	"\x14RESOLUTION_SATISFIED\x10\x01\x12\x1a\n" +
+	"\x16RESOLUTION_UNSATISFIED\x10\x02BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_edge_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_turboci_graph_orchestrator_v1_edge_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_turboci_graph_orchestrator_v1_edge_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_turboci_graph_orchestrator_v1_edge_proto_goTypes = []any{
-	(*Edge)(nil),          // 0: turboci.graph.orchestrator.v1.Edge
-	(*v1.Identifier)(nil), // 1: turboci.graph.ids.v1.Identifier
+	(Resolution)(0),              // 0: turboci.graph.orchestrator.v1.Resolution
+	(*Edge)(nil),                 // 1: turboci.graph.orchestrator.v1.Edge
+	(*Edge_Check)(nil),           // 2: turboci.graph.orchestrator.v1.Edge.Check
+	(*Edge_Stage)(nil),           // 3: turboci.graph.orchestrator.v1.Edge.Stage
+	(*Edge_Check_Condition)(nil), // 4: turboci.graph.orchestrator.v1.Edge.Check.Condition
+	(*Edge_Stage_Condition)(nil), // 5: turboci.graph.orchestrator.v1.Edge.Stage.Condition
+	(*v1.Check)(nil),             // 6: turboci.graph.ids.v1.Check
+	(*v1.Stage)(nil),             // 7: turboci.graph.ids.v1.Stage
+	(CheckState)(0),              // 8: turboci.graph.orchestrator.v1.CheckState
+	(StageState)(0),              // 9: turboci.graph.orchestrator.v1.StageState
 }
 var file_turboci_graph_orchestrator_v1_edge_proto_depIdxs = []int32{
-	1, // 0: turboci.graph.orchestrator.v1.Edge.target:type_name -> turboci.graph.ids.v1.Identifier
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 0: turboci.graph.orchestrator.v1.Edge.check:type_name -> turboci.graph.orchestrator.v1.Edge.Check
+	3, // 1: turboci.graph.orchestrator.v1.Edge.stage:type_name -> turboci.graph.orchestrator.v1.Edge.Stage
+	6, // 2: turboci.graph.orchestrator.v1.Edge.Check.identifier:type_name -> turboci.graph.ids.v1.Check
+	4, // 3: turboci.graph.orchestrator.v1.Edge.Check.condition:type_name -> turboci.graph.orchestrator.v1.Edge.Check.Condition
+	7, // 4: turboci.graph.orchestrator.v1.Edge.Stage.identifier:type_name -> turboci.graph.ids.v1.Stage
+	5, // 5: turboci.graph.orchestrator.v1.Edge.Stage.condition:type_name -> turboci.graph.orchestrator.v1.Edge.Stage.Condition
+	8, // 6: turboci.graph.orchestrator.v1.Edge.Check.Condition.on_state:type_name -> turboci.graph.orchestrator.v1.CheckState
+	9, // 7: turboci.graph.orchestrator.v1.Edge.Stage.Condition.on_state:type_name -> turboci.graph.orchestrator.v1.StageState
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_edge_proto_init() }
@@ -128,19 +795,29 @@ func file_turboci_graph_orchestrator_v1_edge_proto_init() {
 	if File_turboci_graph_orchestrator_v1_edge_proto != nil {
 		return
 	}
-	file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[0].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_check_state_proto_init()
+	file_turboci_graph_orchestrator_v1_stage_state_proto_init()
+	file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[0].OneofWrappers = []any{
+		(*edge_Check_)(nil),
+		(*edge_Stage_)(nil),
+	}
+	file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[1].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[2].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[3].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_edge_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_edge_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_edge_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   1,
+			NumEnums:      1,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_turboci_graph_orchestrator_v1_edge_proto_goTypes,
 		DependencyIndexes: file_turboci_graph_orchestrator_v1_edge_proto_depIdxs,
+		EnumInfos:         file_turboci_graph_orchestrator_v1_edge_proto_enumTypes,
 		MessageInfos:      file_turboci_graph_orchestrator_v1_edge_proto_msgTypes,
 	}.Build()
 	File_turboci_graph_orchestrator_v1_edge_proto = out.File
