@@ -36,10 +36,12 @@ const (
 	QueryExpandDepsMode_QUERY_EXPAND_DEPS_MODE_UNKNOWN QueryExpandDepsMode = 0
 	// Expand to deps which are listed in dependencies.edges.
 	QueryExpandDepsMode_QUERY_EXPAND_DEPS_MODE_EDGES QueryExpandDepsMode = 1
-	// Expand to deps which are listed (transitively) in dependencies.satisfied.
+	// Expand to edges which were the ones that caused dependencies.resolved to be
+	// RESOLUTION_SATISFIED.
 	//
 	// Note that this will be the empty set for nodes which are not already past
-	// the PLANNED state, and for nodes which have unsatisfiable dependencies.
+	// the PLANNED state, and for nodes which have RESOLUTION_UNSATISFIED
+	// dependencies.
 	QueryExpandDepsMode_QUERY_EXPAND_DEPS_MODE_SATISFIED QueryExpandDepsMode = 2
 )
 

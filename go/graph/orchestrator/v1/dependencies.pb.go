@@ -200,7 +200,7 @@ type Dependencies_builder struct {
 	//
 	//	satisfied_edges = {
 	//	  idx
-	//	  for idx, event in deps.resolution_events
+	//	  for idx, event in deps.resolution_events.items()
 	//	  if event.resolution == RESOLUTION_SATISFIED
 	//	}
 	//	def visit(group: Dependencies.Group) -> Dependencies.Group|None:
@@ -217,6 +217,9 @@ type Dependencies_builder struct {
 	//	    threshold=group.threshold
 	//	  )
 	//	predicate_subset = visit(deps.predicate)
+	//
+	// This is the same set of dependencies which would be returned by
+	// a Query.Expand with mode=QUERY_EXPAND_DEPS_MODE_SATISFIED.
 	Resolution *Resolution
 }
 
