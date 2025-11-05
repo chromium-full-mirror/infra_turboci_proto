@@ -10,6 +10,7 @@ import collections
 import contextlib
 import filecmp
 import glob
+import gzip
 import inspect
 import os
 import re
@@ -52,7 +53,11 @@ def check_output(cmd: list[str | Path]) -> str | NoReturn:
 
 
 def check_call(cmd: list[str | Path]):
-  print(f"running: {' '.join(str(c) for c in cmd)}")
+  if len(cmd) == 2 and cmd[0] == 'protoc' and cmd[1].startswith('@'):
+    args = open(cmd[1][1:]).read()
+    print(f"running: protoc {args}")
+  else:
+    print(f"running: {' '.join(str(c) for c in cmd)}")
   ret = subprocess.call(cmd, cwd=_RepoRoot, env=_env)
   if ret != 0:
     sys.exit(ret)
@@ -268,10 +273,10 @@ def protoc(*args: str):
 
 
 def quick_glob(pattern: str) -> list[str]:
-  return glob.glob(pattern, root_dir=_RepoRoot, recursive=True)
+  return sorted(glob.glob(pattern, root_dir=_RepoRoot, recursive=True))
 
 
-def task_compile_desc(outfile: None | str = None):
+def task_compile_desc(outfile: None | str = None, include_imports: bool = False):
   """Runs `protoc` to ensure all protos can compile to a proto descriptor.
 
   The descriptor is discarded, unless outfile is provided.
@@ -290,6 +295,8 @@ def task_compile_desc(outfile: None | str = None):
     args = ['-o', tf.name]
     if outfile:
       args += ['--retain_options', '--include_source_info']
+    if include_imports:
+      args += ['--include_imports']
     protoc(*args)
 
 
@@ -371,6 +378,33 @@ def task_compile_go(mode: None | str = None):
       sys.exit(1)
 
 
+def task_store_descriptors(mode: None | str = None):
+  """Runs `protoc` to store the transitive set of proto descriptors.
+
+  If `mode` is `check`, then this will just check that the currently stored
+  descriptors are correct.
+
+  Example:
+    build.py store_descriptors check
+  """
+  descPath = _RepoRoot / 'go' / 'utils' / 'turbocidesc' / 'desc.pb.gz'
+
+  with tempfile.NamedTemporaryFile() as tf:
+    task_compile_desc(tf.name, include_imports=True)
+    raw = tf.read()
+  gzipped = gzip.compress(raw, mtime=1)
+
+  if mode == 'check':
+    existing = open(descPath, 'rb').read()
+    if existing != gzipped:
+      print('stored descriptors bundle is out of date')
+      sys.exit(1)
+    return
+
+  with open(descPath, 'wb') as f:
+    f.write(gzipped)
+
+
 def task_all():
   """Shorthand to run all presubmit checks."""
   fail = False
@@ -393,6 +427,7 @@ def task_all():
         task_lint,
         task_breaking,
         task_compile_go,
+        task_store_descriptors,
     )
 
     for i, fn in enumerate(allTasks):

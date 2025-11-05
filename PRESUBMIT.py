@@ -67,6 +67,7 @@ def CheckGoPackageOption(input_api, output_api):
       message=output_api.PresubmitError,
   )])
 
+
 def CheckServiceDefinitions(input_api, output_api):
   return input_api.RunTests([input_api.Command(
       name='build.py check_service_definitions',
@@ -75,6 +76,7 @@ def CheckServiceDefinitions(input_api, output_api):
       message=output_api.PresubmitError,
   )])
 
+
 def CheckAllFieldsOptional(input_api, output_api):
   return input_api.RunTests([input_api.Command(
       name='build.py check_all_fields_optional',
@@ -82,6 +84,7 @@ def CheckAllFieldsOptional(input_api, output_api):
       kwargs={'cwd': input_api.PresubmitLocalPath()},
       message=output_api.PresubmitError,
   )])
+
 
 def CheckLicense(input_api, output_api):
   input_api.DEFAULT_FILES_TO_CHECK += (r'.+\.proto$',)
@@ -92,6 +95,15 @@ def CheckGoStubs(input_api, output_api):
   return input_api.RunTests([input_api.Command(
       name='build.py compile_go check',
       cmd=['build.py', 'compile_go', 'check'],
+      kwargs={'cwd': input_api.PresubmitLocalPath()},
+      message=output_api.PresubmitError,
+  )])
+
+
+def CheckStoredDescriptors(input_api, output_api):
+  return input_api.RunTests([input_api.Command(
+      name='build.py store_descriptors check',
+      cmd=['build.py', 'store_descriptors', 'check'],
       kwargs={'cwd': input_api.PresubmitLocalPath()},
       message=output_api.PresubmitError,
   )])
