@@ -1480,17 +1480,17 @@ func (b0 WriteNodesRequest_StageWrite_builder) Build() *WriteNodesRequest_StageW
 // These aspects come from either the Executor which owns this Stage Attempt,
 // or the running Stage Attempt process.
 type WriteNodesRequest_CurrentStageWrite struct {
-	state                                protoimpl.MessageState                     `protogen:"opaque.v1"`
-	xxx_hidden_State                     StageAttemptState                          `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
-	xxx_hidden_ProcessUid                *string                                    `protobuf:"bytes,2,opt,name=process_uid,json=processUid,proto3,oneof"`
-	xxx_hidden_EnsureInContinuationGroup *[]*Edge                                   `protobuf:"bytes,3,rep,name=ensure_in_continuation_group,json=ensureInContinuationGroup,proto3"`
-	xxx_hidden_AttemptExecutionPolicy    *StageAttemptExecutionPolicy               `protobuf:"bytes,4,opt,name=attempt_execution_policy,json=attemptExecutionPolicy,proto3,oneof"`
-	xxx_hidden_Details                   *[]*Value                                  `protobuf:"bytes,5,rep,name=details,proto3"`
-	xxx_hidden_Progress                  *[]*WriteNodesRequest_StageAttemptProgress `protobuf:"bytes,6,rep,name=progress,proto3"`
-	XXX_raceDetectHookData               protoimpl.RaceDetectHookData
-	XXX_presence                         [1]uint32
-	unknownFields                        protoimpl.UnknownFields
-	sizeCache                            protoimpl.SizeCache
+	state                             protoimpl.MessageState                     `protogen:"opaque.v1"`
+	xxx_hidden_State                  StageAttemptState                          `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
+	xxx_hidden_ProcessUid             *string                                    `protobuf:"bytes,2,opt,name=process_uid,json=processUid,proto3,oneof"`
+	xxx_hidden_ContinuationGroup      *WriteNodesRequest_DependencyGroup         `protobuf:"bytes,3,opt,name=continuation_group,json=continuationGroup,proto3,oneof"`
+	xxx_hidden_AttemptExecutionPolicy *StageAttemptExecutionPolicy               `protobuf:"bytes,4,opt,name=attempt_execution_policy,json=attemptExecutionPolicy,proto3,oneof"`
+	xxx_hidden_Details                *[]*Value                                  `protobuf:"bytes,5,rep,name=details,proto3"`
+	xxx_hidden_Progress               *[]*WriteNodesRequest_StageAttemptProgress `protobuf:"bytes,6,rep,name=progress,proto3"`
+	XXX_raceDetectHookData            protoimpl.RaceDetectHookData
+	XXX_presence                      [1]uint32
+	unknownFields                     protoimpl.UnknownFields
+	sizeCache                         protoimpl.SizeCache
 }
 
 func (x *WriteNodesRequest_CurrentStageWrite) Reset() {
@@ -1537,11 +1537,9 @@ func (x *WriteNodesRequest_CurrentStageWrite) GetProcessUid() string {
 	return ""
 }
 
-func (x *WriteNodesRequest_CurrentStageWrite) GetEnsureInContinuationGroup() []*Edge {
+func (x *WriteNodesRequest_CurrentStageWrite) GetContinuationGroup() *WriteNodesRequest_DependencyGroup {
 	if x != nil {
-		if x.xxx_hidden_EnsureInContinuationGroup != nil {
-			return *x.xxx_hidden_EnsureInContinuationGroup
-		}
+		return x.xxx_hidden_ContinuationGroup
 	}
 	return nil
 }
@@ -1581,8 +1579,8 @@ func (x *WriteNodesRequest_CurrentStageWrite) SetProcessUid(v string) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 6)
 }
 
-func (x *WriteNodesRequest_CurrentStageWrite) SetEnsureInContinuationGroup(v []*Edge) {
-	x.xxx_hidden_EnsureInContinuationGroup = &v
+func (x *WriteNodesRequest_CurrentStageWrite) SetContinuationGroup(v *WriteNodesRequest_DependencyGroup) {
+	x.xxx_hidden_ContinuationGroup = v
 }
 
 func (x *WriteNodesRequest_CurrentStageWrite) SetAttemptExecutionPolicy(v *StageAttemptExecutionPolicy) {
@@ -1611,6 +1609,13 @@ func (x *WriteNodesRequest_CurrentStageWrite) HasProcessUid() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
+func (x *WriteNodesRequest_CurrentStageWrite) HasContinuationGroup() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_ContinuationGroup != nil
+}
+
 func (x *WriteNodesRequest_CurrentStageWrite) HasAttemptExecutionPolicy() bool {
 	if x == nil {
 		return false
@@ -1626,6 +1631,10 @@ func (x *WriteNodesRequest_CurrentStageWrite) ClearState() {
 func (x *WriteNodesRequest_CurrentStageWrite) ClearProcessUid() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
 	x.xxx_hidden_ProcessUid = nil
+}
+
+func (x *WriteNodesRequest_CurrentStageWrite) ClearContinuationGroup() {
+	x.xxx_hidden_ContinuationGroup = nil
 }
 
 func (x *WriteNodesRequest_CurrentStageWrite) ClearAttemptExecutionPolicy() {
@@ -1660,15 +1669,14 @@ type WriteNodesRequest_CurrentStageWrite_builder struct {
 	//
 	// Refer to Stage.Attempt.process_uid.
 	ProcessUid *string
-	// Ensure all provided edges are included in `Stage.continuation_group`.
+	// Continuation Group predicate for this Stage.
 	//
-	// Edges are deduplicated with `Stage.continuation_group` if they have the
-	// same `target`.
+	// If set, used to populate the continuation_group.edges and
+	// continuation_group.predicate fields in this Stage.
 	//
-	// TBD: When edges have conditions, will want to coalesce the conditions
-	// with `and` instead? Or just reject multiple conditional Edges with the
-	// same target? Or replace the condition in the existing Edge?
-	EnsureInContinuationGroup []*Edge
+	// Edges here must only point to Stages and Checks which were created_by
+	// this Stage.
+	ContinuationGroup *WriteNodesRequest_DependencyGroup
 	// The modified execution policy for this Stage Attempt.
 	//
 	// This field can only be set by the stage executor when advancing the
@@ -1698,7 +1706,7 @@ func (b0 WriteNodesRequest_CurrentStageWrite_builder) Build() *WriteNodesRequest
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 6)
 		x.xxx_hidden_ProcessUid = b.ProcessUid
 	}
-	x.xxx_hidden_EnsureInContinuationGroup = &b.EnsureInContinuationGroup
+	x.xxx_hidden_ContinuationGroup = b.ContinuationGroup
 	x.xxx_hidden_AttemptExecutionPolicy = b.AttemptExecutionPolicy
 	x.xxx_hidden_Details = &b.Details
 	x.xxx_hidden_Progress = &b.Progress
@@ -1709,7 +1717,7 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xdc\x1a\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\x92\x1b\n" +
 	"\x11WriteNodesRequest\x123\n" +
 	"\x13stage_attempt_token\x18\x01 \x01(\tH\x00R\x11stageAttemptToken\x88\x01\x01\x12Q\n" +
 	"\areasons\x18\x02 \x03(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonR\areasons\x12Z\n" +
@@ -1790,17 +1798,19 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\r_dependenciesB#\n" +
 	"!_requested_stage_execution_policyB\f\n" +
 	"\n" +
-	"_cancelled\x1a\xc1\x04\n" +
+	"_cancelled\x1a\xf7\x04\n" +
 	"\x11CurrentStageWrite\x12K\n" +
 	"\x05state\x18\x01 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x00R\x05state\x88\x01\x01\x12$\n" +
 	"\vprocess_uid\x18\x02 \x01(\tH\x01R\n" +
-	"processUid\x88\x01\x01\x12d\n" +
-	"\x1censure_in_continuation_group\x18\x03 \x03(\v2#.turboci.graph.orchestrator.v1.EdgeR\x19ensureInContinuationGroup\x12y\n" +
-	"\x18attempt_execution_policy\x18\x04 \x01(\v2:.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicyH\x02R\x16attemptExecutionPolicy\x88\x01\x01\x12>\n" +
+	"processUid\x88\x01\x01\x12\x82\x01\n" +
+	"\x12continuation_group\x18\x03 \x01(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
+	"\x02\b\x02H\x02R\x11continuationGroup\x88\x01\x01\x12y\n" +
+	"\x18attempt_execution_policy\x18\x04 \x01(\v2:.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicyH\x03R\x16attemptExecutionPolicy\x88\x01\x01\x12>\n" +
 	"\adetails\x18\x05 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetails\x12a\n" +
 	"\bprogress\x18\x06 \x03(\v2E.turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttemptProgressR\bprogressB\b\n" +
 	"\x06_stateB\x0e\n" +
-	"\f_process_uidB\x1b\n" +
+	"\f_process_uidB\x15\n" +
+	"\x13_continuation_groupB\x1b\n" +
 	"\x19_attempt_execution_policyB\x16\n" +
 	"\x14_stage_attempt_tokenB\x06\n" +
 	"\x04_txnB\x10\n" +
@@ -1855,7 +1865,7 @@ var file_turboci_graph_orchestrator_v1_write_nodes_request_proto_depIdxs = []int
 	17, // 21: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.requested_stage_execution_policy:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
 	18, // 22: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.assignments:type_name -> turboci.graph.orchestrator.v1.Stage.Assignment
 	19, // 23: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
-	10, // 24: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.ensure_in_continuation_group:type_name -> turboci.graph.orchestrator.v1.Edge
+	2,  // 24: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.continuation_group:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroup
 	20, // 25: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.attempt_execution_policy:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
 	9,  // 26: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.details:type_name -> turboci.graph.orchestrator.v1.Value
 	3,  // 27: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.progress:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttemptProgress

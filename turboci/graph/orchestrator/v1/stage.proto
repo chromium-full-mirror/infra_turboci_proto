@@ -11,7 +11,6 @@ import "turboci/graph/ids/v1/identifier.proto";
 import "turboci/graph/orchestrator/v1/actor.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/dependencies.proto";
-import "turboci/graph/orchestrator/v1/edge.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto";
@@ -300,19 +299,23 @@ message Stage {
   // The workflow's intent for this Stage.
   repeated Assignment assignments = 11 [(google.api.field_behavior) = IMMUTABLE];
 
-  // A set of other Stages, created by this Stage, which should be treated as a
-  // logical part of this Stage.
+  // A set of dependencies edges o Stages whose resolution should be treated as
+  // a logical part of this Stage.
   //
-  // Any other Stages in the graph waiting for this one to be FINAL will
-  // additionally wait for the continuation_group stages to be FINAL as well,
-  // allowing this Stage to transition to WAITING_FOR_GROUP without unblocking
-  // dependent Stages.
+  // Stages included in this continuation_group MUST be created BY THIS STAGE.
+  //
+  // If non-empty, this Stage will enter the state AWAITING_GROUP after the
+  // final attempt. The orchestrator will move this Stage to the FINAL state
+  // once these Dependencies are resolved. If this is empty, the Stage will move
+  // directly from ATTEMPTING to FINAL.
   //
   // This allows for encapsulation of work where one Stage may spawn a group of
   // Stages which should be treated as a single unit - otherwise all waiters for
-  // this Stage would need to be informed of, and wait for, these new Stages
-  // which introduces a leaky abstraction.
-  repeated Edge continuation_group = 12 [(turboci).id.allowed = IDENTIFIER_KIND_STAGE];
+  // this Stage would need to be directly informed of, and wait for, these new
+  // Stages, which introduces a leaky abstraction.
+  //
+  // If needed, this could be expanded to allow Checks later.
+  optional Dependencies continuation_group = 12 [(turboci).id.allowed = IDENTIFIER_KIND_STAGE];
 }
 
 // StageAttemptClaimedFailure is a gRPC error detail message returned by
