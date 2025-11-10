@@ -24,8 +24,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TurboCIOrchestrator_WriteNodes_FullMethodName = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/WriteNodes"
-	TurboCIOrchestrator_QueryNodes_FullMethodName = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/QueryNodes"
+	TurboCIOrchestrator_CreateWorkPlan_FullMethodName = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/CreateWorkPlan"
+	TurboCIOrchestrator_WriteNodes_FullMethodName     = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/WriteNodes"
+	TurboCIOrchestrator_QueryNodes_FullMethodName     = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/QueryNodes"
 )
 
 // TurboCIOrchestratorClient is the client API for TurboCIOrchestrator service.
@@ -35,6 +36,11 @@ const (
 // TurboCIOrchestrator is the API for interacting with the TurboCI
 // Orchestrator.
 type TurboCIOrchestratorClient interface {
+	// CreateWorkPlan creates a new WorkPlan.
+	//
+	// Currently can only create empty work plans that can later be populated via
+	// WriteNodes call.
+	CreateWorkPlan(ctx context.Context, in *v1.CreateWorkPlanRequest, opts ...grpc.CallOption) (*v1.CreateWorkPlanResponse, error)
 	// WriteNodes transactionally writes or updates multiple nodes within a
 	// WorkPlan.
 	//
@@ -54,6 +60,16 @@ type turboCIOrchestratorClient struct {
 
 func NewTurboCIOrchestratorClient(cc grpc.ClientConnInterface) TurboCIOrchestratorClient {
 	return &turboCIOrchestratorClient{cc}
+}
+
+func (c *turboCIOrchestratorClient) CreateWorkPlan(ctx context.Context, in *v1.CreateWorkPlanRequest, opts ...grpc.CallOption) (*v1.CreateWorkPlanResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(v1.CreateWorkPlanResponse)
+	err := c.cc.Invoke(ctx, TurboCIOrchestrator_CreateWorkPlan_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *turboCIOrchestratorClient) WriteNodes(ctx context.Context, in *v1.WriteNodesRequest, opts ...grpc.CallOption) (*v1.WriteNodesResponse, error) {
@@ -83,6 +99,11 @@ func (c *turboCIOrchestratorClient) QueryNodes(ctx context.Context, in *v1.Query
 // TurboCIOrchestrator is the API for interacting with the TurboCI
 // Orchestrator.
 type TurboCIOrchestratorServer interface {
+	// CreateWorkPlan creates a new WorkPlan.
+	//
+	// Currently can only create empty work plans that can later be populated via
+	// WriteNodes call.
+	CreateWorkPlan(context.Context, *v1.CreateWorkPlanRequest) (*v1.CreateWorkPlanResponse, error)
 	// WriteNodes transactionally writes or updates multiple nodes within a
 	// WorkPlan.
 	//
@@ -104,6 +125,9 @@ type TurboCIOrchestratorServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTurboCIOrchestratorServer struct{}
 
+func (UnimplementedTurboCIOrchestratorServer) CreateWorkPlan(context.Context, *v1.CreateWorkPlanRequest) (*v1.CreateWorkPlanResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateWorkPlan not implemented")
+}
 func (UnimplementedTurboCIOrchestratorServer) WriteNodes(context.Context, *v1.WriteNodesRequest) (*v1.WriteNodesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method WriteNodes not implemented")
 }
@@ -129,6 +153,24 @@ func RegisterTurboCIOrchestratorServer(s grpc.ServiceRegistrar, srv TurboCIOrche
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&TurboCIOrchestrator_ServiceDesc, srv)
+}
+
+func _TurboCIOrchestrator_CreateWorkPlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.CreateWorkPlanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TurboCIOrchestratorServer).CreateWorkPlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TurboCIOrchestrator_CreateWorkPlan_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TurboCIOrchestratorServer).CreateWorkPlan(ctx, req.(*v1.CreateWorkPlanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _TurboCIOrchestrator_WriteNodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -174,6 +216,10 @@ var TurboCIOrchestrator_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "turboci.graph.orchestrator.v1.TurboCIOrchestrator",
 	HandlerType: (*TurboCIOrchestratorServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateWorkPlan",
+			Handler:    _TurboCIOrchestrator_CreateWorkPlan_Handler,
+		},
 		{
 			MethodName: "WriteNodes",
 			Handler:    _TurboCIOrchestrator_WriteNodes_Handler,
