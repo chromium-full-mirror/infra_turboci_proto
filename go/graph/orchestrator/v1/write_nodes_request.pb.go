@@ -1426,6 +1426,19 @@ type WriteNodesRequest_StageWrite_builder struct {
 	//
 	// If the Stage already exists, this will only result in an error if it
 	// doesn't match the existing dependencies identically.
+	//
+	// NOTE: Currently Stages in this group must only point to Stages created by
+	// the Stage performing this write. In theory, this should help prevent
+	// excessive coupling between different, unrelated, stage implementations.
+	//
+	// If arbitrary stage dependencies are allowed, it could cause errors when
+	// an upstream stage changes it's implementation and no longer produces the
+	// stages the downstream one expects. Instead, the upstream stage should
+	// create a Check which can remain stable across the implementation
+	// versions, and the downstream stages should depend on that.
+	//
+	// However, if the current writer is the one creating the stages, then there
+	// is no implementation risk.
 	Dependencies *WriteNodesRequest_DependencyGroup
 	// The requested retry policy of the Stage.
 	//
@@ -1674,8 +1687,7 @@ type WriteNodesRequest_CurrentStageWrite_builder struct {
 	// If set, used to populate the continuation_group.edges and
 	// continuation_group.predicate fields in this Stage.
 	//
-	// Edges here must only point to Stages and Checks which were created_by
-	// this Stage.
+	// Edges here must only point to Stages which were created_by this Stage.
 	ContinuationGroup *WriteNodesRequest_DependencyGroup
 	// The modified execution policy for this Stage Attempt.
 	//
@@ -1717,7 +1729,7 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\x92\x1b\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\x91\x1b\n" +
 	"\x11WriteNodesRequest\x123\n" +
 	"\x13stage_attempt_token\x18\x01 \x01(\tH\x00R\x11stageAttemptToken\x88\x01\x01\x12Q\n" +
 	"\areasons\x18\x02 \x03(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonR\areasons\x12Z\n" +
@@ -1798,13 +1810,13 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\r_dependenciesB#\n" +
 	"!_requested_stage_execution_policyB\f\n" +
 	"\n" +
-	"_cancelled\x1a\xf7\x04\n" +
+	"_cancelled\x1a\xf6\x04\n" +
 	"\x11CurrentStageWrite\x12K\n" +
 	"\x05state\x18\x01 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x00R\x05state\x88\x01\x01\x12$\n" +
 	"\vprocess_uid\x18\x02 \x01(\tH\x01R\n" +
-	"processUid\x88\x01\x01\x12\x82\x01\n" +
-	"\x12continuation_group\x18\x03 \x01(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
-	"\x02\b\x02H\x02R\x11continuationGroup\x88\x01\x01\x12y\n" +
+	"processUid\x88\x01\x01\x12\x81\x01\n" +
+	"\x12continuation_group\x18\x03 \x01(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
+	"\x01\bH\x02R\x11continuationGroup\x88\x01\x01\x12y\n" +
 	"\x18attempt_execution_policy\x18\x04 \x01(\v2:.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicyH\x03R\x16attemptExecutionPolicy\x88\x01\x01\x12>\n" +
 	"\adetails\x18\x05 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetails\x12a\n" +
 	"\bprogress\x18\x06 \x03(\v2E.turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttemptProgressR\bprogressB\b\n" +

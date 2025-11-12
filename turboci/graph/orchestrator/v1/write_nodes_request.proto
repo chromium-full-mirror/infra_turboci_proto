@@ -338,6 +338,19 @@ message WriteNodesRequest {
     //
     // If the Stage already exists, this will only result in an error if it
     // doesn't match the existing dependencies identically.
+    //
+    // NOTE: Currently Stages in this group must only point to Stages created by
+    // the Stage performing this write. In theory, this should help prevent
+    // excessive coupling between different, unrelated, stage implementations.
+    //
+    // If arbitrary stage dependencies are allowed, it could cause errors when
+    // an upstream stage changes it's implementation and no longer produces the
+    // stages the downstream one expects. Instead, the upstream stage should
+    // create a Check which can remain stable across the implementation
+    // versions, and the downstream stages should depend on that.
+    //
+    // However, if the current writer is the one creating the stages, then there
+    // is no implementation risk.
     optional DependencyGroup dependencies = 4 [
       (turboci).id.allowed = IDENTIFIER_KIND_STAGE,
       (turboci).id.allowed = IDENTIFIER_KIND_CHECK,
@@ -416,12 +429,8 @@ message WriteNodesRequest {
     // If set, used to populate the continuation_group.edges and
     // continuation_group.predicate fields in this Stage.
     //
-    // Edges here must only point to Stages and Checks which were created_by
-    // this Stage.
-    optional DependencyGroup continuation_group = 3 [
-      (turboci).id.allowed = IDENTIFIER_KIND_STAGE,
-      (turboci).id.allowed = IDENTIFIER_KIND_CHECK
-    ];
+    // Edges here must only point to Stages which were created_by this Stage.
+    optional DependencyGroup continuation_group = 3 [(turboci).id.allowed = IDENTIFIER_KIND_STAGE];
 
     // The modified execution policy for this Stage Attempt.
     //
