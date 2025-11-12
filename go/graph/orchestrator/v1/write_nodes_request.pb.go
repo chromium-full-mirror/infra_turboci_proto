@@ -1393,6 +1393,9 @@ type WriteNodesRequest_StageWrite_builder struct {
 	// Otherwise, the Stage must belong to the stage_attempt_token's WorkPlan,
 	// or the caller must have the additional "turboci.workplans.writeExternal"
 	// permission in the stage's realm.
+	//
+	// The `is_worknode` field should also be omitted - it will be filled in by
+	// the server according to the type of `args`.
 	Identifier *v1.Stage
 	// The arguments of the Stage.
 	//
