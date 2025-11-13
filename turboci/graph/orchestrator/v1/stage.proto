@@ -153,14 +153,19 @@ message Stage {
   //
   // TBD: Pull this into its own top-level StageAttempt entity because it will
   // need to have its own state and lifecycle/transactions.
+  //
+  // Next ID: 9
   message Attempt {
+    // The Stage Attempt's identifier.
+    optional ids.v1.StageAttempt identifier = 1;
+
     // The version of this Attempt.
     //
     // Updated any time fields in this Attempt change.
-    optional Revision version = 1;
+    optional Revision version = 2;
 
     // The current state of this Attempt.
-    optional StageAttemptState state = 2;
+    optional StageAttemptState state = 3;
 
     // StateHistoryEntry records the database revision (commit timestamp) when
     // each time this Attempt's state changes.
@@ -173,7 +178,7 @@ message Stage {
 
     // Append-only list of StateHistoryEntry to record the database revision
     // (commit timestamp) when each time this Attempt's state changes.
-    repeated StateHistoryEntry state_history = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+    repeated StateHistoryEntry state_history = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
 
     // An opaque value provided by a Stage Attempt process (i.e. a single thread
     // of execution which is servicing this Stage Attempt) which is used to
@@ -210,7 +215,7 @@ message Stage {
     // In the event that this accepting thread crashes, it is expected that this
     // Stage Attempt will become INCOMPLETE on heartbeat timeout, and, retries
     // permitting, a new Stage Attempt will be generated.
-    optional string process_uid = 4;
+    optional string process_uid = 5;
 
     // Details provided by the Executor about this Stage Attempt.
     //
@@ -224,7 +229,7 @@ message Stage {
     // Attempt is not final (i.e. a state prior to COMPLETE or INCOMPLETE).
     //
     // Kept sorted by, and unique on, type_url.
-    repeated Value details = 5;
+    repeated Value details = 6;
 
     // Attempt-specific progress information.
     //
@@ -245,7 +250,7 @@ message Stage {
       repeated Value details = 3;
     }
     // Append-only Executor-specefic progress messages.
-    repeated Progress progress = 6;
+    repeated Progress progress = 7;
 
     // Actual execution policy for this StageAttempt.
     //
@@ -255,7 +260,7 @@ message Stage {
     // The validated execution policy is sent to the Orchestrator as part of
     // CurrentStageWrite when the executor advances the StageAttempt state
     // PENDING -> (SCHEDULED|RUNNING).
-    optional StageAttemptExecutionPolicy execution_policy = 7;
+    optional StageAttemptExecutionPolicy execution_policy = 8;
   }
   // Current retry/attempts state of this Stage, stored in ascending order by
   // created time.
