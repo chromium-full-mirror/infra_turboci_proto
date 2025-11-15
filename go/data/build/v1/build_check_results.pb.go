@@ -11,6 +11,7 @@
 package buildpb
 
 import (
+	v1 "go.chromium.org/turboci/proto/go/data/common/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -24,68 +25,12 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Different types of message formatting.
-type BuildCheckResult_DisplayMessage_MessageFormat int32
-
-const (
-	// Default message format.
-	BuildCheckResult_DisplayMessage_MESSAGE_FORMAT_UNKNOWN BuildCheckResult_DisplayMessage_MessageFormat = 0
-	// Plain text - no special formatting.
-	BuildCheckResult_DisplayMessage_MESSAGE_FORMAT_PLAIN_TEXT BuildCheckResult_DisplayMessage_MessageFormat = 1
-	// HTML markup.
-	BuildCheckResult_DisplayMessage_MESSAGE_FORMAT_HTML BuildCheckResult_DisplayMessage_MessageFormat = 2
-	// Markdown formatting.
-	BuildCheckResult_DisplayMessage_MESSAGE_FORMAT_MARKDOWN BuildCheckResult_DisplayMessage_MessageFormat = 3
-	// Includes ANSI escape codes for controlling things like text color.
-	BuildCheckResult_DisplayMessage_MESSAGE_FORMAT_ANSI BuildCheckResult_DisplayMessage_MessageFormat = 4
-)
-
-// Enum value maps for BuildCheckResult_DisplayMessage_MessageFormat.
-var (
-	BuildCheckResult_DisplayMessage_MessageFormat_name = map[int32]string{
-		0: "MESSAGE_FORMAT_UNKNOWN",
-		1: "MESSAGE_FORMAT_PLAIN_TEXT",
-		2: "MESSAGE_FORMAT_HTML",
-		3: "MESSAGE_FORMAT_MARKDOWN",
-		4: "MESSAGE_FORMAT_ANSI",
-	}
-	BuildCheckResult_DisplayMessage_MessageFormat_value = map[string]int32{
-		"MESSAGE_FORMAT_UNKNOWN":    0,
-		"MESSAGE_FORMAT_PLAIN_TEXT": 1,
-		"MESSAGE_FORMAT_HTML":       2,
-		"MESSAGE_FORMAT_MARKDOWN":   3,
-		"MESSAGE_FORMAT_ANSI":       4,
-	}
-)
-
-func (x BuildCheckResult_DisplayMessage_MessageFormat) Enum() *BuildCheckResult_DisplayMessage_MessageFormat {
-	p := new(BuildCheckResult_DisplayMessage_MessageFormat)
-	*p = x
-	return p
-}
-
-func (x BuildCheckResult_DisplayMessage_MessageFormat) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (BuildCheckResult_DisplayMessage_MessageFormat) Descriptor() protoreflect.EnumDescriptor {
-	return file_turboci_data_build_v1_build_check_results_proto_enumTypes[0].Descriptor()
-}
-
-func (BuildCheckResult_DisplayMessage_MessageFormat) Type() protoreflect.EnumType {
-	return &file_turboci_data_build_v1_build_check_results_proto_enumTypes[0]
-}
-
-func (x BuildCheckResult_DisplayMessage_MessageFormat) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
 // BuildCheckResults represent the output of a build. This is mainly centered around the artifacts
 // generated from the build and their locations.
 type BuildCheckResult struct {
 	state                            protoimpl.MessageState                    `protogen:"opaque.v1"`
 	xxx_hidden_Success               bool                                      `protobuf:"varint,1,opt,name=success,proto3,oneof"`
-	xxx_hidden_DisplayMessage        *BuildCheckResult_DisplayMessage          `protobuf:"bytes,2,opt,name=display_message,json=displayMessage,proto3,oneof"`
+	xxx_hidden_DisplayMessage        *v1.DisplayMessage                        `protobuf:"bytes,2,opt,name=display_message,json=displayMessage,proto3,oneof"`
 	xxx_hidden_AndroidBuildArtifacts *BuildCheckResult_AndroidBuildArtifacts   `protobuf:"bytes,3,opt,name=android_build_artifacts,json=androidBuildArtifacts,proto3,oneof"`
 	xxx_hidden_CasManifest           *BuildCheckResult_CasManifest             `protobuf:"bytes,4,opt,name=cas_manifest,json=casManifest,proto3,oneof"`
 	xxx_hidden_GcsArtifacts          map[string]*BuildCheckResult_GcsArtifacts `protobuf:"bytes,5,rep,name=gcs_artifacts,json=gcsArtifacts,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -128,7 +73,7 @@ func (x *BuildCheckResult) GetSuccess() bool {
 	return false
 }
 
-func (x *BuildCheckResult) GetDisplayMessage() *BuildCheckResult_DisplayMessage {
+func (x *BuildCheckResult) GetDisplayMessage() *v1.DisplayMessage {
 	if x != nil {
 		return x.xxx_hidden_DisplayMessage
 	}
@@ -171,7 +116,7 @@ func (x *BuildCheckResult) SetSuccess(v bool) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 6)
 }
 
-func (x *BuildCheckResult) SetDisplayMessage(v *BuildCheckResult_DisplayMessage) {
+func (x *BuildCheckResult) SetDisplayMessage(v *v1.DisplayMessage) {
 	x.xxx_hidden_DisplayMessage = v
 }
 
@@ -258,7 +203,7 @@ type BuildCheckResult_builder struct {
 	// failure information should reside in a product-specific proto.
 	Success *bool
 	// A message string detailing the status of the build with information on how to format the text.
-	DisplayMessage *BuildCheckResult_DisplayMessage
+	DisplayMessage *v1.DisplayMessage
 	// Information needed to find artifacts in ab/.
 	// We acknowledge that this is Android-specific but are keeping it here in the "multiproduct"
 	// namespace.
@@ -296,119 +241,6 @@ func (b0 BuildCheckResult_builder) Build() *BuildCheckResult {
 	return m0
 }
 
-// A message string and a format-type enum to instruct clients how to render the text.
-type BuildCheckResult_DisplayMessage struct {
-	state                    protoimpl.MessageState                        `protogen:"opaque.v1"`
-	xxx_hidden_Message       *string                                       `protobuf:"bytes,1,opt,name=message,proto3,oneof"`
-	xxx_hidden_MessageFormat BuildCheckResult_DisplayMessage_MessageFormat `protobuf:"varint,2,opt,name=message_format,json=messageFormat,proto3,enum=turboci.data.build.v1.BuildCheckResult_DisplayMessage_MessageFormat,oneof"`
-	XXX_raceDetectHookData   protoimpl.RaceDetectHookData
-	XXX_presence             [1]uint32
-	unknownFields            protoimpl.UnknownFields
-	sizeCache                protoimpl.SizeCache
-}
-
-func (x *BuildCheckResult_DisplayMessage) Reset() {
-	*x = BuildCheckResult_DisplayMessage{}
-	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *BuildCheckResult_DisplayMessage) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*BuildCheckResult_DisplayMessage) ProtoMessage() {}
-
-func (x *BuildCheckResult_DisplayMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *BuildCheckResult_DisplayMessage) GetMessage() string {
-	if x != nil {
-		if x.xxx_hidden_Message != nil {
-			return *x.xxx_hidden_Message
-		}
-		return ""
-	}
-	return ""
-}
-
-func (x *BuildCheckResult_DisplayMessage) GetMessageFormat() BuildCheckResult_DisplayMessage_MessageFormat {
-	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
-			return x.xxx_hidden_MessageFormat
-		}
-	}
-	return BuildCheckResult_DisplayMessage_MESSAGE_FORMAT_UNKNOWN
-}
-
-func (x *BuildCheckResult_DisplayMessage) SetMessage(v string) {
-	x.xxx_hidden_Message = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
-}
-
-func (x *BuildCheckResult_DisplayMessage) SetMessageFormat(v BuildCheckResult_DisplayMessage_MessageFormat) {
-	x.xxx_hidden_MessageFormat = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
-}
-
-func (x *BuildCheckResult_DisplayMessage) HasMessage() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
-}
-
-func (x *BuildCheckResult_DisplayMessage) HasMessageFormat() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *BuildCheckResult_DisplayMessage) ClearMessage() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Message = nil
-}
-
-func (x *BuildCheckResult_DisplayMessage) ClearMessageFormat() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_MessageFormat = BuildCheckResult_DisplayMessage_MESSAGE_FORMAT_UNKNOWN
-}
-
-type BuildCheckResult_DisplayMessage_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// The message string.
-	Message *string
-	// How the message string should be formatted.
-	MessageFormat *BuildCheckResult_DisplayMessage_MessageFormat
-}
-
-func (b0 BuildCheckResult_DisplayMessage_builder) Build() *BuildCheckResult_DisplayMessage {
-	m0 := &BuildCheckResult_DisplayMessage{}
-	b, x := &b0, m0
-	_, _ = b, x
-	if b.Message != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
-		x.xxx_hidden_Message = b.Message
-	}
-	if b.MessageFormat != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
-		x.xxx_hidden_MessageFormat = *b.MessageFormat
-	}
-	return m0
-}
-
 // Build ID, target and attempt which are necessary to query artifacts in ab/ or Android Build API
 type BuildCheckResult_AndroidBuildArtifacts struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
@@ -423,7 +255,7 @@ type BuildCheckResult_AndroidBuildArtifacts struct {
 
 func (x *BuildCheckResult_AndroidBuildArtifacts) Reset() {
 	*x = BuildCheckResult_AndroidBuildArtifacts{}
-	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[2]
+	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -435,7 +267,7 @@ func (x *BuildCheckResult_AndroidBuildArtifacts) String() string {
 func (*BuildCheckResult_AndroidBuildArtifacts) ProtoMessage() {}
 
 func (x *BuildCheckResult_AndroidBuildArtifacts) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[2]
+	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -574,7 +406,7 @@ type BuildCheckResult_CasManifest struct {
 
 func (x *BuildCheckResult_CasManifest) Reset() {
 	*x = BuildCheckResult_CasManifest{}
-	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[3]
+	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -586,7 +418,7 @@ func (x *BuildCheckResult_CasManifest) String() string {
 func (*BuildCheckResult_CasManifest) ProtoMessage() {}
 
 func (x *BuildCheckResult_CasManifest) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[3]
+	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -743,7 +575,7 @@ type BuildCheckResult_GcsArtifacts struct {
 
 func (x *BuildCheckResult_GcsArtifacts) Reset() {
 	*x = BuildCheckResult_GcsArtifacts{}
-	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[4]
+	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -755,7 +587,7 @@ func (x *BuildCheckResult_GcsArtifacts) String() string {
 func (*BuildCheckResult_GcsArtifacts) ProtoMessage() {}
 
 func (x *BuildCheckResult_GcsArtifacts) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[4]
+	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -838,7 +670,7 @@ type BuildCheckResult_GcsArtifacts_Files struct {
 
 func (x *BuildCheckResult_GcsArtifacts_Files) Reset() {
 	*x = BuildCheckResult_GcsArtifacts_Files{}
-	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[7]
+	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -850,7 +682,7 @@ func (x *BuildCheckResult_GcsArtifacts_Files) String() string {
 func (*BuildCheckResult_GcsArtifacts_Files) ProtoMessage() {}
 
 func (x *BuildCheckResult_GcsArtifacts_Files) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[7]
+	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -891,26 +723,14 @@ var File_turboci_data_build_v1_build_check_results_proto protoreflect.FileDescri
 
 const file_turboci_data_build_v1_build_check_results_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/data/build/v1/build_check_results.proto\x12\x15turboci.data.build.v1\"\x96\x0f\n" +
+	"/turboci/data/build/v1/build_check_results.proto\x12\x15turboci.data.build.v1\x1a,turboci/data/common/v1/display_message.proto\"\xa7\f\n" +
 	"\x10BuildCheckResult\x12\x1d\n" +
-	"\asuccess\x18\x01 \x01(\bH\x00R\asuccess\x88\x01\x01\x12d\n" +
-	"\x0fdisplay_message\x18\x02 \x01(\v26.turboci.data.build.v1.BuildCheckResult.DisplayMessageH\x01R\x0edisplayMessage\x88\x01\x01\x12z\n" +
+	"\asuccess\x18\x01 \x01(\bH\x00R\asuccess\x88\x01\x01\x12T\n" +
+	"\x0fdisplay_message\x18\x02 \x01(\v2&.turboci.data.common.v1.DisplayMessageH\x01R\x0edisplayMessage\x88\x01\x01\x12z\n" +
 	"\x17android_build_artifacts\x18\x03 \x01(\v2=.turboci.data.build.v1.BuildCheckResult.AndroidBuildArtifactsH\x02R\x15androidBuildArtifacts\x88\x01\x01\x12[\n" +
 	"\fcas_manifest\x18\x04 \x01(\v23.turboci.data.build.v1.BuildCheckResult.CasManifestH\x03R\vcasManifest\x88\x01\x01\x12^\n" +
 	"\rgcs_artifacts\x18\x05 \x03(\v29.turboci.data.build.v1.BuildCheckResult.GcsArtifactsEntryR\fgcsArtifacts\x12\x1e\n" +
-	"\bview_url\x18\x06 \x01(\tH\x04R\aviewUrl\x88\x01\x01\x1a\xdc\x02\n" +
-	"\x0eDisplayMessage\x12\x1d\n" +
-	"\amessage\x18\x01 \x01(\tH\x00R\amessage\x88\x01\x01\x12p\n" +
-	"\x0emessage_format\x18\x02 \x01(\x0e2D.turboci.data.build.v1.BuildCheckResult.DisplayMessage.MessageFormatH\x01R\rmessageFormat\x88\x01\x01\"\x99\x01\n" +
-	"\rMessageFormat\x12\x1a\n" +
-	"\x16MESSAGE_FORMAT_UNKNOWN\x10\x00\x12\x1d\n" +
-	"\x19MESSAGE_FORMAT_PLAIN_TEXT\x10\x01\x12\x17\n" +
-	"\x13MESSAGE_FORMAT_HTML\x10\x02\x12\x1b\n" +
-	"\x17MESSAGE_FORMAT_MARKDOWN\x10\x03\x12\x17\n" +
-	"\x13MESSAGE_FORMAT_ANSI\x10\x04B\n" +
-	"\n" +
-	"\b_messageB\x11\n" +
-	"\x0f_message_format\x1a\xa8\x01\n" +
+	"\bview_url\x18\x06 \x01(\tH\x04R\aviewUrl\x88\x01\x01\x1a\xa8\x01\n" +
 	"\x15AndroidBuildArtifacts\x12\x1e\n" +
 	"\bbuild_id\x18\x01 \x01(\tH\x00R\abuildId\x88\x01\x01\x12\x1b\n" +
 	"\x06target\x18\x02 \x01(\tH\x01R\x06target\x88\x01\x01\x12(\n" +
@@ -949,35 +769,32 @@ const file_turboci_data_build_v1_build_check_results_proto_rawDesc = "" +
 	"\r_cas_manifestB\v\n" +
 	"\t_view_urlB:P\x01Z6go.chromium.org/turboci/proto/go/data/build/v1;buildpbb\x06proto3"
 
-var file_turboci_data_build_v1_build_check_results_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_turboci_data_build_v1_build_check_results_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_turboci_data_build_v1_build_check_results_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_turboci_data_build_v1_build_check_results_proto_goTypes = []any{
-	(BuildCheckResult_DisplayMessage_MessageFormat)(0), // 0: turboci.data.build.v1.BuildCheckResult.DisplayMessage.MessageFormat
-	(*BuildCheckResult)(nil),                           // 1: turboci.data.build.v1.BuildCheckResult
-	(*BuildCheckResult_DisplayMessage)(nil),            // 2: turboci.data.build.v1.BuildCheckResult.DisplayMessage
-	(*BuildCheckResult_AndroidBuildArtifacts)(nil),     // 3: turboci.data.build.v1.BuildCheckResult.AndroidBuildArtifacts
-	(*BuildCheckResult_CasManifest)(nil),               // 4: turboci.data.build.v1.BuildCheckResult.CasManifest
-	(*BuildCheckResult_GcsArtifacts)(nil),              // 5: turboci.data.build.v1.BuildCheckResult.GcsArtifacts
-	nil,                                                // 6: turboci.data.build.v1.BuildCheckResult.GcsArtifactsEntry
-	nil,                                                // 7: turboci.data.build.v1.BuildCheckResult.CasManifest.ManifestEntry
-	(*BuildCheckResult_GcsArtifacts_Files)(nil),        // 8: turboci.data.build.v1.BuildCheckResult.GcsArtifacts.Files
-	nil, // 9: turboci.data.build.v1.BuildCheckResult.GcsArtifacts.FilesByCategoryEntry
+	(*BuildCheckResult)(nil),                       // 0: turboci.data.build.v1.BuildCheckResult
+	(*BuildCheckResult_AndroidBuildArtifacts)(nil), // 1: turboci.data.build.v1.BuildCheckResult.AndroidBuildArtifacts
+	(*BuildCheckResult_CasManifest)(nil),           // 2: turboci.data.build.v1.BuildCheckResult.CasManifest
+	(*BuildCheckResult_GcsArtifacts)(nil),          // 3: turboci.data.build.v1.BuildCheckResult.GcsArtifacts
+	nil,                                            // 4: turboci.data.build.v1.BuildCheckResult.GcsArtifactsEntry
+	nil,                                            // 5: turboci.data.build.v1.BuildCheckResult.CasManifest.ManifestEntry
+	(*BuildCheckResult_GcsArtifacts_Files)(nil), // 6: turboci.data.build.v1.BuildCheckResult.GcsArtifacts.Files
+	nil,                       // 7: turboci.data.build.v1.BuildCheckResult.GcsArtifacts.FilesByCategoryEntry
+	(*v1.DisplayMessage)(nil), // 8: turboci.data.common.v1.DisplayMessage
 }
 var file_turboci_data_build_v1_build_check_results_proto_depIdxs = []int32{
-	2, // 0: turboci.data.build.v1.BuildCheckResult.display_message:type_name -> turboci.data.build.v1.BuildCheckResult.DisplayMessage
-	3, // 1: turboci.data.build.v1.BuildCheckResult.android_build_artifacts:type_name -> turboci.data.build.v1.BuildCheckResult.AndroidBuildArtifacts
-	4, // 2: turboci.data.build.v1.BuildCheckResult.cas_manifest:type_name -> turboci.data.build.v1.BuildCheckResult.CasManifest
-	6, // 3: turboci.data.build.v1.BuildCheckResult.gcs_artifacts:type_name -> turboci.data.build.v1.BuildCheckResult.GcsArtifactsEntry
-	0, // 4: turboci.data.build.v1.BuildCheckResult.DisplayMessage.message_format:type_name -> turboci.data.build.v1.BuildCheckResult.DisplayMessage.MessageFormat
-	7, // 5: turboci.data.build.v1.BuildCheckResult.CasManifest.manifest:type_name -> turboci.data.build.v1.BuildCheckResult.CasManifest.ManifestEntry
-	9, // 6: turboci.data.build.v1.BuildCheckResult.GcsArtifacts.files_by_category:type_name -> turboci.data.build.v1.BuildCheckResult.GcsArtifacts.FilesByCategoryEntry
-	5, // 7: turboci.data.build.v1.BuildCheckResult.GcsArtifactsEntry.value:type_name -> turboci.data.build.v1.BuildCheckResult.GcsArtifacts
-	8, // 8: turboci.data.build.v1.BuildCheckResult.GcsArtifacts.FilesByCategoryEntry.value:type_name -> turboci.data.build.v1.BuildCheckResult.GcsArtifacts.Files
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	8, // 0: turboci.data.build.v1.BuildCheckResult.display_message:type_name -> turboci.data.common.v1.DisplayMessage
+	1, // 1: turboci.data.build.v1.BuildCheckResult.android_build_artifacts:type_name -> turboci.data.build.v1.BuildCheckResult.AndroidBuildArtifacts
+	2, // 2: turboci.data.build.v1.BuildCheckResult.cas_manifest:type_name -> turboci.data.build.v1.BuildCheckResult.CasManifest
+	4, // 3: turboci.data.build.v1.BuildCheckResult.gcs_artifacts:type_name -> turboci.data.build.v1.BuildCheckResult.GcsArtifactsEntry
+	5, // 4: turboci.data.build.v1.BuildCheckResult.CasManifest.manifest:type_name -> turboci.data.build.v1.BuildCheckResult.CasManifest.ManifestEntry
+	7, // 5: turboci.data.build.v1.BuildCheckResult.GcsArtifacts.files_by_category:type_name -> turboci.data.build.v1.BuildCheckResult.GcsArtifacts.FilesByCategoryEntry
+	3, // 6: turboci.data.build.v1.BuildCheckResult.GcsArtifactsEntry.value:type_name -> turboci.data.build.v1.BuildCheckResult.GcsArtifacts
+	6, // 7: turboci.data.build.v1.BuildCheckResult.GcsArtifacts.FilesByCategoryEntry.value:type_name -> turboci.data.build.v1.BuildCheckResult.GcsArtifacts.Files
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_turboci_data_build_v1_build_check_results_proto_init() }
@@ -989,20 +806,18 @@ func file_turboci_data_build_v1_build_check_results_proto_init() {
 	file_turboci_data_build_v1_build_check_results_proto_msgTypes[1].OneofWrappers = []any{}
 	file_turboci_data_build_v1_build_check_results_proto_msgTypes[2].OneofWrappers = []any{}
 	file_turboci_data_build_v1_build_check_results_proto_msgTypes[3].OneofWrappers = []any{}
-	file_turboci_data_build_v1_build_check_results_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_data_build_v1_build_check_results_proto_rawDesc), len(file_turboci_data_build_v1_build_check_results_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   9,
+			NumEnums:      0,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_turboci_data_build_v1_build_check_results_proto_goTypes,
 		DependencyIndexes: file_turboci_data_build_v1_build_check_results_proto_depIdxs,
-		EnumInfos:         file_turboci_data_build_v1_build_check_results_proto_enumTypes,
 		MessageInfos:      file_turboci_data_build_v1_build_check_results_proto_msgTypes,
 	}.Build()
 	File_turboci_data_build_v1_build_check_results_proto = out.File
