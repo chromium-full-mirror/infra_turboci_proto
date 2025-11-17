@@ -225,6 +225,7 @@ type GerritChangeInfo struct {
 	xxx_hidden_Host                 *string                  `protobuf:"bytes,1,opt,name=host,proto3,oneof"`
 	xxx_hidden_Project              *string                  `protobuf:"bytes,2,opt,name=project,proto3,oneof"`
 	xxx_hidden_Branch               *string                  `protobuf:"bytes,3,opt,name=branch,proto3,oneof"`
+	xxx_hidden_FullBranch           *string                  `protobuf:"bytes,20,opt,name=full_branch,json=fullBranch,proto3,oneof"`
 	xxx_hidden_ChangeNumber         int64                    `protobuf:"varint,4,opt,name=change_number,json=changeNumber,proto3,oneof"`
 	xxx_hidden_Patchset             int32                    `protobuf:"varint,5,opt,name=patchset,proto3,oneof"`
 	xxx_hidden_Status               GerritChangeInfo_Status  `protobuf:"varint,6,opt,name=status,proto3,enum=turboci.data.gerrit.v1.GerritChangeInfo_Status,oneof"`
@@ -302,6 +303,16 @@ func (x *GerritChangeInfo) GetBranch() string {
 	return ""
 }
 
+func (x *GerritChangeInfo) GetFullBranch() string {
+	if x != nil {
+		if x.xxx_hidden_FullBranch != nil {
+			return *x.xxx_hidden_FullBranch
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *GerritChangeInfo) GetChangeNumber() int64 {
 	if x != nil {
 		return x.xxx_hidden_ChangeNumber
@@ -318,7 +329,7 @@ func (x *GerritChangeInfo) GetPatchset() int32 {
 
 func (x *GerritChangeInfo) GetStatus() GerritChangeInfo_Status {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 5) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 6) {
 			return x.xxx_hidden_Status
 		}
 	}
@@ -429,32 +440,37 @@ func (x *GerritChangeInfo) GetIsOwnerBot() bool {
 
 func (x *GerritChangeInfo) SetHost(v string) {
 	x.xxx_hidden_Host = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 19)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 20)
 }
 
 func (x *GerritChangeInfo) SetProject(v string) {
 	x.xxx_hidden_Project = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 19)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 20)
 }
 
 func (x *GerritChangeInfo) SetBranch(v string) {
 	x.xxx_hidden_Branch = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 19)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 20)
+}
+
+func (x *GerritChangeInfo) SetFullBranch(v string) {
+	x.xxx_hidden_FullBranch = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 20)
 }
 
 func (x *GerritChangeInfo) SetChangeNumber(v int64) {
 	x.xxx_hidden_ChangeNumber = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 19)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 20)
 }
 
 func (x *GerritChangeInfo) SetPatchset(v int32) {
 	x.xxx_hidden_Patchset = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 19)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 20)
 }
 
 func (x *GerritChangeInfo) SetStatus(v GerritChangeInfo_Status) {
 	x.xxx_hidden_Status = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 19)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 20)
 }
 
 func (x *GerritChangeInfo) SetCreationTime(v *timestamppb.Timestamp) {
@@ -471,7 +487,7 @@ func (x *GerritChangeInfo) SetSubmittedTime(v *timestamppb.Timestamp) {
 
 func (x *GerritChangeInfo) SetCurrentRevision(v string) {
 	x.xxx_hidden_CurrentRevision = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 9, 19)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 10, 20)
 }
 
 func (x *GerritChangeInfo) SetRevisions(v map[string]*RevisionInfo) {
@@ -496,22 +512,22 @@ func (x *GerritChangeInfo) SetMessages(v []*ChangeMessageInfo) {
 
 func (x *GerritChangeInfo) SetChangeId(v string) {
 	x.xxx_hidden_ChangeId = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 15, 19)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 16, 20)
 }
 
 func (x *GerritChangeInfo) SetTopic(v string) {
 	x.xxx_hidden_Topic = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 16, 19)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 17, 20)
 }
 
 func (x *GerritChangeInfo) SetLocal(v bool) {
 	x.xxx_hidden_Local = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 17, 19)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 18, 20)
 }
 
 func (x *GerritChangeInfo) SetIsOwnerBot(v bool) {
 	x.xxx_hidden_IsOwnerBot = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 18, 19)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 19, 20)
 }
 
 func (x *GerritChangeInfo) HasHost() bool {
@@ -535,25 +551,32 @@ func (x *GerritChangeInfo) HasBranch() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
-func (x *GerritChangeInfo) HasChangeNumber() bool {
+func (x *GerritChangeInfo) HasFullBranch() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
-func (x *GerritChangeInfo) HasPatchset() bool {
+func (x *GerritChangeInfo) HasChangeNumber() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
 }
 
-func (x *GerritChangeInfo) HasStatus() bool {
+func (x *GerritChangeInfo) HasPatchset() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
+}
+
+func (x *GerritChangeInfo) HasStatus() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
 }
 
 func (x *GerritChangeInfo) HasCreationTime() bool {
@@ -581,7 +604,7 @@ func (x *GerritChangeInfo) HasCurrentRevision() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 9)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 10)
 }
 
 func (x *GerritChangeInfo) HasOwner() bool {
@@ -595,28 +618,28 @@ func (x *GerritChangeInfo) HasChangeId() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 15)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 16)
 }
 
 func (x *GerritChangeInfo) HasTopic() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 16)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 17)
 }
 
 func (x *GerritChangeInfo) HasLocal() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 17)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 18)
 }
 
 func (x *GerritChangeInfo) HasIsOwnerBot() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 18)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 19)
 }
 
 func (x *GerritChangeInfo) ClearHost() {
@@ -634,18 +657,23 @@ func (x *GerritChangeInfo) ClearBranch() {
 	x.xxx_hidden_Branch = nil
 }
 
-func (x *GerritChangeInfo) ClearChangeNumber() {
+func (x *GerritChangeInfo) ClearFullBranch() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_FullBranch = nil
+}
+
+func (x *GerritChangeInfo) ClearChangeNumber() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
 	x.xxx_hidden_ChangeNumber = 0
 }
 
 func (x *GerritChangeInfo) ClearPatchset() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
 	x.xxx_hidden_Patchset = 0
 }
 
 func (x *GerritChangeInfo) ClearStatus() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
 	x.xxx_hidden_Status = GerritChangeInfo_STATUS_UNKNOWN
 }
 
@@ -662,7 +690,7 @@ func (x *GerritChangeInfo) ClearSubmittedTime() {
 }
 
 func (x *GerritChangeInfo) ClearCurrentRevision() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 9)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 10)
 	x.xxx_hidden_CurrentRevision = nil
 }
 
@@ -671,22 +699,22 @@ func (x *GerritChangeInfo) ClearOwner() {
 }
 
 func (x *GerritChangeInfo) ClearChangeId() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 15)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 16)
 	x.xxx_hidden_ChangeId = nil
 }
 
 func (x *GerritChangeInfo) ClearTopic() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 16)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 17)
 	x.xxx_hidden_Topic = nil
 }
 
 func (x *GerritChangeInfo) ClearLocal() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 17)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 18)
 	x.xxx_hidden_Local = false
 }
 
 func (x *GerritChangeInfo) ClearIsOwnerBot() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 18)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 19)
 	x.xxx_hidden_IsOwnerBot = false
 }
 
@@ -708,8 +736,10 @@ type GerritChangeInfo_builder struct {
 	//	https://android.googlesource.com/device/google/cuttlefish/ ->
 	//	  "device/google/cuttlefish"
 	Project *string
-	// Which branch. The refs/heads/ prefix is omitted.
+	// Which branch (shortname). Matches full_branch, except the refs/*/ prefix is omitted.
 	Branch *string
+	// The full name of the branch. Always starts with refs/.
+	FullBranch *string
 	// The gerrit assigned change number for this change.
 	//
 	// Example:
@@ -773,34 +803,38 @@ func (b0 GerritChangeInfo_builder) Build() *GerritChangeInfo {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Host != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 19)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 20)
 		x.xxx_hidden_Host = b.Host
 	}
 	if b.Project != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 19)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 20)
 		x.xxx_hidden_Project = b.Project
 	}
 	if b.Branch != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 19)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 20)
 		x.xxx_hidden_Branch = b.Branch
 	}
+	if b.FullBranch != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 20)
+		x.xxx_hidden_FullBranch = b.FullBranch
+	}
 	if b.ChangeNumber != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 19)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 20)
 		x.xxx_hidden_ChangeNumber = *b.ChangeNumber
 	}
 	if b.Patchset != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 19)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 20)
 		x.xxx_hidden_Patchset = *b.Patchset
 	}
 	if b.Status != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 19)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 20)
 		x.xxx_hidden_Status = *b.Status
 	}
 	x.xxx_hidden_CreationTime = b.CreationTime
 	x.xxx_hidden_LastModificationTime = b.LastModificationTime
 	x.xxx_hidden_SubmittedTime = b.SubmittedTime
 	if b.CurrentRevision != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 9, 19)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 10, 20)
 		x.xxx_hidden_CurrentRevision = b.CurrentRevision
 	}
 	x.xxx_hidden_Revisions = b.Revisions
@@ -809,19 +843,19 @@ func (b0 GerritChangeInfo_builder) Build() *GerritChangeInfo {
 	x.xxx_hidden_Labels = b.Labels
 	x.xxx_hidden_Messages = &b.Messages
 	if b.ChangeId != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 15, 19)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 16, 20)
 		x.xxx_hidden_ChangeId = b.ChangeId
 	}
 	if b.Topic != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 16, 19)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 17, 20)
 		x.xxx_hidden_Topic = b.Topic
 	}
 	if b.Local != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 17, 19)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 18, 20)
 		x.xxx_hidden_Local = *b.Local
 	}
 	if b.IsOwnerBot != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 18, 19)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 19, 20)
 		x.xxx_hidden_IsOwnerBot = *b.IsOwnerBot
 	}
 	return m0
@@ -2510,29 +2544,31 @@ var File_turboci_data_gerrit_v1_gerrit_change_info_proto protoreflect.FileDescri
 
 const file_turboci_data_gerrit_v1_gerrit_change_info_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/data/gerrit/v1/gerrit_change_info.proto\x12\x16turboci.data.gerrit.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8b\r\n" +
+	"/turboci/data/gerrit/v1/gerrit_change_info.proto\x12\x16turboci.data.gerrit.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc1\r\n" +
 	"\x10GerritChangeInfo\x12\x17\n" +
 	"\x04host\x18\x01 \x01(\tH\x00R\x04host\x88\x01\x01\x12\x1d\n" +
 	"\aproject\x18\x02 \x01(\tH\x01R\aproject\x88\x01\x01\x12\x1b\n" +
-	"\x06branch\x18\x03 \x01(\tH\x02R\x06branch\x88\x01\x01\x12(\n" +
-	"\rchange_number\x18\x04 \x01(\x03H\x03R\fchangeNumber\x88\x01\x01\x12\x1f\n" +
-	"\bpatchset\x18\x05 \x01(\x05H\x04R\bpatchset\x88\x01\x01\x12L\n" +
-	"\x06status\x18\x06 \x01(\x0e2/.turboci.data.gerrit.v1.GerritChangeInfo.StatusH\x05R\x06status\x88\x01\x01\x12D\n" +
-	"\rcreation_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampH\x06R\fcreationTime\x88\x01\x01\x12U\n" +
-	"\x16last_modification_time\x18\b \x01(\v2\x1a.google.protobuf.TimestampH\aR\x14lastModificationTime\x88\x01\x01\x12F\n" +
-	"\x0esubmitted_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampH\bR\rsubmittedTime\x88\x01\x01\x12.\n" +
+	"\x06branch\x18\x03 \x01(\tH\x02R\x06branch\x88\x01\x01\x12$\n" +
+	"\vfull_branch\x18\x14 \x01(\tH\x03R\n" +
+	"fullBranch\x88\x01\x01\x12(\n" +
+	"\rchange_number\x18\x04 \x01(\x03H\x04R\fchangeNumber\x88\x01\x01\x12\x1f\n" +
+	"\bpatchset\x18\x05 \x01(\x05H\x05R\bpatchset\x88\x01\x01\x12L\n" +
+	"\x06status\x18\x06 \x01(\x0e2/.turboci.data.gerrit.v1.GerritChangeInfo.StatusH\x06R\x06status\x88\x01\x01\x12D\n" +
+	"\rcreation_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampH\aR\fcreationTime\x88\x01\x01\x12U\n" +
+	"\x16last_modification_time\x18\b \x01(\v2\x1a.google.protobuf.TimestampH\bR\x14lastModificationTime\x88\x01\x01\x12F\n" +
+	"\x0esubmitted_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampH\tR\rsubmittedTime\x88\x01\x01\x12.\n" +
 	"\x10current_revision\x18\n" +
-	" \x01(\tH\tR\x0fcurrentRevision\x88\x01\x01\x12U\n" +
+	" \x01(\tH\n" +
+	"R\x0fcurrentRevision\x88\x01\x01\x12U\n" +
 	"\trevisions\x18\v \x03(\v27.turboci.data.gerrit.v1.GerritChangeInfo.RevisionsEntryR\trevisions\x12>\n" +
-	"\x05owner\x18\f \x01(\v2#.turboci.data.gerrit.v1.AccountInfoH\n" +
-	"R\x05owner\x88\x01\x01\x12U\n" +
+	"\x05owner\x18\f \x01(\v2#.turboci.data.gerrit.v1.AccountInfoH\vR\x05owner\x88\x01\x01\x12U\n" +
 	"\treviewers\x18\r \x03(\v27.turboci.data.gerrit.v1.GerritChangeInfo.ReviewersEntryR\treviewers\x12L\n" +
 	"\x06labels\x18\x0e \x03(\v24.turboci.data.gerrit.v1.GerritChangeInfo.LabelsEntryR\x06labels\x12E\n" +
 	"\bmessages\x18\x0f \x03(\v2).turboci.data.gerrit.v1.ChangeMessageInfoR\bmessages\x12 \n" +
-	"\tchange_id\x18\x10 \x01(\tH\vR\bchangeId\x88\x01\x01\x12\x19\n" +
-	"\x05topic\x18\x11 \x01(\tH\fR\x05topic\x88\x01\x01\x12\x19\n" +
-	"\x05local\x18\x12 \x01(\bH\rR\x05local\x88\x01\x01\x12%\n" +
-	"\fis_owner_bot\x18\x13 \x01(\bH\x0eR\n" +
+	"\tchange_id\x18\x10 \x01(\tH\fR\bchangeId\x88\x01\x01\x12\x19\n" +
+	"\x05topic\x18\x11 \x01(\tH\rR\x05topic\x88\x01\x01\x12\x19\n" +
+	"\x05local\x18\x12 \x01(\bH\x0eR\x05local\x88\x01\x01\x12%\n" +
+	"\fis_owner_bot\x18\x13 \x01(\bH\x0fR\n" +
 	"isOwnerBot\x88\x01\x01\x1ab\n" +
 	"\x0eRevisionsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12:\n" +
@@ -2553,7 +2589,8 @@ const file_turboci_data_gerrit_v1_gerrit_change_info_proto_rawDesc = "" +
 	"\x05_hostB\n" +
 	"\n" +
 	"\b_projectB\t\n" +
-	"\a_branchB\x10\n" +
+	"\a_branchB\x0e\n" +
+	"\f_full_branchB\x10\n" +
 	"\x0e_change_numberB\v\n" +
 	"\t_patchsetB\t\n" +
 	"\a_statusB\x10\n" +
