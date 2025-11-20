@@ -28,11 +28,11 @@ const (
 // StageAttemptExecutionPolicy describes constraints on how a StageAttempt
 // may be executed by the Orchestrator.
 type StageAttemptExecutionPolicy struct {
-	state                       protoimpl.MessageState                 `protogen:"opaque.v1"`
-	xxx_hidden_AttemptHeartbeat *StageAttemptExecutionPolicy_Heartbeat `protobuf:"bytes,1,opt,name=attempt_heartbeat,json=attemptHeartbeat,proto3,oneof"`
-	xxx_hidden_Timeout          *StageAttemptExecutionPolicy_Timeout   `protobuf:"bytes,2,opt,name=timeout,proto3,oneof"`
-	unknownFields               protoimpl.UnknownFields
-	sizeCache                   protoimpl.SizeCache
+	state                protoimpl.MessageState                 `protogen:"opaque.v1"`
+	xxx_hidden_Heartbeat *StageAttemptExecutionPolicy_Heartbeat `protobuf:"bytes,1,opt,name=heartbeat,proto3,oneof"`
+	xxx_hidden_Timeout   *StageAttemptExecutionPolicy_Timeout   `protobuf:"bytes,2,opt,name=timeout,proto3,oneof"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *StageAttemptExecutionPolicy) Reset() {
@@ -60,9 +60,9 @@ func (x *StageAttemptExecutionPolicy) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *StageAttemptExecutionPolicy) GetAttemptHeartbeat() *StageAttemptExecutionPolicy_Heartbeat {
+func (x *StageAttemptExecutionPolicy) GetHeartbeat() *StageAttemptExecutionPolicy_Heartbeat {
 	if x != nil {
-		return x.xxx_hidden_AttemptHeartbeat
+		return x.xxx_hidden_Heartbeat
 	}
 	return nil
 }
@@ -74,19 +74,19 @@ func (x *StageAttemptExecutionPolicy) GetTimeout() *StageAttemptExecutionPolicy_
 	return nil
 }
 
-func (x *StageAttemptExecutionPolicy) SetAttemptHeartbeat(v *StageAttemptExecutionPolicy_Heartbeat) {
-	x.xxx_hidden_AttemptHeartbeat = v
+func (x *StageAttemptExecutionPolicy) SetHeartbeat(v *StageAttemptExecutionPolicy_Heartbeat) {
+	x.xxx_hidden_Heartbeat = v
 }
 
 func (x *StageAttemptExecutionPolicy) SetTimeout(v *StageAttemptExecutionPolicy_Timeout) {
 	x.xxx_hidden_Timeout = v
 }
 
-func (x *StageAttemptExecutionPolicy) HasAttemptHeartbeat() bool {
+func (x *StageAttemptExecutionPolicy) HasHeartbeat() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_AttemptHeartbeat != nil
+	return x.xxx_hidden_Heartbeat != nil
 }
 
 func (x *StageAttemptExecutionPolicy) HasTimeout() bool {
@@ -96,8 +96,8 @@ func (x *StageAttemptExecutionPolicy) HasTimeout() bool {
 	return x.xxx_hidden_Timeout != nil
 }
 
-func (x *StageAttemptExecutionPolicy) ClearAttemptHeartbeat() {
-	x.xxx_hidden_AttemptHeartbeat = nil
+func (x *StageAttemptExecutionPolicy) ClearHeartbeat() {
+	x.xxx_hidden_Heartbeat = nil
 }
 
 func (x *StageAttemptExecutionPolicy) ClearTimeout() {
@@ -107,8 +107,8 @@ func (x *StageAttemptExecutionPolicy) ClearTimeout() {
 type StageAttemptExecutionPolicy_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The heartbeat policies for Attempts of this Stage.
-	AttemptHeartbeat *StageAttemptExecutionPolicy_Heartbeat
+	// The heart policies for the StageAttempt.
+	Heartbeat *StageAttemptExecutionPolicy_Heartbeat
 	// The timeout policies for the StageAttempt.
 	Timeout *StageAttemptExecutionPolicy_Timeout
 }
@@ -117,7 +117,7 @@ func (b0 StageAttemptExecutionPolicy_builder) Build() *StageAttemptExecutionPoli
 	m0 := &StageAttemptExecutionPolicy{}
 	b, x := &b0, m0
 	_, _ = b, x
-	x.xxx_hidden_AttemptHeartbeat = b.AttemptHeartbeat
+	x.xxx_hidden_Heartbeat = b.Heartbeat
 	x.xxx_hidden_Timeout = b.Timeout
 	return m0
 }
@@ -477,9 +477,9 @@ var File_turboci_graph_orchestrator_v1_stage_attempt_execution_policy_proto prot
 
 const file_turboci_graph_orchestrator_v1_stage_attempt_execution_policy_proto_rawDesc = "" +
 	"\n" +
-	"Bturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1egoogle/protobuf/duration.proto\"\xe3\x06\n" +
-	"\x1bStageAttemptExecutionPolicy\x12v\n" +
-	"\x11attempt_heartbeat\x18\x01 \x01(\v2D.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.HeartbeatH\x00R\x10attemptHeartbeat\x88\x01\x01\x12a\n" +
+	"Bturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1egoogle/protobuf/duration.proto\"\xcc\x06\n" +
+	"\x1bStageAttemptExecutionPolicy\x12g\n" +
+	"\theartbeat\x18\x01 \x01(\v2D.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.HeartbeatH\x00R\theartbeat\x88\x01\x01\x12a\n" +
 	"\atimeout\x18\x02 \x01(\v2B.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.TimeoutH\x01R\atimeout\x88\x01\x01\x1a\xf1\x01\n" +
 	"\tHeartbeat\x12<\n" +
 	"\tscheduled\x18\x01 \x01(\v2\x19.google.protobuf.DurationH\x00R\tscheduled\x88\x01\x01\x128\n" +
@@ -500,8 +500,9 @@ const file_turboci_graph_orchestrator_v1_stage_attempt_execution_policy_proto_ra
 	"_scheduledB\n" +
 	"\n" +
 	"\b_runningB\x0f\n" +
-	"\r_tearing_downB\x14\n" +
-	"\x12_attempt_heartbeatB\n" +
+	"\r_tearing_downB\f\n" +
+	"\n" +
+	"_heartbeatB\n" +
 	"\n" +
 	"\b_timeoutBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
@@ -513,7 +514,7 @@ var file_turboci_graph_orchestrator_v1_stage_attempt_execution_policy_proto_goTy
 	(*durationpb.Duration)(nil),                   // 3: google.protobuf.Duration
 }
 var file_turboci_graph_orchestrator_v1_stage_attempt_execution_policy_proto_depIdxs = []int32{
-	1, // 0: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.attempt_heartbeat:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Heartbeat
+	1, // 0: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.heartbeat:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Heartbeat
 	2, // 1: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.timeout:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Timeout
 	3, // 2: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Heartbeat.scheduled:type_name -> google.protobuf.Duration
 	3, // 3: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Heartbeat.running:type_name -> google.protobuf.Duration

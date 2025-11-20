@@ -82,8 +82,8 @@ message StageAttemptExecutionPolicy {
     // is still subject to timeouts for the phase.
     optional google.protobuf.Duration tearing_down = 3;
   }
-  // The heartbeat policies for Attempts of this Stage.
-  optional Heartbeat attempt_heartbeat = 1;
+  // The heart policies for the StageAttempt.
+  optional Heartbeat heartbeat = 1;
 
   // Timeout describes the maximum amount of time a Stage Attempt can be in a
   // given state (in addition to restrictions imposed by Heartbeat).
