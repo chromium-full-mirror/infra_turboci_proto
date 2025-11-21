@@ -49,6 +49,13 @@ message Value {
   // A ProtoJSON-serialized version of `value`.
   optional string value_json = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 
+  // If true, `value.value` was pruned from this message either due to
+  // permissions (no read access in the realm containing this Value) or due to
+  // a Query filter (not in type_info.wanted).
+  //
+  // `value.type_url`, however will always be present as metadata.
+  optional bool omitted = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
   // TBD: An additional disambiguator/key in addition to value.type_url?
 
   // TBD: Orchestrator-visible index values.

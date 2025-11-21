@@ -29,7 +29,7 @@ const (
 type StageView struct {
 	state            protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Stage *Stage                 `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`
-	xxx_hidden_Edits *[]*StageEditView      `protobuf:"bytes,3,rep,name=edits,proto3"`
+	xxx_hidden_Edits *[]*Edit               `protobuf:"bytes,2,rep,name=edits,proto3"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -66,7 +66,7 @@ func (x *StageView) GetStage() *Stage {
 	return nil
 }
 
-func (x *StageView) GetEdits() []*StageEditView {
+func (x *StageView) GetEdits() []*Edit {
 	if x != nil {
 		if x.xxx_hidden_Edits != nil {
 			return *x.xxx_hidden_Edits
@@ -79,7 +79,7 @@ func (x *StageView) SetStage(v *Stage) {
 	x.xxx_hidden_Stage = v
 }
 
-func (x *StageView) SetEdits(v []*StageEditView) {
+func (x *StageView) SetEdits(v []*Edit) {
 	x.xxx_hidden_Edits = &v
 }
 
@@ -101,8 +101,8 @@ type StageView_builder struct {
 	Stage *Stage
 	// StageEdits for this Stage.
 	//
-	// Sorted by `edit.version`.
-	Edits []*StageEditView
+	// Sorted by `version`.
+	Edits []*Edit
 }
 
 func (b0 StageView_builder) Build() *StageView {
@@ -118,21 +118,21 @@ var File_turboci_graph_orchestrator_v1_stage_view_proto protoreflect.FileDescrip
 
 const file_turboci_graph_orchestrator_v1_stage_view_proto_rawDesc = "" +
 	"\n" +
-	".turboci/graph/orchestrator/v1/stage_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a3turboci/graph/orchestrator/v1/stage_edit_view.proto\"\xa0\x01\n" +
+	".turboci/graph/orchestrator/v1/stage_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a(turboci/graph/orchestrator/v1/edit.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\x91\x01\n" +
 	"\tStageView\x12?\n" +
-	"\x05stage\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.StageH\x00R\x05stage\x88\x01\x01\x12B\n" +
-	"\x05edits\x18\x03 \x03(\v2,.turboci.graph.orchestrator.v1.StageEditViewR\x05editsB\b\n" +
-	"\x06_stageJ\x04\b\x02\x10\x03BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x05stage\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.StageH\x00R\x05stage\x88\x01\x01\x129\n" +
+	"\x05edits\x18\x02 \x03(\v2#.turboci.graph.orchestrator.v1.EditR\x05editsB\b\n" +
+	"\x06_stageBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_stage_view_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_stage_view_proto_goTypes = []any{
-	(*StageView)(nil),     // 0: turboci.graph.orchestrator.v1.StageView
-	(*Stage)(nil),         // 1: turboci.graph.orchestrator.v1.Stage
-	(*StageEditView)(nil), // 2: turboci.graph.orchestrator.v1.StageEditView
+	(*StageView)(nil), // 0: turboci.graph.orchestrator.v1.StageView
+	(*Stage)(nil),     // 1: turboci.graph.orchestrator.v1.Stage
+	(*Edit)(nil),      // 2: turboci.graph.orchestrator.v1.Edit
 }
 var file_turboci_graph_orchestrator_v1_stage_view_proto_depIdxs = []int32{
 	1, // 0: turboci.graph.orchestrator.v1.StageView.stage:type_name -> turboci.graph.orchestrator.v1.Stage
-	2, // 1: turboci.graph.orchestrator.v1.StageView.edits:type_name -> turboci.graph.orchestrator.v1.StageEditView
+	2, // 1: turboci.graph.orchestrator.v1.StageView.edits:type_name -> turboci.graph.orchestrator.v1.Edit
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -145,8 +145,8 @@ func file_turboci_graph_orchestrator_v1_stage_view_proto_init() {
 	if File_turboci_graph_orchestrator_v1_stage_view_proto != nil {
 		return
 	}
+	file_turboci_graph_orchestrator_v1_edit_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_proto_init()
-	file_turboci_graph_orchestrator_v1_stage_edit_view_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_view_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

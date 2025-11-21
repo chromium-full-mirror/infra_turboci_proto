@@ -63,7 +63,7 @@ type Check struct {
 	xxx_hidden_State        CheckState                  `protobuf:"varint,6,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
 	xxx_hidden_StateHistory *[]*Check_StateHistoryEntry `protobuf:"bytes,7,rep,name=state_history,json=stateHistory,proto3"`
 	xxx_hidden_Dependencies *Dependencies               `protobuf:"bytes,8,opt,name=dependencies,proto3,oneof"`
-	xxx_hidden_Options      *[]*Check_OptionRef         `protobuf:"bytes,9,rep,name=options,proto3"`
+	xxx_hidden_Options      *[]*Datum                   `protobuf:"bytes,9,rep,name=options,proto3"`
 	xxx_hidden_Results      *[]*Check_Result            `protobuf:"bytes,10,rep,name=results,proto3"`
 	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
 	XXX_presence            [1]uint32
@@ -161,7 +161,7 @@ func (x *Check) GetDependencies() *Dependencies {
 	return nil
 }
 
-func (x *Check) GetOptions() []*Check_OptionRef {
+func (x *Check) GetOptions() []*Datum {
 	if x != nil {
 		if x.xxx_hidden_Options != nil {
 			return *x.xxx_hidden_Options
@@ -214,7 +214,7 @@ func (x *Check) SetDependencies(v *Dependencies) {
 	x.xxx_hidden_Dependencies = v
 }
 
-func (x *Check) SetOptions(v []*Check_OptionRef) {
+func (x *Check) SetOptions(v []*Datum) {
 	x.xxx_hidden_Options = &v
 }
 
@@ -361,12 +361,11 @@ type Check_builder struct {
 	// Orchestrator will ensure that the option types here are registered to be
 	// valid for this Check's kind.
 	//
-	// This field is kept unique by `type_url` and ordered by
-	// identifier.options_idx.
-	//
-	// You can use QueryNodes to get a CheckView which includes this Check and
-	// also CheckOptions.
-	Options []*Check_OptionRef
+	// This field is kept unique by `type_url`, and will reflect the insertion
+	// order of when each type_url was first added. Note that Datum have
+	// a revision value which is independent of the Check's revision value - Stage
+	// Attempts writing option data can do so without altering the Check itself.
+	Options []*Datum
 	// The list of Results this Check has.
 	//
 	// Any time a StageAttempt adds new result *data* for this Check for the first
@@ -515,112 +514,6 @@ func (b0 Check_StateHistoryEntry_builder) Build() *Check_StateHistoryEntry {
 	return m0
 }
 
-// OptionRef is a reference to a CheckOption.
-type Check_OptionRef struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Identifier  *v1.CheckOption        `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
-	xxx_hidden_TypeUrl     *string                `protobuf:"bytes,2,opt,name=type_url,json=typeUrl,proto3,oneof"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
-}
-
-func (x *Check_OptionRef) Reset() {
-	*x = Check_OptionRef{}
-	mi := &file_turboci_graph_orchestrator_v1_check_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Check_OptionRef) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Check_OptionRef) ProtoMessage() {}
-
-func (x *Check_OptionRef) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_check_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *Check_OptionRef) GetIdentifier() *v1.CheckOption {
-	if x != nil {
-		return x.xxx_hidden_Identifier
-	}
-	return nil
-}
-
-func (x *Check_OptionRef) GetTypeUrl() string {
-	if x != nil {
-		if x.xxx_hidden_TypeUrl != nil {
-			return *x.xxx_hidden_TypeUrl
-		}
-		return ""
-	}
-	return ""
-}
-
-func (x *Check_OptionRef) SetIdentifier(v *v1.CheckOption) {
-	x.xxx_hidden_Identifier = v
-}
-
-func (x *Check_OptionRef) SetTypeUrl(v string) {
-	x.xxx_hidden_TypeUrl = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
-}
-
-func (x *Check_OptionRef) HasIdentifier() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Identifier != nil
-}
-
-func (x *Check_OptionRef) HasTypeUrl() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *Check_OptionRef) ClearIdentifier() {
-	x.xxx_hidden_Identifier = nil
-}
-
-func (x *Check_OptionRef) ClearTypeUrl() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_TypeUrl = nil
-}
-
-type Check_OptionRef_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// The Identifier for the CheckOption, which is a Datum.
-	Identifier *v1.CheckOption
-	// The type_url of the data contained for this CheckOption.
-	TypeUrl *string
-}
-
-func (b0 Check_OptionRef_builder) Build() *Check_OptionRef {
-	m0 := &Check_OptionRef{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_Identifier = b.Identifier
-	if b.TypeUrl != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
-		x.xxx_hidden_TypeUrl = b.TypeUrl
-	}
-	return m0
-}
-
 // A Result is a container of result data for a Check.
 //
 // Results belong to exactly one Actor (usually a StageAttempt), and any given
@@ -630,19 +523,19 @@ func (b0 Check_OptionRef_builder) Build() *Check_OptionRef {
 // of result data. This could occur when multiple Stages all contribute
 // results to the same Check (e.g. sharding, multiple executions, etc.).
 type Check_Result struct {
-	state                  protoimpl.MessageState          `protogen:"opaque.v1"`
-	xxx_hidden_Identifier  *v1.CheckResult                 `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
-	xxx_hidden_Owner       *Actor                          `protobuf:"bytes,2,opt,name=owner,proto3,oneof"`
-	xxx_hidden_CreatedAt   *Revision                       `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3,oneof"`
-	xxx_hidden_Data        *[]*Check_Result_ResultDatumRef `protobuf:"bytes,4,rep,name=data,proto3"`
-	xxx_hidden_FinalizedAt *Revision                       `protobuf:"bytes,5,opt,name=finalized_at,json=finalizedAt,proto3,oneof"`
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier  *v1.CheckResult        `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Owner       *Actor                 `protobuf:"bytes,2,opt,name=owner,proto3,oneof"`
+	xxx_hidden_CreatedAt   *Revision              `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3,oneof"`
+	xxx_hidden_Data        *[]*Datum              `protobuf:"bytes,4,rep,name=data,proto3"`
+	xxx_hidden_FinalizedAt *Revision              `protobuf:"bytes,5,opt,name=finalized_at,json=finalizedAt,proto3,oneof"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Check_Result) Reset() {
 	*x = Check_Result{}
-	mi := &file_turboci_graph_orchestrator_v1_check_proto_msgTypes[3]
+	mi := &file_turboci_graph_orchestrator_v1_check_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -654,7 +547,7 @@ func (x *Check_Result) String() string {
 func (*Check_Result) ProtoMessage() {}
 
 func (x *Check_Result) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_check_proto_msgTypes[3]
+	mi := &file_turboci_graph_orchestrator_v1_check_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -686,7 +579,7 @@ func (x *Check_Result) GetCreatedAt() *Revision {
 	return nil
 }
 
-func (x *Check_Result) GetData() []*Check_Result_ResultDatumRef {
+func (x *Check_Result) GetData() []*Datum {
 	if x != nil {
 		if x.xxx_hidden_Data != nil {
 			return *x.xxx_hidden_Data
@@ -714,7 +607,7 @@ func (x *Check_Result) SetCreatedAt(v *Revision) {
 	x.xxx_hidden_CreatedAt = v
 }
 
-func (x *Check_Result) SetData(v []*Check_Result_ResultDatumRef) {
+func (x *Check_Result) SetData(v []*Datum) {
 	x.xxx_hidden_Data = &v
 }
 
@@ -780,15 +673,18 @@ type Check_Result_builder struct {
 	//
 	// NOTE: Most data should be stored in ResultDB via turboci.ResultStorage.
 	//
-	// This field is kept unique by `type_url` and ordered by
-	// identifier.options_idx.
+	// This field is kept unique by `type_url`, and will reflect the insertion
+	// order of when each type_url was first added. Note that Datum have
+	// a revision value which is independent of the Check's revision value
+	// - Stage Attempts writing result data can do so without altering the
+	// Check itself.
 	//
 	// Orchestrator will ensure that the option types here are registered to be
-	// valid for this Result's kind.
+	// valid for this Check's kind.
 	//
-	// You can use QueryNodes to get a CheckView which includes this Check and
-	// also Result Data.
-	Data []*Check_Result_ResultDatumRef
+	// All data will have an Identifier of kind
+	// IDENTIFIER_KIND_CHECK_RESULT_DATUM.
+	Data []*Datum
 	// The database revsision (commit timestamp) at which this Result is
 	// finalized.
 	//
@@ -811,117 +707,11 @@ func (b0 Check_Result_builder) Build() *Check_Result {
 	return m0
 }
 
-// ResultDatumRef is a reference to a CheckResultDatum.
-type Check_Result_ResultDatumRef struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Identifier  *v1.CheckResultDatum   `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
-	xxx_hidden_TypeUrl     *string                `protobuf:"bytes,2,opt,name=type_url,json=typeUrl,proto3,oneof"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
-}
-
-func (x *Check_Result_ResultDatumRef) Reset() {
-	*x = Check_Result_ResultDatumRef{}
-	mi := &file_turboci_graph_orchestrator_v1_check_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Check_Result_ResultDatumRef) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Check_Result_ResultDatumRef) ProtoMessage() {}
-
-func (x *Check_Result_ResultDatumRef) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_check_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *Check_Result_ResultDatumRef) GetIdentifier() *v1.CheckResultDatum {
-	if x != nil {
-		return x.xxx_hidden_Identifier
-	}
-	return nil
-}
-
-func (x *Check_Result_ResultDatumRef) GetTypeUrl() string {
-	if x != nil {
-		if x.xxx_hidden_TypeUrl != nil {
-			return *x.xxx_hidden_TypeUrl
-		}
-		return ""
-	}
-	return ""
-}
-
-func (x *Check_Result_ResultDatumRef) SetIdentifier(v *v1.CheckResultDatum) {
-	x.xxx_hidden_Identifier = v
-}
-
-func (x *Check_Result_ResultDatumRef) SetTypeUrl(v string) {
-	x.xxx_hidden_TypeUrl = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
-}
-
-func (x *Check_Result_ResultDatumRef) HasIdentifier() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Identifier != nil
-}
-
-func (x *Check_Result_ResultDatumRef) HasTypeUrl() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *Check_Result_ResultDatumRef) ClearIdentifier() {
-	x.xxx_hidden_Identifier = nil
-}
-
-func (x *Check_Result_ResultDatumRef) ClearTypeUrl() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_TypeUrl = nil
-}
-
-type Check_Result_ResultDatumRef_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// The Identifier for the CheckResultDatum.
-	Identifier *v1.CheckResultDatum
-	// The type_url of the data contained for this CheckResultDatum.
-	TypeUrl *string
-}
-
-func (b0 Check_Result_ResultDatumRef_builder) Build() *Check_Result_ResultDatumRef {
-	m0 := &Check_Result_ResultDatumRef{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_Identifier = b.Identifier
-	if b.TypeUrl != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
-		x.xxx_hidden_TypeUrl = b.TypeUrl
-	}
-	return m0
-}
-
 var File_turboci_graph_orchestrator_v1_check_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\x89\x0e\n" +
+	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a)turboci/graph/orchestrator/v1/datum.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xbb\v\n" +
 	"\x05Check\x12E\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckB\x03\xe0A\x05H\x00R\n" +
@@ -934,8 +724,8 @@ const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x05R\x05state\x88\x01\x01\x12`\n" +
 	"\rstate_history\x18\a \x03(\v26.turboci.graph.orchestrator.v1.Check.StateHistoryEntryB\x03\xe0A\x03R\fstateHistory\x12a\n" +
 	"\fdependencies\x18\b \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\x02H\x06R\fdependencies\x88\x01\x01\x12T\n" +
-	"\aoptions\x18\t \x03(\v2..turboci.graph.orchestrator.v1.Check.OptionRefB\n" +
+	"\x01\x02H\x06R\fdependencies\x88\x01\x01\x12J\n" +
+	"\aoptions\x18\t \x03(\v2$.turboci.graph.orchestrator.v1.DatumB\n" +
 	"\x82\x86\xf6\xfb\x0f\x04\n" +
 	"\x02\b\n" +
 	"R\aoptions\x12T\n" +
@@ -947,30 +737,16 @@ const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01B\b\n" +
 	"\x06_stateB\n" +
 	"\n" +
-	"\b_version\x1a\x8f\x01\n" +
-	"\tOptionRef\x12F\n" +
-	"\n" +
-	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckOptionH\x00R\n" +
-	"identifier\x88\x01\x01\x12\x1e\n" +
-	"\btype_url\x18\x02 \x01(\tH\x01R\atypeUrl\x88\x01\x01B\r\n" +
-	"\v_identifierB\v\n" +
-	"\t_type_url\x1a\xde\x04\n" +
+	"\b_version\x1a\xac\x03\n" +
 	"\x06Result\x12F\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckResultH\x00R\n" +
 	"identifier\x88\x01\x01\x12D\n" +
 	"\x05owner\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x03H\x01R\x05owner\x88\x01\x01\x12P\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x03H\x02R\tcreatedAt\x88\x01\x01\x12N\n" +
-	"\x04data\x18\x04 \x03(\v2:.turboci.graph.orchestrator.v1.Check.Result.ResultDatumRefR\x04data\x12O\n" +
-	"\ffinalized_at\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x03R\vfinalizedAt\x88\x01\x01\x1a\x99\x01\n" +
-	"\x0eResultDatumRef\x12K\n" +
-	"\n" +
-	"identifier\x18\x01 \x01(\v2&.turboci.graph.ids.v1.CheckResultDatumH\x00R\n" +
-	"identifier\x88\x01\x01\x12\x1e\n" +
-	"\btype_url\x18\x02 \x01(\tH\x01R\atypeUrl\x88\x01\x01B\r\n" +
-	"\v_identifierB\v\n" +
-	"\t_type_urlB\r\n" +
+	"created_at\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x03H\x02R\tcreatedAt\x88\x01\x01\x128\n" +
+	"\x04data\x18\x04 \x03(\v2$.turboci.graph.orchestrator.v1.DatumR\x04data\x12O\n" +
+	"\ffinalized_at\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x03R\vfinalizedAt\x88\x01\x01B\r\n" +
 	"\v_identifierB\b\n" +
 	"\x06_ownerB\r\n" +
 	"\v_created_atB\x0f\n" +
@@ -984,47 +760,42 @@ const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\x06_stateB\x0f\n" +
 	"\r_dependenciesBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_check_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_turboci_graph_orchestrator_v1_check_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_turboci_graph_orchestrator_v1_check_proto_goTypes = []any{
-	(*Check)(nil),                       // 0: turboci.graph.orchestrator.v1.Check
-	(*Check_StateHistoryEntry)(nil),     // 1: turboci.graph.orchestrator.v1.Check.StateHistoryEntry
-	(*Check_OptionRef)(nil),             // 2: turboci.graph.orchestrator.v1.Check.OptionRef
-	(*Check_Result)(nil),                // 3: turboci.graph.orchestrator.v1.Check.Result
-	(*Check_Result_ResultDatumRef)(nil), // 4: turboci.graph.orchestrator.v1.Check.Result.ResultDatumRef
-	(*v1.Check)(nil),                    // 5: turboci.graph.ids.v1.Check
-	(*Actor)(nil),                       // 6: turboci.graph.orchestrator.v1.Actor
-	(CheckKind)(0),                      // 7: turboci.graph.orchestrator.v1.CheckKind
-	(*Revision)(nil),                    // 8: turboci.graph.orchestrator.v1.Revision
-	(CheckState)(0),                     // 9: turboci.graph.orchestrator.v1.CheckState
-	(*Dependencies)(nil),                // 10: turboci.graph.orchestrator.v1.Dependencies
-	(*v1.CheckOption)(nil),              // 11: turboci.graph.ids.v1.CheckOption
-	(*v1.CheckResult)(nil),              // 12: turboci.graph.ids.v1.CheckResult
-	(*v1.CheckResultDatum)(nil),         // 13: turboci.graph.ids.v1.CheckResultDatum
+	(*Check)(nil),                   // 0: turboci.graph.orchestrator.v1.Check
+	(*Check_StateHistoryEntry)(nil), // 1: turboci.graph.orchestrator.v1.Check.StateHistoryEntry
+	(*Check_Result)(nil),            // 2: turboci.graph.orchestrator.v1.Check.Result
+	(*v1.Check)(nil),                // 3: turboci.graph.ids.v1.Check
+	(*Actor)(nil),                   // 4: turboci.graph.orchestrator.v1.Actor
+	(CheckKind)(0),                  // 5: turboci.graph.orchestrator.v1.CheckKind
+	(*Revision)(nil),                // 6: turboci.graph.orchestrator.v1.Revision
+	(CheckState)(0),                 // 7: turboci.graph.orchestrator.v1.CheckState
+	(*Dependencies)(nil),            // 8: turboci.graph.orchestrator.v1.Dependencies
+	(*Datum)(nil),                   // 9: turboci.graph.orchestrator.v1.Datum
+	(*v1.CheckResult)(nil),          // 10: turboci.graph.ids.v1.CheckResult
 }
 var file_turboci_graph_orchestrator_v1_check_proto_depIdxs = []int32{
-	5,  // 0: turboci.graph.orchestrator.v1.Check.identifier:type_name -> turboci.graph.ids.v1.Check
-	6,  // 1: turboci.graph.orchestrator.v1.Check.created_by:type_name -> turboci.graph.orchestrator.v1.Actor
-	7,  // 2: turboci.graph.orchestrator.v1.Check.kind:type_name -> turboci.graph.orchestrator.v1.CheckKind
-	8,  // 3: turboci.graph.orchestrator.v1.Check.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	9,  // 4: turboci.graph.orchestrator.v1.Check.state:type_name -> turboci.graph.orchestrator.v1.CheckState
+	3,  // 0: turboci.graph.orchestrator.v1.Check.identifier:type_name -> turboci.graph.ids.v1.Check
+	4,  // 1: turboci.graph.orchestrator.v1.Check.created_by:type_name -> turboci.graph.orchestrator.v1.Actor
+	5,  // 2: turboci.graph.orchestrator.v1.Check.kind:type_name -> turboci.graph.orchestrator.v1.CheckKind
+	6,  // 3: turboci.graph.orchestrator.v1.Check.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	7,  // 4: turboci.graph.orchestrator.v1.Check.state:type_name -> turboci.graph.orchestrator.v1.CheckState
 	1,  // 5: turboci.graph.orchestrator.v1.Check.state_history:type_name -> turboci.graph.orchestrator.v1.Check.StateHistoryEntry
-	10, // 6: turboci.graph.orchestrator.v1.Check.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
-	2,  // 7: turboci.graph.orchestrator.v1.Check.options:type_name -> turboci.graph.orchestrator.v1.Check.OptionRef
-	3,  // 8: turboci.graph.orchestrator.v1.Check.results:type_name -> turboci.graph.orchestrator.v1.Check.Result
-	9,  // 9: turboci.graph.orchestrator.v1.Check.StateHistoryEntry.state:type_name -> turboci.graph.orchestrator.v1.CheckState
-	8,  // 10: turboci.graph.orchestrator.v1.Check.StateHistoryEntry.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	11, // 11: turboci.graph.orchestrator.v1.Check.OptionRef.identifier:type_name -> turboci.graph.ids.v1.CheckOption
-	12, // 12: turboci.graph.orchestrator.v1.Check.Result.identifier:type_name -> turboci.graph.ids.v1.CheckResult
-	6,  // 13: turboci.graph.orchestrator.v1.Check.Result.owner:type_name -> turboci.graph.orchestrator.v1.Actor
-	8,  // 14: turboci.graph.orchestrator.v1.Check.Result.created_at:type_name -> turboci.graph.orchestrator.v1.Revision
-	4,  // 15: turboci.graph.orchestrator.v1.Check.Result.data:type_name -> turboci.graph.orchestrator.v1.Check.Result.ResultDatumRef
-	8,  // 16: turboci.graph.orchestrator.v1.Check.Result.finalized_at:type_name -> turboci.graph.orchestrator.v1.Revision
-	13, // 17: turboci.graph.orchestrator.v1.Check.Result.ResultDatumRef.identifier:type_name -> turboci.graph.ids.v1.CheckResultDatum
-	18, // [18:18] is the sub-list for method output_type
-	18, // [18:18] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	8,  // 6: turboci.graph.orchestrator.v1.Check.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
+	9,  // 7: turboci.graph.orchestrator.v1.Check.options:type_name -> turboci.graph.orchestrator.v1.Datum
+	2,  // 8: turboci.graph.orchestrator.v1.Check.results:type_name -> turboci.graph.orchestrator.v1.Check.Result
+	7,  // 9: turboci.graph.orchestrator.v1.Check.StateHistoryEntry.state:type_name -> turboci.graph.orchestrator.v1.CheckState
+	6,  // 10: turboci.graph.orchestrator.v1.Check.StateHistoryEntry.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	10, // 11: turboci.graph.orchestrator.v1.Check.Result.identifier:type_name -> turboci.graph.ids.v1.CheckResult
+	4,  // 12: turboci.graph.orchestrator.v1.Check.Result.owner:type_name -> turboci.graph.orchestrator.v1.Actor
+	6,  // 13: turboci.graph.orchestrator.v1.Check.Result.created_at:type_name -> turboci.graph.orchestrator.v1.Revision
+	9,  // 14: turboci.graph.orchestrator.v1.Check.Result.data:type_name -> turboci.graph.orchestrator.v1.Datum
+	6,  // 15: turboci.graph.orchestrator.v1.Check.Result.finalized_at:type_name -> turboci.graph.orchestrator.v1.Revision
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_check_proto_init() }
@@ -1035,21 +806,20 @@ func file_turboci_graph_orchestrator_v1_check_proto_init() {
 	file_turboci_graph_orchestrator_v1_actor_proto_init()
 	file_turboci_graph_orchestrator_v1_check_kind_proto_init()
 	file_turboci_graph_orchestrator_v1_check_state_proto_init()
+	file_turboci_graph_orchestrator_v1_datum_proto_init()
 	file_turboci_graph_orchestrator_v1_dependencies_proto_init()
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
 	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[0].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[1].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[2].OneofWrappers = []any{}
-	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[3].OneofWrappers = []any{}
-	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_check_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_check_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

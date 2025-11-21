@@ -98,13 +98,12 @@ func (x QueryExpandDepsMode) Number() protoreflect.EnumNumber {
 //
 // See QueryNodesRequest.version for how this Query interacts with transactions.
 type Query struct {
-	state               protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_TypeUrls []string               `protobuf:"bytes,1,rep,name=type_urls,json=typeUrls,proto3"`
-	xxx_hidden_Select   *Query_Select          `protobuf:"bytes,2,opt,name=select,proto3,oneof"`
-	xxx_hidden_Expand   *Query_Expand          `protobuf:"bytes,3,opt,name=expand,proto3,oneof"`
-	xxx_hidden_Collect  *Query_Collect         `protobuf:"bytes,4,opt,name=collect,proto3,oneof"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Select  *Query_Select          `protobuf:"bytes,2,opt,name=select,proto3,oneof"`
+	xxx_hidden_Expand  *Query_Expand          `protobuf:"bytes,3,opt,name=expand,proto3,oneof"`
+	xxx_hidden_Collect *Query_Collect         `protobuf:"bytes,4,opt,name=collect,proto3,oneof"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *Query) Reset() {
@@ -132,13 +131,6 @@ func (x *Query) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *Query) GetTypeUrls() []string {
-	if x != nil {
-		return x.xxx_hidden_TypeUrls
-	}
-	return nil
-}
-
 func (x *Query) GetSelect() *Query_Select {
 	if x != nil {
 		return x.xxx_hidden_Select
@@ -158,10 +150,6 @@ func (x *Query) GetCollect() *Query_Collect {
 		return x.xxx_hidden_Collect
 	}
 	return nil
-}
-
-func (x *Query) SetTypeUrls(v []string) {
-	x.xxx_hidden_TypeUrls = v
 }
 
 func (x *Query) SetSelect(v *Query_Select) {
@@ -212,19 +200,6 @@ func (x *Query) ClearCollect() {
 type Query_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Type URLs (for Check Option Datum, Check Result Datum, Stage args,
-	// CheckEdit Option Datum and CheckEdit Result) that the caller wants to see
-	// in the response.  Any child Node whose type URL is not specified here
-	// will be omitted in the response.
-	//
-	// TBD: The special value "*" means that the caller wants to see all type
-	// URLs, but this requires an extra permission. Extra permission is needed
-	// to encourage clients to be explicit about what they want to reduce
-	// bandwidth, coupling and increase auditability.
-	//
-	// TBD: Allow limited wildcards to include everything under some package
-	// namespace.
-	TypeUrls []string
 	// Select an arbitrary set of nodes.
 	Select *Query_Select
 	// Expand that set of nodes by following their edges.
@@ -237,7 +212,6 @@ func (b0 Query_builder) Build() *Query {
 	m0 := &Query{}
 	b, x := &b0, m0
 	_, _ = b, x
-	x.xxx_hidden_TypeUrls = b.TypeUrls
 	x.xxx_hidden_Select = b.Select
 	x.xxx_hidden_Expand = b.Expand
 	x.xxx_hidden_Collect = b.Collect
@@ -1234,9 +1208,8 @@ var File_turboci_graph_orchestrator_v1_query_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_query_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/query.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a2turboci/graph/orchestrator/v1/revision_range.proto\"\xd9\x0f\n" +
-	"\x05Query\x12\x1b\n" +
-	"\ttype_urls\x18\x01 \x03(\tR\btypeUrls\x12H\n" +
+	")turboci/graph/orchestrator/v1/query.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a2turboci/graph/orchestrator/v1/revision_range.proto\"\xbc\x0f\n" +
+	"\x05Query\x12H\n" +
 	"\x06select\x18\x02 \x01(\v2+.turboci.graph.orchestrator.v1.Query.SelectH\x00R\x06select\x88\x01\x01\x12H\n" +
 	"\x06expand\x18\x03 \x01(\v2+.turboci.graph.orchestrator.v1.Query.ExpandH\x01R\x06expand\x88\x01\x01\x12K\n" +
 	"\acollect\x18\x04 \x01(\v2,.turboci.graph.orchestrator.v1.Query.CollectH\x02R\acollect\x88\x01\x01\x1a\xa2\x06\n" +

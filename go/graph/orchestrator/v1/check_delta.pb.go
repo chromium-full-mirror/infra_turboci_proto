@@ -32,7 +32,7 @@ type CheckDelta struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_State        CheckState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
 	xxx_hidden_Dependencies *Dependencies          `protobuf:"bytes,2,opt,name=dependencies,proto3,oneof"`
-	xxx_hidden_Options      *[]*v1.CheckOption     `protobuf:"bytes,3,rep,name=options,proto3"`
+	xxx_hidden_Options      *[]*Datum              `protobuf:"bytes,3,rep,name=options,proto3"`
 	xxx_hidden_Result       *[]*CheckDelta_Result  `protobuf:"bytes,4,rep,name=result,proto3"`
 	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
 	XXX_presence            [1]uint32
@@ -81,7 +81,7 @@ func (x *CheckDelta) GetDependencies() *Dependencies {
 	return nil
 }
 
-func (x *CheckDelta) GetOptions() []*v1.CheckOption {
+func (x *CheckDelta) GetOptions() []*Datum {
 	if x != nil {
 		if x.xxx_hidden_Options != nil {
 			return *x.xxx_hidden_Options
@@ -108,7 +108,7 @@ func (x *CheckDelta) SetDependencies(v *Dependencies) {
 	x.xxx_hidden_Dependencies = v
 }
 
-func (x *CheckDelta) SetOptions(v []*v1.CheckOption) {
+func (x *CheckDelta) SetOptions(v []*Datum) {
 	x.xxx_hidden_Options = &v
 }
 
@@ -152,7 +152,9 @@ type CheckDelta_builder struct {
 	//   - `resolution_events` reflects just new events resolved in this edit.
 	Dependencies *Dependencies
 	// Options written as part of this edit.
-	Options []*v1.CheckOption
+	//
+	// NOTE: The identifier.idx will tell you which 'slots' were written.
+	Options []*Datum
 	// Result data written as part of this edit.
 	//
 	// This is repeated to allow for the Orchestrator to make a single edit
@@ -179,11 +181,11 @@ func (b0 CheckDelta_builder) Build() *CheckDelta {
 
 // Information about a single Check.Result written as part of this edit.
 type CheckDelta_Result struct {
-	state                  protoimpl.MessageState  `protogen:"opaque.v1"`
-	xxx_hidden_Identifier  *v1.CheckResult         `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
-	xxx_hidden_Created     bool                    `protobuf:"varint,2,opt,name=created,proto3,oneof"`
-	xxx_hidden_Data        *[]*v1.CheckResultDatum `protobuf:"bytes,3,rep,name=data,proto3"`
-	xxx_hidden_Finalized   bool                    `protobuf:"varint,4,opt,name=finalized,proto3,oneof"`
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier  *v1.CheckResult        `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Created     bool                   `protobuf:"varint,2,opt,name=created,proto3,oneof"`
+	xxx_hidden_Data        *[]*Datum              `protobuf:"bytes,3,rep,name=data,proto3"`
+	xxx_hidden_Finalized   bool                   `protobuf:"varint,4,opt,name=finalized,proto3,oneof"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -229,7 +231,7 @@ func (x *CheckDelta_Result) GetCreated() bool {
 	return false
 }
 
-func (x *CheckDelta_Result) GetData() []*v1.CheckResultDatum {
+func (x *CheckDelta_Result) GetData() []*Datum {
 	if x != nil {
 		if x.xxx_hidden_Data != nil {
 			return *x.xxx_hidden_Data
@@ -254,7 +256,7 @@ func (x *CheckDelta_Result) SetCreated(v bool) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
 }
 
-func (x *CheckDelta_Result) SetData(v []*v1.CheckResultDatum) {
+func (x *CheckDelta_Result) SetData(v []*Datum) {
 	x.xxx_hidden_Data = &v
 }
 
@@ -305,8 +307,15 @@ type CheckDelta_Result_builder struct {
 	Identifier *v1.CheckResult
 	// If true, this Check.Result was created by this edit.
 	Created *bool
-	// Reference to the data written as part of this edit.
-	Data []*v1.CheckResultDatum
+	// The data written as part of this edit.
+	//
+	// NOTE: The identifier.idx will tell you which data 'slots' were written
+	// to.
+	//
+	// NOTE: For now, the Data here will be devoid of their 'value' field, as we
+	// expect it to be noisy and not particularly useful to see all the
+	// intermediate data.
+	Data []*Datum
 	// If true, this edit finalized the Check.Result.
 	//
 	// This may be true in conjunction with `created` to indicate that a
@@ -337,20 +346,20 @@ var File_turboci_graph_orchestrator_v1_check_delta_proto protoreflect.FileDescri
 
 const file_turboci_graph_orchestrator_v1_check_delta_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/check_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\"\xd1\x04\n" +
+	"/turboci/graph/orchestrator/v1/check_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a)turboci/graph/orchestrator/v1/datum.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\"\xd2\x04\n" +
 	"\n" +
 	"CheckDelta\x12D\n" +
 	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\x05state\x88\x01\x01\x12a\n" +
 	"\fdependencies\x18\x02 \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\x02H\x01R\fdependencies\x88\x01\x01\x12;\n" +
-	"\aoptions\x18\x03 \x03(\v2!.turboci.graph.ids.v1.CheckOptionR\aoptions\x12H\n" +
-	"\x06result\x18\x04 \x03(\v20.turboci.graph.orchestrator.v1.CheckDelta.ResultR\x06result\x1a\xf7\x01\n" +
+	"\x01\x02H\x01R\fdependencies\x88\x01\x01\x12>\n" +
+	"\aoptions\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.DatumR\aoptions\x12H\n" +
+	"\x06result\x18\x04 \x03(\v20.turboci.graph.orchestrator.v1.CheckDelta.ResultR\x06result\x1a\xf5\x01\n" +
 	"\x06Result\x12F\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckResultH\x00R\n" +
 	"identifier\x88\x01\x01\x12\x1d\n" +
-	"\acreated\x18\x02 \x01(\bH\x01R\acreated\x88\x01\x01\x12:\n" +
-	"\x04data\x18\x03 \x03(\v2&.turboci.graph.ids.v1.CheckResultDatumR\x04data\x12!\n" +
+	"\acreated\x18\x02 \x01(\bH\x01R\acreated\x88\x01\x01\x128\n" +
+	"\x04data\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.DatumR\x04data\x12!\n" +
 	"\tfinalized\x18\x04 \x01(\bH\x02R\tfinalized\x88\x01\x01B\r\n" +
 	"\v_identifierB\n" +
 	"\n" +
@@ -362,21 +371,20 @@ const file_turboci_graph_orchestrator_v1_check_delta_proto_rawDesc = "" +
 
 var file_turboci_graph_orchestrator_v1_check_delta_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_check_delta_proto_goTypes = []any{
-	(*CheckDelta)(nil),          // 0: turboci.graph.orchestrator.v1.CheckDelta
-	(*CheckDelta_Result)(nil),   // 1: turboci.graph.orchestrator.v1.CheckDelta.Result
-	(CheckState)(0),             // 2: turboci.graph.orchestrator.v1.CheckState
-	(*Dependencies)(nil),        // 3: turboci.graph.orchestrator.v1.Dependencies
-	(*v1.CheckOption)(nil),      // 4: turboci.graph.ids.v1.CheckOption
-	(*v1.CheckResult)(nil),      // 5: turboci.graph.ids.v1.CheckResult
-	(*v1.CheckResultDatum)(nil), // 6: turboci.graph.ids.v1.CheckResultDatum
+	(*CheckDelta)(nil),        // 0: turboci.graph.orchestrator.v1.CheckDelta
+	(*CheckDelta_Result)(nil), // 1: turboci.graph.orchestrator.v1.CheckDelta.Result
+	(CheckState)(0),           // 2: turboci.graph.orchestrator.v1.CheckState
+	(*Dependencies)(nil),      // 3: turboci.graph.orchestrator.v1.Dependencies
+	(*Datum)(nil),             // 4: turboci.graph.orchestrator.v1.Datum
+	(*v1.CheckResult)(nil),    // 5: turboci.graph.ids.v1.CheckResult
 }
 var file_turboci_graph_orchestrator_v1_check_delta_proto_depIdxs = []int32{
 	2, // 0: turboci.graph.orchestrator.v1.CheckDelta.state:type_name -> turboci.graph.orchestrator.v1.CheckState
 	3, // 1: turboci.graph.orchestrator.v1.CheckDelta.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
-	4, // 2: turboci.graph.orchestrator.v1.CheckDelta.options:type_name -> turboci.graph.ids.v1.CheckOption
+	4, // 2: turboci.graph.orchestrator.v1.CheckDelta.options:type_name -> turboci.graph.orchestrator.v1.Datum
 	1, // 3: turboci.graph.orchestrator.v1.CheckDelta.result:type_name -> turboci.graph.orchestrator.v1.CheckDelta.Result
 	5, // 4: turboci.graph.orchestrator.v1.CheckDelta.Result.identifier:type_name -> turboci.graph.ids.v1.CheckResult
-	6, // 5: turboci.graph.orchestrator.v1.CheckDelta.Result.data:type_name -> turboci.graph.ids.v1.CheckResultDatum
+	4, // 5: turboci.graph.orchestrator.v1.CheckDelta.Result.data:type_name -> turboci.graph.orchestrator.v1.Datum
 	6, // [6:6] is the sub-list for method output_type
 	6, // [6:6] is the sub-list for method input_type
 	6, // [6:6] is the sub-list for extension type_name
@@ -390,6 +398,7 @@ func file_turboci_graph_orchestrator_v1_check_delta_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_check_state_proto_init()
+	file_turboci_graph_orchestrator_v1_datum_proto_init()
 	file_turboci_graph_orchestrator_v1_dependencies_proto_init()
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_check_delta_proto_msgTypes[0].OneofWrappers = []any{}

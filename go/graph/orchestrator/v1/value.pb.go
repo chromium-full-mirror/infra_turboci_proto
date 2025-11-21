@@ -54,6 +54,7 @@ type Value struct {
 	xxx_hidden_Value            *anypb.Any             `protobuf:"bytes,1,opt,name=value,proto3,oneof"`
 	xxx_hidden_HasUnknownFields bool                   `protobuf:"varint,2,opt,name=has_unknown_fields,json=hasUnknownFields,proto3,oneof"`
 	xxx_hidden_ValueJson        *string                `protobuf:"bytes,3,opt,name=value_json,json=valueJson,proto3,oneof"`
+	xxx_hidden_Omitted          bool                   `protobuf:"varint,4,opt,name=omitted,proto3,oneof"`
 	XXX_raceDetectHookData      protoimpl.RaceDetectHookData
 	XXX_presence                [1]uint32
 	unknownFields               protoimpl.UnknownFields
@@ -109,18 +110,30 @@ func (x *Value) GetValueJson() string {
 	return ""
 }
 
+func (x *Value) GetOmitted() bool {
+	if x != nil {
+		return x.xxx_hidden_Omitted
+	}
+	return false
+}
+
 func (x *Value) SetValue(v *anypb.Any) {
 	x.xxx_hidden_Value = v
 }
 
 func (x *Value) SetHasUnknownFields(v bool) {
 	x.xxx_hidden_HasUnknownFields = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
 }
 
 func (x *Value) SetValueJson(v string) {
 	x.xxx_hidden_ValueJson = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
+}
+
+func (x *Value) SetOmitted(v bool) {
+	x.xxx_hidden_Omitted = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
 }
 
 func (x *Value) HasValue() bool {
@@ -144,6 +157,13 @@ func (x *Value) HasValueJson() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
+func (x *Value) HasOmitted() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+}
+
 func (x *Value) ClearValue() {
 	x.xxx_hidden_Value = nil
 }
@@ -156,6 +176,11 @@ func (x *Value) ClearHasUnknownFields() {
 func (x *Value) ClearValueJson() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
 	x.xxx_hidden_ValueJson = nil
+}
+
+func (x *Value) ClearOmitted() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_Omitted = false
 }
 
 type Value_builder struct {
@@ -171,6 +196,12 @@ type Value_builder struct {
 	HasUnknownFields *bool
 	// A ProtoJSON-serialized version of `value`.
 	ValueJson *string
+	// If true, `value.value` was pruned from this message either due to
+	// permissions (no read access in the realm containing this Value) or due to
+	// a Query filter (not in type_info.wanted).
+	//
+	// `value.type_url`, however will always be present as metadata.
+	Omitted *bool
 }
 
 func (b0 Value_builder) Build() *Value {
@@ -179,12 +210,16 @@ func (b0 Value_builder) Build() *Value {
 	_, _ = b, x
 	x.xxx_hidden_Value = b.Value
 	if b.HasUnknownFields != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
 		x.xxx_hidden_HasUnknownFields = *b.HasUnknownFields
 	}
 	if b.ValueJson != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
 		x.xxx_hidden_ValueJson = b.ValueJson
+	}
+	if b.Omitted != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
+		x.xxx_hidden_Omitted = *b.Omitted
 	}
 	return m0
 }
@@ -193,15 +228,18 @@ var File_turboci_graph_orchestrator_v1_value_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_value_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/value.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\"\xc9\x01\n" +
+	")turboci/graph/orchestrator/v1/value.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\"\xf9\x01\n" +
 	"\x05Value\x12/\n" +
 	"\x05value\x18\x01 \x01(\v2\x14.google.protobuf.AnyH\x00R\x05value\x88\x01\x01\x126\n" +
 	"\x12has_unknown_fields\x18\x02 \x01(\bB\x03\xe0A\x03H\x01R\x10hasUnknownFields\x88\x01\x01\x12'\n" +
 	"\n" +
-	"value_json\x18\x03 \x01(\tB\x03\xe0A\x03H\x02R\tvalueJson\x88\x01\x01B\b\n" +
+	"value_json\x18\x03 \x01(\tB\x03\xe0A\x03H\x02R\tvalueJson\x88\x01\x01\x12\"\n" +
+	"\aomitted\x18\x04 \x01(\bB\x03\xe0A\x03H\x03R\aomitted\x88\x01\x01B\b\n" +
 	"\x06_valueB\x15\n" +
 	"\x13_has_unknown_fieldsB\r\n" +
-	"\v_value_jsonBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\v_value_jsonB\n" +
+	"\n" +
+	"\b_omittedBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_value_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_value_proto_goTypes = []any{

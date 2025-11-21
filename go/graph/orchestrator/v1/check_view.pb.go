@@ -27,13 +27,11 @@ const (
 // CheckView is a collated, partial, view of a single Check and the nodes
 // which belong to it.
 type CheckView struct {
-	state                 protoimpl.MessageState     `protogen:"opaque.v1"`
-	xxx_hidden_Check      *Check                     `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
-	xxx_hidden_OptionData map[string]*Datum          `protobuf:"bytes,2,rep,name=option_data,json=optionData,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	xxx_hidden_Edits      *[]*CheckEditView          `protobuf:"bytes,3,rep,name=edits,proto3"`
-	xxx_hidden_Results    map[int32]*CheckResultView `protobuf:"bytes,4,rep,name=results,proto3" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Check *Check                 `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
+	xxx_hidden_Edits *[]*Edit               `protobuf:"bytes,2,rep,name=edits,proto3"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *CheckView) Reset() {
@@ -68,14 +66,7 @@ func (x *CheckView) GetCheck() *Check {
 	return nil
 }
 
-func (x *CheckView) GetOptionData() map[string]*Datum {
-	if x != nil {
-		return x.xxx_hidden_OptionData
-	}
-	return nil
-}
-
-func (x *CheckView) GetEdits() []*CheckEditView {
+func (x *CheckView) GetEdits() []*Edit {
 	if x != nil {
 		if x.xxx_hidden_Edits != nil {
 			return *x.xxx_hidden_Edits
@@ -84,27 +75,12 @@ func (x *CheckView) GetEdits() []*CheckEditView {
 	return nil
 }
 
-func (x *CheckView) GetResults() map[int32]*CheckResultView {
-	if x != nil {
-		return x.xxx_hidden_Results
-	}
-	return nil
-}
-
 func (x *CheckView) SetCheck(v *Check) {
 	x.xxx_hidden_Check = v
 }
 
-func (x *CheckView) SetOptionData(v map[string]*Datum) {
-	x.xxx_hidden_OptionData = v
-}
-
-func (x *CheckView) SetEdits(v []*CheckEditView) {
+func (x *CheckView) SetEdits(v []*Edit) {
 	x.xxx_hidden_Edits = &v
-}
-
-func (x *CheckView) SetResults(v map[int32]*CheckResultView) {
-	x.xxx_hidden_Results = v
 }
 
 func (x *CheckView) HasCheck() bool {
@@ -123,22 +99,10 @@ type CheckView_builder struct {
 
 	// The Check itself - always present.
 	Check *Check
-	// Data for the Check's options which are visible and of a type which was
-	// requested.
-	//
-	// Indexed by type_url.
-	//
-	// NOTE: If we add an additional distinguisher other than type_url, it will
-	// need to also be rendered in this string key. Probably <tag>:<type_url>.
-	OptionData map[string]*Datum
 	// CheckEdits for this Check.
 	//
-	// Sorted by `edit.version`.
-	Edits []*CheckEditView
-	// Result data for this Check.
-	//
-	// Indexed by `identifier.idx`.
-	Results map[int32]*CheckResultView
+	// Sorted by `version`.
+	Edits []*Edit
 }
 
 func (b0 CheckView_builder) Build() *CheckView {
@@ -146,9 +110,7 @@ func (b0 CheckView_builder) Build() *CheckView {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Check = b.Check
-	x.xxx_hidden_OptionData = b.OptionData
 	x.xxx_hidden_Edits = &b.Edits
-	x.xxx_hidden_Results = b.Results
 	return m0
 }
 
@@ -156,43 +118,26 @@ var File_turboci_graph_orchestrator_v1_check_view_proto protoreflect.FileDescrip
 
 const file_turboci_graph_orchestrator_v1_check_view_proto_rawDesc = "" +
 	"\n" +
-	".turboci/graph/orchestrator/v1/check_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/check.proto\x1a3turboci/graph/orchestrator/v1/check_edit_view.proto\x1a5turboci/graph/orchestrator/v1/check_result_view.proto\x1a)turboci/graph/orchestrator/v1/datum.proto\"\x97\x04\n" +
+	".turboci/graph/orchestrator/v1/check_view.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/check.proto\x1a(turboci/graph/orchestrator/v1/edit.proto\"\x91\x01\n" +
 	"\tCheckView\x12?\n" +
-	"\x05check\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.CheckH\x00R\x05check\x88\x01\x01\x12Y\n" +
-	"\voption_data\x18\x02 \x03(\v28.turboci.graph.orchestrator.v1.CheckView.OptionDataEntryR\n" +
-	"optionData\x12B\n" +
-	"\x05edits\x18\x03 \x03(\v2,.turboci.graph.orchestrator.v1.CheckEditViewR\x05edits\x12O\n" +
-	"\aresults\x18\x04 \x03(\v25.turboci.graph.orchestrator.v1.CheckView.ResultsEntryR\aresults\x1ac\n" +
-	"\x0fOptionDataEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12:\n" +
-	"\x05value\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.DatumR\x05value:\x028\x01\x1aj\n" +
-	"\fResultsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\x05R\x03key\x12D\n" +
-	"\x05value\x18\x02 \x01(\v2..turboci.graph.orchestrator.v1.CheckResultViewR\x05value:\x028\x01B\b\n" +
+	"\x05check\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.CheckH\x00R\x05check\x88\x01\x01\x129\n" +
+	"\x05edits\x18\x02 \x03(\v2#.turboci.graph.orchestrator.v1.EditR\x05editsB\b\n" +
 	"\x06_checkBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_check_view_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_turboci_graph_orchestrator_v1_check_view_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_check_view_proto_goTypes = []any{
-	(*CheckView)(nil),       // 0: turboci.graph.orchestrator.v1.CheckView
-	nil,                     // 1: turboci.graph.orchestrator.v1.CheckView.OptionDataEntry
-	nil,                     // 2: turboci.graph.orchestrator.v1.CheckView.ResultsEntry
-	(*Check)(nil),           // 3: turboci.graph.orchestrator.v1.Check
-	(*CheckEditView)(nil),   // 4: turboci.graph.orchestrator.v1.CheckEditView
-	(*Datum)(nil),           // 5: turboci.graph.orchestrator.v1.Datum
-	(*CheckResultView)(nil), // 6: turboci.graph.orchestrator.v1.CheckResultView
+	(*CheckView)(nil), // 0: turboci.graph.orchestrator.v1.CheckView
+	(*Check)(nil),     // 1: turboci.graph.orchestrator.v1.Check
+	(*Edit)(nil),      // 2: turboci.graph.orchestrator.v1.Edit
 }
 var file_turboci_graph_orchestrator_v1_check_view_proto_depIdxs = []int32{
-	3, // 0: turboci.graph.orchestrator.v1.CheckView.check:type_name -> turboci.graph.orchestrator.v1.Check
-	1, // 1: turboci.graph.orchestrator.v1.CheckView.option_data:type_name -> turboci.graph.orchestrator.v1.CheckView.OptionDataEntry
-	4, // 2: turboci.graph.orchestrator.v1.CheckView.edits:type_name -> turboci.graph.orchestrator.v1.CheckEditView
-	2, // 3: turboci.graph.orchestrator.v1.CheckView.results:type_name -> turboci.graph.orchestrator.v1.CheckView.ResultsEntry
-	5, // 4: turboci.graph.orchestrator.v1.CheckView.OptionDataEntry.value:type_name -> turboci.graph.orchestrator.v1.Datum
-	6, // 5: turboci.graph.orchestrator.v1.CheckView.ResultsEntry.value:type_name -> turboci.graph.orchestrator.v1.CheckResultView
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	1, // 0: turboci.graph.orchestrator.v1.CheckView.check:type_name -> turboci.graph.orchestrator.v1.Check
+	2, // 1: turboci.graph.orchestrator.v1.CheckView.edits:type_name -> turboci.graph.orchestrator.v1.Edit
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_check_view_proto_init() }
@@ -201,9 +146,7 @@ func file_turboci_graph_orchestrator_v1_check_view_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_check_proto_init()
-	file_turboci_graph_orchestrator_v1_check_edit_view_proto_init()
-	file_turboci_graph_orchestrator_v1_check_result_view_proto_init()
-	file_turboci_graph_orchestrator_v1_datum_proto_init()
+	file_turboci_graph_orchestrator_v1_edit_proto_init()
 	file_turboci_graph_orchestrator_v1_check_view_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -211,7 +154,7 @@ func file_turboci_graph_orchestrator_v1_check_view_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_check_view_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_check_view_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

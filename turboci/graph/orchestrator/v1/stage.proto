@@ -266,6 +266,12 @@ message Stage {
   // created time.
   //
   // Only the most recent attempt (the last in the list) is potentially 'live'.
+  //
+  // Note that the revision of the attempts are unrelated to the revision of the
+  // Stage. While the Stage is ATTEMPTING, the Stage's revision only changes
+  // when:
+  //   * A new Attempt is created
+  //   * The Stage is canceled
   repeated Attempt attempts = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Assignment describes the workflow's intent that this Stage will handle one

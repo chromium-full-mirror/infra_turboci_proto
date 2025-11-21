@@ -388,6 +388,12 @@ type Stage_builder struct {
 	// created time.
 	//
 	// Only the most recent attempt (the last in the list) is potentially 'live'.
+	//
+	// Note that the revision of the attempts are unrelated to the revision of the
+	// Stage. While the Stage is ATTEMPTING, the Stage's revision only changes
+	// when:
+	//   - A new Attempt is created
+	//   - The Stage is canceled
 	Attempts []*Stage_Attempt
 	// The workflow's intent for this Stage.
 	Assignments []*Stage_Assignment
