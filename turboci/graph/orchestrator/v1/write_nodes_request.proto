@@ -30,10 +30,10 @@ message WriteNodesRequest {
   //
   // This is used to write objects which appear in the graph as Datum messages.
   message RealmValue {
-    // The realm to assign to this value (if the value is being created).
-    // If it's unset/empty, it will inherit from the realm of the Stage
-    // indicated by stage_attempt_token. If it's unset/empty and there is no
-    // stage_attempt_token, the update will be rejected.
+    // The realm to assign to this value (if the value is being created). If
+    // it's unset/empty, it will inherit from the realm of the object containing
+    // it (so, for Check options or result data, this would be the Check's
+    // realm).
     //
     // If the value is being overwritten and `realm` is provided, it must match
     // the already-written value's realm.
@@ -76,20 +76,28 @@ message WriteNodesRequest {
     repeated Value details = 2;
   }
 
-  // The token of the Stage Attempt which is performing this write.
+  // The token which constrains this write to a specific Workplan (and possibly
+  // to a Stage Attempt in that Workplan).
+  //
+  // A suitable token is provided to the Executor of a Stage or to the creator
+  // of an empty Workplan.
   //
   // This is in addition to regular RPC authorization.
   //
   // If missing, this RPC will check that the caller additionally has the
   // 'turboci.workplans.writeExternal' permission on Workplan(s) in the
   // CheckWrites/StageWrites.
-  optional string stage_attempt_token = 1;
+  optional string token = 1;
 
   // Reason is the write-request analogue of Edit.Reason.
   message Reason {
     // The security realm for this reason.
     //
     // If omitted, this will be the same as the parent node's realm.
+    //
+    // This means that if you write to multiple Checks/Stages in the same
+    // WriteNodes call, this same Reason will be present in multiple Edits
+    // belonging to those different Checks and/or Stages' realms.
     optional string realm = 1;
 
     // A 'low effort' reason for this edit.
@@ -216,12 +224,11 @@ message WriteNodesRequest {
     // The check to write to.
     //
     // If the WorkPlan is left blank, will be populated with the WorkPlan in
-    // `stage_attempt_token`, if it's provided.
+    // `token`, if it's provided.
     //
-    // Otherwise, the Check must belong to the stage_attempt_token's WorkPlan,
-    // or the caller must have the additional "turboci.workplans.writeExternal"
-    // permission in the check's realm (or in the realm of the option/result
-    // data).
+    // Otherwise, the Check must belong to the token's WorkPlan, or the caller
+    // must have the additional "turboci.workplans.writeExternal" permission in
+    // the check's realm (or in the realm of the option/result data).
     optional ids.v1.Check identifier = 1;
 
     // Realm to assign to this check.
@@ -230,9 +237,11 @@ message WriteNodesRequest {
     // existing realm.
     //
     // If absent and this CheckWrite creates the Check, the written Check will
-    // copy its realm from the Stage doing the write (assuming
-    // `stage_attempt_token` is set). If `stage_attempt_token` is unset and this
-    // field is absent, the write will be rejected.
+    // copy its realm from the implied realm of the `token`. For Stage Attempt
+    // tokens, this will be the Stage's realm, and for Creator tokens, this
+    // will be the WorkPlan's realm.
+    //
+    // If `token` is unset and this field is absent, the write will be rejected.
     optional string realm = 2 [(turboci).creation_only = true];
 
     // Kind to assign to this check.
@@ -260,8 +269,8 @@ message WriteNodesRequest {
     // Write data to a Result for this Check.
     //
     // The Result to write in is keyed on:
-    //   * The Stage Attempt (if stage_attempt_token is provided)
-    //   * The caller's identity (if stage_attempt_token is absent)
+    //   * The Stage Attempt (if `token` is provided)
+    //   * The caller's identity (if `token` is absent)
     //
     // If the given keyed Result does not exist, it will be automatically
     // created. Multiple calls to WriteNodes from this same StageAttempt or
@@ -297,11 +306,11 @@ message WriteNodesRequest {
     // The stage to write to.
     //
     // If the WorkPlan is left blank, will be populated with the WorkPlan in
-    // `stage_attempt_token`, if it's provided.
+    // `token`, if it's provided.
     //
-    // Otherwise, the Stage must belong to the stage_attempt_token's WorkPlan,
-    // or the caller must have the additional "turboci.workplans.writeExternal"
-    // permission in the stage's realm.
+    // Otherwise, the Stage must belong to the token's WorkPlan, or the caller
+    // must have the additional "turboci.workplans.writeExternal" permission in
+    // the stage's realm.
     //
     // The `is_worknode` field should also be omitted - it will be filled in by
     // the server according to the type of `args`.
@@ -328,10 +337,11 @@ message WriteNodesRequest {
     // If the Stage already exists, this will only result in an error if it
     // doesn't match the existing realm.
     //
-    // If absent, the written Stage will copy its realm from the Stage doing
-    // the write (assuming `stage_attempt_token` is set). If
-    // `stage_attempt_token` is unset and this field is absent, the write will
-    // be rejected.
+    // If absent the written Stage will copy its realm from the implied realm of
+    // the `token`. For Stage Attempt tokens, this will be the Stage's realm,
+    // and for Creator tokens, this will be the WorkPlan's realm.
+    //
+    // If `token` is unset and this field is absent, the write will be rejected.
     optional string realm = 3 [(turboci).creation_only = true];
 
     // Dependency predicate for this Stage.
@@ -453,9 +463,9 @@ message WriteNodesRequest {
     // it's possible to double-append them.
     repeated StageAttemptProgress progress = 6;
   }
-  // State for the current Stage as indicated by `stage_attempt_token`.
+  // State for the current Stage as indicated by `token`.
   //
-  // It is invalid to set this without also setting `stage_attempt_token`.
+  // It is invalid to set this without also setting `token`.
   //
   // All WriteNodes calls with a token act as a heartbeat for the current Stage
   // Attempt indicated by the token. If you need to implement the 'simplest

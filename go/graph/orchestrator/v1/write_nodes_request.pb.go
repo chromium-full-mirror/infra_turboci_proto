@@ -30,17 +30,17 @@ const (
 // Allows atomically writing to multiple nodes (Checks, Stages) in a single
 // transaction.
 type WriteNodesRequest struct {
-	state                        protoimpl.MessageState                `protogen:"opaque.v1"`
-	xxx_hidden_StageAttemptToken *string                               `protobuf:"bytes,1,opt,name=stage_attempt_token,json=stageAttemptToken,proto3,oneof"`
-	xxx_hidden_Reasons           *[]*WriteNodesRequest_Reason          `protobuf:"bytes,2,rep,name=reasons,proto3"`
-	xxx_hidden_Txn               *WriteNodesRequest_TransactionDetails `protobuf:"bytes,3,opt,name=txn,proto3,oneof"`
-	xxx_hidden_Checks            *[]*WriteNodesRequest_CheckWrite      `protobuf:"bytes,4,rep,name=checks,proto3"`
-	xxx_hidden_Stages            *[]*WriteNodesRequest_StageWrite      `protobuf:"bytes,5,rep,name=stages,proto3"`
-	xxx_hidden_CurrentStage      *WriteNodesRequest_CurrentStageWrite  `protobuf:"bytes,6,opt,name=current_stage,json=currentStage,proto3,oneof"`
-	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
-	XXX_presence                 [1]uint32
-	unknownFields                protoimpl.UnknownFields
-	sizeCache                    protoimpl.SizeCache
+	state                   protoimpl.MessageState                `protogen:"opaque.v1"`
+	xxx_hidden_Token        *string                               `protobuf:"bytes,1,opt,name=token,proto3,oneof"`
+	xxx_hidden_Reasons      *[]*WriteNodesRequest_Reason          `protobuf:"bytes,2,rep,name=reasons,proto3"`
+	xxx_hidden_Txn          *WriteNodesRequest_TransactionDetails `protobuf:"bytes,3,opt,name=txn,proto3,oneof"`
+	xxx_hidden_Checks       *[]*WriteNodesRequest_CheckWrite      `protobuf:"bytes,4,rep,name=checks,proto3"`
+	xxx_hidden_Stages       *[]*WriteNodesRequest_StageWrite      `protobuf:"bytes,5,rep,name=stages,proto3"`
+	xxx_hidden_CurrentStage *WriteNodesRequest_CurrentStageWrite  `protobuf:"bytes,6,opt,name=current_stage,json=currentStage,proto3,oneof"`
+	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
+	XXX_presence            [1]uint32
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *WriteNodesRequest) Reset() {
@@ -68,10 +68,10 @@ func (x *WriteNodesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *WriteNodesRequest) GetStageAttemptToken() string {
+func (x *WriteNodesRequest) GetToken() string {
 	if x != nil {
-		if x.xxx_hidden_StageAttemptToken != nil {
-			return *x.xxx_hidden_StageAttemptToken
+		if x.xxx_hidden_Token != nil {
+			return *x.xxx_hidden_Token
 		}
 		return ""
 	}
@@ -119,8 +119,8 @@ func (x *WriteNodesRequest) GetCurrentStage() *WriteNodesRequest_CurrentStageWri
 	return nil
 }
 
-func (x *WriteNodesRequest) SetStageAttemptToken(v string) {
-	x.xxx_hidden_StageAttemptToken = &v
+func (x *WriteNodesRequest) SetToken(v string) {
+	x.xxx_hidden_Token = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 6)
 }
 
@@ -144,7 +144,7 @@ func (x *WriteNodesRequest) SetCurrentStage(v *WriteNodesRequest_CurrentStageWri
 	x.xxx_hidden_CurrentStage = v
 }
 
-func (x *WriteNodesRequest) HasStageAttemptToken() bool {
+func (x *WriteNodesRequest) HasToken() bool {
 	if x == nil {
 		return false
 	}
@@ -165,9 +165,9 @@ func (x *WriteNodesRequest) HasCurrentStage() bool {
 	return x.xxx_hidden_CurrentStage != nil
 }
 
-func (x *WriteNodesRequest) ClearStageAttemptToken() {
+func (x *WriteNodesRequest) ClearToken() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_StageAttemptToken = nil
+	x.xxx_hidden_Token = nil
 }
 
 func (x *WriteNodesRequest) ClearTxn() {
@@ -181,14 +181,18 @@ func (x *WriteNodesRequest) ClearCurrentStage() {
 type WriteNodesRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The token of the Stage Attempt which is performing this write.
+	// The token which constrains this write to a specific Workplan (and possibly
+	// to a Stage Attempt in that Workplan).
+	//
+	// A suitable token is provided to the Executor of a Stage or to the creator
+	// of an empty Workplan.
 	//
 	// This is in addition to regular RPC authorization.
 	//
 	// If missing, this RPC will check that the caller additionally has the
 	// 'turboci.workplans.writeExternal' permission on Workplan(s) in the
 	// CheckWrites/StageWrites.
-	StageAttemptToken *string
+	Token *string
 	// The reason for this write operation, as supplied by the entity performing
 	// the write.
 	//
@@ -221,9 +225,9 @@ type WriteNodesRequest_builder struct {
 	Checks []*WriteNodesRequest_CheckWrite
 	// Write to zero or more Stages.
 	Stages []*WriteNodesRequest_StageWrite
-	// State for the current Stage as indicated by `stage_attempt_token`.
+	// State for the current Stage as indicated by `token`.
 	//
-	// It is invalid to set this without also setting `stage_attempt_token`.
+	// It is invalid to set this without also setting `token`.
 	//
 	// All WriteNodes calls with a token act as a heartbeat for the current Stage
 	// Attempt indicated by the token. If you need to implement the 'simplest
@@ -240,9 +244,9 @@ func (b0 WriteNodesRequest_builder) Build() *WriteNodesRequest {
 	m0 := &WriteNodesRequest{}
 	b, x := &b0, m0
 	_, _ = b, x
-	if b.StageAttemptToken != nil {
+	if b.Token != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 6)
-		x.xxx_hidden_StageAttemptToken = b.StageAttemptToken
+		x.xxx_hidden_Token = b.Token
 	}
 	x.xxx_hidden_Reasons = &b.Reasons
 	x.xxx_hidden_Txn = b.Txn
@@ -342,10 +346,10 @@ func (x *WriteNodesRequest_RealmValue) ClearValue() {
 type WriteNodesRequest_RealmValue_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The realm to assign to this value (if the value is being created).
-	// If it's unset/empty, it will inherit from the realm of the Stage
-	// indicated by stage_attempt_token. If it's unset/empty and there is no
-	// stage_attempt_token, the update will be rejected.
+	// The realm to assign to this value (if the value is being created). If
+	// it's unset/empty, it will inherit from the realm of the object containing
+	// it (so, for Check options or result data, this would be the Check's
+	// realm).
 	//
 	// If the value is being overwritten and `realm` is provided, it must match
 	// the already-written value's realm.
@@ -696,6 +700,10 @@ type WriteNodesRequest_Reason_builder struct {
 	// The security realm for this reason.
 	//
 	// If omitted, this will be the same as the parent node's realm.
+	//
+	// This means that if you write to multiple Checks/Stages in the same
+	// WriteNodes call, this same Reason will be present in multiple Edits
+	// belonging to those different Checks and/or Stages' realms.
 	Realm *string
 	// A 'low effort' reason for this edit.
 	//
@@ -1098,12 +1106,11 @@ type WriteNodesRequest_CheckWrite_builder struct {
 	// The check to write to.
 	//
 	// If the WorkPlan is left blank, will be populated with the WorkPlan in
-	// `stage_attempt_token`, if it's provided.
+	// `token`, if it's provided.
 	//
-	// Otherwise, the Check must belong to the stage_attempt_token's WorkPlan,
-	// or the caller must have the additional "turboci.workplans.writeExternal"
-	// permission in the check's realm (or in the realm of the option/result
-	// data).
+	// Otherwise, the Check must belong to the token's WorkPlan, or the caller
+	// must have the additional "turboci.workplans.writeExternal" permission in
+	// the check's realm (or in the realm of the option/result data).
 	Identifier *v1.Check
 	// Realm to assign to this check.
 	//
@@ -1111,9 +1118,11 @@ type WriteNodesRequest_CheckWrite_builder struct {
 	// existing realm.
 	//
 	// If absent and this CheckWrite creates the Check, the written Check will
-	// copy its realm from the Stage doing the write (assuming
-	// `stage_attempt_token` is set). If `stage_attempt_token` is unset and this
-	// field is absent, the write will be rejected.
+	// copy its realm from the implied realm of the `token`. For Stage Attempt
+	// tokens, this will be the Stage's realm, and for Creator tokens, this
+	// will be the WorkPlan's realm.
+	//
+	// If `token` is unset and this field is absent, the write will be rejected.
 	Realm *string
 	// Kind to assign to this check.
 	//
@@ -1134,8 +1143,8 @@ type WriteNodesRequest_CheckWrite_builder struct {
 	// Write data to a Result for this Check.
 	//
 	// The Result to write in is keyed on:
-	//   - The Stage Attempt (if stage_attempt_token is provided)
-	//   - The caller's identity (if stage_attempt_token is absent)
+	//   - The Stage Attempt (if `token` is provided)
+	//   - The caller's identity (if `token` is absent)
 	//
 	// If the given keyed Result does not exist, it will be automatically
 	// created. Multiple calls to WriteNodes from this same StageAttempt or
@@ -1388,11 +1397,11 @@ type WriteNodesRequest_StageWrite_builder struct {
 	// The stage to write to.
 	//
 	// If the WorkPlan is left blank, will be populated with the WorkPlan in
-	// `stage_attempt_token`, if it's provided.
+	// `token`, if it's provided.
 	//
-	// Otherwise, the Stage must belong to the stage_attempt_token's WorkPlan,
-	// or the caller must have the additional "turboci.workplans.writeExternal"
-	// permission in the stage's realm.
+	// Otherwise, the Stage must belong to the token's WorkPlan, or the caller
+	// must have the additional "turboci.workplans.writeExternal" permission in
+	// the stage's realm.
 	//
 	// The `is_worknode` field should also be omitted - it will be filled in by
 	// the server according to the type of `args`.
@@ -1417,10 +1426,11 @@ type WriteNodesRequest_StageWrite_builder struct {
 	// If the Stage already exists, this will only result in an error if it
 	// doesn't match the existing realm.
 	//
-	// If absent, the written Stage will copy its realm from the Stage doing
-	// the write (assuming `stage_attempt_token` is set). If
-	// `stage_attempt_token` is unset and this field is absent, the write will
-	// be rejected.
+	// If absent the written Stage will copy its realm from the implied realm of
+	// the `token`. For Stage Attempt tokens, this will be the Stage's realm,
+	// and for Creator tokens, this will be the WorkPlan's realm.
+	//
+	// If `token` is unset and this field is absent, the write will be rejected.
 	Realm *string
 	// Dependency predicate for this Stage.
 	//
@@ -1732,9 +1742,9 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\x91\x1b\n" +
-	"\x11WriteNodesRequest\x123\n" +
-	"\x13stage_attempt_token\x18\x01 \x01(\tH\x00R\x11stageAttemptToken\x88\x01\x01\x12Q\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xe9\x1a\n" +
+	"\x11WriteNodesRequest\x12\x19\n" +
+	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12Q\n" +
 	"\areasons\x18\x02 \x03(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonR\areasons\x12Z\n" +
 	"\x03txn\x18\x03 \x01(\v2C.turboci.graph.orchestrator.v1.WriteNodesRequest.TransactionDetailsH\x01R\x03txn\x88\x01\x01\x12S\n" +
 	"\x06checks\x18\x04 \x03(\v2;.turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWriteR\x06checks\x12S\n" +
@@ -1826,8 +1836,8 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x06_stateB\x0e\n" +
 	"\f_process_uidB\x15\n" +
 	"\x13_continuation_groupB\x1b\n" +
-	"\x19_attempt_execution_policyB\x16\n" +
-	"\x14_stage_attempt_tokenB\x06\n" +
+	"\x19_attempt_execution_policyB\b\n" +
+	"\x06_tokenB\x06\n" +
 	"\x04_txnB\x10\n" +
 	"\x0e_current_stageBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 

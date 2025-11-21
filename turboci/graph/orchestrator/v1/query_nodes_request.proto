@@ -14,13 +14,17 @@ option java_multiple_files = true;
 
 // Request message for TurboCIGraphService.QueryNodes.
 message QueryNodesRequest {
-  // The token of the Stage Attempt which is performing this query.
+  // The token which indicates that the query is coming from within a specific
+  // WorkPlan.
+  //
+  // A suitable token is provided to the Executor of a Stage or to the creator
+  // of an empty Workplan.
   //
   // This is in addition to regular RPC authorization.
   //
   // If missing, this RPC will check that the caller additionally has the
   // 'turboci.workplans.readExternal' on the implied workplans.
-  optional string stage_attempt_token = 1;
+  optional string token = 1;
 
   // VersionRestriction describes how this query can be constrained by database
   // version.

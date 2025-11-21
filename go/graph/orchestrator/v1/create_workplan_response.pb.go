@@ -27,10 +27,13 @@ const (
 
 // Request message for TurboCIOrchestrator.CreateWorkPlan.
 type CreateWorkPlanResponse struct {
-	state                 protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Identifier *v1.WorkPlan           `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	state                   protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier   *v1.WorkPlan           `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_CreatorToken *string                `protobuf:"bytes,2,opt,name=creator_token,json=creatorToken,proto3,oneof"`
+	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
+	XXX_presence            [1]uint32
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *CreateWorkPlanResponse) Reset() {
@@ -65,8 +68,23 @@ func (x *CreateWorkPlanResponse) GetIdentifier() *v1.WorkPlan {
 	return nil
 }
 
+func (x *CreateWorkPlanResponse) GetCreatorToken() string {
+	if x != nil {
+		if x.xxx_hidden_CreatorToken != nil {
+			return *x.xxx_hidden_CreatorToken
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *CreateWorkPlanResponse) SetIdentifier(v *v1.WorkPlan) {
 	x.xxx_hidden_Identifier = v
+}
+
+func (x *CreateWorkPlanResponse) SetCreatorToken(v string) {
+	x.xxx_hidden_CreatorToken = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
 }
 
 func (x *CreateWorkPlanResponse) HasIdentifier() bool {
@@ -76,8 +94,20 @@ func (x *CreateWorkPlanResponse) HasIdentifier() bool {
 	return x.xxx_hidden_Identifier != nil
 }
 
+func (x *CreateWorkPlanResponse) HasCreatorToken() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
 func (x *CreateWorkPlanResponse) ClearIdentifier() {
 	x.xxx_hidden_Identifier = nil
+}
+
+func (x *CreateWorkPlanResponse) ClearCreatorToken() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_CreatorToken = nil
 }
 
 type CreateWorkPlanResponse_builder struct {
@@ -85,6 +115,11 @@ type CreateWorkPlanResponse_builder struct {
 
 	// The created WorkPlan's identifier.
 	Identifier *v1.WorkPlan
+	// A token suitable for use with WriteNodes and QueryNodes.
+	//
+	// Any writes done with this token are attributed to "WorkplanCreator", rather
+	// than any particular stage.
+	CreatorToken *string
 }
 
 func (b0 CreateWorkPlanResponse_builder) Build() *CreateWorkPlanResponse {
@@ -92,6 +127,10 @@ func (b0 CreateWorkPlanResponse_builder) Build() *CreateWorkPlanResponse {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Identifier = b.Identifier
+	if b.CreatorToken != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_CreatorToken = b.CreatorToken
+	}
 	return m0
 }
 
@@ -99,12 +138,14 @@ var File_turboci_graph_orchestrator_v1_create_workplan_response_proto protorefle
 
 const file_turboci_graph_orchestrator_v1_create_workplan_response_proto_rawDesc = "" +
 	"\n" +
-	"<turboci/graph/orchestrator/v1/create_workplan_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\"l\n" +
+	"<turboci/graph/orchestrator/v1/create_workplan_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\"\xa8\x01\n" +
 	"\x16CreateWorkPlanResponse\x12C\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x00R\n" +
-	"identifier\x88\x01\x01B\r\n" +
-	"\v_identifierBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"identifier\x88\x01\x01\x12(\n" +
+	"\rcreator_token\x18\x02 \x01(\tH\x01R\fcreatorToken\x88\x01\x01B\r\n" +
+	"\v_identifierB\x10\n" +
+	"\x0e_creator_tokenBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_create_workplan_response_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_create_workplan_response_proto_goTypes = []any{

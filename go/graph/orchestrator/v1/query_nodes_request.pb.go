@@ -26,14 +26,14 @@ const (
 
 // Request message for TurboCIGraphService.QueryNodes.
 type QueryNodesRequest struct {
-	state                        protoimpl.MessageState                `protogen:"opaque.v1"`
-	xxx_hidden_StageAttemptToken *string                               `protobuf:"bytes,1,opt,name=stage_attempt_token,json=stageAttemptToken,proto3,oneof"`
-	xxx_hidden_Version           *QueryNodesRequest_VersionRestriction `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
-	xxx_hidden_Query             *[]*Query                             `protobuf:"bytes,3,rep,name=query,proto3"`
-	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
-	XXX_presence                 [1]uint32
-	unknownFields                protoimpl.UnknownFields
-	sizeCache                    protoimpl.SizeCache
+	state                  protoimpl.MessageState                `protogen:"opaque.v1"`
+	xxx_hidden_Token       *string                               `protobuf:"bytes,1,opt,name=token,proto3,oneof"`
+	xxx_hidden_Version     *QueryNodesRequest_VersionRestriction `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
+	xxx_hidden_Query       *[]*Query                             `protobuf:"bytes,3,rep,name=query,proto3"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *QueryNodesRequest) Reset() {
@@ -61,10 +61,10 @@ func (x *QueryNodesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *QueryNodesRequest) GetStageAttemptToken() string {
+func (x *QueryNodesRequest) GetToken() string {
 	if x != nil {
-		if x.xxx_hidden_StageAttemptToken != nil {
-			return *x.xxx_hidden_StageAttemptToken
+		if x.xxx_hidden_Token != nil {
+			return *x.xxx_hidden_Token
 		}
 		return ""
 	}
@@ -87,8 +87,8 @@ func (x *QueryNodesRequest) GetQuery() []*Query {
 	return nil
 }
 
-func (x *QueryNodesRequest) SetStageAttemptToken(v string) {
-	x.xxx_hidden_StageAttemptToken = &v
+func (x *QueryNodesRequest) SetToken(v string) {
+	x.xxx_hidden_Token = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
 }
 
@@ -100,7 +100,7 @@ func (x *QueryNodesRequest) SetQuery(v []*Query) {
 	x.xxx_hidden_Query = &v
 }
 
-func (x *QueryNodesRequest) HasStageAttemptToken() bool {
+func (x *QueryNodesRequest) HasToken() bool {
 	if x == nil {
 		return false
 	}
@@ -114,9 +114,9 @@ func (x *QueryNodesRequest) HasVersion() bool {
 	return x.xxx_hidden_Version != nil
 }
 
-func (x *QueryNodesRequest) ClearStageAttemptToken() {
+func (x *QueryNodesRequest) ClearToken() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_StageAttemptToken = nil
+	x.xxx_hidden_Token = nil
 }
 
 func (x *QueryNodesRequest) ClearVersion() {
@@ -126,13 +126,17 @@ func (x *QueryNodesRequest) ClearVersion() {
 type QueryNodesRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The token of the Stage Attempt which is performing this query.
+	// The token which indicates that the query is coming from within a specific
+	// WorkPlan.
+	//
+	// A suitable token is provided to the Executor of a Stage or to the creator
+	// of an empty Workplan.
 	//
 	// This is in addition to regular RPC authorization.
 	//
 	// If missing, this RPC will check that the caller additionally has the
 	// 'turboci.workplans.readExternal' on the implied workplans.
-	StageAttemptToken *string
+	Token *string
 	// If omitted, QueryNodes will return the current version of any nodes in the
 	// query from within a read-only transaction.
 	//
@@ -147,9 +151,9 @@ func (b0 QueryNodesRequest_builder) Build() *QueryNodesRequest {
 	m0 := &QueryNodesRequest{}
 	b, x := &b0, m0
 	_, _ = b, x
-	if b.StageAttemptToken != nil {
+	if b.Token != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
-		x.xxx_hidden_StageAttemptToken = b.StageAttemptToken
+		x.xxx_hidden_Token = b.Token
 	}
 	x.xxx_hidden_Version = b.Version
 	x.xxx_hidden_Query = &b.Query
@@ -379,16 +383,16 @@ var File_turboci_graph_orchestrator_v1_query_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/query_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/query.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xbe\x03\n" +
-	"\x11QueryNodesRequest\x123\n" +
-	"\x13stage_attempt_token\x18\x01 \x01(\tH\x00R\x11stageAttemptToken\x88\x01\x01\x12b\n" +
+	"7turboci/graph/orchestrator/v1/query_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/query.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\x96\x03\n" +
+	"\x11QueryNodesRequest\x12\x19\n" +
+	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12b\n" +
 	"\aversion\x18\x02 \x01(\v2C.turboci.graph.orchestrator.v1.QueryNodesRequest.VersionRestrictionH\x01R\aversion\x88\x01\x01\x12:\n" +
 	"\x05query\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.QueryR\x05query\x1a\xaf\x01\n" +
 	"\x12VersionRestriction\x12C\n" +
 	"\arequire\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\arequire\x12E\n" +
 	"\bsnapshot\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\bsnapshotB\r\n" +
-	"\vrestrictionB\x16\n" +
-	"\x14_stage_attempt_tokenB\n" +
+	"\vrestrictionB\b\n" +
+	"\x06_tokenB\n" +
 	"\n" +
 	"\b_versionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
