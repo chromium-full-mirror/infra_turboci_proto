@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 syntax = "proto3";
-package turboci.data.depot_tools.v1;
+package turboci.data.chrome.depot_tools.v1;
 
-option go_package = "go.chromium.org/turboci/proto/go/data/depot_tools/v1;depot_toolspb";
+option go_package = "go.chromium.org/turboci/proto/go/data/chrome/depot_tools/v1;depot_toolspb";
 option java_multiple_files = true;
 
 // BotUpdateResults provides details about all of the repositories that were

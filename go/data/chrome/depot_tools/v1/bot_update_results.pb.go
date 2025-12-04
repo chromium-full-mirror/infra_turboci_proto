@@ -6,7 +6,7 @@
 // versions:
 // 	protoc-gen-go v1.36.9
 // 	protoc        v6.32.1
-// source: turboci/data/depot_tools/v1/bot_update_results.proto
+// source: turboci/data/chrome/depot_tools/v1/bot_update_results.proto
 
 package depot_toolspb
 
@@ -38,7 +38,7 @@ type BotUpdateResults struct {
 
 func (x *BotUpdateResults) Reset() {
 	*x = BotUpdateResults{}
-	mi := &file_turboci_data_depot_tools_v1_bot_update_results_proto_msgTypes[0]
+	mi := &file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -50,7 +50,7 @@ func (x *BotUpdateResults) String() string {
 func (*BotUpdateResults) ProtoMessage() {}
 
 func (x *BotUpdateResults) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_data_depot_tools_v1_bot_update_results_proto_msgTypes[0]
+	mi := &file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -105,7 +105,7 @@ type BotUpdateResults_GitCommit struct {
 
 func (x *BotUpdateResults_GitCommit) Reset() {
 	*x = BotUpdateResults_GitCommit{}
-	mi := &file_turboci_data_depot_tools_v1_bot_update_results_proto_msgTypes[1]
+	mi := &file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -117,7 +117,7 @@ func (x *BotUpdateResults_GitCommit) String() string {
 func (*BotUpdateResults_GitCommit) ProtoMessage() {}
 
 func (x *BotUpdateResults_GitCommit) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_data_depot_tools_v1_bot_update_results_proto_msgTypes[1]
+	mi := &file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -241,13 +241,13 @@ func (b0 BotUpdateResults_GitCommit_builder) Build() *BotUpdateResults_GitCommit
 	return m0
 }
 
-var File_turboci_data_depot_tools_v1_bot_update_results_proto protoreflect.FileDescriptor
+var File_turboci_data_chrome_depot_tools_v1_bot_update_results_proto protoreflect.FileDescriptor
 
-const file_turboci_data_depot_tools_v1_bot_update_results_proto_rawDesc = "" +
+const file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_rawDesc = "" +
 	"\n" +
-	"4turboci/data/depot_tools/v1/bot_update_results.proto\x12\x1bturboci.data.depot_tools.v1\"\xd7\x02\n" +
-	"\x10BotUpdateResults\x12W\n" +
-	"\bmanifest\x18\x01 \x03(\v2;.turboci.data.depot_tools.v1.BotUpdateResults.ManifestEntryR\bmanifest\x1at\n" +
+	";turboci/data/chrome/depot_tools/v1/bot_update_results.proto\x12\"turboci.data.chrome.depot_tools.v1\"\xe5\x02\n" +
+	"\x10BotUpdateResults\x12^\n" +
+	"\bmanifest\x18\x01 \x03(\v2B.turboci.data.chrome.depot_tools.v1.BotUpdateResults.ManifestEntryR\bmanifest\x1at\n" +
 	"\tGitCommit\x12\x17\n" +
 	"\x04host\x18\x01 \x01(\tH\x00R\x04host\x88\x01\x01\x12\x1d\n" +
 	"\aproject\x18\x02 \x01(\tH\x01R\aproject\x88\x01\x01\x12\x13\n" +
@@ -255,20 +255,20 @@ const file_turboci_data_depot_tools_v1_bot_update_results_proto_rawDesc = "" +
 	"\x05_hostB\n" +
 	"\n" +
 	"\b_projectB\x05\n" +
-	"\x03_id\x1at\n" +
+	"\x03_id\x1a{\n" +
 	"\rManifestEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12M\n" +
-	"\x05value\x18\x02 \x01(\v27.turboci.data.depot_tools.v1.BotUpdateResults.GitCommitR\x05value:\x028\x01BFP\x01ZBgo.chromium.org/turboci/proto/go/data/depot_tools/v1;depot_toolspbb\x06proto3"
+	"\x03key\x18\x01 \x01(\tR\x03key\x12T\n" +
+	"\x05value\x18\x02 \x01(\v2>.turboci.data.chrome.depot_tools.v1.BotUpdateResults.GitCommitR\x05value:\x028\x01BMP\x01ZIgo.chromium.org/turboci/proto/go/data/chrome/depot_tools/v1;depot_toolspbb\x06proto3"
 
-var file_turboci_data_depot_tools_v1_bot_update_results_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_turboci_data_depot_tools_v1_bot_update_results_proto_goTypes = []any{
-	(*BotUpdateResults)(nil),           // 0: turboci.data.depot_tools.v1.BotUpdateResults
-	(*BotUpdateResults_GitCommit)(nil), // 1: turboci.data.depot_tools.v1.BotUpdateResults.GitCommit
-	nil,                                // 2: turboci.data.depot_tools.v1.BotUpdateResults.ManifestEntry
+var file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_goTypes = []any{
+	(*BotUpdateResults)(nil),           // 0: turboci.data.chrome.depot_tools.v1.BotUpdateResults
+	(*BotUpdateResults_GitCommit)(nil), // 1: turboci.data.chrome.depot_tools.v1.BotUpdateResults.GitCommit
+	nil,                                // 2: turboci.data.chrome.depot_tools.v1.BotUpdateResults.ManifestEntry
 }
-var file_turboci_data_depot_tools_v1_bot_update_results_proto_depIdxs = []int32{
-	2, // 0: turboci.data.depot_tools.v1.BotUpdateResults.manifest:type_name -> turboci.data.depot_tools.v1.BotUpdateResults.ManifestEntry
-	1, // 1: turboci.data.depot_tools.v1.BotUpdateResults.ManifestEntry.value:type_name -> turboci.data.depot_tools.v1.BotUpdateResults.GitCommit
+var file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_depIdxs = []int32{
+	2, // 0: turboci.data.chrome.depot_tools.v1.BotUpdateResults.manifest:type_name -> turboci.data.chrome.depot_tools.v1.BotUpdateResults.ManifestEntry
+	1, // 1: turboci.data.chrome.depot_tools.v1.BotUpdateResults.ManifestEntry.value:type_name -> turboci.data.chrome.depot_tools.v1.BotUpdateResults.GitCommit
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -276,27 +276,27 @@ var file_turboci_data_depot_tools_v1_bot_update_results_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_turboci_data_depot_tools_v1_bot_update_results_proto_init() }
-func file_turboci_data_depot_tools_v1_bot_update_results_proto_init() {
-	if File_turboci_data_depot_tools_v1_bot_update_results_proto != nil {
+func init() { file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_init() }
+func file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_init() {
+	if File_turboci_data_chrome_depot_tools_v1_bot_update_results_proto != nil {
 		return
 	}
-	file_turboci_data_depot_tools_v1_bot_update_results_proto_msgTypes[1].OneofWrappers = []any{}
+	file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_data_depot_tools_v1_bot_update_results_proto_rawDesc), len(file_turboci_data_depot_tools_v1_bot_update_results_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_rawDesc), len(file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_turboci_data_depot_tools_v1_bot_update_results_proto_goTypes,
-		DependencyIndexes: file_turboci_data_depot_tools_v1_bot_update_results_proto_depIdxs,
-		MessageInfos:      file_turboci_data_depot_tools_v1_bot_update_results_proto_msgTypes,
+		GoTypes:           file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_goTypes,
+		DependencyIndexes: file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_depIdxs,
+		MessageInfos:      file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_msgTypes,
 	}.Build()
-	File_turboci_data_depot_tools_v1_bot_update_results_proto = out.File
-	file_turboci_data_depot_tools_v1_bot_update_results_proto_goTypes = nil
-	file_turboci_data_depot_tools_v1_bot_update_results_proto_depIdxs = nil
+	File_turboci_data_chrome_depot_tools_v1_bot_update_results_proto = out.File
+	file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_goTypes = nil
+	file_turboci_data_chrome_depot_tools_v1_bot_update_results_proto_depIdxs = nil
 }
