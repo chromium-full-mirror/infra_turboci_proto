@@ -467,13 +467,23 @@ message WriteNodesRequest {
   //
   // It is invalid to set this without also setting `token`.
   //
-  // All WriteNodes calls with a token act as a heartbeat for the current Stage
-  // Attempt indicated by the token. If you need to implement the 'simplest
-  // heartbeat', you can make a WriteNodes call with the token set and nothing
-  // else.
+  // A WriteNodes call with `current_stage` set (even when it is empty) acts as
+  // a heartbeat for the current Stage Attempt indicated by the token. If you
+  // need to implement the 'simplest heartbeat', you can make a WriteNodes call
+  // with just the token and an empty `current_stage {}`.
+  //
+  // WriteNodes calls that don't have `current_stage` set do not affect the
+  // heartbeat timer. This makes such calls less likely to hit transaction
+  // collisions (since they don't try to concurrently modify the heartbeat
+  // timer). This may be useful if you want to make concurrent WriteNodes calls
+  // from the same Stage Attempt, or even closely-sequential WriteNodes calls
+  // (to non-overlapping portions of the graph) from the same Stage Attempt.
+  //
+  // All else being equal, it's better to do fewer, larger, WriteNodes calls
+  // than many small WriteNodes calls.
   //
   // TBD: Document the SCHEDULED -> RUNNING state transition requirements (i.e.
-  // setting a unique worker_id and handling multiple logicall processes all
+  // setting a unique worker_id and handling multiple logical processes all
   // trying to transition to RUNNING at the same time).
   optional CurrentStageWrite current_stage = 6;
 }
