@@ -1,0 +1,24 @@
+// Copyright 2025 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+syntax = "proto3";
+
+package turboci.data.stage.v1;
+// This proto is intended to be classified as MVP (converged) maturity.
+// TBD - Pending actual implementation to annotate maturity.
+
+option go_package = "go.chromium.org/turboci/proto/go/data/stage/v1;stagepb";
+option java_multiple_files = true;
+
+// Stage Attempt details provided by the Executor. This message is meant to be used
+// only for the Stage.Attempt.details generic Value field. Common, generic stage attempt
+// details can go in this message. Other stage-specific details should use a separate
+// message.
+message StageAttemptDetails {
+  // A map of URLs to view information about the stage attempt. This might include pages
+  // for viewing the actions taken by the stage attempt, results it produced, logs, etc.
+  // Key: a human-readable label for the URL (eg. "Artifacts", "Logs", "Test Results")
+  // Value: the URL to link to
+  map<string, string> view_urls = 1;
+}
