@@ -10,6 +10,7 @@ import "turboci/graph/ids/v1/identifier.proto";
 import "turboci/graph/orchestrator/v1/check_kind.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/edge.proto";
+import "turboci/graph/orchestrator/v1/failure.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 import "turboci/graph/orchestrator/v1/stage.proto";
@@ -462,6 +463,36 @@ message WriteNodesRequest {
     // It is a good idea to do these progress updates transactionally, otherwise
     // it's possible to double-append them.
     repeated StageAttemptProgress progress = 6;
+
+    // Failure is for stage attempt execution failure information.
+    //
+    // Note: this message is not intended to be used for workflow-level failures.
+    // For example if a stage attempt finishes everything it is intended to do
+    // (i.e. to run a suite of tests), and it produces some failure
+    // results (i.e. some tests failed), those results should be reported to the
+    // corresponding check's result.Data, not here.
+    message Failure {
+      // Human-readable error message.
+      optional string message = 1;
+
+      // Type of the failure.
+      //
+      // This is a subset of failures in failure.proto. Only the failures that
+      // are relevant to Stage Executor executing a StageAttempt are listed here.
+      oneof type {
+        // Failure to transition a stage attempt to SCHEDULED state.
+        ToScheduled to_scheduled = 2;
+        // Failure to transition a stage attempt to RUNNING state.
+        ToRunning to_running = 3;
+      }
+    }
+
+    // Failure is for stage attempt execution failure information.
+    //
+    // This field must only be set when transition the StageAttempt to
+    // INCOMPLETE state. Omitting the state or setting the state to other
+    // values will result in an error.
+    optional Failure failure = 7;
   }
   // State for the current Stage as indicated by `token`.
   //

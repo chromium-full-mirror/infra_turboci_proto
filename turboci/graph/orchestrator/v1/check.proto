@@ -13,6 +13,7 @@ import "turboci/graph/orchestrator/v1/check_kind.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/datum.proto";
 import "turboci/graph/orchestrator/v1/dependencies.proto";
+import "turboci/graph/orchestrator/v1/failure.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 
@@ -170,6 +171,13 @@ message Check {
     //   * The `owner` explicitly indicates that their results are final.
     //   * The Check advances to the FINAL state.
     optional Revision finalized_at = 5;
+
+    // The failure information if the owner of this result failed.
+    //
+    // Most commonly, this will occur when a StageAttempt fails, but this could
+    // also be populated by the orchestrator itself if, for example, the workplan
+    // is ended without any result being created for this Check.
+    optional Failure failure = 6;
   }
   // The list of Results this Check has.
   //
