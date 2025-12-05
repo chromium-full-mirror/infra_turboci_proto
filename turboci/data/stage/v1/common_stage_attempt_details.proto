@@ -15,10 +15,20 @@ option java_multiple_files = true;
 // only for the Stage.Attempt.details generic Value field. Common, generic stage attempt
 // details can go in this message. Other stage-specific details should use a separate
 // message.
-message StageAttemptDetails {
+message CommonStageAttemptDetails {
   // A map of URLs to view information about the stage attempt. This might include pages
   // for viewing the actions taken by the stage attempt, results it produced, logs, etc.
-  // Key: a human-readable label for the URL (eg. "Artifacts", "Logs", "Test Results")
-  // Value: the URL to link to
-  map<string, string> view_urls = 1;
+  // Key:   A human-readable label for the URL which will be displayed in the UI. This
+  //        can include things like logs or other artifacts holding information about how
+  //        the stage ran. Outputs produced by the stage should go in the check results,
+  //        but may also appear here for ease of debugging.
+  // Value: A UrlDetails message containing more information about the URL.
+  map<string, UrlDetails> view_urls = 1;
+
+  // Details about the URL to link to as well as additional information such as priority
+  // ordering in the UI, enums for specific types of URLs etc.
+  message UrlDetails {
+    // The URL to link to.
+    optional string url = 1;
+  }
 }
