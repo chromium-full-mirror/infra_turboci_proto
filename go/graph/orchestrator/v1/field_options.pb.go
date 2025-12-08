@@ -28,14 +28,15 @@ const (
 
 // FieldOptions are field options which apply to TurboCI message fields.
 type FieldOptions struct {
-	state                   protoimpl.MessageState          `protogen:"opaque.v1"`
-	xxx_hidden_Check        *FieldOptions_CheckFieldOptions `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
-	xxx_hidden_Id           *FieldOptions_IdentifierOptions `protobuf:"bytes,2,opt,name=id,proto3,oneof"`
-	xxx_hidden_CreationOnly bool                            `protobuf:"varint,3,opt,name=creation_only,json=creationOnly,proto3,oneof"`
-	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
-	XXX_presence            [1]uint32
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	state                          protoimpl.MessageState          `protogen:"opaque.v1"`
+	xxx_hidden_Check               *FieldOptions_CheckFieldOptions `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
+	xxx_hidden_Id                  *FieldOptions_IdentifierOptions `protobuf:"bytes,2,opt,name=id,proto3,oneof"`
+	xxx_hidden_CreationOnly        bool                            `protobuf:"varint,3,opt,name=creation_only,json=creationOnly,proto3,oneof"`
+	xxx_hidden_RealmInheritsWriter bool                            `protobuf:"varint,4,opt,name=realm_inherits_writer,json=realmInheritsWriter,proto3,oneof"`
+	XXX_raceDetectHookData         protoimpl.RaceDetectHookData
+	XXX_presence                   [1]uint32
+	unknownFields                  protoimpl.UnknownFields
+	sizeCache                      protoimpl.SizeCache
 }
 
 func (x *FieldOptions) Reset() {
@@ -84,6 +85,13 @@ func (x *FieldOptions) GetCreationOnly() bool {
 	return false
 }
 
+func (x *FieldOptions) GetRealmInheritsWriter() bool {
+	if x != nil {
+		return x.xxx_hidden_RealmInheritsWriter
+	}
+	return false
+}
+
 func (x *FieldOptions) SetCheck(v *FieldOptions_CheckFieldOptions) {
 	x.xxx_hidden_Check = v
 }
@@ -94,7 +102,12 @@ func (x *FieldOptions) SetId(v *FieldOptions_IdentifierOptions) {
 
 func (x *FieldOptions) SetCreationOnly(v bool) {
 	x.xxx_hidden_CreationOnly = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
+}
+
+func (x *FieldOptions) SetRealmInheritsWriter(v bool) {
+	x.xxx_hidden_RealmInheritsWriter = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
 }
 
 func (x *FieldOptions) HasCheck() bool {
@@ -118,6 +131,13 @@ func (x *FieldOptions) HasCreationOnly() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
+func (x *FieldOptions) HasRealmInheritsWriter() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+}
+
 func (x *FieldOptions) ClearCheck() {
 	x.xxx_hidden_Check = nil
 }
@@ -129,6 +149,11 @@ func (x *FieldOptions) ClearId() {
 func (x *FieldOptions) ClearCreationOnly() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
 	x.xxx_hidden_CreationOnly = false
+}
+
+func (x *FieldOptions) ClearRealmInheritsWriter() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_RealmInheritsWriter = false
 }
 
 type FieldOptions_builder struct {
@@ -143,6 +168,10 @@ type FieldOptions_builder struct {
 	// If this field is supplied and the target node already exists, its value
 	// must match the target's value for this field.
 	CreationOnly *bool
+	// If set on a `realm` field in WriteNodesRequest, it indicates that this
+	// realm, if left unset, will inherit the realm of the writer making the
+	// request (encoded in the `token` supplied in the WriteNodesRequest).
+	RealmInheritsWriter *bool
 }
 
 func (b0 FieldOptions_builder) Build() *FieldOptions {
@@ -152,8 +181,12 @@ func (b0 FieldOptions_builder) Build() *FieldOptions {
 	x.xxx_hidden_Check = b.Check
 	x.xxx_hidden_Id = b.Id
 	if b.CreationOnly != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
 		x.xxx_hidden_CreationOnly = *b.CreationOnly
+	}
+	if b.RealmInheritsWriter != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
+		x.xxx_hidden_RealmInheritsWriter = *b.RealmInheritsWriter
 	}
 	return m0
 }
@@ -343,11 +376,12 @@ var File_turboci_graph_orchestrator_v1_field_options_proto protoreflect.FileDesc
 
 const file_turboci_graph_orchestrator_v1_field_options_proto_rawDesc = "" +
 	"\n" +
-	"1turboci/graph/orchestrator/v1/field_options.proto\x12\x1dturboci.graph.orchestrator.v1\x1a google/protobuf/descriptor.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\"\xd0\x03\n" +
+	"1turboci/graph/orchestrator/v1/field_options.proto\x12\x1dturboci.graph.orchestrator.v1\x1a google/protobuf/descriptor.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\"\xa3\x04\n" +
 	"\fFieldOptions\x12X\n" +
 	"\x05check\x18\x01 \x01(\v2=.turboci.graph.orchestrator.v1.FieldOptions.CheckFieldOptionsH\x00R\x05check\x88\x01\x01\x12R\n" +
 	"\x02id\x18\x02 \x01(\v2=.turboci.graph.orchestrator.v1.FieldOptions.IdentifierOptionsH\x01R\x02id\x88\x01\x01\x12(\n" +
-	"\rcreation_only\x18\x03 \x01(\bH\x02R\fcreationOnly\x88\x01\x01\x1al\n" +
+	"\rcreation_only\x18\x03 \x01(\bH\x02R\fcreationOnly\x88\x01\x01\x127\n" +
+	"\x15realm_inherits_writer\x18\x04 \x01(\bH\x03R\x13realmInheritsWriter\x88\x01\x01\x1al\n" +
 	"\x11CheckFieldOptions\x12J\n" +
 	"\beditable\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\beditable\x88\x01\x01B\v\n" +
 	"\t_editable\x1aW\n" +
@@ -355,7 +389,8 @@ const file_turboci_graph_orchestrator_v1_field_options_proto_rawDesc = "" +
 	"\aallowed\x18\x01 \x03(\x0e2$.turboci.graph.ids.v1.IdentifierKindB\x02\x10\x01R\aallowedB\b\n" +
 	"\x06_checkB\x05\n" +
 	"\x03_idB\x10\n" +
-	"\x0e_creation_only:k\n" +
+	"\x0e_creation_onlyB\x18\n" +
+	"\x16_realm_inherits_writer:k\n" +
 	"\aturboci\x12\x1d.google.protobuf.FieldOptions\x18\xe0\xe0\xbe\xff\x01 \x01(\v2+.turboci.graph.orchestrator.v1.FieldOptionsR\aturboci\x88\x01\x01BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_field_options_proto_msgTypes = make([]protoimpl.MessageInfo, 3)

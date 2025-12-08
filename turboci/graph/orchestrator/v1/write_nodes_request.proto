@@ -94,12 +94,10 @@ message WriteNodesRequest {
   message Reason {
     // The security realm for this reason.
     //
-    // If omitted, this will be the same as the parent node's realm.
-    //
-    // This means that if you write to multiple Checks/Stages in the same
-    // WriteNodes call, this same Reason will be present in multiple Edits
-    // belonging to those different Checks and/or Stages' realms.
-    optional string realm = 1;
+    // If absent the written Stage will copy its realm from the implied realm
+    // of the `token`. For Stage Attempt tokens, this will be the Stage's
+    // realm, and for Creator tokens, this will be the WorkPlan's realm.
+    optional string realm = 1 [(turboci).realm_inherits_writer = true];
 
     // A 'low effort' reason for this edit.
     //
@@ -243,7 +241,10 @@ message WriteNodesRequest {
     // will be the WorkPlan's realm.
     //
     // If `token` is unset and this field is absent, the write will be rejected.
-    optional string realm = 2 [(turboci).creation_only = true];
+    optional string realm = 2 [
+      (turboci).creation_only = true,
+      (turboci).realm_inherits_writer = true
+    ];
 
     // Kind to assign to this check.
     //
@@ -343,7 +344,10 @@ message WriteNodesRequest {
     // and for Creator tokens, this will be the WorkPlan's realm.
     //
     // If `token` is unset and this field is absent, the write will be rejected.
-    optional string realm = 3 [(turboci).creation_only = true];
+    optional string realm = 3 [
+      (turboci).creation_only = true,
+      (turboci).realm_inherits_writer = true
+    ];
 
     // Dependency predicate for this Stage.
     //

@@ -709,11 +709,9 @@ type WriteNodesRequest_Reason_builder struct {
 
 	// The security realm for this reason.
 	//
-	// If omitted, this will be the same as the parent node's realm.
-	//
-	// This means that if you write to multiple Checks/Stages in the same
-	// WriteNodes call, this same Reason will be present in multiple Edits
-	// belonging to those different Checks and/or Stages' realms.
+	// If absent the written Stage will copy its realm from the implied realm
+	// of the `token`. For Stage Attempt tokens, this will be the Stage's
+	// realm, and for Creator tokens, this will be the WorkPlan's realm.
 	Realm *string
 	// A 'low effort' reason for this edit.
 	//
@@ -2007,7 +2005,7 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a+turboci/graph/orchestrator/v1/failure.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xbb\x1d\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a+turboci/graph/orchestrator/v1/failure.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xc9\x1d\n" +
 	"\x11WriteNodesRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12Q\n" +
 	"\areasons\x18\x02 \x03(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonR\areasons\x12Z\n" +
@@ -2030,9 +2028,9 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x14StageAttemptProgress\x12\x15\n" +
 	"\x03msg\x18\x01 \x01(\tH\x00R\x03msg\x88\x01\x01\x12>\n" +
 	"\adetails\x18\x02 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetailsB\x06\n" +
-	"\x04_msg\x1a\x95\x01\n" +
-	"\x06Reason\x12\x19\n" +
-	"\x05realm\x18\x01 \x01(\tH\x00R\x05realm\x88\x01\x01\x12\x1b\n" +
+	"\x04_msg\x1a\x9f\x01\n" +
+	"\x06Reason\x12#\n" +
+	"\x05realm\x18\x01 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02 \x01H\x00R\x05realm\x88\x01\x01\x12\x1b\n" +
 	"\x06reason\x18\x02 \x01(\tH\x01R\x06reason\x88\x01\x01\x12>\n" +
 	"\adetails\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetailsB\b\n" +
 	"\x06_realmB\t\n" +
@@ -2041,13 +2039,14 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x0enodes_observed\x18\x01 \x03(\v2 .turboci.graph.ids.v1.IdentifierB\x0e\x82\x86\xf6\xfb\x0f\b\x12\x06\n" +
 	"\x04\x02\x03\x05\bR\rnodesObserved\x12W\n" +
 	"\x10snapshot_version\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\x0fsnapshotVersion\x88\x01\x01B\x13\n" +
-	"\x11_snapshot_version\x1a\xd6\x05\n" +
+	"\x11_snapshot_version\x1a\xd8\x05\n" +
 	"\n" +
 	"CheckWrite\x12@\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckH\x00R\n" +
-	"identifier\x88\x01\x01\x12#\n" +
-	"\x05realm\x18\x02 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x01R\x05realm\x88\x01\x01\x12K\n" +
+	"identifier\x88\x01\x01\x12%\n" +
+	"\x05realm\x18\x02 \x01(\tB\n" +
+	"\x82\x86\xf6\xfb\x0f\x04\x18\x01 \x01H\x01R\x05realm\x88\x01\x01\x12K\n" +
 	"\x04kind\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x02R\x04kind\x88\x01\x01\x12a\n" +
 	"\aoptions\x18\x04 \x03(\v2;.turboci.graph.orchestrator.v1.WriteNodesRequest.RealmValueB\n" +
 	"\x82\x86\xf6\xfb\x0f\x04\n" +
@@ -2069,14 +2068,15 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x05_kindB\x0f\n" +
 	"\r_dependenciesB\x13\n" +
 	"\x11_finalize_resultsB\b\n" +
-	"\x06_state\x1a\xab\x05\n" +
+	"\x06_state\x1a\xad\x05\n" +
 	"\n" +
 	"StageWrite\x12@\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageH\x00R\n" +
 	"identifier\x88\x01\x01\x12G\n" +
-	"\x04args\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ValueB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x01R\x04args\x88\x01\x01\x12#\n" +
-	"\x05realm\x18\x03 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x02R\x05realm\x88\x01\x01\x12y\n" +
+	"\x04args\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ValueB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x01R\x04args\x88\x01\x01\x12%\n" +
+	"\x05realm\x18\x03 \x01(\tB\n" +
+	"\x82\x86\xf6\xfb\x0f\x04\x18\x01 \x01H\x02R\x05realm\x88\x01\x01\x12y\n" +
 	"\fdependencies\x18\x04 \x01(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupB\x0e\x82\x86\xf6\xfb\x0f\b\x12\x04\n" +
 	"\x02\b\x02\x18\x01H\x03R\fdependencies\x88\x01\x01\x12\x8b\x01\n" +
 	" requested_stage_execution_policy\x18\x05 \x01(\v23.turboci.graph.orchestrator.v1.StageExecutionPolicyB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x04R\x1drequestedStageExecutionPolicy\x88\x01\x01\x12[\n" +
