@@ -361,6 +361,8 @@ type WriteNodesRequest_RealmValue_builder struct {
 	// it (so, for Check options or result data, this would be the Check's
 	// realm).
 	//
+	// If provided, must be the absolute form "<project>:<name>".
+	//
 	// If the value is being overwritten and `realm` is provided, it must match
 	// the already-written value's realm.
 	Realm *string
@@ -708,6 +710,8 @@ type WriteNodesRequest_Reason_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// The security realm for this reason.
+	//
+	// If provided, must be the absolute form "<project>:<name>".
 	//
 	// If absent the written Stage will copy its realm from the implied realm
 	// of the `token`. For Stage Attempt tokens, this will be the Stage's
@@ -1122,6 +1126,8 @@ type WriteNodesRequest_CheckWrite_builder struct {
 	Identifier *v1.Check
 	// Realm to assign to this check.
 	//
+	// If provided, must be the absolute form "<project>:<name>".
+	//
 	// If this is set, and the Check DOES already exist, this MUST match the
 	// existing realm.
 	//
@@ -1430,6 +1436,8 @@ type WriteNodesRequest_StageWrite_builder struct {
 	// feels a bit wishy-washy.
 	Args *Value
 	// Realm to assign to this Stage.
+	//
+	// If provided, must be the absolute form "<project>:<name>".
 	//
 	// If the Stage already exists, this will only result in an error if it
 	// doesn't match the existing realm.
