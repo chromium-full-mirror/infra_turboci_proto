@@ -93,6 +93,12 @@ message WriteNodesRequest {
   optional string token = 1;
 
   // Reason is the write-request analogue of Edit.Reason.
+  //
+  // NOTE: If this WriteNodes is a no-op because it's a retry of a previous
+  // successful WriteNodes, these Reasons will not be recorded in the graph
+  // because there will not be any applied writes. This means that if you
+  // vary the Reasons from retry to retry, it's possible to see a successful
+  // WriteNodes where the provided reasons are not retained.
   message Reason {
     // The security realm for this reason.
     //
@@ -133,8 +139,8 @@ message WriteNodesRequest {
 
   // TransactionDetails encapsulates the information necessary to make this
   // write safe by describing the snapshot of the graph which the writer
-  // observed. TurboCI Orchestrator will transactionally ensure that these nodes
-  // haven't changed since the writer observed them.
+  // observed. TurboCI Orchestrator will transactionally ensure that these
+  // nodes haven't changed since the writer observed them.
   //
   // TurboCI Orchestrator will implicitly include all nodes which are being
   // written to - this message can provide additional nodes to that set.
@@ -150,20 +156,19 @@ message WriteNodesRequest {
   //     more_nodes, _ = QueryNodes(..., ensure_version=snapshot_version)
   //     # This will cause QueryNodes to fail if any returned nodes have
   //     # a version greater than `snapshot_version`. This will allow the
-  //     # transaction loop to retry.
+  //     # transaction loop to retry immediately, rather than waiting for the
+  //     # WriteNodes call.
   //
   //     # computations
   //
   //     if WriteNodes(..., txn={nodes+more_nodes, snapshot_version}) {
   //       # Success!
   //
-  //       # It would be technically possible to use the written_version field from the
-  //       # response to do another WriteNodes call, assuming you supply a subset of
-  //       # the `nodes_observed` to the new write. However, if this second write fails,
-  //       # you must restart the second write process from after the first Write.
-  //       #
-  //       # It is simplest to just start a second transaction loop, including potentially
-  //       # re-reading the nodes_observed.
+  //       # If you need to make another transaction, you CAN use the
+  //       # written_version in the response as an input snapshot_version to
+  //       # the subsequent transaction. However, it's important that if this
+  //       # second transaction gets a conflict, it restart with
+  //       # snapshot_version unset.
   //       break
   //     } else {
   //       # failure - retry from the top
@@ -187,8 +192,8 @@ message WriteNodesRequest {
     // and `snapshot_version` left unset is sufficient to guard against the
     // nodes already being written. However, if you get
     // a TransactionConflictFailure because the nodes already exist, when you
-    // recover make sure to do the query before you try the write again! You may
-    // be conflicting with a previous incarnation of your own process!
+    // recover make sure to do the query before you try the write again! You
+    // may be conflicting with a previous incarnation of your own process!
     repeated ids.v1.Identifier nodes_observed = 1 [
       (turboci).id.allowed = IDENTIFIER_KIND_CHECK,
       (turboci).id.allowed = IDENTIFIER_KIND_CHECK_OPTION,
@@ -199,8 +204,8 @@ message WriteNodesRequest {
     // The 'version' of the GraphView returned from QueryNodes.
     //
     // If multiple queries were made in this transaction, this revision MUST be
-    // the first revision observed. Providing version.require to QueryNodes will
-    // help enforce this.
+    // the first revision observed. Providing version.require to QueryNodes
+    // will help enforce this.
     //
     // If `snapshot_version` is unset, it is treated as a 0 value (which means
     // that all `nodes_observed` plus all nodes being written in this request

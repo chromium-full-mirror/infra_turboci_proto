@@ -45,6 +45,7 @@ type Edit struct {
 	xxx_hidden_Realm            *string                `protobuf:"bytes,5,opt,name=realm,proto3,oneof"`
 	xxx_hidden_Editor           *Actor                 `protobuf:"bytes,6,opt,name=editor,proto3,oneof"`
 	xxx_hidden_TransactionalSet *[]*v1.Identifier      `protobuf:"bytes,7,rep,name=transactional_set,json=transactionalSet,proto3"`
+	xxx_hidden_ObliviousWrite   bool                   `protobuf:"varint,11,opt,name=oblivious_write,json=obliviousWrite,proto3,oneof"`
 	xxx_hidden_Reasons          *[]*Edit_Reason        `protobuf:"bytes,8,rep,name=reasons,proto3"`
 	xxx_hidden_Delta            isEdit_Delta           `protobuf_oneof:"delta"`
 	XXX_raceDetectHookData      protoimpl.RaceDetectHookData
@@ -132,6 +133,13 @@ func (x *Edit) GetTransactionalSet() []*v1.Identifier {
 	return nil
 }
 
+func (x *Edit) GetObliviousWrite() bool {
+	if x != nil {
+		return x.xxx_hidden_ObliviousWrite
+	}
+	return false
+}
+
 func (x *Edit) GetReasons() []*Edit_Reason {
 	if x != nil {
 		if x.xxx_hidden_Reasons != nil {
@@ -177,7 +185,7 @@ func (x *Edit) SetDataExpireAt(v *timestamppb.Timestamp) {
 
 func (x *Edit) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 9)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 10)
 }
 
 func (x *Edit) SetEditor(v *Actor) {
@@ -186,6 +194,11 @@ func (x *Edit) SetEditor(v *Actor) {
 
 func (x *Edit) SetTransactionalSet(v []*v1.Identifier) {
 	x.xxx_hidden_TransactionalSet = &v
+}
+
+func (x *Edit) SetObliviousWrite(v bool) {
+	x.xxx_hidden_ObliviousWrite = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 7, 10)
 }
 
 func (x *Edit) SetReasons(v []*Edit_Reason) {
@@ -250,6 +263,13 @@ func (x *Edit) HasEditor() bool {
 	return x.xxx_hidden_Editor != nil
 }
 
+func (x *Edit) HasObliviousWrite() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 7)
+}
+
 func (x *Edit) HasDelta() bool {
 	if x == nil {
 		return false
@@ -296,6 +316,11 @@ func (x *Edit) ClearRealm() {
 
 func (x *Edit) ClearEditor() {
 	x.xxx_hidden_Editor = nil
+}
+
+func (x *Edit) ClearObliviousWrite() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 7)
+	x.xxx_hidden_ObliviousWrite = false
 }
 
 func (x *Edit) ClearDelta() {
@@ -352,19 +377,47 @@ type Edit_builder struct {
 	//
 	// Defaults to 30 days from the time of the Edit.
 	//
+	// This currently has no effect for Stage edits, because Stage edits don't
+	// retain any heavy data.
+	//
 	// TBD: Add RPC to extend the TTL of an Edit and its data.
 	DataExpireAt *timestamppb.Timestamp
 	// The security realm for this Edit (duplicated from the affected Check/Stage
 	// to allow easy ACL resolution).
+	//
+	// The premise is that if you can read a Check or Stage, you can read the
+	// edits for that Check or Stage.
 	Realm *string
 	// The entity which generated this Edit.
 	Editor *Actor
-	// If set, the WriteNodes call which produced this Edit was transactional over
-	// this set of Identifiers.
+	// This is the set of nodes which were included in the same WriteNodes
+	// RPC as this Edit (one per `checks`, `stages`, and/or
+	// `current_stage_write`). For simplicity, this will also always include
+	// `for_node`.
 	//
-	// If this is unset, then this Edit was the result of an 'oblivious write'
-	// without a transaction snapshot.
+	// This may contain more nodes than were actually written in the case of
+	// a partially applied write, e.g.
+	//
+	//   - One writer writes Check["foo", BUILD]
+	//   - Another writer writes Check["foo", BUILD], Check["bar", BUILD].
+	//
+	// In this case, the edit on "bar" from the second write will include "foo"
+	// in this set because the requested write is compatible with the state of
+	// "foo".
+	//
+	// This can only happen with WriteNodes requests with `txn` unset (i.e.
+	// 'oblivious writes').
+	//
+	// If you need to detect this, load e.g. `Check["foo"] / Edit[version]`. If
+	// the edit does not exist, then it means foo was already written before this
+	// Edit.
 	TransactionalSet []*v1.Identifier
+	// If set, then the WriteNodes which created this edit was done as an
+	// 'oblivious' write - that is, `txn` was not supplied in WriteNodseRequest.
+	//
+	// This is intended to be a hint when debugging that a non-transactional
+	// write could be an issue.
+	ObliviousWrite *bool
 	// The writer-provided reason(s) for this Edit.
 	//
 	// The only reason to have multiple Reason messages is to allow for different
@@ -383,11 +436,11 @@ type Edit_builder struct {
 	// Fields of oneof xxx_hidden_Delta:
 	// This is a delta for a Check.
 	//
-	// `what` must be an Identifier.Check.
+	// `for_node` must be an Identifier.Check.
 	Check *CheckDelta
 	// This is a delta for a Stage.
 	//
-	// `what` must be an Identifier.Stage.
+	// `for_node` must be an Identifier.Stage.
 	Stage *StageDelta
 	// -- end of xxx_hidden_Delta
 }
@@ -401,11 +454,15 @@ func (b0 Edit_builder) Build() *Edit {
 	x.xxx_hidden_ExpireAt = b.ExpireAt
 	x.xxx_hidden_DataExpireAt = b.DataExpireAt
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 9)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 10)
 		x.xxx_hidden_Realm = b.Realm
 	}
 	x.xxx_hidden_Editor = b.Editor
 	x.xxx_hidden_TransactionalSet = &b.TransactionalSet
+	if b.ObliviousWrite != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 7, 10)
+		x.xxx_hidden_ObliviousWrite = *b.ObliviousWrite
+	}
 	x.xxx_hidden_Reasons = &b.Reasons
 	if b.Check != nil {
 		x.xxx_hidden_Delta = &edit_Check{b.Check}
@@ -433,14 +490,14 @@ type isEdit_Delta interface {
 type edit_Check struct {
 	// This is a delta for a Check.
 	//
-	// `what` must be an Identifier.Check.
+	// `for_node` must be an Identifier.Check.
 	Check *CheckDelta `protobuf:"bytes,9,opt,name=check,proto3,oneof"`
 }
 
 type edit_Stage struct {
 	// This is a delta for a Stage.
 	//
-	// `what` must be an Identifier.Stage.
+	// `for_node` must be an Identifier.Stage.
 	Stage *StageDelta `protobuf:"bytes,10,opt,name=stage,proto3,oneof"`
 }
 
@@ -558,7 +615,13 @@ type Edit_Reason_builder struct {
 
 	// The security realm for this reason.
 	//
-	// If omitted, this will be the same as the parent node's realm.
+	// This is set by the writer which created this Edit. In WriteNodseRequest,
+	// this defaults to the writer's realm unless explicitly set, and so may
+	// differ from the Edit's realm.
+	//
+	// The premise is that the Edit is a property of the Check/Stage but
+	// details of why an Edit was made are controlled by the writer that made
+	// them.
 	Realm *string
 	// A 'low effort' reason for this edit.
 	//
@@ -593,7 +656,7 @@ var File_turboci_graph_orchestrator_v1_edit_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_edit_proto_rawDesc = "" +
 	"\n" +
-	"(turboci/graph/orchestrator/v1/edit.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_delta.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_delta.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xa1\a\n" +
+	"(turboci/graph/orchestrator/v1/edit.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_delta.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_delta.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xe2\a\n" +
 	"\x04Edit\x12N\n" +
 	"\bfor_node\x18\x01 \x01(\v2 .turboci.graph.ids.v1.IdentifierB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
 	"\x02\x02\bH\x01R\aforNode\x88\x01\x01\x12F\n" +
@@ -601,9 +664,10 @@ const file_turboci_graph_orchestrator_v1_edit_proto_rawDesc = "" +
 	"\texpire_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampH\x03R\bexpireAt\x88\x01\x01\x12E\n" +
 	"\x0edata_expire_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampH\x04R\fdataExpireAt\x88\x01\x01\x12\x1e\n" +
 	"\x05realm\x18\x05 \x01(\tB\x03\xe0A\x05H\x05R\x05realm\x88\x01\x01\x12A\n" +
-	"\x06editor\x18\x06 \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x06R\x06editor\x88\x01\x01\x12]\n" +
-	"\x11transactional_set\x18\a \x03(\v2 .turboci.graph.ids.v1.IdentifierB\x0e\x82\x86\xf6\xfb\x0f\b\x12\x06\n" +
-	"\x04\x02\x03\x05\bR\x10transactionalSet\x12D\n" +
+	"\x06editor\x18\x06 \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x06R\x06editor\x88\x01\x01\x12\\\n" +
+	"\x11transactional_set\x18\a \x03(\v2 .turboci.graph.ids.v1.IdentifierB\r\x82\x86\xf6\xfb\x0f\a\x12\x05\n" +
+	"\x03\x02\b\tR\x10transactionalSet\x12,\n" +
+	"\x0foblivious_write\x18\v \x01(\bH\aR\x0eobliviousWrite\x88\x01\x01\x12D\n" +
 	"\areasons\x18\b \x03(\v2*.turboci.graph.orchestrator.v1.Edit.ReasonR\areasons\x12A\n" +
 	"\x05check\x18\t \x01(\v2).turboci.graph.orchestrator.v1.CheckDeltaH\x00R\x05check\x12A\n" +
 	"\x05stage\x18\n" +
@@ -622,7 +686,8 @@ const file_turboci_graph_orchestrator_v1_edit_proto_rawDesc = "" +
 	"_expire_atB\x11\n" +
 	"\x0f_data_expire_atB\b\n" +
 	"\x06_realmB\t\n" +
-	"\a_editorBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\a_editorB\x12\n" +
+	"\x10_oblivious_writeBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_edit_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_edit_proto_goTypes = []any{
