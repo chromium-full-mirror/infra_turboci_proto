@@ -11,6 +11,7 @@
 package orchestratorpb
 
 import (
+	v1 "go.chromium.org/turboci/proto/go/graph/ids/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -26,13 +27,13 @@ const (
 
 // Encapsulates data changes to a Stage object.
 type StageDelta struct {
-	state                        protoimpl.MessageState   `protogen:"opaque.v1"`
-	xxx_hidden_State             StageState               `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
-	xxx_hidden_ExecutionPolicies *[]*StageExecutionPolicy `protobuf:"bytes,2,rep,name=execution_policies,json=executionPolicies,proto3"`
-	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
-	XXX_presence                 [1]uint32
-	unknownFields                protoimpl.UnknownFields
-	sizeCache                    protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_State       StageState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
+	xxx_hidden_Attempts    *[]*StageDelta_Attempt `protobuf:"bytes,2,rep,name=attempts,proto3"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *StageDelta) Reset() {
@@ -69,10 +70,10 @@ func (x *StageDelta) GetState() StageState {
 	return StageState_STAGE_STATE_UNKNOWN
 }
 
-func (x *StageDelta) GetExecutionPolicies() []*StageExecutionPolicy {
+func (x *StageDelta) GetAttempts() []*StageDelta_Attempt {
 	if x != nil {
-		if x.xxx_hidden_ExecutionPolicies != nil {
-			return *x.xxx_hidden_ExecutionPolicies
+		if x.xxx_hidden_Attempts != nil {
+			return *x.xxx_hidden_Attempts
 		}
 	}
 	return nil
@@ -83,8 +84,8 @@ func (x *StageDelta) SetState(v StageState) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
 }
 
-func (x *StageDelta) SetExecutionPolicies(v []*StageExecutionPolicy) {
-	x.xxx_hidden_ExecutionPolicies = &v
+func (x *StageDelta) SetAttempts(v []*StageDelta_Attempt) {
+	x.xxx_hidden_Attempts = &v
 }
 
 func (x *StageDelta) HasState() bool {
@@ -104,14 +105,11 @@ type StageDelta_builder struct {
 
 	// If set, the new Stage state that was set as part of this edit.
 	State *StageState
-	// Execution policy writes for this Stage.
+	// Attempt(s) which were modified as part of this edit.
 	//
-	// Usually this should be empty or have only one policy change - but it's
-	// possible for a single write to affect multiple policies.
-	//
-	// Like Stage.execution_policies, this will be sorted and unique on
-	// StageExecutionPolicy.source.
-	ExecutionPolicies []*StageExecutionPolicy
+	// NOTE: This should have a maximum length of 2 when an old Attempt is made
+	// INCOMPLETE at the same time a new Attempt is written as PENDING.
+	Attempts []*StageDelta_Attempt
 }
 
 func (b0 StageDelta_builder) Build() *StageDelta {
@@ -122,7 +120,179 @@ func (b0 StageDelta_builder) Build() *StageDelta {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
 		x.xxx_hidden_State = *b.State
 	}
-	x.xxx_hidden_ExecutionPolicies = &b.ExecutionPolicies
+	x.xxx_hidden_Attempts = &b.Attempts
+	return m0
+}
+
+// Attempt represents a delta to a given StageAttempt.
+type StageDelta_Attempt struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier  *v1.StageAttempt       `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_State       StageAttemptState      `protobuf:"varint,2,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
+	xxx_hidden_Details     *[]*Value              `protobuf:"bytes,3,rep,name=details,proto3"`
+	xxx_hidden_Progress    []int64                `protobuf:"varint,4,rep,packed,name=progress,proto3"`
+	xxx_hidden_Failure     bool                   `protobuf:"varint,5,opt,name=failure,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *StageDelta_Attempt) Reset() {
+	*x = StageDelta_Attempt{}
+	mi := &file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StageDelta_Attempt) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StageDelta_Attempt) ProtoMessage() {}
+
+func (x *StageDelta_Attempt) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *StageDelta_Attempt) GetIdentifier() *v1.StageAttempt {
+	if x != nil {
+		return x.xxx_hidden_Identifier
+	}
+	return nil
+}
+
+func (x *StageDelta_Attempt) GetState() StageAttemptState {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
+			return x.xxx_hidden_State
+		}
+	}
+	return StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
+}
+
+func (x *StageDelta_Attempt) GetDetails() []*Value {
+	if x != nil {
+		if x.xxx_hidden_Details != nil {
+			return *x.xxx_hidden_Details
+		}
+	}
+	return nil
+}
+
+func (x *StageDelta_Attempt) GetProgress() []int64 {
+	if x != nil {
+		return x.xxx_hidden_Progress
+	}
+	return nil
+}
+
+func (x *StageDelta_Attempt) GetFailure() bool {
+	if x != nil {
+		return x.xxx_hidden_Failure
+	}
+	return false
+}
+
+func (x *StageDelta_Attempt) SetIdentifier(v *v1.StageAttempt) {
+	x.xxx_hidden_Identifier = v
+}
+
+func (x *StageDelta_Attempt) SetState(v StageAttemptState) {
+	x.xxx_hidden_State = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 5)
+}
+
+func (x *StageDelta_Attempt) SetDetails(v []*Value) {
+	x.xxx_hidden_Details = &v
+}
+
+func (x *StageDelta_Attempt) SetProgress(v []int64) {
+	x.xxx_hidden_Progress = v
+}
+
+func (x *StageDelta_Attempt) SetFailure(v bool) {
+	x.xxx_hidden_Failure = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 5)
+}
+
+func (x *StageDelta_Attempt) HasIdentifier() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Identifier != nil
+}
+
+func (x *StageDelta_Attempt) HasState() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *StageDelta_Attempt) HasFailure() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+}
+
+func (x *StageDelta_Attempt) ClearIdentifier() {
+	x.xxx_hidden_Identifier = nil
+}
+
+func (x *StageDelta_Attempt) ClearState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_State = StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
+}
+
+func (x *StageDelta_Attempt) ClearFailure() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	x.xxx_hidden_Failure = false
+}
+
+type StageDelta_Attempt_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The identifier of the StageAttempt which was edited.
+	Identifier *v1.StageAttempt
+	// The state that the Attempt entered as part of this Edit.
+	State *StageAttemptState
+	// Details written as part of this edit.
+	//
+	// NOTE: For now, the Value here will be devoid of content other than
+	// `type_url`.
+	Details []*Value
+	// The index of the progress message(s) written as part of this edit.
+	Progress []int64
+	// Failure is true iff the `failure` fieild was written as part of this
+	// edit.
+	Failure *bool
+}
+
+func (b0 StageDelta_Attempt_builder) Build() *StageDelta_Attempt {
+	m0 := &StageDelta_Attempt{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Identifier = b.Identifier
+	if b.State != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 5)
+		x.xxx_hidden_State = *b.State
+	}
+	x.xxx_hidden_Details = &b.Details
+	x.xxx_hidden_Progress = b.Progress
+	if b.Failure != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 5)
+		x.xxx_hidden_Failure = *b.Failure
+	}
 	return m0
 }
 
@@ -130,27 +300,45 @@ var File_turboci_graph_orchestrator_v1_stage_delta_proto protoreflect.FileDescri
 
 const file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/stage_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\"\xc0\x01\n" +
+	"/turboci/graph/orchestrator/v1/stage_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xed\x03\n" +
 	"\n" +
 	"StageDelta\x12D\n" +
-	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x00R\x05state\x88\x01\x01\x12b\n" +
-	"\x12execution_policies\x18\x02 \x03(\v23.turboci.graph.orchestrator.v1.StageExecutionPolicyR\x11executionPoliciesB\b\n" +
+	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x00R\x05state\x88\x01\x01\x12M\n" +
+	"\battempts\x18\x02 \x03(\v21.turboci.graph.orchestrator.v1.StageDelta.AttemptR\battempts\x1a\xbf\x02\n" +
+	"\aAttempt\x12G\n" +
+	"\n" +
+	"identifier\x18\x01 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\n" +
+	"identifier\x88\x01\x01\x12K\n" +
+	"\x05state\x18\x02 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x01R\x05state\x88\x01\x01\x12>\n" +
+	"\adetails\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetails\x12\x1a\n" +
+	"\bprogress\x18\x04 \x03(\x03R\bprogress\x12\x1d\n" +
+	"\afailure\x18\x05 \x01(\bH\x02R\afailure\x88\x01\x01B\r\n" +
+	"\v_identifierB\b\n" +
+	"\x06_stateB\n" +
+	"\n" +
+	"\b_failureB\b\n" +
 	"\x06_stateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_stage_delta_proto_goTypes = []any{
-	(*StageDelta)(nil),           // 0: turboci.graph.orchestrator.v1.StageDelta
-	(StageState)(0),              // 1: turboci.graph.orchestrator.v1.StageState
-	(*StageExecutionPolicy)(nil), // 2: turboci.graph.orchestrator.v1.StageExecutionPolicy
+	(*StageDelta)(nil),         // 0: turboci.graph.orchestrator.v1.StageDelta
+	(*StageDelta_Attempt)(nil), // 1: turboci.graph.orchestrator.v1.StageDelta.Attempt
+	(StageState)(0),            // 2: turboci.graph.orchestrator.v1.StageState
+	(*v1.StageAttempt)(nil),    // 3: turboci.graph.ids.v1.StageAttempt
+	(StageAttemptState)(0),     // 4: turboci.graph.orchestrator.v1.StageAttemptState
+	(*Value)(nil),              // 5: turboci.graph.orchestrator.v1.Value
 }
 var file_turboci_graph_orchestrator_v1_stage_delta_proto_depIdxs = []int32{
-	1, // 0: turboci.graph.orchestrator.v1.StageDelta.state:type_name -> turboci.graph.orchestrator.v1.StageState
-	2, // 1: turboci.graph.orchestrator.v1.StageDelta.execution_policies:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2, // 0: turboci.graph.orchestrator.v1.StageDelta.state:type_name -> turboci.graph.orchestrator.v1.StageState
+	1, // 1: turboci.graph.orchestrator.v1.StageDelta.attempts:type_name -> turboci.graph.orchestrator.v1.StageDelta.Attempt
+	3, // 2: turboci.graph.orchestrator.v1.StageDelta.Attempt.identifier:type_name -> turboci.graph.ids.v1.StageAttempt
+	4, // 3: turboci.graph.orchestrator.v1.StageDelta.Attempt.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
+	5, // 4: turboci.graph.orchestrator.v1.StageDelta.Attempt.details:type_name -> turboci.graph.orchestrator.v1.Value
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_stage_delta_proto_init() }
@@ -158,16 +346,18 @@ func file_turboci_graph_orchestrator_v1_stage_delta_proto_init() {
 	if File_turboci_graph_orchestrator_v1_stage_delta_proto != nil {
 		return
 	}
-	file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_init()
+	file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_state_proto_init()
+	file_turboci_graph_orchestrator_v1_value_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes[0].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
