@@ -15,6 +15,7 @@ Description:
 Standard googleapi protos.
 
 Local Modifications:
- * Copy `google/api/field_behavior.proto` here.
+ * Copy `google/api/field_behavior.proto` to `api/`.
+ * Copy `google/rpc/status.proto` to `rpc/`.
  * Copy `LICENSE` here.
  * Remove everything else.

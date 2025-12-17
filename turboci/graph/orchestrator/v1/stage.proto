@@ -155,7 +155,7 @@ message Stage {
   // TBD: Pull this into its own top-level StageAttempt entity because it will
   // need to have its own state and lifecycle/transactions.
   //
-  // Next ID: 9
+  // Next ID: 10
   message Attempt {
     // The Stage Attempt's identifier.
     optional ids.v1.StageAttempt identifier = 1;
@@ -242,13 +242,20 @@ message Stage {
       // Low-effort/human-readable progress information.
       optional string msg = 1;
 
-      // The version of this Stage which added this Progress message.
+      // The version of the Stage Attempt when this Progress message was added.
       optional Revision version = 2;
 
       // Machine-readable details for this progress item.
       //
       // Kept sorted by, and unique on, type_url.
       repeated Value details = 3;
+
+      // The entity which created this progress message.
+      //
+      // If created_by is Orchestrator, then `details` may contain the
+      // following:
+      //   * turboci.graph.orchestrator.v1.ProgressEvolvePending
+      optional Actor created_by = 4;
     }
     // Append-only Executor-specefic progress messages.
     repeated Progress progress = 7;
