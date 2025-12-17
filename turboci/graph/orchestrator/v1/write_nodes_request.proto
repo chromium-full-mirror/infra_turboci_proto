@@ -286,13 +286,13 @@ message WriteNodesRequest {
     //   * The caller's identity (if `token` is absent)
     //
     // If the given keyed Result does not exist, it will be automatically
-    // created. Multiple calls to WriteNodes from this same StageAttempt or
+    // created. Multiple calls to WriteNodes from this same Stage Attempt or
     // service account will update the same Result, and the Result will be
-    // automatically finalized when this StageAttempt ends (if a WriteNodes with
-    // `finalize_results` is not called before then).
+    // automatically finalized when this Stage Attempt ends (if a WriteNodes
+    // with `finalize_results` is not called before then).
     //
     // The data here will overwrite existing data of the same type in the
-    // selected Result for this StageAttempt.
+    // selected Result for this Stage Attempt.
     repeated RealmValue results = 6 [(turboci).check.editable = CHECK_STATE_WAITING];
 
     // If set, finalize the Check.Result.
@@ -314,7 +314,7 @@ message WriteNodesRequest {
   //
   // Note that the `state` of a Stage is managed entirely by the Orchestrator
   // itself. If you are a Stage implementation and need to manage the state of
-  // your own StageAttempt, see CurrentStageWrite.
+  // your own Stage Attempt, see CurrentStageWrite.
   message StageWrite {
     // The stage to write to.
     //
@@ -388,13 +388,14 @@ message WriteNodesRequest {
       (turboci).creation_only = true
     ];
 
-    // The requested retry policy of the Stage.
+    // The requested execution policy of the Stage.
     //
     // If the Stage already exists, this will only result in an error if this
-    // requested policy doesn't match doesn't match the existing requested policy.
+    // requested policy doesn't match doesn't match the existing requested
+    // policy.
     //
-    // If this write creates the stage and the requested_stage_execution_policy is
-    // omitted, the stage will get the default StageExecutionPolicy from the
+    // If this write creates the stage and the requested_stage_execution_policy
+    // is omitted, the stage will get the default StageExecutionPolicy from the
     // Executor.
     optional StageExecutionPolicy requested_stage_execution_policy = 5 [(turboci).creation_only = true];
 
@@ -444,11 +445,11 @@ message WriteNodesRequest {
     //   * RUNNING -> INCOMPLETE
     optional StageAttemptState state = 1;
 
-    // Sets the StageAttempt.process_uid field.
+    // Sets the Stage Attempt.process_uid field.
     //
-    // MUST be supplied when transitioning a StageAttempt to RUNNING.
+    // MUST be supplied when transitioning a Stage Attempt to RUNNING.
     //
-    // If the field is already populated in the StageAttempt, this value must
+    // If the field is already populated in the Stage Attempt, this value must
     // match - otherwise the write is rejected with an error detail of
     // StageAttemptClaimedFailure.
     //
@@ -475,7 +476,7 @@ message WriteNodesRequest {
     // must exactly equal the existing data; Otherwise the write is rejected.
     repeated Value details = 5;
 
-    // Progress messages to add to the current StageAttempt.
+    // Progress messages to add to the current Stage Attempt.
     //
     // It is a good idea to do these progress updates transactionally, otherwise
     // it's possible to double-append them.
@@ -483,11 +484,11 @@ message WriteNodesRequest {
 
     // Failure is for stage attempt execution failure information.
     //
-    // Note: this message is not intended to be used for workflow-level failures.
-    // For example if a stage attempt finishes everything it is intended to do
-    // (i.e. to run a suite of tests), and it produces some failure
-    // results (i.e. some tests failed), those results should be reported to the
-    // corresponding check's result.Data, not here.
+    // Note: this message is not intended to be used for workflow-level
+    // failures. For example if a stage attempt finishes everything it is
+    // intended to do (i.e. to run a suite of tests), and it produces some
+    // failure results (i.e. some tests failed), those results should be
+    // reported to the corresponding check's result.Data, not here.
     message Failure {
       // Human-readable error message.
       optional string message = 1;
@@ -495,7 +496,8 @@ message WriteNodesRequest {
       // Type of the failure.
       //
       // This is a subset of failures in failure.proto. Only the failures that
-      // are relevant to Stage Executor executing a StageAttempt are listed here.
+      // are relevant to Stage Executor executing a Stage Attempt are listed
+      // here.
       oneof type {
         // Failure to transition a stage attempt to SCHEDULED state.
         ToScheduled to_scheduled = 2;
@@ -506,10 +508,17 @@ message WriteNodesRequest {
 
     // Failure is for stage attempt execution failure information.
     //
-    // This field must only be set when transition the StageAttempt to
+    // This field must only be set when transition the Stage Attempt to
     // INCOMPLETE state. Omitting the state or setting the state to other
     // values will result in an error.
     optional Failure failure = 7;
+
+    // Controls if this Stage should make another Attempt.
+    //
+    // May only be set when also setting state == INCOMPLETE.
+    //
+    // If true, then no new Attempt is made, even if policy would permit one.
+    optional bool block_new_attempts = 8;
   }
   // State for the current Stage as indicated by `token`.
   //

@@ -354,6 +354,10 @@ type StageExecutionPolicy_Retry_builder struct {
 
 	// The maximum number of retries (apart from the first attempt) that will be
 	// made for this Stage.
+	//
+	// Another Attempt is created when the number of Attempts does not exceed
+	// max_retries+1, stage_timeout and stage_timeout_mode would allow another
+	// Attempt, and `WriteNodes.current_state.block_new_attempts` was false.
 	MaxRetries *int32
 }
 

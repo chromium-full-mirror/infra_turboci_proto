@@ -1166,13 +1166,13 @@ type WriteNodesRequest_CheckWrite_builder struct {
 	//   - The caller's identity (if `token` is absent)
 	//
 	// If the given keyed Result does not exist, it will be automatically
-	// created. Multiple calls to WriteNodes from this same StageAttempt or
+	// created. Multiple calls to WriteNodes from this same Stage Attempt or
 	// service account will update the same Result, and the Result will be
-	// automatically finalized when this StageAttempt ends (if a WriteNodes with
-	// `finalize_results` is not called before then).
+	// automatically finalized when this Stage Attempt ends (if a WriteNodes
+	// with `finalize_results` is not called before then).
 	//
 	// The data here will overwrite existing data of the same type in the
-	// selected Result for this StageAttempt.
+	// selected Result for this Stage Attempt.
 	Results []*WriteNodesRequest_RealmValue
 	// If set, finalize the Check.Result.
 	//
@@ -1217,7 +1217,7 @@ func (b0 WriteNodesRequest_CheckWrite_builder) Build() *WriteNodesRequest_CheckW
 //
 // Note that the `state` of a Stage is managed entirely by the Orchestrator
 // itself. If you are a Stage implementation and need to manage the state of
-// your own StageAttempt, see CurrentStageWrite.
+// your own Stage Attempt, see CurrentStageWrite.
 type WriteNodesRequest_StageWrite struct {
 	state                                    protoimpl.MessageState             `protogen:"opaque.v1"`
 	xxx_hidden_Identifier                    *v1.Stage                          `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
@@ -1474,13 +1474,14 @@ type WriteNodesRequest_StageWrite_builder struct {
 	// However, if the current writer is the one creating the stages, then there
 	// is no implementation risk.
 	Dependencies *WriteNodesRequest_DependencyGroup
-	// The requested retry policy of the Stage.
+	// The requested execution policy of the Stage.
 	//
 	// If the Stage already exists, this will only result in an error if this
-	// requested policy doesn't match doesn't match the existing requested policy.
+	// requested policy doesn't match doesn't match the existing requested
+	// policy.
 	//
-	// If this write creates the stage and the requested_stage_execution_policy is
-	// omitted, the stage will get the default StageExecutionPolicy from the
+	// If this write creates the stage and the requested_stage_execution_policy
+	// is omitted, the stage will get the default StageExecutionPolicy from the
 	// Executor.
 	RequestedStageExecutionPolicy *StageExecutionPolicy
 	// The Check assignments of the Stage.
@@ -1535,6 +1536,7 @@ type WriteNodesRequest_CurrentStageWrite struct {
 	xxx_hidden_Details                *[]*Value                                    `protobuf:"bytes,5,rep,name=details,proto3"`
 	xxx_hidden_Progress               *[]*WriteNodesRequest_StageAttemptProgress   `protobuf:"bytes,6,rep,name=progress,proto3"`
 	xxx_hidden_Failure                *WriteNodesRequest_CurrentStageWrite_Failure `protobuf:"bytes,7,opt,name=failure,proto3,oneof"`
+	xxx_hidden_BlockNewAttempts       bool                                         `protobuf:"varint,8,opt,name=block_new_attempts,json=blockNewAttempts,proto3,oneof"`
 	XXX_raceDetectHookData            protoimpl.RaceDetectHookData
 	XXX_presence                      [1]uint32
 	unknownFields                     protoimpl.UnknownFields
@@ -1624,14 +1626,21 @@ func (x *WriteNodesRequest_CurrentStageWrite) GetFailure() *WriteNodesRequest_Cu
 	return nil
 }
 
+func (x *WriteNodesRequest_CurrentStageWrite) GetBlockNewAttempts() bool {
+	if x != nil {
+		return x.xxx_hidden_BlockNewAttempts
+	}
+	return false
+}
+
 func (x *WriteNodesRequest_CurrentStageWrite) SetState(v StageAttemptState) {
 	x.xxx_hidden_State = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 7)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 8)
 }
 
 func (x *WriteNodesRequest_CurrentStageWrite) SetProcessUid(v string) {
 	x.xxx_hidden_ProcessUid = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 7)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 8)
 }
 
 func (x *WriteNodesRequest_CurrentStageWrite) SetContinuationGroup(v *WriteNodesRequest_DependencyGroup) {
@@ -1652,6 +1661,11 @@ func (x *WriteNodesRequest_CurrentStageWrite) SetProgress(v []*WriteNodesRequest
 
 func (x *WriteNodesRequest_CurrentStageWrite) SetFailure(v *WriteNodesRequest_CurrentStageWrite_Failure) {
 	x.xxx_hidden_Failure = v
+}
+
+func (x *WriteNodesRequest_CurrentStageWrite) SetBlockNewAttempts(v bool) {
+	x.xxx_hidden_BlockNewAttempts = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 7, 8)
 }
 
 func (x *WriteNodesRequest_CurrentStageWrite) HasState() bool {
@@ -1689,6 +1703,13 @@ func (x *WriteNodesRequest_CurrentStageWrite) HasFailure() bool {
 	return x.xxx_hidden_Failure != nil
 }
 
+func (x *WriteNodesRequest_CurrentStageWrite) HasBlockNewAttempts() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 7)
+}
+
 func (x *WriteNodesRequest_CurrentStageWrite) ClearState() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_State = StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
@@ -1711,6 +1732,11 @@ func (x *WriteNodesRequest_CurrentStageWrite) ClearFailure() {
 	x.xxx_hidden_Failure = nil
 }
 
+func (x *WriteNodesRequest_CurrentStageWrite) ClearBlockNewAttempts() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 7)
+	x.xxx_hidden_BlockNewAttempts = false
+}
+
 type WriteNodesRequest_CurrentStageWrite_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
@@ -1729,11 +1755,11 @@ type WriteNodesRequest_CurrentStageWrite_builder struct {
 	//   - RUNNING -> COMPLETE
 	//   - RUNNING -> INCOMPLETE
 	State *StageAttemptState
-	// Sets the StageAttempt.process_uid field.
+	// Sets the Stage Attempt.process_uid field.
 	//
-	// MUST be supplied when transitioning a StageAttempt to RUNNING.
+	// MUST be supplied when transitioning a Stage Attempt to RUNNING.
 	//
-	// If the field is already populated in the StageAttempt, this value must
+	// If the field is already populated in the Stage Attempt, this value must
 	// match - otherwise the write is rejected with an error detail of
 	// StageAttemptClaimedFailure.
 	//
@@ -1756,17 +1782,23 @@ type WriteNodesRequest_CurrentStageWrite_builder struct {
 	// If a data type here is already present in the database, the data here
 	// must exactly equal the existing data; Otherwise the write is rejected.
 	Details []*Value
-	// Progress messages to add to the current StageAttempt.
+	// Progress messages to add to the current Stage Attempt.
 	//
 	// It is a good idea to do these progress updates transactionally, otherwise
 	// it's possible to double-append them.
 	Progress []*WriteNodesRequest_StageAttemptProgress
 	// Failure is for stage attempt execution failure information.
 	//
-	// This field must only be set when transition the StageAttempt to
+	// This field must only be set when transition the Stage Attempt to
 	// INCOMPLETE state. Omitting the state or setting the state to other
 	// values will result in an error.
 	Failure *WriteNodesRequest_CurrentStageWrite_Failure
+	// Controls if this Stage should make another Attempt.
+	//
+	// May only be set when also setting state == INCOMPLETE.
+	//
+	// If true, then no new Attempt is made, even if policy would permit one.
+	BlockNewAttempts *bool
 }
 
 func (b0 WriteNodesRequest_CurrentStageWrite_builder) Build() *WriteNodesRequest_CurrentStageWrite {
@@ -1774,11 +1806,11 @@ func (b0 WriteNodesRequest_CurrentStageWrite_builder) Build() *WriteNodesRequest
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.State != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 7)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 8)
 		x.xxx_hidden_State = *b.State
 	}
 	if b.ProcessUid != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 7)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 8)
 		x.xxx_hidden_ProcessUid = b.ProcessUid
 	}
 	x.xxx_hidden_ContinuationGroup = b.ContinuationGroup
@@ -1786,16 +1818,20 @@ func (b0 WriteNodesRequest_CurrentStageWrite_builder) Build() *WriteNodesRequest
 	x.xxx_hidden_Details = &b.Details
 	x.xxx_hidden_Progress = &b.Progress
 	x.xxx_hidden_Failure = b.Failure
+	if b.BlockNewAttempts != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 7, 8)
+		x.xxx_hidden_BlockNewAttempts = *b.BlockNewAttempts
+	}
 	return m0
 }
 
 // Failure is for stage attempt execution failure information.
 //
-// Note: this message is not intended to be used for workflow-level failures.
-// For example if a stage attempt finishes everything it is intended to do
-// (i.e. to run a suite of tests), and it produces some failure
-// results (i.e. some tests failed), those results should be reported to the
-// corresponding check's result.Data, not here.
+// Note: this message is not intended to be used for workflow-level
+// failures. For example if a stage attempt finishes everything it is
+// intended to do (i.e. to run a suite of tests), and it produces some
+// failure results (i.e. some tests failed), those results should be
+// reported to the corresponding check's result.Data, not here.
 type WriteNodesRequest_CurrentStageWrite_Failure struct {
 	state                  protoimpl.MessageState                             `protogen:"opaque.v1"`
 	xxx_hidden_Message     *string                                            `protobuf:"bytes,1,opt,name=message,proto3,oneof"`
@@ -1957,7 +1993,8 @@ type WriteNodesRequest_CurrentStageWrite_Failure_builder struct {
 	// Type of the failure.
 	//
 	// This is a subset of failures in failure.proto. Only the failures that
-	// are relevant to Stage Executor executing a StageAttempt are listed here.
+	// are relevant to Stage Executor executing a Stage Attempt are listed
+	// here.
 
 	// Fields of oneof xxx_hidden_Type:
 	// Failure to transition a stage attempt to SCHEDULED state.
@@ -2018,7 +2055,7 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a+turboci/graph/orchestrator/v1/failure.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xc9\x1d\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a+turboci/graph/orchestrator/v1/failure.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\x93\x1e\n" +
 	"\x11WriteNodesRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12Q\n" +
 	"\areasons\x18\x02 \x03(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonR\areasons\x12Z\n" +
@@ -2101,7 +2138,7 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\r_dependenciesB#\n" +
 	"!_requested_stage_execution_policyB\f\n" +
 	"\n" +
-	"_cancelled\x1a\xc8\a\n" +
+	"_cancelled\x1a\x92\b\n" +
 	"\x11CurrentStageWrite\x12K\n" +
 	"\x05state\x18\x01 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x00R\x05state\x88\x01\x01\x12$\n" +
 	"\vprocess_uid\x18\x02 \x01(\tH\x01R\n" +
@@ -2111,7 +2148,8 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x18attempt_execution_policy\x18\x04 \x01(\v2:.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicyH\x03R\x16attemptExecutionPolicy\x88\x01\x01\x12>\n" +
 	"\adetails\x18\x05 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetails\x12a\n" +
 	"\bprogress\x18\x06 \x03(\v2E.turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttemptProgressR\bprogress\x12i\n" +
-	"\afailure\x18\a \x01(\v2J.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.FailureH\x04R\afailure\x88\x01\x01\x1a\xd8\x01\n" +
+	"\afailure\x18\a \x01(\v2J.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.FailureH\x04R\afailure\x88\x01\x01\x121\n" +
+	"\x12block_new_attempts\x18\b \x01(\bH\x05R\x10blockNewAttempts\x88\x01\x01\x1a\xd8\x01\n" +
 	"\aFailure\x12\x1d\n" +
 	"\amessage\x18\x01 \x01(\tH\x01R\amessage\x88\x01\x01\x12O\n" +
 	"\fto_scheduled\x18\x02 \x01(\v2*.turboci.graph.orchestrator.v1.ToScheduledH\x00R\vtoScheduled\x12I\n" +
@@ -2125,7 +2163,8 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x13_continuation_groupB\x1b\n" +
 	"\x19_attempt_execution_policyB\n" +
 	"\n" +
-	"\b_failureB\b\n" +
+	"\b_failureB\x15\n" +
+	"\x13_block_new_attemptsB\b\n" +
 	"\x06_tokenB\x06\n" +
 	"\x04_txnB\x10\n" +
 	"\x0e_current_stageBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"

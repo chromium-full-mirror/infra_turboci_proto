@@ -24,7 +24,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// StageAttemptState describes the current state of a StageAttempt.
+// StageAttemptState describes the current state of a Stage Attempt.
 //
 // This state machine is much more complicated than Check or Stage state
 // because:
@@ -61,16 +61,16 @@ const (
 //
 //	INCOMPLETE and COMPLETE are terminal states.
 //
-// The Nth StageAttempt (i.e. any StageAttempt after the first) may also be
+// The Nth Stage Attempt (i.e. any Stage Attempt after the first) may also be
 // created in an AWAITING_RETRY state rather than PENDING.
 //
 //	AWAITING_RETRY -> PENDING
 //	AWAITING_RETRY -> INCOMPLETE
 //
-// The Orchestrator manages StageAttempt state evolution in conjunction with the
-// Executor, and explicit state transitions made explicitly by the StageAttempt
-// itself. The only state transition which can be activated by a third party
-// would be transitions to INCOMPLETE or CANCELLING done when the Stage is
+// The Orchestrator manages Stage Attempt state evolution in conjunction with
+// the Executor, and explicit state transitions made explicitly by the Stage
+// Attempt itself. The only state transition which can be activated by a third
+// party would be transitions to INCOMPLETE or CANCELLING done when the Stage is
 // cancelled.
 //
 // These states have enum values in multiples of 10 in case we need to add more
@@ -80,41 +80,41 @@ type StageAttemptState int32
 const (
 	// UNKNOWN is the default, invalid, state.
 	StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN StageAttemptState = 0
-	// This is an initial state for a StageAttempt and indicates that the
-	// StageAttempt is available for an Executor, but either:
-	//   - The Orchestrator has not yet sent this StageAttempt to the Executor.
+	// This is an initial state for a Stage Attempt and indicates that the
+	// Stage Attempt is available for an Executor, but either:
+	//   - The Orchestrator has not yet sent this Stage Attempt to the Executor.
 	//   - [WorkNode only] The Executor has advertised this Stage on pub/sub, but
 	//     it has not yet been "Popped".
 	//
 	// This state can transition to THROTTLED, SCHEDULED, RUNNING, COMPLETE or
 	// INCOMPLETE.
 	StageAttemptState_STAGE_ATTEMPT_STATE_PENDING StageAttemptState = 10
-	// This state indicates that the StageAttempt was PENDING, but is now picked
+	// This state indicates that the Stage Attempt was PENDING, but is now picked
 	// up for execution by an Executor.
 	//
 	// This state can transition to RUNNING, COMPLETE or INCOMPLETE.
 	StageAttemptState_STAGE_ATTEMPT_STATE_SCHEDULED StageAttemptState = 30
-	// This state indicates that the StageAttempt is now actually being executed
+	// This state indicates that the Stage Attempt is now actually being executed
 	// by an Executor.
 	//
 	// This state can transition to COMPLETE or INCOMPLETE.
 	StageAttemptState_STAGE_ATTEMPT_STATE_RUNNING StageAttemptState = 40
-	// This state indicates that the StageAttempt has been cancelled, but this has
-	// not yet been communicated to the running STAGE_ATTEMPT.
+	// This state indicates that the Stage Attempt has been cancelled, but this
+	// has not yet been communicated to the running Stage Attempt.
 	//
-	// The StageAttempt must be assumed to internally consider itself to be
+	// The Stage Attempt must be assumed to internally consider itself to be
 	// RUNNING while viewing this state from the API - this means that the
 	// `running` heartbeat and timeout still apply during this state.
 	//
 	// This state will transition to TEARING_DOWN as soon as TurboCI has
-	// confirmation that the StageAttempt knows it's been cancelled.
+	// confirmation that the Stage Attempt knows it's been cancelled.
 	//
 	// This state is explicitly different than TEARING_DOWN to avoid the
 	// possibility that a Stage is cancelled, but the Stage Attempt doesn't see
 	// this until its next valid heartbeat - thus effectively losing up to 1.9x
 	// the heartbeat interval out of its TEARING_DOWN timeout.
 	StageAttemptState_STAGE_ATTEMPT_STATE_CANCELLING StageAttemptState = 50
-	// This state indicates that the StageAttempt is doing some work after the
+	// This state indicates that the Stage Attempt is doing some work after the
 	// 'RUNNING' state.
 	//
 	// This is meant to model things like:
@@ -127,7 +127,7 @@ const (
 	//
 	// This state can transition to COMPLETE or INCOMPLETE.
 	StageAttemptState_STAGE_ATTEMPT_STATE_TEARING_DOWN StageAttemptState = 60
-	// This is a final state which indicates that this StageAttempt finished
+	// This is a final state which indicates that this Stage Attempt finished
 	// everything the Executor intended it to do.
 	//
 	// NOTE: 'finished everything the Executor intended it to do' does not imply
@@ -138,39 +138,28 @@ const (
 	// (e.g. tests may be graded on flakiness, not simply pass/fail, build may
 	// have failed on an optional target but successfully completed the required
 	// targets). These workflow-level outcomes are reflected in the Check Results
-	// which this StageAttempt would have written during its execution.
+	// which this Stage Attempt would have written during its execution.
 	//
-	// NOTE: It is currently allowed for an Executor to request a retry of this
-	// Stage, even as it marks the StageAttempt as COMPLETE. This can happen in
-	// cases where the workflow-level criteria failed and the Executor wants a
-	// 'quick and dirty' retry. More nuanced retries should be done at the
-	// workflow level by adding additional follow-up Stages which can e.g. just
-	// retry the subset of failing tests/build targets, or wait until a wider
-	// analysis of other, parallel, stages have completed to make a smarter retry
-	// decision.
-	//
-	// This state is terminal (but if a retry was requested, a new StageAttempt
-	// may be created for this Stage).
+	// This state is terminal.
 	StageAttemptState_STAGE_ATTEMPT_STATE_COMPLETE StageAttemptState = 70
-	// This is a final state which indicates that this StageAttempt was not able
+	// This is a final state which indicates that this Stage Attempt was not able
 	// to complete everything that the Executor intended it to do.
 	//
-	// The Orchestrator itself can transition the StageAttempt to this state in
+	// The Orchestrator itself can transition the Stage Attempt to this state in
 	// the event of a heartbeat timeout. This state can also be entered by
 	// explicit external actions (e.g. the Executor marking the stage as
 	// INCOMPLETE, or external cancellation signals).
 	//
-	// Like COMPLETE, a retry can be requested for this state, even when the state
-	// is explicitly written by the Executor. Similarly, the Executor could mark
-	// the StageAttempt as INCOMPLETE without a retry for e.g. a non-retriable
-	// failure (e.g. lack of resources).
+	// The Orchestrator will consult the StageExecutionPolicy, and if allowed,
+	// will make a new Attempt. This can be blocked when using WriteNodes to
+	// mark a Stage Attempt as INCOMPLETE by setting the
+	// WriteNodesRequest.current_stage.block_new_attempts field to true.
 	//
-	// This state is terminal (but if a retry was requested, a new StageAttempt
+	// This state is terminal (but if a retry was requested, a new Stage Attempt
 	// may be created for this Stage).
 	StageAttemptState_STAGE_ATTEMPT_STATE_INCOMPLETE StageAttemptState = 80
-	// This is an initial state and indicates that a previous StageAttempt went to
-	// a terminal state (COMPLETE or INCOMPLETE), a retry was requested, AND the
-	// Stage's execution policy permitted a retry.
+	// This is an initial state and indicates that a previous Stage Attempt went
+	// to INCOMPLETE and the Stage's execution policy permitted a retry.
 	//
 	// Transition to PENDING is automatic after the execution policy's computed
 	// retry delay.
