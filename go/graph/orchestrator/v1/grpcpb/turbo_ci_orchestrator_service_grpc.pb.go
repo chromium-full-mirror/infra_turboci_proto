@@ -46,11 +46,23 @@ type TurboCIOrchestratorClient interface {
 	//
 	// NOTE: Simple workflows can have all Checks, Check options and Stages in the
 	// same realm, minimizing the number of required bindings.
+	//
+	// If a correctly encoded Stage Attempt token is used for
+	// WriteNodesRequest.token, then a
+	// turboci.graph.orchestrator.v1.StageAttemptCurrentState will be embedded as
+	// an error detail, and the client is expected to respect the indicated
+	// state.
 	WriteNodes(ctx context.Context, in *v1.WriteNodesRequest, opts ...grpc.CallOption) (*v1.WriteNodesResponse, error)
 	// QueryNodes allows querying nodes in a fairly simple way.
 	//
 	// In the future we may add a more advanced API to open up more of GQL's
 	// underlying expressiveness.
+	//
+	// If a correctly encoded Stage Attempt token is used for
+	// QueryNodesRequest.token, then a
+	// turboci.graph.orchestrator.v1.StageAttemptCurrentState will be embedded as
+	// an error detail, and the client is expected to respect the indicated
+	// state.
 	QueryNodes(ctx context.Context, in *v1.QueryNodesRequest, opts ...grpc.CallOption) (*v1.QueryNodesResponse, error)
 }
 
@@ -109,11 +121,23 @@ type TurboCIOrchestratorServer interface {
 	//
 	// NOTE: Simple workflows can have all Checks, Check options and Stages in the
 	// same realm, minimizing the number of required bindings.
+	//
+	// If a correctly encoded Stage Attempt token is used for
+	// WriteNodesRequest.token, then a
+	// turboci.graph.orchestrator.v1.StageAttemptCurrentState will be embedded as
+	// an error detail, and the client is expected to respect the indicated
+	// state.
 	WriteNodes(context.Context, *v1.WriteNodesRequest) (*v1.WriteNodesResponse, error)
 	// QueryNodes allows querying nodes in a fairly simple way.
 	//
 	// In the future we may add a more advanced API to open up more of GQL's
 	// underlying expressiveness.
+	//
+	// If a correctly encoded Stage Attempt token is used for
+	// QueryNodesRequest.token, then a
+	// turboci.graph.orchestrator.v1.StageAttemptCurrentState will be embedded as
+	// an error detail, and the client is expected to respect the indicated
+	// state.
 	QueryNodes(context.Context, *v1.QueryNodesRequest) (*v1.QueryNodesResponse, error)
 	mustEmbedUnimplementedTurboCIOrchestratorServer()
 }

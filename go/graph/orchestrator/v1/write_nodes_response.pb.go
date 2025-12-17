@@ -26,10 +26,11 @@ const (
 
 // Response message for TurboCIGraphService.WriteNodes.
 type WriteNodesResponse struct {
-	state                     protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_WrittenVersion *Revision              `protobuf:"bytes,1,opt,name=written_version,json=writtenVersion,proto3,oneof"`
-	unknownFields             protoimpl.UnknownFields
-	sizeCache                 protoimpl.SizeCache
+	state                          protoimpl.MessageState    `protogen:"opaque.v1"`
+	xxx_hidden_WrittenVersion      *Revision                 `protobuf:"bytes,1,opt,name=written_version,json=writtenVersion,proto3,oneof"`
+	xxx_hidden_CurrentAttemptState *StageAttemptCurrentState `protobuf:"bytes,2,opt,name=current_attempt_state,json=currentAttemptState,proto3,oneof"`
+	unknownFields                  protoimpl.UnknownFields
+	sizeCache                      protoimpl.SizeCache
 }
 
 func (x *WriteNodesResponse) Reset() {
@@ -64,8 +65,19 @@ func (x *WriteNodesResponse) GetWrittenVersion() *Revision {
 	return nil
 }
 
+func (x *WriteNodesResponse) GetCurrentAttemptState() *StageAttemptCurrentState {
+	if x != nil {
+		return x.xxx_hidden_CurrentAttemptState
+	}
+	return nil
+}
+
 func (x *WriteNodesResponse) SetWrittenVersion(v *Revision) {
 	x.xxx_hidden_WrittenVersion = v
+}
+
+func (x *WriteNodesResponse) SetCurrentAttemptState(v *StageAttemptCurrentState) {
+	x.xxx_hidden_CurrentAttemptState = v
 }
 
 func (x *WriteNodesResponse) HasWrittenVersion() bool {
@@ -75,8 +87,19 @@ func (x *WriteNodesResponse) HasWrittenVersion() bool {
 	return x.xxx_hidden_WrittenVersion != nil
 }
 
+func (x *WriteNodesResponse) HasCurrentAttemptState() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_CurrentAttemptState != nil
+}
+
 func (x *WriteNodesResponse) ClearWrittenVersion() {
 	x.xxx_hidden_WrittenVersion = nil
+}
+
+func (x *WriteNodesResponse) ClearCurrentAttemptState() {
+	x.xxx_hidden_CurrentAttemptState = nil
 }
 
 type WriteNodesResponse_builder struct {
@@ -94,6 +117,10 @@ type WriteNodesResponse_builder struct {
 	//
 	// See WriteNodesRequest.TransactionDetails.
 	WrittenVersion *Revision
+	// State of the current stage attempt.
+	//
+	// Only set if the `token` was for a stage attempt.
+	CurrentAttemptState *StageAttemptCurrentState
 }
 
 func (b0 WriteNodesResponse_builder) Build() *WriteNodesResponse {
@@ -101,6 +128,7 @@ func (b0 WriteNodesResponse_builder) Build() *WriteNodesResponse {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_WrittenVersion = b.WrittenVersion
+	x.xxx_hidden_CurrentAttemptState = b.CurrentAttemptState
 	return m0
 }
 
@@ -108,23 +136,27 @@ var File_turboci_graph_orchestrator_v1_write_nodes_response_proto protoreflect.F
 
 const file_turboci_graph_orchestrator_v1_write_nodes_response_proto_rawDesc = "" +
 	"\n" +
-	"8turboci/graph/orchestrator/v1/write_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a,turboci/graph/orchestrator/v1/revision.proto\"\x7f\n" +
+	"8turboci/graph/orchestrator/v1/write_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\x8b\x02\n" +
 	"\x12WriteNodesResponse\x12U\n" +
-	"\x0fwritten_version\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\x0ewrittenVersion\x88\x01\x01B\x12\n" +
-	"\x10_written_versionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x0fwritten_version\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\x0ewrittenVersion\x88\x01\x01\x12p\n" +
+	"\x15current_attempt_state\x18\x02 \x01(\v27.turboci.graph.orchestrator.v1.StageAttemptCurrentStateH\x01R\x13currentAttemptState\x88\x01\x01B\x12\n" +
+	"\x10_written_versionB\x18\n" +
+	"\x16_current_attempt_stateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_write_nodes_response_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_write_nodes_response_proto_goTypes = []any{
-	(*WriteNodesResponse)(nil), // 0: turboci.graph.orchestrator.v1.WriteNodesResponse
-	(*Revision)(nil),           // 1: turboci.graph.orchestrator.v1.Revision
+	(*WriteNodesResponse)(nil),       // 0: turboci.graph.orchestrator.v1.WriteNodesResponse
+	(*Revision)(nil),                 // 1: turboci.graph.orchestrator.v1.Revision
+	(*StageAttemptCurrentState)(nil), // 2: turboci.graph.orchestrator.v1.StageAttemptCurrentState
 }
 var file_turboci_graph_orchestrator_v1_write_nodes_response_proto_depIdxs = []int32{
 	1, // 0: turboci.graph.orchestrator.v1.WriteNodesResponse.written_version:type_name -> turboci.graph.orchestrator.v1.Revision
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 1: turboci.graph.orchestrator.v1.WriteNodesResponse.current_attempt_state:type_name -> turboci.graph.orchestrator.v1.StageAttemptCurrentState
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_write_nodes_response_proto_init() }
@@ -133,6 +165,7 @@ func file_turboci_graph_orchestrator_v1_write_nodes_response_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
+	file_turboci_graph_orchestrator_v1_stage_proto_init()
 	file_turboci_graph_orchestrator_v1_write_nodes_response_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

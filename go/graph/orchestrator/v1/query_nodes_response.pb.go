@@ -27,11 +27,12 @@ const (
 
 // Response message for TurboCIGraphService.QueryNodes.
 type QueryNodesResponse struct {
-	state             protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Graph  map[string]*GraphView  `protobuf:"bytes,1,rep,name=graph,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	xxx_hidden_Absent *[]*v1.Identifier      `protobuf:"bytes,2,rep,name=absent,proto3"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state                          protoimpl.MessageState    `protogen:"opaque.v1"`
+	xxx_hidden_Graph               map[string]*GraphView     `protobuf:"bytes,1,rep,name=graph,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	xxx_hidden_Absent              *[]*v1.Identifier         `protobuf:"bytes,2,rep,name=absent,proto3"`
+	xxx_hidden_CurrentAttemptState *StageAttemptCurrentState `protobuf:"bytes,3,opt,name=current_attempt_state,json=currentAttemptState,proto3,oneof"`
+	unknownFields                  protoimpl.UnknownFields
+	sizeCache                      protoimpl.SizeCache
 }
 
 func (x *QueryNodesResponse) Reset() {
@@ -75,12 +76,34 @@ func (x *QueryNodesResponse) GetAbsent() []*v1.Identifier {
 	return nil
 }
 
+func (x *QueryNodesResponse) GetCurrentAttemptState() *StageAttemptCurrentState {
+	if x != nil {
+		return x.xxx_hidden_CurrentAttemptState
+	}
+	return nil
+}
+
 func (x *QueryNodesResponse) SetGraph(v map[string]*GraphView) {
 	x.xxx_hidden_Graph = v
 }
 
 func (x *QueryNodesResponse) SetAbsent(v []*v1.Identifier) {
 	x.xxx_hidden_Absent = &v
+}
+
+func (x *QueryNodesResponse) SetCurrentAttemptState(v *StageAttemptCurrentState) {
+	x.xxx_hidden_CurrentAttemptState = v
+}
+
+func (x *QueryNodesResponse) HasCurrentAttemptState() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_CurrentAttemptState != nil
+}
+
+func (x *QueryNodesResponse) ClearCurrentAttemptState() {
+	x.xxx_hidden_CurrentAttemptState = nil
 }
 
 type QueryNodesResponse_builder struct {
@@ -94,6 +117,10 @@ type QueryNodesResponse_builder struct {
 	Graph map[string]*GraphView
 	// A list of explicitly-selected nodes which were not found in the graph.
 	Absent []*v1.Identifier
+	// State of the current stage attempt.
+	//
+	// Only set if the `token` was for a stage attempt.
+	CurrentAttemptState *StageAttemptCurrentState
 }
 
 func (b0 QueryNodesResponse_builder) Build() *QueryNodesResponse {
@@ -102,6 +129,7 @@ func (b0 QueryNodesResponse_builder) Build() *QueryNodesResponse {
 	_, _ = b, x
 	x.xxx_hidden_Graph = b.Graph
 	x.xxx_hidden_Absent = &b.Absent
+	x.xxx_hidden_CurrentAttemptState = b.CurrentAttemptState
 	return m0
 }
 
@@ -109,31 +137,35 @@ var File_turboci_graph_orchestrator_v1_query_nodes_response_proto protoreflect.F
 
 const file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDesc = "" +
 	"\n" +
-	"8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/graph_view.proto\"\x86\x02\n" +
+	"8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/graph_view.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\x92\x03\n" +
 	"\x12QueryNodesResponse\x12R\n" +
 	"\x05graph\x18\x01 \x03(\v2<.turboci.graph.orchestrator.v1.QueryNodesResponse.GraphEntryR\x05graph\x128\n" +
-	"\x06absent\x18\x02 \x03(\v2 .turboci.graph.ids.v1.IdentifierR\x06absent\x1ab\n" +
+	"\x06absent\x18\x02 \x03(\v2 .turboci.graph.ids.v1.IdentifierR\x06absent\x12p\n" +
+	"\x15current_attempt_state\x18\x03 \x01(\v27.turboci.graph.orchestrator.v1.StageAttemptCurrentStateH\x00R\x13currentAttemptState\x88\x01\x01\x1ab\n" +
 	"\n" +
 	"GraphEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12>\n" +
-	"\x05value\x18\x02 \x01(\v2(.turboci.graph.orchestrator.v1.GraphViewR\x05value:\x028\x01BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x05value\x18\x02 \x01(\v2(.turboci.graph.orchestrator.v1.GraphViewR\x05value:\x028\x01B\x18\n" +
+	"\x16_current_attempt_stateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_goTypes = []any{
-	(*QueryNodesResponse)(nil), // 0: turboci.graph.orchestrator.v1.QueryNodesResponse
-	nil,                        // 1: turboci.graph.orchestrator.v1.QueryNodesResponse.GraphEntry
-	(*v1.Identifier)(nil),      // 2: turboci.graph.ids.v1.Identifier
-	(*GraphView)(nil),          // 3: turboci.graph.orchestrator.v1.GraphView
+	(*QueryNodesResponse)(nil),       // 0: turboci.graph.orchestrator.v1.QueryNodesResponse
+	nil,                              // 1: turboci.graph.orchestrator.v1.QueryNodesResponse.GraphEntry
+	(*v1.Identifier)(nil),            // 2: turboci.graph.ids.v1.Identifier
+	(*StageAttemptCurrentState)(nil), // 3: turboci.graph.orchestrator.v1.StageAttemptCurrentState
+	(*GraphView)(nil),                // 4: turboci.graph.orchestrator.v1.GraphView
 }
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_depIdxs = []int32{
 	1, // 0: turboci.graph.orchestrator.v1.QueryNodesResponse.graph:type_name -> turboci.graph.orchestrator.v1.QueryNodesResponse.GraphEntry
 	2, // 1: turboci.graph.orchestrator.v1.QueryNodesResponse.absent:type_name -> turboci.graph.ids.v1.Identifier
-	3, // 2: turboci.graph.orchestrator.v1.QueryNodesResponse.GraphEntry.value:type_name -> turboci.graph.orchestrator.v1.GraphView
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	3, // 2: turboci.graph.orchestrator.v1.QueryNodesResponse.current_attempt_state:type_name -> turboci.graph.orchestrator.v1.StageAttemptCurrentState
+	4, // 3: turboci.graph.orchestrator.v1.QueryNodesResponse.GraphEntry.value:type_name -> turboci.graph.orchestrator.v1.GraphView
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_query_nodes_response_proto_init() }
@@ -142,6 +174,8 @@ func file_turboci_graph_orchestrator_v1_query_nodes_response_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_graph_view_proto_init()
+	file_turboci_graph_orchestrator_v1_stage_proto_init()
+	file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
