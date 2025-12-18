@@ -1627,12 +1627,12 @@ func (b0 WriteNodesRequest_CurrentStageWrite_builder) Build() *WriteNodesRequest
 // CurrentAttempt encapsulates all mutations which can be done to a Stage
 // Attempt.
 type WriteNodesRequest_CurrentStageWrite_CurrentAttempt struct {
-	state                       protoimpl.MessageState                                              `protogen:"opaque.v1"`
-	xxx_hidden_Details          *[]*Value                                                           `protobuf:"bytes,1,rep,name=details,proto3"`
-	xxx_hidden_Progress         *[]*WriteNodesRequest_StageAttemptProgress                          `protobuf:"bytes,2,rep,name=progress,proto3"`
-	xxx_hidden_StateTransitions *WriteNodesRequest_CurrentStageWrite_CurrentAttempt_StateTransition `protobuf:"bytes,3,opt,name=state_transitions,json=stateTransitions,proto3,oneof"`
-	unknownFields               protoimpl.UnknownFields
-	sizeCache                   protoimpl.SizeCache
+	state                      protoimpl.MessageState                                              `protogen:"opaque.v1"`
+	xxx_hidden_Details         *[]*Value                                                           `protobuf:"bytes,1,rep,name=details,proto3"`
+	xxx_hidden_Progress        *[]*WriteNodesRequest_StageAttemptProgress                          `protobuf:"bytes,2,rep,name=progress,proto3"`
+	xxx_hidden_StateTransition *WriteNodesRequest_CurrentStageWrite_CurrentAttempt_StateTransition `protobuf:"bytes,3,opt,name=state_transition,json=stateTransition,proto3,oneof"`
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
 }
 
 func (x *WriteNodesRequest_CurrentStageWrite_CurrentAttempt) Reset() {
@@ -1678,9 +1678,9 @@ func (x *WriteNodesRequest_CurrentStageWrite_CurrentAttempt) GetProgress() []*Wr
 	return nil
 }
 
-func (x *WriteNodesRequest_CurrentStageWrite_CurrentAttempt) GetStateTransitions() *WriteNodesRequest_CurrentStageWrite_CurrentAttempt_StateTransition {
+func (x *WriteNodesRequest_CurrentStageWrite_CurrentAttempt) GetStateTransition() *WriteNodesRequest_CurrentStageWrite_CurrentAttempt_StateTransition {
 	if x != nil {
-		return x.xxx_hidden_StateTransitions
+		return x.xxx_hidden_StateTransition
 	}
 	return nil
 }
@@ -1693,19 +1693,19 @@ func (x *WriteNodesRequest_CurrentStageWrite_CurrentAttempt) SetProgress(v []*Wr
 	x.xxx_hidden_Progress = &v
 }
 
-func (x *WriteNodesRequest_CurrentStageWrite_CurrentAttempt) SetStateTransitions(v *WriteNodesRequest_CurrentStageWrite_CurrentAttempt_StateTransition) {
-	x.xxx_hidden_StateTransitions = v
+func (x *WriteNodesRequest_CurrentStageWrite_CurrentAttempt) SetStateTransition(v *WriteNodesRequest_CurrentStageWrite_CurrentAttempt_StateTransition) {
+	x.xxx_hidden_StateTransition = v
 }
 
-func (x *WriteNodesRequest_CurrentStageWrite_CurrentAttempt) HasStateTransitions() bool {
+func (x *WriteNodesRequest_CurrentStageWrite_CurrentAttempt) HasStateTransition() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_StateTransitions != nil
+	return x.xxx_hidden_StateTransition != nil
 }
 
-func (x *WriteNodesRequest_CurrentStageWrite_CurrentAttempt) ClearStateTransitions() {
-	x.xxx_hidden_StateTransitions = nil
+func (x *WriteNodesRequest_CurrentStageWrite_CurrentAttempt) ClearStateTransition() {
+	x.xxx_hidden_StateTransition = nil
 }
 
 type WriteNodesRequest_CurrentStageWrite_CurrentAttempt_builder struct {
@@ -1722,7 +1722,7 @@ type WriteNodesRequest_CurrentStageWrite_CurrentAttempt_builder struct {
 	// otherwise it's possible to double-append them.
 	Progress []*WriteNodesRequest_StageAttemptProgress
 	// A state transition to make in this write.
-	StateTransitions *WriteNodesRequest_CurrentStageWrite_CurrentAttempt_StateTransition
+	StateTransition *WriteNodesRequest_CurrentStageWrite_CurrentAttempt_StateTransition
 }
 
 func (b0 WriteNodesRequest_CurrentStageWrite_CurrentAttempt_builder) Build() *WriteNodesRequest_CurrentStageWrite_CurrentAttempt {
@@ -1731,7 +1731,7 @@ func (b0 WriteNodesRequest_CurrentStageWrite_CurrentAttempt_builder) Build() *Wr
 	_, _ = b, x
 	x.xxx_hidden_Details = &b.Details
 	x.xxx_hidden_Progress = &b.Progress
-	x.xxx_hidden_StateTransitions = b.StateTransitions
+	x.xxx_hidden_StateTransition = b.StateTransition
 	return m0
 }
 
@@ -2674,7 +2674,7 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xea'\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xe7'\n" +
 	"\x11WriteNodesRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12Q\n" +
 	"\areasons\x18\x02 \x03(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonR\areasons\x12Z\n" +
@@ -2759,14 +2759,14 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\r_dependenciesB#\n" +
 	"!_requested_stage_execution_policyB\f\n" +
 	"\n" +
-	"_cancelled\x1a\xd9\x11\n" +
+	"_cancelled\x1a\xd6\x11\n" +
 	"\x11CurrentStageWrite\x12\x7f\n" +
 	"\x0fcurrent_attempt\x18\x01 \x01(\v2Q.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttemptH\x00R\x0ecurrentAttempt\x88\x01\x01\x12c\n" +
-	"\x05stage\x18\x04 \x01(\v2H.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.StageH\x01R\x05stage\x88\x01\x01\x1a\x9a\x0e\n" +
+	"\x05stage\x18\x04 \x01(\v2H.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.StageH\x01R\x05stage\x88\x01\x01\x1a\x97\x0e\n" +
 	"\x0eCurrentAttempt\x12>\n" +
 	"\adetails\x18\x01 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetails\x12a\n" +
-	"\bprogress\x18\x02 \x03(\v2E.turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttemptProgressR\bprogress\x12\x93\x01\n" +
-	"\x11state_transitions\x18\x03 \x01(\v2a.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.StateTransitionH\x00R\x10stateTransitions\x88\x01\x01\x1a\xb8\v\n" +
+	"\bprogress\x18\x02 \x03(\v2E.turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttemptProgressR\bprogress\x12\x91\x01\n" +
+	"\x10state_transition\x18\x03 \x01(\v2a.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.StateTransitionH\x00R\x0fstateTransition\x88\x01\x01\x1a\xb8\v\n" +
 	"\x0fStateTransition\x12\x8b\x01\n" +
 	"\tthrottled\x18\x01 \x01(\v2k.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.StateTransition.ThrottledH\x00R\tthrottled\x12\x8b\x01\n" +
 	"\tscheduled\x18\x02 \x01(\v2k.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.StateTransition.ScheduledH\x00R\tscheduled\x12\x85\x01\n" +
@@ -2795,8 +2795,8 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"Incomplete\x121\n" +
 	"\x12block_new_attempts\x18\x01 \x01(\bH\x00R\x10blockNewAttempts\x88\x01\x01B\x15\n" +
 	"\x13_block_new_attemptsB\x0f\n" +
-	"\rdesired_stateB\x14\n" +
-	"\x12_state_transitions\x1a\xa2\x01\n" +
+	"\rdesired_stateB\x13\n" +
+	"\x11_state_transition\x1a\xa2\x01\n" +
 	"\x05Stage\x12\x81\x01\n" +
 	"\x12continuation_group\x18\x01 \x01(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
 	"\x01\bH\x00R\x11continuationGroup\x88\x01\x01B\x15\n" +
@@ -2868,7 +2868,7 @@ var file_turboci_graph_orchestrator_v1_write_nodes_request_proto_depIdxs = []int
 	10, // 24: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.stage:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.Stage
 	18, // 25: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.details:type_name -> turboci.graph.orchestrator.v1.Value
 	3,  // 26: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.progress:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttemptProgress
-	11, // 27: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.state_transitions:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.StateTransition
+	11, // 27: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.state_transition:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.StateTransition
 	2,  // 28: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.Stage.continuation_group:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroup
 	12, // 29: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.StateTransition.throttled:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.StateTransition.Throttled
 	13, // 30: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.StateTransition.scheduled:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentStageWrite.CurrentAttempt.StateTransition.Scheduled

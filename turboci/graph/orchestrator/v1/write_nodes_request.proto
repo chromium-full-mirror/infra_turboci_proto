@@ -564,7 +564,7 @@ message WriteNodesRequest {
         }
       }
       // A state transition to make in this write.
-      optional StateTransition state_transitions = 3;
+      optional StateTransition state_transition = 3;
     }
     // Mutations to apply to the current Stage Attempt as indicated by the
     // WriteNodesRequest.token.
