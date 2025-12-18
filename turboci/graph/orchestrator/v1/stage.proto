@@ -155,7 +155,7 @@ message Stage {
   // TBD: Pull this into its own top-level StageAttempt entity because it will
   // need to have its own state and lifecycle/transactions.
   //
-  // Next ID: 10
+  // Next ID: 11
   message Attempt {
     // The Stage Attempt's identifier.
     optional ids.v1.StageAttempt identifier = 1;
@@ -164,6 +164,18 @@ message Stage {
     //
     // Updated any time fields in this Attempt change.
     optional Revision version = 2;
+
+    // Last time we got a WriteNodes from this Attempt with the `current_stage`
+    // field populated.
+    //
+    // This is distinct from `version` because the state of the Attempt can be
+    // altered by the Orchestrator without counting as a heartbeat.
+    //
+    // Until the first successful WriteNodes call from the executor happens,
+    // this will remain unset. This will be set, but not updated, during
+    // THROTTLED (because we accepted a WriteNodes in order to enter the
+    // THROTTLED state).
+    optional Revision last_heartbeat = 10;
 
     // The current state of this Attempt.
     optional StageAttemptState state = 3;
