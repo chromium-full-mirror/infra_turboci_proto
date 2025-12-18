@@ -6,16 +6,15 @@ syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
+import "google/protobuf/timestamp.proto";
 import "turboci/graph/ids/v1/identifier.proto";
 import "turboci/graph/orchestrator/v1/check_kind.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/edge.proto";
-import "turboci/graph/orchestrator/v1/failure.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 import "turboci/graph/orchestrator/v1/stage.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto";
-import "turboci/graph/orchestrator/v1/stage_attempt_state.proto";
 import "turboci/graph/orchestrator/v1/stage_execution_policy.proto";
 import "turboci/graph/orchestrator/v1/value.proto";
 
@@ -73,7 +72,7 @@ message WriteNodesRequest {
     // Low-effort/human-readable progress information.
     //
     // Better than nothing, but not good for machines to parse.
-    optional string msg = 1;
+    optional string message = 1;
 
     // Machine-readable details for this progress item.
     repeated Value details = 2;
@@ -113,7 +112,7 @@ message WriteNodesRequest {
     //
     // This is 'low effort' because it's preferable for the writer to provide
     // detailed machine-readable data in the `details` field below.
-    optional string reason = 2;
+    optional string message = 2;
 
     // Machine-readable reason(s) for this edit.
     //
@@ -417,9 +416,6 @@ message WriteNodesRequest {
     //
     // Use the top-level `reason` field to provide the cancellation reason.
     optional bool cancelled = 7;
-
-    // TBD: Other Adjustments ?
-    // TBD: Dynamic Execution Policy
   }
   // Write to zero or more Stages.
   repeated StageWrite stages = 5;
@@ -429,96 +425,171 @@ message WriteNodesRequest {
   // These aspects come from either the Executor which owns this Stage Attempt,
   // or the running Stage Attempt process.
   message CurrentStageWrite {
-    // Report the attempt's current state. This can only make the following
-    // transitions (since all other transitions are handled by the Orchestrator
-    // itself):
-    //
-    //   * PENDING -> SCHEDULED
-    //   * PENDING -> RUNNING
-    //   * PENDING -> COMPLETE
-    //   * PENDING -> INCOMPLETE
-    //   * SCHEDULED -> RUNNING
-    //   * SCHEDULED -> COMPLETE
-    //   * SCHEDULED -> INCOMPLETE
-    //   * RUNNING -> TEARING_DOWN
-    //   * RUNNING -> COMPLETE
-    //   * RUNNING -> INCOMPLETE
-    optional StageAttemptState state = 1;
-
-    // Sets the Stage Attempt.process_uid field.
-    //
-    // MUST be supplied when transitioning a Stage Attempt to RUNNING.
-    //
-    // If the field is already populated in the Stage Attempt, this value must
-    // match - otherwise the write is rejected with an error detail of
-    // StageAttemptClaimedFailure.
-    //
-    // Refer to Stage.Attempt.process_uid.
-    optional string process_uid = 2;
-
-    // Continuation Group predicate for this Stage.
-    //
-    // If set, used to populate the continuation_group.edges and
-    // continuation_group.predicate fields in this Stage.
-    //
-    // Edges here must only point to Stages which were created_by this Stage.
-    optional DependencyGroup continuation_group = 3 [(turboci).id.allowed = IDENTIFIER_KIND_STAGE];
-
-    // The modified execution policy for this Stage Attempt.
-    //
-    // This field can only be set by the stage executor when advancing the
-    // stage attempt state PENDING -> (SCHEDULED|RUNNING).
-    optional StageAttemptExecutionPolicy attempt_execution_policy = 4;
-
-    // Adds details to the Stage Attempt.details field.
-    //
-    // If a data type here is already present in the database, the data here
-    // must exactly equal the existing data; Otherwise the write is rejected.
-    repeated Value details = 5;
-
-    // Progress messages to add to the current Stage Attempt.
-    //
-    // It is a good idea to do these progress updates transactionally, otherwise
-    // it's possible to double-append them.
-    repeated StageAttemptProgress progress = 6;
-
-    // Failure is for stage attempt execution failure information.
-    //
-    // Note: this message is not intended to be used for workflow-level
-    // failures. For example if a stage attempt finishes everything it is
-    // intended to do (i.e. to run a suite of tests), and it produces some
-    // failure results (i.e. some tests failed), those results should be
-    // reported to the corresponding check's result.Data, not here.
-    message Failure {
-      // Human-readable error message.
-      optional string message = 1;
-
-      // Type of the failure.
+    // CurrentAttempt encapsulates all mutations which can be done to a Stage
+    // Attempt.
+    message CurrentAttempt {
+      // Adds details to the Stage Attempt.details field.
       //
-      // This is a subset of failures in failure.proto. Only the failures that
-      // are relevant to Stage Executor executing a Stage Attempt are listed
-      // here.
-      oneof type {
-        // Failure to transition a stage attempt to SCHEDULED state.
-        ToScheduled to_scheduled = 2;
-        // Failure to transition a stage attempt to RUNNING state.
-        ToRunning to_running = 3;
+      // If a data type here is already present in the database, the data here
+      // must exactly equal the existing data; Otherwise the write is rejected.
+      repeated Value details = 1;
+
+      // Progress messages to add to the current Stage Attempt.
+      //
+      // It is a good idea to do these progress updates transactionally,
+      // otherwise it's possible to double-append them.
+      repeated StageAttemptProgress progress = 2;
+
+      // Indicate how the Orchestrator should transition to a given state.
+      message StateTransition {
+        // Throttled indicates that the Executor can run this Attempt, just not
+        // right now.
+        message Throttled {
+          // Specifies that the Stage Attempt should not be made PENDING again
+          // (and thus sent to the Executor via RunStage) until this time.
+          //
+          // Specifying a time in the past will cause the write to be a no-op
+          // (which will leave the Attempt in the PENDING state).
+          //
+          // Required.
+          optional google.protobuf.Timestamp until = 1;
+        }
+
+        // Scheduled indicates that the Executor has accepted the Attempt, and
+        // will run it at a later time.
+        message Scheduled {
+          // The execution policy for this Stage Attempt.
+          //
+          // Optional.
+          optional StageAttemptExecutionPolicy attempt_execution_policy = 1;
+        }
+
+        // Running indicates that the Executor is actively running this Attempt.
+        message Running {
+          // The execution policy for this Stage Attempt.
+          //
+          // This should only be used if it wasn't already set in SCHEDULED.
+          // If it's set for both SCHEDULED and RUNNING, it must be the same
+          // value.
+          //
+          // Optional.
+          optional StageAttemptExecutionPolicy attempt_execution_policy = 1;
+
+          // Sets the Stage.Attempt.process_uid field.
+          //
+          // If the field is already populated in the Stage Attempt, this value
+          // must match - otherwise the write is rejected with an error detail
+          // of StageAttemptClaimedFailure.
+          //
+          // Refer to Stage.Attempt.process_uid.
+          //
+          // Required.
+          optional string process_uid = 2;
+        }
+
+        // TearingDown indicates that the Executor has either finished RUNNING
+        // the Attempt, or the Stage was cancelled and the Executor is doing
+        // its final cleanup for a previously-RUNNING Attempt.
+        message TearingDown {
+          // Nothing here for now.
+        }
+
+        // Complete indicates that the Executor has finished all work on this
+        // Attempt, and the Stage can now move into its next state.
+        //
+        // NOTE: See STAGE_ATTEMPT_COMPLETE. Completing a Stage does not imply
+        // workflow-level success like "the code compiled successfully" or "the
+        // tests all passed". It simply means that e.g. the requested build ran
+        // to completion, or the test harness executed all the tests.
+        // Workflow-level records like compilation success/failure or test
+        // execution success/failure should be recorded in the Checks for those
+        // things as specific Result data.
+        message Complete {
+          // Nothing here for now.
+        }
+
+        // Incomplete indicates an Executor-level failure which prevented the
+        // stage from running to completion.
+        //
+        // By convention, the reason for this should be reflected in the final
+        // Progress message (which, unlike the write reasons, will not be
+        // garbage collected after some amount of time).
+        //
+        // NOTE: See STAGE_ATTEMPT_INCOMPLETE. Similar to COMPLETE, INCOMPLETE
+        // is used to indicate failure of the stage to complete it's desired
+        // task (e.g. compiler segfaulted, test harness lost contact with a DUT
+        // during test execution (and such a failure may not be due to the test
+        // itself), etc.)
+        message Incomplete {
+          // Controls if this Stage should make another Attempt.
+          //
+          // If true, then no new Attempt is made, even if policy would permit one.
+          //
+          // Optional.
+          optional bool block_new_attempts = 1;
+        }
+
+        // Required - the state that this StateTransition wants to move
+        // to.
+        oneof desired_state {
+          // Move to the THROTTLED state.
+          //
+          // Current state must be PENDING.
+          Throttled throttled = 1;
+
+          // Move to the SCHEDULED state.
+          //
+          // Current state must be PENDING.
+          Scheduled scheduled = 2;
+
+          // Move to the RUNNING state.
+          //
+          // Current state must be PENDING or SCHEDULED.
+          Running running = 3;
+
+          // Move to the TEARING_DOWN state.
+          //
+          // Current state must be RUNNING or CANCELLING.
+          TearingDown tearing_down = 4;
+
+          // Move to the COMPLETE state.
+          //
+          // Current state must be PENDING, SCHEDULED, RUNNING or TEARING_DOWN.
+          Complete complete = 5;
+
+          // Move to the INCOMPLETE state.
+          //
+          // Current state must be PENDING, SCHEDULED, RUNNING or TEARING_DOWN.
+          Incomplete incomplete = 6;
+        }
       }
+      // A state transition to make in this write.
+      optional StateTransition state_transitions = 3;
     }
+    // Mutations to apply to the current Stage Attempt as indicated by the
+    // WriteNodesRequest.token.
+    optional CurrentAttempt current_attempt = 1;
 
-    // Failure is for stage attempt execution failure information.
+    // Stage encapsulates all mutations which can be done to a Stage
+    // (excluding Stage of Stage Attempts).
+    message Stage {
+      // Continuation Group predicate for this Stage.
+      //
+      // If set, used to populate the continuation_group.edges and
+      // continuation_group.predicate fields in this Stage.
+      //
+      // Edges here must only point to Stages which were created_by this Stage.
+      //
+      // If continuation_group is already set, this will overwrite the existing
+      // continuation_group.
+      optional DependencyGroup continuation_group = 1 [(turboci).id.allowed = IDENTIFIER_KIND_STAGE];
+    }
+    // Mutations to apply to the current Stage as indicated by the
+    // WriteNodesRequest.token.
     //
-    // This field must only be set when transition the Stage Attempt to
-    // INCOMPLETE state. Omitting the state or setting the state to other
-    // values will result in an error.
-    optional Failure failure = 7;
-
-    // Controls if this Stage should make another Attempt.
-    //
-    // May only be set when also setting state == INCOMPLETE.
-    //
-    // If true, then no new Attempt is made, even if policy would permit one.
-    optional bool block_new_attempts = 8;
+    // This field may only be set when the current Stage Attempt is in the, or
+    // transitioning to/through, the RUNNING or COMPLETE states.
+    optional Stage stage = 4;
   }
   // State for the current Stage as indicated by `token`.
   //
@@ -538,9 +609,5 @@ message WriteNodesRequest {
   //
   // All else being equal, it's better to do fewer, larger, WriteNodes calls
   // than many small WriteNodes calls.
-  //
-  // TBD: Document the SCHEDULED -> RUNNING state transition requirements (i.e.
-  // setting a unique worker_id and handling multiple logical processes all
-  // trying to transition to RUNNING at the same time).
   optional CurrentStageWrite current_stage = 6;
 }

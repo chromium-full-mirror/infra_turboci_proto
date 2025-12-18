@@ -66,7 +66,7 @@ message Edit {
   optional string realm = 5 [(google.api.field_behavior) = IMMUTABLE];
 
   // The entity which generated this Edit.
-  optional Actor editor = 6;
+  optional Actor created_by = 6;
 
   // This is the set of nodes which were included in the same WriteNodes
   // RPC as this Edit (one per `checks`, `stages`, and/or
@@ -121,7 +121,7 @@ message Edit {
     //
     // This is 'low effort' because it's preferable for the writer to provide
     // detailed machine-readable data in the `details` field below.
-    optional string reason = 2;
+    optional string message = 2;
 
     // Machine-readable reason(s) for this edit.
     //

@@ -13,9 +13,9 @@ import "turboci/graph/orchestrator/v1/check_kind.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/datum.proto";
 import "turboci/graph/orchestrator/v1/dependencies.proto";
-import "turboci/graph/orchestrator/v1/failure.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
+import "turboci/graph/orchestrator/v1/stage_attempt_state.proto";
 
 option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
 option java_multiple_files = true;
@@ -140,6 +140,8 @@ message Check {
     optional ids.v1.CheckResult identifier = 1;
 
     // The entity which created this Result.
+    //
+    // This is the only entity which can modify this Result.
     optional Actor owner = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 
     // The database revsision (commit timestamp) at which this Result was
@@ -172,12 +174,13 @@ message Check {
     //   * The Check advances to the FINAL state.
     optional Revision finalized_at = 5;
 
-    // The failure information if the owner of this result failed.
+    // If the Result was finalized automatically by the conclusion of the owner
+    // Stage Attempt, this indicates the final state of that Stage Attempt (i.e.
+    // COMPLETE or INCOMPLETE).
     //
-    // Most commonly, this will occur when a StageAttempt fails, but this could
-    // also be populated by the orchestrator itself if, for example, the workplan
-    // is ended without any result being created for this Check.
-    optional Failure failure = 6;
+    // If this is unset, it means that the Result was either finalized
+    // explicitly by the owner, or by the Check advancing to the final state.
+    optional StageAttemptState attempt_state = 6;
   }
   // The list of Results this Check has.
   //

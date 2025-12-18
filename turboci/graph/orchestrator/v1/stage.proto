@@ -12,7 +12,6 @@ import "turboci/graph/ids/v1/identifier.proto";
 import "turboci/graph/orchestrator/v1/actor.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/dependencies.proto";
-import "turboci/graph/orchestrator/v1/failure.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto";
@@ -241,7 +240,7 @@ message Stage {
     // information in a time-oriented way.
     message Progress {
       // Low-effort/human-readable progress information.
-      optional string msg = 1;
+      optional string message = 1;
 
       // The version of the Stage Attempt when this Progress message was added.
       optional Revision version = 2;
@@ -270,9 +269,6 @@ message Stage {
     // CurrentStageWrite when the executor advances the StageAttempt state
     // PENDING -> (SCHEDULED|RUNNING).
     optional StageAttemptExecutionPolicy execution_policy = 8;
-
-    // Execution failure information for the StageAttempt.
-    optional Failure failure = 9;
   }
   // Current retry/attempts state of this Stage, stored in ascending order by
   // created time.

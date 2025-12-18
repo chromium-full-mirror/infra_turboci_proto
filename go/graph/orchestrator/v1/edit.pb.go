@@ -43,7 +43,7 @@ type Edit struct {
 	xxx_hidden_ExpireAt         *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=expire_at,json=expireAt,proto3,oneof"`
 	xxx_hidden_DataExpireAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=data_expire_at,json=dataExpireAt,proto3,oneof"`
 	xxx_hidden_Realm            *string                `protobuf:"bytes,5,opt,name=realm,proto3,oneof"`
-	xxx_hidden_Editor           *Actor                 `protobuf:"bytes,6,opt,name=editor,proto3,oneof"`
+	xxx_hidden_CreatedBy        *Actor                 `protobuf:"bytes,6,opt,name=created_by,json=createdBy,proto3,oneof"`
 	xxx_hidden_TransactionalSet *[]*v1.Identifier      `protobuf:"bytes,7,rep,name=transactional_set,json=transactionalSet,proto3"`
 	xxx_hidden_ObliviousWrite   bool                   `protobuf:"varint,11,opt,name=oblivious_write,json=obliviousWrite,proto3,oneof"`
 	xxx_hidden_Reasons          *[]*Edit_Reason        `protobuf:"bytes,8,rep,name=reasons,proto3"`
@@ -117,9 +117,9 @@ func (x *Edit) GetRealm() string {
 	return ""
 }
 
-func (x *Edit) GetEditor() *Actor {
+func (x *Edit) GetCreatedBy() *Actor {
 	if x != nil {
-		return x.xxx_hidden_Editor
+		return x.xxx_hidden_CreatedBy
 	}
 	return nil
 }
@@ -188,8 +188,8 @@ func (x *Edit) SetRealm(v string) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 10)
 }
 
-func (x *Edit) SetEditor(v *Actor) {
-	x.xxx_hidden_Editor = v
+func (x *Edit) SetCreatedBy(v *Actor) {
+	x.xxx_hidden_CreatedBy = v
 }
 
 func (x *Edit) SetTransactionalSet(v []*v1.Identifier) {
@@ -256,11 +256,11 @@ func (x *Edit) HasRealm() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
 }
 
-func (x *Edit) HasEditor() bool {
+func (x *Edit) HasCreatedBy() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_Editor != nil
+	return x.xxx_hidden_CreatedBy != nil
 }
 
 func (x *Edit) HasObliviousWrite() bool {
@@ -314,8 +314,8 @@ func (x *Edit) ClearRealm() {
 	x.xxx_hidden_Realm = nil
 }
 
-func (x *Edit) ClearEditor() {
-	x.xxx_hidden_Editor = nil
+func (x *Edit) ClearCreatedBy() {
+	x.xxx_hidden_CreatedBy = nil
 }
 
 func (x *Edit) ClearObliviousWrite() {
@@ -389,7 +389,7 @@ type Edit_builder struct {
 	// edits for that Check or Stage.
 	Realm *string
 	// The entity which generated this Edit.
-	Editor *Actor
+	CreatedBy *Actor
 	// This is the set of nodes which were included in the same WriteNodes
 	// RPC as this Edit (one per `checks`, `stages`, and/or
 	// `current_stage_write`). For simplicity, this will also always include
@@ -457,7 +457,7 @@ func (b0 Edit_builder) Build() *Edit {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 10)
 		x.xxx_hidden_Realm = b.Realm
 	}
-	x.xxx_hidden_Editor = b.Editor
+	x.xxx_hidden_CreatedBy = b.CreatedBy
 	x.xxx_hidden_TransactionalSet = &b.TransactionalSet
 	if b.ObliviousWrite != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 7, 10)
@@ -510,7 +510,7 @@ func (*edit_Stage) isEdit_Delta() {}
 type Edit_Reason struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Realm       *string                `protobuf:"bytes,1,opt,name=realm,proto3,oneof"`
-	xxx_hidden_Reason      *string                `protobuf:"bytes,2,opt,name=reason,proto3,oneof"`
+	xxx_hidden_Message     *string                `protobuf:"bytes,2,opt,name=message,proto3,oneof"`
 	xxx_hidden_Details     *[]*Value              `protobuf:"bytes,3,rep,name=details,proto3"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
@@ -553,10 +553,10 @@ func (x *Edit_Reason) GetRealm() string {
 	return ""
 }
 
-func (x *Edit_Reason) GetReason() string {
+func (x *Edit_Reason) GetMessage() string {
 	if x != nil {
-		if x.xxx_hidden_Reason != nil {
-			return *x.xxx_hidden_Reason
+		if x.xxx_hidden_Message != nil {
+			return *x.xxx_hidden_Message
 		}
 		return ""
 	}
@@ -577,8 +577,8 @@ func (x *Edit_Reason) SetRealm(v string) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
 }
 
-func (x *Edit_Reason) SetReason(v string) {
-	x.xxx_hidden_Reason = &v
+func (x *Edit_Reason) SetMessage(v string) {
+	x.xxx_hidden_Message = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
 }
 
@@ -593,7 +593,7 @@ func (x *Edit_Reason) HasRealm() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *Edit_Reason) HasReason() bool {
+func (x *Edit_Reason) HasMessage() bool {
 	if x == nil {
 		return false
 	}
@@ -605,9 +605,9 @@ func (x *Edit_Reason) ClearRealm() {
 	x.xxx_hidden_Realm = nil
 }
 
-func (x *Edit_Reason) ClearReason() {
+func (x *Edit_Reason) ClearMessage() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Reason = nil
+	x.xxx_hidden_Message = nil
 }
 
 type Edit_Reason_builder struct {
@@ -627,7 +627,7 @@ type Edit_Reason_builder struct {
 	//
 	// This is 'low effort' because it's preferable for the writer to provide
 	// detailed machine-readable data in the `details` field below.
-	Reason *string
+	Message *string
 	// Machine-readable reason(s) for this edit.
 	//
 	// This is repeated to allow for standardized reason message types in
@@ -644,9 +644,9 @@ func (b0 Edit_Reason_builder) Build() *Edit_Reason {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
 		x.xxx_hidden_Realm = b.Realm
 	}
-	if b.Reason != nil {
+	if b.Message != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
-		x.xxx_hidden_Reason = b.Reason
+		x.xxx_hidden_Message = b.Message
 	}
 	x.xxx_hidden_Details = &b.Details
 	return m0
@@ -656,28 +656,30 @@ var File_turboci_graph_orchestrator_v1_edit_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_edit_proto_rawDesc = "" +
 	"\n" +
-	"(turboci/graph/orchestrator/v1/edit.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_delta.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_delta.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xe2\a\n" +
+	"(turboci/graph/orchestrator/v1/edit.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_delta.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_delta.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xf0\a\n" +
 	"\x04Edit\x12N\n" +
 	"\bfor_node\x18\x01 \x01(\v2 .turboci.graph.ids.v1.IdentifierB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
 	"\x02\x02\bH\x01R\aforNode\x88\x01\x01\x12F\n" +
 	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\aversion\x88\x01\x01\x12<\n" +
 	"\texpire_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampH\x03R\bexpireAt\x88\x01\x01\x12E\n" +
 	"\x0edata_expire_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampH\x04R\fdataExpireAt\x88\x01\x01\x12\x1e\n" +
-	"\x05realm\x18\x05 \x01(\tB\x03\xe0A\x05H\x05R\x05realm\x88\x01\x01\x12A\n" +
-	"\x06editor\x18\x06 \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x06R\x06editor\x88\x01\x01\x12\\\n" +
+	"\x05realm\x18\x05 \x01(\tB\x03\xe0A\x05H\x05R\x05realm\x88\x01\x01\x12H\n" +
+	"\n" +
+	"created_by\x18\x06 \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x06R\tcreatedBy\x88\x01\x01\x12\\\n" +
 	"\x11transactional_set\x18\a \x03(\v2 .turboci.graph.ids.v1.IdentifierB\r\x82\x86\xf6\xfb\x0f\a\x12\x05\n" +
 	"\x03\x02\b\tR\x10transactionalSet\x12,\n" +
 	"\x0foblivious_write\x18\v \x01(\bH\aR\x0eobliviousWrite\x88\x01\x01\x12D\n" +
 	"\areasons\x18\b \x03(\v2*.turboci.graph.orchestrator.v1.Edit.ReasonR\areasons\x12A\n" +
 	"\x05check\x18\t \x01(\v2).turboci.graph.orchestrator.v1.CheckDeltaH\x00R\x05check\x12A\n" +
 	"\x05stage\x18\n" +
-	" \x01(\v2).turboci.graph.orchestrator.v1.StageDeltaH\x00R\x05stage\x1a\x95\x01\n" +
+	" \x01(\v2).turboci.graph.orchestrator.v1.StageDeltaH\x00R\x05stage\x1a\x98\x01\n" +
 	"\x06Reason\x12\x19\n" +
-	"\x05realm\x18\x01 \x01(\tH\x00R\x05realm\x88\x01\x01\x12\x1b\n" +
-	"\x06reason\x18\x02 \x01(\tH\x01R\x06reason\x88\x01\x01\x12>\n" +
+	"\x05realm\x18\x01 \x01(\tH\x00R\x05realm\x88\x01\x01\x12\x1d\n" +
+	"\amessage\x18\x02 \x01(\tH\x01R\amessage\x88\x01\x01\x12>\n" +
 	"\adetails\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetailsB\b\n" +
-	"\x06_realmB\t\n" +
-	"\a_reasonB\a\n" +
+	"\x06_realmB\n" +
+	"\n" +
+	"\b_messageB\a\n" +
 	"\x05deltaB\v\n" +
 	"\t_for_nodeB\n" +
 	"\n" +
@@ -685,8 +687,8 @@ const file_turboci_graph_orchestrator_v1_edit_proto_rawDesc = "" +
 	"\n" +
 	"_expire_atB\x11\n" +
 	"\x0f_data_expire_atB\b\n" +
-	"\x06_realmB\t\n" +
-	"\a_editorB\x12\n" +
+	"\x06_realmB\r\n" +
+	"\v_created_byB\x12\n" +
 	"\x10_oblivious_writeBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_edit_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
@@ -706,7 +708,7 @@ var file_turboci_graph_orchestrator_v1_edit_proto_depIdxs = []int32{
 	3,  // 1: turboci.graph.orchestrator.v1.Edit.version:type_name -> turboci.graph.orchestrator.v1.Revision
 	4,  // 2: turboci.graph.orchestrator.v1.Edit.expire_at:type_name -> google.protobuf.Timestamp
 	4,  // 3: turboci.graph.orchestrator.v1.Edit.data_expire_at:type_name -> google.protobuf.Timestamp
-	5,  // 4: turboci.graph.orchestrator.v1.Edit.editor:type_name -> turboci.graph.orchestrator.v1.Actor
+	5,  // 4: turboci.graph.orchestrator.v1.Edit.created_by:type_name -> turboci.graph.orchestrator.v1.Actor
 	2,  // 5: turboci.graph.orchestrator.v1.Edit.transactional_set:type_name -> turboci.graph.ids.v1.Identifier
 	1,  // 6: turboci.graph.orchestrator.v1.Edit.reasons:type_name -> turboci.graph.orchestrator.v1.Edit.Reason
 	6,  // 7: turboci.graph.orchestrator.v1.Edit.check:type_name -> turboci.graph.orchestrator.v1.CheckDelta

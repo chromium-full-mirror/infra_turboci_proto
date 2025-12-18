@@ -523,15 +523,17 @@ func (b0 Check_StateHistoryEntry_builder) Build() *Check_StateHistoryEntry {
 // of result data. This could occur when multiple Stages all contribute
 // results to the same Check (e.g. sharding, multiple executions, etc.).
 type Check_Result struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Identifier  *v1.CheckResult        `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
-	xxx_hidden_Owner       *Actor                 `protobuf:"bytes,2,opt,name=owner,proto3,oneof"`
-	xxx_hidden_CreatedAt   *Revision              `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3,oneof"`
-	xxx_hidden_Data        *[]*Datum              `protobuf:"bytes,4,rep,name=data,proto3"`
-	xxx_hidden_FinalizedAt *Revision              `protobuf:"bytes,5,opt,name=finalized_at,json=finalizedAt,proto3,oneof"`
-	xxx_hidden_Failure     *Failure               `protobuf:"bytes,6,opt,name=failure,proto3,oneof"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state                   protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier   *v1.CheckResult        `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Owner        *Actor                 `protobuf:"bytes,2,opt,name=owner,proto3,oneof"`
+	xxx_hidden_CreatedAt    *Revision              `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3,oneof"`
+	xxx_hidden_Data         *[]*Datum              `protobuf:"bytes,4,rep,name=data,proto3"`
+	xxx_hidden_FinalizedAt  *Revision              `protobuf:"bytes,5,opt,name=finalized_at,json=finalizedAt,proto3,oneof"`
+	xxx_hidden_AttemptState StageAttemptState      `protobuf:"varint,6,opt,name=attempt_state,json=attemptState,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
+	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
+	XXX_presence            [1]uint32
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *Check_Result) Reset() {
@@ -596,11 +598,13 @@ func (x *Check_Result) GetFinalizedAt() *Revision {
 	return nil
 }
 
-func (x *Check_Result) GetFailure() *Failure {
+func (x *Check_Result) GetAttemptState() StageAttemptState {
 	if x != nil {
-		return x.xxx_hidden_Failure
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 5) {
+			return x.xxx_hidden_AttemptState
+		}
 	}
-	return nil
+	return StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
 }
 
 func (x *Check_Result) SetIdentifier(v *v1.CheckResult) {
@@ -623,8 +627,9 @@ func (x *Check_Result) SetFinalizedAt(v *Revision) {
 	x.xxx_hidden_FinalizedAt = v
 }
 
-func (x *Check_Result) SetFailure(v *Failure) {
-	x.xxx_hidden_Failure = v
+func (x *Check_Result) SetAttemptState(v StageAttemptState) {
+	x.xxx_hidden_AttemptState = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 6)
 }
 
 func (x *Check_Result) HasIdentifier() bool {
@@ -655,11 +660,11 @@ func (x *Check_Result) HasFinalizedAt() bool {
 	return x.xxx_hidden_FinalizedAt != nil
 }
 
-func (x *Check_Result) HasFailure() bool {
+func (x *Check_Result) HasAttemptState() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_Failure != nil
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
 }
 
 func (x *Check_Result) ClearIdentifier() {
@@ -678,8 +683,9 @@ func (x *Check_Result) ClearFinalizedAt() {
 	x.xxx_hidden_FinalizedAt = nil
 }
 
-func (x *Check_Result) ClearFailure() {
-	x.xxx_hidden_Failure = nil
+func (x *Check_Result) ClearAttemptState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	x.xxx_hidden_AttemptState = StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
 }
 
 type Check_Result_builder struct {
@@ -688,6 +694,8 @@ type Check_Result_builder struct {
 	// Identifier for this Result.
 	Identifier *v1.CheckResult
 	// The entity which created this Result.
+	//
+	// This is the only entity which can modify this Result.
 	Owner *Actor
 	// The database revsision (commit timestamp) at which this Result was
 	// created.
@@ -716,12 +724,13 @@ type Check_Result_builder struct {
 	//   - The `owner` explicitly indicates that their results are final.
 	//   - The Check advances to the FINAL state.
 	FinalizedAt *Revision
-	// The failure information if the owner of this result failed.
+	// If the Result was finalized automatically by the conclusion of the owner
+	// Stage Attempt, this indicates the final state of that Stage Attempt (i.e.
+	// COMPLETE or INCOMPLETE).
 	//
-	// Most commonly, this will occur when a StageAttempt fails, but this could
-	// also be populated by the orchestrator itself if, for example, the workplan
-	// is ended without any result being created for this Check.
-	Failure *Failure
+	// If this is unset, it means that the Result was either finalized
+	// explicitly by the owner, or by the Check advancing to the final state.
+	AttemptState *StageAttemptState
 }
 
 func (b0 Check_Result_builder) Build() *Check_Result {
@@ -733,7 +742,10 @@ func (b0 Check_Result_builder) Build() *Check_Result {
 	x.xxx_hidden_CreatedAt = b.CreatedAt
 	x.xxx_hidden_Data = &b.Data
 	x.xxx_hidden_FinalizedAt = b.FinalizedAt
-	x.xxx_hidden_Failure = b.Failure
+	if b.AttemptState != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 6)
+		x.xxx_hidden_AttemptState = *b.AttemptState
+	}
 	return m0
 }
 
@@ -741,7 +753,7 @@ var File_turboci_graph_orchestrator_v1_check_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a)turboci/graph/orchestrator/v1/datum.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a+turboci/graph/orchestrator/v1/failure.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\x8e\f\n" +
+	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a)turboci/graph/orchestrator/v1/datum.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\"\xa9\f\n" +
 	"\x05Check\x12E\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckB\x03\xe0A\x05H\x00R\n" +
@@ -767,7 +779,7 @@ const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01B\b\n" +
 	"\x06_stateB\n" +
 	"\n" +
-	"\b_version\x1a\xff\x03\n" +
+	"\b_version\x1a\x9a\x04\n" +
 	"\x06Result\x12F\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckResultH\x00R\n" +
@@ -776,14 +788,13 @@ const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x03H\x02R\tcreatedAt\x88\x01\x01\x128\n" +
 	"\x04data\x18\x04 \x03(\v2$.turboci.graph.orchestrator.v1.DatumR\x04data\x12O\n" +
-	"\ffinalized_at\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x03R\vfinalizedAt\x88\x01\x01\x12E\n" +
-	"\afailure\x18\x06 \x01(\v2&.turboci.graph.orchestrator.v1.FailureH\x04R\afailure\x88\x01\x01B\r\n" +
+	"\ffinalized_at\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x03R\vfinalizedAt\x88\x01\x01\x12Z\n" +
+	"\rattempt_state\x18\x06 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x04R\fattemptState\x88\x01\x01B\r\n" +
 	"\v_identifierB\b\n" +
 	"\x06_ownerB\r\n" +
 	"\v_created_atB\x0f\n" +
-	"\r_finalized_atB\n" +
-	"\n" +
-	"\b_failureB\r\n" +
+	"\r_finalized_atB\x10\n" +
+	"\x0e_attempt_stateB\r\n" +
 	"\v_identifierB\r\n" +
 	"\v_created_byB\a\n" +
 	"\x05_kindB\b\n" +
@@ -806,7 +817,7 @@ var file_turboci_graph_orchestrator_v1_check_proto_goTypes = []any{
 	(*Dependencies)(nil),            // 8: turboci.graph.orchestrator.v1.Dependencies
 	(*Datum)(nil),                   // 9: turboci.graph.orchestrator.v1.Datum
 	(*v1.CheckResult)(nil),          // 10: turboci.graph.ids.v1.CheckResult
-	(*Failure)(nil),                 // 11: turboci.graph.orchestrator.v1.Failure
+	(StageAttemptState)(0),          // 11: turboci.graph.orchestrator.v1.StageAttemptState
 }
 var file_turboci_graph_orchestrator_v1_check_proto_depIdxs = []int32{
 	3,  // 0: turboci.graph.orchestrator.v1.Check.identifier:type_name -> turboci.graph.ids.v1.Check
@@ -825,7 +836,7 @@ var file_turboci_graph_orchestrator_v1_check_proto_depIdxs = []int32{
 	6,  // 13: turboci.graph.orchestrator.v1.Check.Result.created_at:type_name -> turboci.graph.orchestrator.v1.Revision
 	9,  // 14: turboci.graph.orchestrator.v1.Check.Result.data:type_name -> turboci.graph.orchestrator.v1.Datum
 	6,  // 15: turboci.graph.orchestrator.v1.Check.Result.finalized_at:type_name -> turboci.graph.orchestrator.v1.Revision
-	11, // 16: turboci.graph.orchestrator.v1.Check.Result.failure:type_name -> turboci.graph.orchestrator.v1.Failure
+	11, // 16: turboci.graph.orchestrator.v1.Check.Result.attempt_state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
 	17, // [17:17] is the sub-list for method output_type
 	17, // [17:17] is the sub-list for method input_type
 	17, // [17:17] is the sub-list for extension type_name
@@ -843,9 +854,9 @@ func file_turboci_graph_orchestrator_v1_check_proto_init() {
 	file_turboci_graph_orchestrator_v1_check_state_proto_init()
 	file_turboci_graph_orchestrator_v1_datum_proto_init()
 	file_turboci_graph_orchestrator_v1_dependencies_proto_init()
-	file_turboci_graph_orchestrator_v1_failure_proto_init()
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
+	file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_init()
 	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[0].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[1].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[2].OneofWrappers = []any{}

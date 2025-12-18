@@ -89,6 +89,20 @@ const (
 	// This state can transition to THROTTLED, SCHEDULED, RUNNING, COMPLETE or
 	// INCOMPLETE.
 	StageAttemptState_STAGE_ATTEMPT_STATE_PENDING StageAttemptState = 10
+	// This state indicates that the Stage Attempt was PENDING, but is currently
+	// throttled.
+	//
+	// Throttling happens when the Executor explicitly marks this Stage Attempt as
+	// Throttled, or if an external Update/Patch to a WorkNode increases its
+	// availability_time_millis.
+	//
+	// This should be used by an Executor as a way to explicitly acknowledge a
+	// RunStage call for a valid stage, but have the orchestrator keep this stage
+	// on ice for some specified amount of time, indicated by setting the `until`
+	// field when transitioning the current attempt to Throttled.
+	//
+	// This state can transition to PENDING or INCOMPLETE.
+	StageAttemptState_STAGE_ATTEMPT_STATE_THROTTLED StageAttemptState = 20
 	// This state indicates that the Stage Attempt was PENDING, but is now picked
 	// up for execution by an Executor.
 	//
@@ -152,8 +166,7 @@ const (
 	//
 	// The Orchestrator will consult the StageExecutionPolicy, and if allowed,
 	// will make a new Attempt. This can be blocked when using WriteNodes to
-	// mark a Stage Attempt as INCOMPLETE by setting the
-	// WriteNodesRequest.current_stage.block_new_attempts field to true.
+	// mark a Stage Attempt as INCOMPLETE by setting the `block_new_attempts`
 	//
 	// This state is terminal (but if a retry was requested, a new Stage Attempt
 	// may be created for this Stage).
@@ -173,6 +186,7 @@ var (
 	StageAttemptState_name = map[int32]string{
 		0:  "STAGE_ATTEMPT_STATE_UNKNOWN",
 		10: "STAGE_ATTEMPT_STATE_PENDING",
+		20: "STAGE_ATTEMPT_STATE_THROTTLED",
 		30: "STAGE_ATTEMPT_STATE_SCHEDULED",
 		40: "STAGE_ATTEMPT_STATE_RUNNING",
 		50: "STAGE_ATTEMPT_STATE_CANCELLING",
@@ -184,6 +198,7 @@ var (
 	StageAttemptState_value = map[string]int32{
 		"STAGE_ATTEMPT_STATE_UNKNOWN":        0,
 		"STAGE_ATTEMPT_STATE_PENDING":        10,
+		"STAGE_ATTEMPT_STATE_THROTTLED":      20,
 		"STAGE_ATTEMPT_STATE_SCHEDULED":      30,
 		"STAGE_ATTEMPT_STATE_RUNNING":        40,
 		"STAGE_ATTEMPT_STATE_CANCELLING":     50,
@@ -220,11 +235,12 @@ var File_turboci_graph_orchestrator_v1_stage_attempt_state_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x12\x1dturboci.graph.orchestrator.v1*\xd1\x02\n" +
+	"7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x12\x1dturboci.graph.orchestrator.v1*\xf4\x02\n" +
 	"\x11StageAttemptState\x12\x1f\n" +
 	"\x1bSTAGE_ATTEMPT_STATE_UNKNOWN\x10\x00\x12\x1f\n" +
 	"\x1bSTAGE_ATTEMPT_STATE_PENDING\x10\n" +
 	"\x12!\n" +
+	"\x1dSTAGE_ATTEMPT_STATE_THROTTLED\x10\x14\x12!\n" +
 	"\x1dSTAGE_ATTEMPT_STATE_SCHEDULED\x10\x1e\x12\x1f\n" +
 	"\x1bSTAGE_ATTEMPT_STATE_RUNNING\x10(\x12\"\n" +
 	"\x1eSTAGE_ATTEMPT_STATE_CANCELLING\x102\x12$\n" +
