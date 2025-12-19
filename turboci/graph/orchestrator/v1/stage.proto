@@ -16,6 +16,7 @@ import "turboci/graph/orchestrator/v1/field_options.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_state.proto";
+import "turboci/graph/orchestrator/v1/stage_concluded_reason.proto";
 import "turboci/graph/orchestrator/v1/stage_execution_policy.proto";
 import "turboci/graph/orchestrator/v1/stage_state.proto";
 import "turboci/graph/orchestrator/v1/value.proto";
@@ -347,6 +348,11 @@ message Stage {
   //
   // If needed, this could be expanded to allow Checks later.
   optional Dependencies continuation_group = 12 [(turboci).id.allowed = IDENTIFIER_KIND_STAGE];
+
+  // Describes why this stage is not PLANNED or ATTEMPTING anymore.
+  //
+  // Set for stages that are in AWAITING_GROUP or FINAL states.
+  optional StageConcludedReason concluded_reason = 13 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // StageAttemptClaimedFailure is a gRPC error detail message returned by
