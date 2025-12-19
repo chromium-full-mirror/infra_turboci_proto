@@ -41,10 +41,6 @@ message StageDelta {
 
     // The index of the progress message(s) written as part of this edit.
     repeated int64 progress = 4;
-
-    // Failure is true iff the `failure` fieild was written as part of this
-    // edit.
-    optional bool failure = 5;
   }
   // Attempt(s) which were modified as part of this edit.
   //

@@ -131,7 +131,6 @@ type StageDelta_Attempt struct {
 	xxx_hidden_State       StageAttemptState      `protobuf:"varint,2,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
 	xxx_hidden_Details     *[]*Value              `protobuf:"bytes,3,rep,name=details,proto3"`
 	xxx_hidden_Progress    []int64                `protobuf:"varint,4,rep,packed,name=progress,proto3"`
-	xxx_hidden_Failure     bool                   `protobuf:"varint,5,opt,name=failure,proto3,oneof"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -195,20 +194,13 @@ func (x *StageDelta_Attempt) GetProgress() []int64 {
 	return nil
 }
 
-func (x *StageDelta_Attempt) GetFailure() bool {
-	if x != nil {
-		return x.xxx_hidden_Failure
-	}
-	return false
-}
-
 func (x *StageDelta_Attempt) SetIdentifier(v *v1.StageAttempt) {
 	x.xxx_hidden_Identifier = v
 }
 
 func (x *StageDelta_Attempt) SetState(v StageAttemptState) {
 	x.xxx_hidden_State = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 5)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
 }
 
 func (x *StageDelta_Attempt) SetDetails(v []*Value) {
@@ -217,11 +209,6 @@ func (x *StageDelta_Attempt) SetDetails(v []*Value) {
 
 func (x *StageDelta_Attempt) SetProgress(v []int64) {
 	x.xxx_hidden_Progress = v
-}
-
-func (x *StageDelta_Attempt) SetFailure(v bool) {
-	x.xxx_hidden_Failure = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 5)
 }
 
 func (x *StageDelta_Attempt) HasIdentifier() bool {
@@ -238,13 +225,6 @@ func (x *StageDelta_Attempt) HasState() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *StageDelta_Attempt) HasFailure() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
-}
-
 func (x *StageDelta_Attempt) ClearIdentifier() {
 	x.xxx_hidden_Identifier = nil
 }
@@ -252,11 +232,6 @@ func (x *StageDelta_Attempt) ClearIdentifier() {
 func (x *StageDelta_Attempt) ClearState() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
 	x.xxx_hidden_State = StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
-}
-
-func (x *StageDelta_Attempt) ClearFailure() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
-	x.xxx_hidden_Failure = false
 }
 
 type StageDelta_Attempt_builder struct {
@@ -273,9 +248,6 @@ type StageDelta_Attempt_builder struct {
 	Details []*Value
 	// The index of the progress message(s) written as part of this edit.
 	Progress []int64
-	// Failure is true iff the `failure` fieild was written as part of this
-	// edit.
-	Failure *bool
 }
 
 func (b0 StageDelta_Attempt_builder) Build() *StageDelta_Attempt {
@@ -284,15 +256,11 @@ func (b0 StageDelta_Attempt_builder) Build() *StageDelta_Attempt {
 	_, _ = b, x
 	x.xxx_hidden_Identifier = b.Identifier
 	if b.State != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 5)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
 		x.xxx_hidden_State = *b.State
 	}
 	x.xxx_hidden_Details = &b.Details
 	x.xxx_hidden_Progress = b.Progress
-	if b.Failure != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 5)
-		x.xxx_hidden_Failure = *b.Failure
-	}
 	return m0
 }
 
@@ -300,23 +268,20 @@ var File_turboci_graph_orchestrator_v1_stage_delta_proto protoreflect.FileDescri
 
 const file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/stage_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xed\x03\n" +
+	"/turboci/graph/orchestrator/v1/stage_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xc2\x03\n" +
 	"\n" +
 	"StageDelta\x12D\n" +
 	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x00R\x05state\x88\x01\x01\x12M\n" +
-	"\battempts\x18\x02 \x03(\v21.turboci.graph.orchestrator.v1.StageDelta.AttemptR\battempts\x1a\xbf\x02\n" +
+	"\battempts\x18\x02 \x03(\v21.turboci.graph.orchestrator.v1.StageDelta.AttemptR\battempts\x1a\x94\x02\n" +
 	"\aAttempt\x12G\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\n" +
 	"identifier\x88\x01\x01\x12K\n" +
 	"\x05state\x18\x02 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x01R\x05state\x88\x01\x01\x12>\n" +
 	"\adetails\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetails\x12\x1a\n" +
-	"\bprogress\x18\x04 \x03(\x03R\bprogress\x12\x1d\n" +
-	"\afailure\x18\x05 \x01(\bH\x02R\afailure\x88\x01\x01B\r\n" +
+	"\bprogress\x18\x04 \x03(\x03R\bprogressB\r\n" +
 	"\v_identifierB\b\n" +
-	"\x06_stateB\n" +
-	"\n" +
-	"\b_failureB\b\n" +
+	"\x06_stateB\b\n" +
 	"\x06_stateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
