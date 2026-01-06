@@ -25,82 +25,14 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// The description of what happens when `stage_timeout` is reached.
-type StageExecutionPolicy_StageTimeoutMode int32
-
-const (
-	// UNKNOWN is the invalid mode.
-	StageExecutionPolicy_STAGE_TIMEOUT_MODE_UNKNOWN StageExecutionPolicy_StageTimeoutMode = 0
-	// FINISH_CURRENT_ATTEMPT means that when `stage_timeout` occurs, the
-	// Orchestrator will allow the current Attempt to finish within it's
-	// configured expiration.
-	StageExecutionPolicy_STAGE_TIMEOUT_MODE_FINISH_CURRENT_ATTEMPT StageExecutionPolicy_StageTimeoutMode = 1
-	// BLOCK_MAX_EXECUTION_RETRY means that BEFORE `stage_timeout` occurs, the
-	// Orchestrator will calculate if the next Attempt, assuming it runs to the
-	// maximum duration of all timeouts in `attempt_timeout`, plus the computed
-	// backoff delay, would complete before `stage_timeout`.
-	//
-	// If it would, then the retry Attempt will be created. Otherwise the
-	// Orchestrator will not create a retry.
-	//
-	// Note that this mode also means that if it took a VERY long time to
-	// unblock this Stage, and the Stage Attempt's maximum execution time is
-	// also long, it's possible for the Stage to move to FINAL without executing
-	// any Attempt at all. See HYBRID for a compromise.
-	StageExecutionPolicy_STAGE_TIMEOUT_MODE_BLOCK_MAX_EXECUTION_RETRY StageExecutionPolicy_StageTimeoutMode = 2
-	// This is the same as BLOCK_MAX_EXECUTION_RETRY, except that the Stage will
-	// always have at least one Attempt (so, it behaves like
-	// FINISH_CURRENT_ATTEMPT if the Stage has zero or one Attempts, otherwise
-	// like BLOCK_MAX_EXECUTION_RETRY).
-	StageExecutionPolicy_STAGE_TIMEOUT_MODE_HYBRID StageExecutionPolicy_StageTimeoutMode = 3
-)
-
-// Enum value maps for StageExecutionPolicy_StageTimeoutMode.
-var (
-	StageExecutionPolicy_StageTimeoutMode_name = map[int32]string{
-		0: "STAGE_TIMEOUT_MODE_UNKNOWN",
-		1: "STAGE_TIMEOUT_MODE_FINISH_CURRENT_ATTEMPT",
-		2: "STAGE_TIMEOUT_MODE_BLOCK_MAX_EXECUTION_RETRY",
-		3: "STAGE_TIMEOUT_MODE_HYBRID",
-	}
-	StageExecutionPolicy_StageTimeoutMode_value = map[string]int32{
-		"STAGE_TIMEOUT_MODE_UNKNOWN":                   0,
-		"STAGE_TIMEOUT_MODE_FINISH_CURRENT_ATTEMPT":    1,
-		"STAGE_TIMEOUT_MODE_BLOCK_MAX_EXECUTION_RETRY": 2,
-		"STAGE_TIMEOUT_MODE_HYBRID":                    3,
-	}
-)
-
-func (x StageExecutionPolicy_StageTimeoutMode) Enum() *StageExecutionPolicy_StageTimeoutMode {
-	p := new(StageExecutionPolicy_StageTimeoutMode)
-	*p = x
-	return p
-}
-
-func (x StageExecutionPolicy_StageTimeoutMode) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (StageExecutionPolicy_StageTimeoutMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_enumTypes[0].Descriptor()
-}
-
-func (StageExecutionPolicy_StageTimeoutMode) Type() protoreflect.EnumType {
-	return &file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_enumTypes[0]
-}
-
-func (x StageExecutionPolicy_StageTimeoutMode) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// StageExecutionPolicy describes constraints on how a Stage may be executed by the
-// Orchestrator.
+// StageExecutionPolicy describes constraints on how a Stage may be executed
+// by the Orchestrator.
 type StageExecutionPolicy struct {
-	state                                     protoimpl.MessageState                `protogen:"opaque.v1"`
-	xxx_hidden_Retry                          *StageExecutionPolicy_Retry           `protobuf:"bytes,1,opt,name=retry,proto3,oneof"`
-	xxx_hidden_StageTimeout                   *durationpb.Duration                  `protobuf:"bytes,2,opt,name=stage_timeout,json=stageTimeout,proto3,oneof"`
-	xxx_hidden_StageTimeoutMode               StageExecutionPolicy_StageTimeoutMode `protobuf:"varint,3,opt,name=stage_timeout_mode,json=stageTimeoutMode,proto3,enum=turboci.graph.orchestrator.v1.StageExecutionPolicy_StageTimeoutMode,oneof"`
-	xxx_hidden_AttemptExecutionPolicyTemplate *StageAttemptExecutionPolicy          `protobuf:"bytes,4,opt,name=attempt_execution_policy_template,json=attemptExecutionPolicyTemplate,proto3,oneof"`
+	state                                     protoimpl.MessageState       `protogen:"opaque.v1"`
+	xxx_hidden_Retry                          *StageExecutionPolicy_Retry  `protobuf:"bytes,1,opt,name=retry,proto3,oneof"`
+	xxx_hidden_StageTimeout                   *durationpb.Duration         `protobuf:"bytes,2,opt,name=stage_timeout,json=stageTimeout,proto3,oneof"`
+	xxx_hidden_ExecuteAtLeastOneAttempt       bool                         `protobuf:"varint,3,opt,name=execute_at_least_one_attempt,json=executeAtLeastOneAttempt,proto3,oneof"`
+	xxx_hidden_AttemptExecutionPolicyTemplate *StageAttemptExecutionPolicy `protobuf:"bytes,4,opt,name=attempt_execution_policy_template,json=attemptExecutionPolicyTemplate,proto3,oneof"`
 	XXX_raceDetectHookData                    protoimpl.RaceDetectHookData
 	XXX_presence                              [1]uint32
 	unknownFields                             protoimpl.UnknownFields
@@ -146,13 +78,11 @@ func (x *StageExecutionPolicy) GetStageTimeout() *durationpb.Duration {
 	return nil
 }
 
-func (x *StageExecutionPolicy) GetStageTimeoutMode() StageExecutionPolicy_StageTimeoutMode {
+func (x *StageExecutionPolicy) GetExecuteAtLeastOneAttempt() bool {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 2) {
-			return x.xxx_hidden_StageTimeoutMode
-		}
+		return x.xxx_hidden_ExecuteAtLeastOneAttempt
 	}
-	return StageExecutionPolicy_STAGE_TIMEOUT_MODE_UNKNOWN
+	return false
 }
 
 func (x *StageExecutionPolicy) GetAttemptExecutionPolicyTemplate() *StageAttemptExecutionPolicy {
@@ -170,8 +100,8 @@ func (x *StageExecutionPolicy) SetStageTimeout(v *durationpb.Duration) {
 	x.xxx_hidden_StageTimeout = v
 }
 
-func (x *StageExecutionPolicy) SetStageTimeoutMode(v StageExecutionPolicy_StageTimeoutMode) {
-	x.xxx_hidden_StageTimeoutMode = v
+func (x *StageExecutionPolicy) SetExecuteAtLeastOneAttempt(v bool) {
+	x.xxx_hidden_ExecuteAtLeastOneAttempt = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
 }
 
@@ -193,7 +123,7 @@ func (x *StageExecutionPolicy) HasStageTimeout() bool {
 	return x.xxx_hidden_StageTimeout != nil
 }
 
-func (x *StageExecutionPolicy) HasStageTimeoutMode() bool {
+func (x *StageExecutionPolicy) HasExecuteAtLeastOneAttempt() bool {
 	if x == nil {
 		return false
 	}
@@ -215,9 +145,9 @@ func (x *StageExecutionPolicy) ClearStageTimeout() {
 	x.xxx_hidden_StageTimeout = nil
 }
 
-func (x *StageExecutionPolicy) ClearStageTimeoutMode() {
+func (x *StageExecutionPolicy) ClearExecuteAtLeastOneAttempt() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
-	x.xxx_hidden_StageTimeoutMode = StageExecutionPolicy_STAGE_TIMEOUT_MODE_UNKNOWN
+	x.xxx_hidden_ExecuteAtLeastOneAttempt = false
 }
 
 func (x *StageExecutionPolicy) ClearAttemptExecutionPolicyTemplate() {
@@ -229,46 +159,49 @@ type StageExecutionPolicy_builder struct {
 
 	// Policy for retrying this Stage across multiple Attempts.
 	//
-	// If omitted, the Stage will be attempted at most once.
+	// If omitted, the Stage will be attempted at most once (if at all permitted
+	// by `stage_timeout` and `execute_at_least_one_attempt`).
 	Retry *StageExecutionPolicy_Retry
-	// The maximum amount of time the Stage itself can stay in a non-FINAL state.
+	// An approximate cap on the maximum amount of time the Stage itself can stay
+	// in a non-FINAL state.
 	//
 	// This timeout starts from the time the Stage is *created*.
 	//
-	// This supersedes all per-Attempt restrictions and is intended to be able
-	// to set a cap on the maximum overall amount of time that a stage can take.
+	// When launching an attempt, the orchestrator will estimate when the attempt
+	// will finish executing in the most pessimistic scenario (e.g. hitting all
+	// possible StageAttemptExecutionPolicy timeouts). A new attempt will be
+	// allowed to run if its estimated completion time still fits within the stage
+	// timeout. Retrying an attempt has extra conditions (see Retry for details).
+	// If `execute_at_least_one_attempt` is true, then this timeout will be
+	// totally ignored when launching the first attempt.
 	//
-	// This MUST be greater than the cumulative timeouts in `attempt_timeout` - it
-	// should also account for some amount of time for this Stage to enter the
-	// ATTEMPTING state in the first place.
+	// This timeout normally should be greater than the cumulative timeouts in
+	// StageAttemptExecutionPolicy. It should also account for some amount of time
+	// for this Stage to enter the ATTEMPTING state in the first place.
 	//
-	// Interaction with retries: See `stage_timeout_mode`.
+	// Note this timeout is enforced only when launching an attempt, i.e. if
+	// a stage attempt is already running, it will always be allowed to run to its
+	// completion (or an attempt timeout per its own StageAttemptExecutionPolicy).
+	//
+	// Note that the timeout enforcement doesn't apply to stages that are still
+	// blocked on their dependencies: if a stage timeout is reached while the
+	// stage is still in PLANNED state, nothing will happen to the stage state at
+	// that particular moment. The stage will remain in PLANNED state until its
+	// dependencies are resolved (just like happens in a normal scenario). Only
+	// then will it potentially move into FINAL state due to hitting the stage
+	// timeout (depending on `execute_at_least_one_attempt`).
+	//
+	// If unset, this timeout will not apply at all (i.e. logically this timeout
+	// will be infinite).
 	StageTimeout *durationpb.Duration
-	// Describes how stage_timeout interacts with the Stage state machine.
+	// If true, always launch the first attempt, totally ignoring `stage_timeout`.
 	//
-	// In particular, we want to avoid the situation where the Orchestrator
-	// creates 'doomed' Stage Attempts.
-	//
-	// Consider the case where a Build Stage is allotted a total of 6 hours to be
-	// scheduled, execute and complete. If there are only 4 hours left on
-	// `stage_timeout`, it likely doesn't make sense to trigger the Build with the
-	// intent on killing it off 2 hours before it will likely complete (which
-	// would just be a waste of resources).
-	//
-	// In this scenario, the two modes available today would let you:
-	//   - potentially overshoot stage_timeout by 2 hours
-	//   - fail the stage with 4 hours of stage_timeout left
-	//   - fail the stage with 4 hours of stage_timeout left (unless the stage has
-	//     zero attempts, in which case it will overshoot by 2 hours)
-	//
-	// TBD: it's possible to imagine another mode which runs a final Attempt with
-	// a modified `attempt_timeout` - this is likely more complicated (which
-	// timeout do you prune? probably pending_throttled?). Leaving this out for
-	// now to see how far these other modes get us.
-	//
-	// If unset, defaults to STAGE_TIMEOUT_MODE_FINISH_CURRENT_ATTEMPT.
-	StageTimeoutMode *StageExecutionPolicy_StageTimeoutMode
-	// Template for attempt level execution policy.
+	// If false or unset, and the estimated stage attempt completion time exceeds
+	// the stage timeout (see `stage_timeout` for details), the stage (when its
+	// dependencies are unblocked) will move into FINAL state immediately without
+	// running any attempts at all. StageConcludedReason will be TIMEOUT.
+	ExecuteAtLeastOneAttempt *bool
+	// Template for an attempt level execution policy.
 	//
 	// Each attempt will be created with this policy as requested. But the
 	// executor may augment the policy by merging the requested policy and what
@@ -282,9 +215,9 @@ func (b0 StageExecutionPolicy_builder) Build() *StageExecutionPolicy {
 	_, _ = b, x
 	x.xxx_hidden_Retry = b.Retry
 	x.xxx_hidden_StageTimeout = b.StageTimeout
-	if b.StageTimeoutMode != nil {
+	if b.ExecuteAtLeastOneAttempt != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
-		x.xxx_hidden_StageTimeoutMode = *b.StageTimeoutMode
+		x.xxx_hidden_ExecuteAtLeastOneAttempt = *b.ExecuteAtLeastOneAttempt
 	}
 	x.xxx_hidden_AttemptExecutionPolicyTemplate = b.AttemptExecutionPolicyTemplate
 	return m0
@@ -355,9 +288,22 @@ type StageExecutionPolicy_Retry_builder struct {
 	// The maximum number of retries (apart from the first attempt) that will be
 	// made for this Stage.
 	//
-	// Another Attempt is created when the number of Attempts does not exceed
-	// max_retries+1, stage_timeout and stage_timeout_mode would allow another
-	// Attempt, and `WriteNodes.current_state.block_new_attempts` was false.
+	// If an Attempt fails (i.e. becomes INCOMPLETE), a new Attempt is created
+	// when all of the below is true:
+	//  1. The new number of Attempts does not exceed max_retries+1. If this
+	//     condition is violated, StageConcludedReason will be NO_RETRIES_LEFT.
+	//  2. There's enough time left in `stage_timeout` to run the new attempt
+	//     to completion in the most pessimistic case (waiting the attempt
+	//     retry backoff timer and hitting all possible stage attempt timeouts
+	//     configured in the StageAttemptExecutionPolicy). If this condition
+	//     is violated, StageConcludedReason will be TIMEOUT.
+	//  3. The last attempt had `WriteNodes.current_state.block_new_attempts`
+	//     set to false. If this condition is violated, StageConcludedReason
+	//     will be FINAL_ATTEMPT_BLOCKED_RETRY.
+	//
+	// If no retries are allowed, the stage will transition to FINAL or
+	// AWAITING_GROUP state (in case the incomplete attempt managed to submit
+	// a continuation group before it died).
 	MaxRetries *int32
 }
 
@@ -376,45 +322,37 @@ var File_turboci_graph_orchestrator_v1_stage_execution_policy_proto protoreflect
 
 const file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_rawDesc = "" +
 	"\n" +
-	":turboci/graph/orchestrator/v1/stage_execution_policy.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1egoogle/protobuf/duration.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\"\x84\x06\n" +
+	":turboci/graph/orchestrator/v1/stage_execution_policy.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1egoogle/protobuf/duration.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\"\xa5\x04\n" +
 	"\x14StageExecutionPolicy\x12T\n" +
 	"\x05retry\x18\x01 \x01(\v29.turboci.graph.orchestrator.v1.StageExecutionPolicy.RetryH\x00R\x05retry\x88\x01\x01\x12C\n" +
-	"\rstage_timeout\x18\x02 \x01(\v2\x19.google.protobuf.DurationH\x01R\fstageTimeout\x88\x01\x01\x12w\n" +
-	"\x12stage_timeout_mode\x18\x03 \x01(\x0e2D.turboci.graph.orchestrator.v1.StageExecutionPolicy.StageTimeoutModeH\x02R\x10stageTimeoutMode\x88\x01\x01\x12\x8a\x01\n" +
+	"\rstage_timeout\x18\x02 \x01(\v2\x19.google.protobuf.DurationH\x01R\fstageTimeout\x88\x01\x01\x12C\n" +
+	"\x1cexecute_at_least_one_attempt\x18\x03 \x01(\bH\x02R\x18executeAtLeastOneAttempt\x88\x01\x01\x12\x8a\x01\n" +
 	"!attempt_execution_policy_template\x18\x04 \x01(\v2:.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicyH\x03R\x1eattemptExecutionPolicyTemplate\x88\x01\x01\x1a=\n" +
 	"\x05Retry\x12$\n" +
 	"\vmax_retries\x18\x01 \x01(\x05H\x00R\n" +
 	"maxRetries\x88\x01\x01B\x0e\n" +
-	"\f_max_retries\"\xb2\x01\n" +
-	"\x10StageTimeoutMode\x12\x1e\n" +
-	"\x1aSTAGE_TIMEOUT_MODE_UNKNOWN\x10\x00\x12-\n" +
-	")STAGE_TIMEOUT_MODE_FINISH_CURRENT_ATTEMPT\x10\x01\x120\n" +
-	",STAGE_TIMEOUT_MODE_BLOCK_MAX_EXECUTION_RETRY\x10\x02\x12\x1d\n" +
-	"\x19STAGE_TIMEOUT_MODE_HYBRID\x10\x03B\b\n" +
+	"\f_max_retriesB\b\n" +
 	"\x06_retryB\x10\n" +
-	"\x0e_stage_timeoutB\x15\n" +
-	"\x13_stage_timeout_modeB$\n" +
+	"\x0e_stage_timeoutB\x1f\n" +
+	"\x1d_execute_at_least_one_attemptB$\n" +
 	"\"_attempt_execution_policy_templateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_goTypes = []any{
-	(StageExecutionPolicy_StageTimeoutMode)(0), // 0: turboci.graph.orchestrator.v1.StageExecutionPolicy.StageTimeoutMode
-	(*StageExecutionPolicy)(nil),               // 1: turboci.graph.orchestrator.v1.StageExecutionPolicy
-	(*StageExecutionPolicy_Retry)(nil),         // 2: turboci.graph.orchestrator.v1.StageExecutionPolicy.Retry
-	(*durationpb.Duration)(nil),                // 3: google.protobuf.Duration
-	(*StageAttemptExecutionPolicy)(nil),        // 4: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
+	(*StageExecutionPolicy)(nil),        // 0: turboci.graph.orchestrator.v1.StageExecutionPolicy
+	(*StageExecutionPolicy_Retry)(nil),  // 1: turboci.graph.orchestrator.v1.StageExecutionPolicy.Retry
+	(*durationpb.Duration)(nil),         // 2: google.protobuf.Duration
+	(*StageAttemptExecutionPolicy)(nil), // 3: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
 }
 var file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_depIdxs = []int32{
-	2, // 0: turboci.graph.orchestrator.v1.StageExecutionPolicy.retry:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy.Retry
-	3, // 1: turboci.graph.orchestrator.v1.StageExecutionPolicy.stage_timeout:type_name -> google.protobuf.Duration
-	0, // 2: turboci.graph.orchestrator.v1.StageExecutionPolicy.stage_timeout_mode:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy.StageTimeoutMode
-	4, // 3: turboci.graph.orchestrator.v1.StageExecutionPolicy.attempt_execution_policy_template:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	1, // 0: turboci.graph.orchestrator.v1.StageExecutionPolicy.retry:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy.Retry
+	2, // 1: turboci.graph.orchestrator.v1.StageExecutionPolicy.stage_timeout:type_name -> google.protobuf.Duration
+	3, // 2: turboci.graph.orchestrator.v1.StageExecutionPolicy.attempt_execution_policy_template:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_init() }
@@ -430,14 +368,13 @@ func file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_goTypes,
 		DependencyIndexes: file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_depIdxs,
-		EnumInfos:         file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_enumTypes,
 		MessageInfos:      file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_msgTypes,
 	}.Build()
 	File_turboci_graph_orchestrator_v1_stage_execution_policy_proto = out.File
