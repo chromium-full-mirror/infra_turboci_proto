@@ -305,6 +305,18 @@ func (b0 StageAttemptExecutionPolicy_Heartbeat_builder) Build() *StageAttemptExe
 // The Orchestrator will automatically transition a Stage Attempt to
 // INCOMPLETE after the timeout has passed if the Stage Attempt has not yet
 // transitioned to the next state.
+//
+// Individual fields (or the entire `timeout` field) can be unset or be zero
+// when a StageAttemptExecutionPolicy is written via WriteNodes RPC. Such
+// policy will be sent to the executor as is in the ValidateStage RPC. The
+// executor must fill it in with defaults as it sees fit. Any fields that
+// still remain unset after that will be treated as zero (this make sense
+// in case the executor doesn't support SCHEDULED state or it is a
+// synchronous executor that doesn't have explicit RUNNING state, etc.). The
+// only exception is `pending_throttled`: the orchestrator imposes its own
+// constraints on top of what the executor returns, since stage attempts
+// in PENDING/THROTTLED state are primarily handled by the orchestrator
+// itself.
 type StageAttemptExecutionPolicy_Timeout struct {
 	state                       protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_PendingThrottled *durationpb.Duration   `protobuf:"bytes,1,opt,name=pending_throttled,json=pendingThrottled,proto3,oneof"`
@@ -431,35 +443,34 @@ func (x *StageAttemptExecutionPolicy_Timeout) ClearTearingDown() {
 type StageAttemptExecutionPolicy_Timeout_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The maximum amount of time a Stage Attempt can be in the
-	// PENDING/THROTTLED state.
+	// The maximum amount of time a Stage Attempt can be PENDING/THROTTLED.
 	//
-	// It is calculated from the time the Attempt first enters `PENDING` to the
-	// time that it leaves `PENDING` for a non-THROTTLED state.
+	// It is calculated from the time the Attempt first enters PENDING to the
+	// time that it leaves PENDING for a non-THROTTLED state.
 	//
-	// If unset, then there is a large default limit on how long a Stage Attempt
-	// can be in the PENDING/THROTTLED state.
+	// If unset or zero, the orchestrator will use some default value.
 	PendingThrottled *durationpb.Duration
-	// The maximum amount of time a Stage Attempt can be in the SCHEDULED
+	// The maximum amount of time a Stage Attempt can be SCHEDULED.
+	//
+	// If unset or zero, it is assumed the executor doesn't implement SCHEDULED
 	// state.
-	//
-	// If unset, then there is a large default limit on how long a Stage Attempt
-	// can be in the SCHEDULED state.
 	Scheduled *durationpb.Duration
-	// The maximum amount of time a Stage Attempt can be in the RUNNING state.
-	//
-	// If unset, then there is a large default limit on how long a Stage Attempt
-	// can be in the RUNNING state.
+	// The maximum amount of time a Stage Attempt can be RUNNING.
 	//
 	// NOTE: This timeout still applies during the CANCELLING state - it's
 	// expected that CANCELLING only applies to Stage Attempts which are
 	// RUNNING, but before the Stage Attempt actually knows this.
-	Running *durationpb.Duration
-	// The maximum amount of time a Stage Attempt can be in the
-	// TEARING_DOWN state.
 	//
-	// If unset, then there is a large default limit on how long a Stage Attempt can be in
-	// the TEARING_DOWN state.
+	// If unset or zero, it is assumed the executor is a synchronous one, i.e.
+	// it moves attempts immediately into COMPLETE or INCOMPLETE states,
+	// bypassing SCHEDULED/RUNNING.
+	Running *durationpb.Duration
+	// The maximum amount of time a Stage Attempt can be TEARING_DOWN.
+	//
+	// Can be unset or zero if `running` is also unset or zero or if the
+	// executor doesn't implement stage cancellation at all. Otherwise it should
+	// be set to something to avoid premature termination of a cancelled
+	// attempt as timed out during the tear down.
 	TearingDown *durationpb.Duration
 }
 

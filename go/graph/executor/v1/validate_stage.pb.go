@@ -154,6 +154,13 @@ type ValidateStageResponse_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// Validated execution policy for the stage.
+	//
+	// It SHOULD be based on `stage.execution_policy.requested`. In particular
+	// executors are expected to populate various unset fields with
+	// executor-specific defaults (see e.g. `timeout` field in
+	// StageAttemptExecutionPolicy).
+	//
+	// Required.
 	StageExecutionPolicy *v1.StageExecutionPolicy
 }
 
