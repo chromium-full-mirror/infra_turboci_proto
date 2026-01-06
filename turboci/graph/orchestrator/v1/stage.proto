@@ -156,7 +156,7 @@ message Stage {
   // TBD: Pull this into its own top-level StageAttempt entity because it will
   // need to have its own state and lifecycle/transactions.
   //
-  // Next ID: 11
+  // Next ID: 12
   message Attempt {
     // The Stage Attempt's identifier.
     optional ids.v1.StageAttempt identifier = 1;
@@ -193,6 +193,11 @@ message Stage {
     // Append-only list of StateHistoryEntry to record the database revision
     // (commit timestamp) when each time this Attempt's state changes.
     repeated StateHistoryEntry state_history = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+    // If set, this Attempt was put into the THROTTLED state by the Executor,
+    // which asked the Orchestrator not to attempt to call RunStage again until
+    // this time.
+    optional google.protobuf.Timestamp throttled_until = 11;
 
     // An opaque value provided by a Stage Attempt process (i.e. a single thread
     // of execution which is servicing this Stage Attempt) which is used to
