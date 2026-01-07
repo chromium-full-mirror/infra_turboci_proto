@@ -753,40 +753,41 @@ var File_turboci_graph_orchestrator_v1_check_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a)turboci/graph/orchestrator/v1/datum.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\"\xa9\f\n" +
+	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a)turboci/graph/orchestrator/v1/datum.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\"\xb0\f\n" +
 	"\x05Check\x12E\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckB\x03\xe0A\x05H\x00R\n" +
 	"identifier\x88\x01\x01\x12M\n" +
 	"\n" +
-	"created_by\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x03H\x01R\tcreatedBy\x88\x01\x01\x12F\n" +
+	"created_by\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x05H\x01R\tcreatedBy\x88\x01\x01\x12F\n" +
 	"\x04kind\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\x03\xe0A\x05H\x02R\x04kind\x88\x01\x01\x12\x1e\n" +
 	"\x05realm\x18\x04 \x01(\tB\x03\xe0A\x05H\x03R\x05realm\x88\x01\x01\x12F\n" +
 	"\aversion\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x04R\aversion\x88\x01\x01\x12D\n" +
-	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x05R\x05state\x88\x01\x01\x12`\n" +
-	"\rstate_history\x18\a \x03(\v26.turboci.graph.orchestrator.v1.Check.StateHistoryEntryB\x03\xe0A\x03R\fstateHistory\x12a\n" +
+	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x05R\x05state\x88\x01\x01\x12[\n" +
+	"\rstate_history\x18\a \x03(\v26.turboci.graph.orchestrator.v1.Check.StateHistoryEntryR\fstateHistory\x12a\n" +
 	"\fdependencies\x18\b \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
 	"\x01\x02H\x06R\fdependencies\x88\x01\x01\x12J\n" +
 	"\aoptions\x18\t \x03(\v2$.turboci.graph.orchestrator.v1.DatumB\n" +
 	"\x82\x86\xf6\xfb\x0f\x04\n" +
 	"\x02\b\n" +
-	"R\aoptions\x12T\n" +
+	"R\aoptions\x12Q\n" +
 	"\aresults\x18\n" +
-	" \x03(\v2+.turboci.graph.orchestrator.v1.Check.ResultB\r\xe0A\x03\x82\x86\xf6\xfb\x0f\x04\n" +
-	"\x02\b\x1eR\aresults\x1a\xb7\x01\n" +
-	"\x11StateHistoryEntry\x12D\n" +
-	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\x05state\x88\x01\x01\x12F\n" +
-	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01B\b\n" +
+	" \x03(\v2+.turboci.graph.orchestrator.v1.Check.ResultB\n" +
+	"\x82\x86\xf6\xfb\x0f\x04\n" +
+	"\x02\b\x1eR\aresults\x1a\xc1\x01\n" +
+	"\x11StateHistoryEntry\x12I\n" +
+	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateB\x03\xe0A\x05H\x00R\x05state\x88\x01\x01\x12K\n" +
+	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05H\x01R\aversion\x88\x01\x01B\b\n" +
 	"\x06_stateB\n" +
 	"\n" +
-	"\b_version\x1a\x9a\x04\n" +
-	"\x06Result\x12F\n" +
+	"\b_version\x1a\x9f\x04\n" +
+	"\x06Result\x12K\n" +
 	"\n" +
-	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckResultH\x00R\n" +
+	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckResultB\x03\xe0A\x05H\x00R\n" +
 	"identifier\x88\x01\x01\x12D\n" +
-	"\x05owner\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x03H\x01R\x05owner\x88\x01\x01\x12P\n" +
+	"\x05owner\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x05H\x01R\x05owner\x88\x01\x01\x12P\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x03H\x02R\tcreatedAt\x88\x01\x01\x128\n" +
+	"created_at\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05H\x02R\tcreatedAt\x88\x01\x01\x128\n" +
 	"\x04data\x18\x04 \x03(\v2$.turboci.graph.orchestrator.v1.DatumR\x04data\x12O\n" +
 	"\ffinalized_at\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x03R\vfinalizedAt\x88\x01\x01\x12Z\n" +
 	"\rattempt_state\x18\x06 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x04R\fattemptState\x88\x01\x01B\r\n" +
