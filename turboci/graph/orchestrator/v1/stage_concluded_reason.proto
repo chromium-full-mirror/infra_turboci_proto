@@ -36,4 +36,7 @@ enum StageConcludedReason {
   //
   // See StageExecutionPolicy for details.
   STAGE_CONCLUDED_REASON_TIMEOUT = 4;
+
+  // The Stage was explicitly cancelled via WriteNodes.
+  STAGE_CONCLUDED_REASON_CANCELLED = 5;
 }

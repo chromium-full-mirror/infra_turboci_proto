@@ -147,7 +147,7 @@ type CheckDelta_builder struct {
 	// Dependencies written as part of this edit.
 	//
 	// The fields within reflect what was changed in this edit:
-	//   - `edges`, `to_unblock` and `resolved` are included in-whole, and mean
+	//   - `edges`, `predicate` and `resolution` are included in-whole, and mean
 	//     that this edit modified those fields.
 	//   - `resolution_events` reflects just new events resolved in this edit.
 	Dependencies *Dependencies

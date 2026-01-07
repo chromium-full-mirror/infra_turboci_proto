@@ -85,6 +85,15 @@ func (x *Actor) GetWorkplanCreator() *Actor_WorkplanCreator {
 	return nil
 }
 
+func (x *Actor) GetExternal() *Actor_External {
+	if x != nil {
+		if x, ok := x.xxx_hidden_Kind.(*actor_External_); ok {
+			return x.External
+		}
+	}
+	return nil
+}
+
 func (x *Actor) SetStageAttempt(v *v1.StageAttempt) {
 	if v == nil {
 		x.xxx_hidden_Kind = nil
@@ -107,6 +116,14 @@ func (x *Actor) SetWorkplanCreator(v *Actor_WorkplanCreator) {
 		return
 	}
 	x.xxx_hidden_Kind = &actor_WorkplanCreator_{v}
+}
+
+func (x *Actor) SetExternal(v *Actor_External) {
+	if v == nil {
+		x.xxx_hidden_Kind = nil
+		return
+	}
+	x.xxx_hidden_Kind = &actor_External_{v}
 }
 
 func (x *Actor) HasKind() bool {
@@ -140,6 +157,14 @@ func (x *Actor) HasWorkplanCreator() bool {
 	return ok
 }
 
+func (x *Actor) HasExternal() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Kind.(*actor_External_)
+	return ok
+}
+
 func (x *Actor) ClearKind() {
 	x.xxx_hidden_Kind = nil
 }
@@ -162,10 +187,17 @@ func (x *Actor) ClearWorkplanCreator() {
 	}
 }
 
+func (x *Actor) ClearExternal() {
+	if _, ok := x.xxx_hidden_Kind.(*actor_External_); ok {
+		x.xxx_hidden_Kind = nil
+	}
+}
+
 const Actor_Kind_not_set_case case_Actor_Kind = 0
 const Actor_StageAttempt_case case_Actor_Kind = 1
 const Actor_Orchestrator_case case_Actor_Kind = 2
 const Actor_WorkplanCreator_case case_Actor_Kind = 3
+const Actor_External_case case_Actor_Kind = 4
 
 func (x *Actor) WhichKind() case_Actor_Kind {
 	if x == nil {
@@ -178,6 +210,8 @@ func (x *Actor) WhichKind() case_Actor_Kind {
 		return Actor_Orchestrator_case
 	case *actor_WorkplanCreator_:
 		return Actor_WorkplanCreator_case
+	case *actor_External_:
+		return Actor_External_case
 	default:
 		return Actor_Kind_not_set_case
 	}
@@ -197,6 +231,8 @@ type Actor_builder struct {
 	Orchestrator *Actor_Orchestrator
 	// The Creator of the Workplan generated this Edit.
 	WorkplanCreator *Actor_WorkplanCreator
+	// An account not represented by one of the other Actor kinds.
+	External *Actor_External
 	// -- end of xxx_hidden_Kind
 }
 
@@ -212,6 +248,9 @@ func (b0 Actor_builder) Build() *Actor {
 	}
 	if b.WorkplanCreator != nil {
 		x.xxx_hidden_Kind = &actor_WorkplanCreator_{b.WorkplanCreator}
+	}
+	if b.External != nil {
+		x.xxx_hidden_Kind = &actor_External_{b.External}
 	}
 	return m0
 }
@@ -247,11 +286,18 @@ type actor_WorkplanCreator_ struct {
 	WorkplanCreator *Actor_WorkplanCreator `protobuf:"bytes,3,opt,name=workplan_creator,json=workplanCreator,proto3,oneof"`
 }
 
+type actor_External_ struct {
+	// An account not represented by one of the other Actor kinds.
+	External *Actor_External `protobuf:"bytes,4,opt,name=external,proto3,oneof"`
+}
+
 func (*actor_StageAttempt) isActor_Kind() {}
 
 func (*actor_Orchestrator_) isActor_Kind() {}
 
 func (*actor_WorkplanCreator_) isActor_Kind() {}
+
+func (*actor_External_) isActor_Kind() {}
 
 // Placeholder type for when the Orchestrator itself makes this edit.
 type Actor_Orchestrator struct {
@@ -341,35 +387,85 @@ func (b0 Actor_WorkplanCreator_builder) Build() *Actor_WorkplanCreator {
 	return m0
 }
 
+// External indicates that the edit came from some Actor using an External
+// permission variant (no write token used).
+type Actor_External struct {
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Actor_External) Reset() {
+	*x = Actor_External{}
+	mi := &file_turboci_graph_orchestrator_v1_actor_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Actor_External) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Actor_External) ProtoMessage() {}
+
+func (x *Actor_External) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_actor_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+type Actor_External_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 Actor_External_builder) Build() *Actor_External {
+	m0 := &Actor_External{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
+}
+
 var File_turboci_graph_orchestrator_v1_actor_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_actor_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/actor.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\"\xb9\x02\n" +
+	")turboci/graph/orchestrator/v1/actor.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\"\x92\x03\n" +
 	"\x05Actor\x12I\n" +
 	"\rstage_attempt\x18\x01 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\fstageAttempt\x12W\n" +
 	"\forchestrator\x18\x02 \x01(\v21.turboci.graph.orchestrator.v1.Actor.OrchestratorH\x00R\forchestrator\x12a\n" +
-	"\x10workplan_creator\x18\x03 \x01(\v24.turboci.graph.orchestrator.v1.Actor.WorkplanCreatorH\x00R\x0fworkplanCreator\x1a\x0e\n" +
+	"\x10workplan_creator\x18\x03 \x01(\v24.turboci.graph.orchestrator.v1.Actor.WorkplanCreatorH\x00R\x0fworkplanCreator\x12K\n" +
+	"\bexternal\x18\x04 \x01(\v2-.turboci.graph.orchestrator.v1.Actor.ExternalH\x00R\bexternal\x1a\x0e\n" +
 	"\fOrchestrator\x1a\x11\n" +
-	"\x0fWorkplanCreatorB\x06\n" +
+	"\x0fWorkplanCreator\x1a\n" +
+	"\n" +
+	"\bExternalB\x06\n" +
 	"\x04kindBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_actor_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_turboci_graph_orchestrator_v1_actor_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_turboci_graph_orchestrator_v1_actor_proto_goTypes = []any{
 	(*Actor)(nil),                 // 0: turboci.graph.orchestrator.v1.Actor
 	(*Actor_Orchestrator)(nil),    // 1: turboci.graph.orchestrator.v1.Actor.Orchestrator
 	(*Actor_WorkplanCreator)(nil), // 2: turboci.graph.orchestrator.v1.Actor.WorkplanCreator
-	(*v1.StageAttempt)(nil),       // 3: turboci.graph.ids.v1.StageAttempt
+	(*Actor_External)(nil),        // 3: turboci.graph.orchestrator.v1.Actor.External
+	(*v1.StageAttempt)(nil),       // 4: turboci.graph.ids.v1.StageAttempt
 }
 var file_turboci_graph_orchestrator_v1_actor_proto_depIdxs = []int32{
-	3, // 0: turboci.graph.orchestrator.v1.Actor.stage_attempt:type_name -> turboci.graph.ids.v1.StageAttempt
+	4, // 0: turboci.graph.orchestrator.v1.Actor.stage_attempt:type_name -> turboci.graph.ids.v1.StageAttempt
 	1, // 1: turboci.graph.orchestrator.v1.Actor.orchestrator:type_name -> turboci.graph.orchestrator.v1.Actor.Orchestrator
 	2, // 2: turboci.graph.orchestrator.v1.Actor.workplan_creator:type_name -> turboci.graph.orchestrator.v1.Actor.WorkplanCreator
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	3, // 3: turboci.graph.orchestrator.v1.Actor.external:type_name -> turboci.graph.orchestrator.v1.Actor.External
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_actor_proto_init() }
@@ -381,6 +477,7 @@ func file_turboci_graph_orchestrator_v1_actor_proto_init() {
 		(*actor_StageAttempt)(nil),
 		(*actor_Orchestrator_)(nil),
 		(*actor_WorkplanCreator_)(nil),
+		(*actor_External_)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -388,7 +485,7 @@ func file_turboci_graph_orchestrator_v1_actor_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_actor_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_actor_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

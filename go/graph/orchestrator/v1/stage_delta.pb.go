@@ -27,13 +27,15 @@ const (
 
 // Encapsulates data changes to a Stage object.
 type StageDelta struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_State       StageState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
-	xxx_hidden_Attempts    *[]*StageDelta_Attempt `protobuf:"bytes,2,rep,name=attempts,proto3"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state                        protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_State             StageState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
+	xxx_hidden_Attempts          *[]*StageDelta_Attempt `protobuf:"bytes,2,rep,name=attempts,proto3"`
+	xxx_hidden_Cancelled         bool                   `protobuf:"varint,3,opt,name=cancelled,proto3,oneof"`
+	xxx_hidden_ContinuationGroup *Dependencies          `protobuf:"bytes,4,opt,name=continuation_group,json=continuationGroup,proto3,oneof"`
+	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
+	XXX_presence                 [1]uint32
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
 }
 
 func (x *StageDelta) Reset() {
@@ -79,13 +81,36 @@ func (x *StageDelta) GetAttempts() []*StageDelta_Attempt {
 	return nil
 }
 
+func (x *StageDelta) GetCancelled() bool {
+	if x != nil {
+		return x.xxx_hidden_Cancelled
+	}
+	return false
+}
+
+func (x *StageDelta) GetContinuationGroup() *Dependencies {
+	if x != nil {
+		return x.xxx_hidden_ContinuationGroup
+	}
+	return nil
+}
+
 func (x *StageDelta) SetState(v StageState) {
 	x.xxx_hidden_State = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
 }
 
 func (x *StageDelta) SetAttempts(v []*StageDelta_Attempt) {
 	x.xxx_hidden_Attempts = &v
+}
+
+func (x *StageDelta) SetCancelled(v bool) {
+	x.xxx_hidden_Cancelled = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
+}
+
+func (x *StageDelta) SetContinuationGroup(v *Dependencies) {
+	x.xxx_hidden_ContinuationGroup = v
 }
 
 func (x *StageDelta) HasState() bool {
@@ -95,9 +120,32 @@ func (x *StageDelta) HasState() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
+func (x *StageDelta) HasCancelled() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *StageDelta) HasContinuationGroup() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_ContinuationGroup != nil
+}
+
 func (x *StageDelta) ClearState() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_State = StageState_STAGE_STATE_UNKNOWN
+}
+
+func (x *StageDelta) ClearCancelled() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Cancelled = false
+}
+
+func (x *StageDelta) ClearContinuationGroup() {
+	x.xxx_hidden_ContinuationGroup = nil
 }
 
 type StageDelta_builder struct {
@@ -110,6 +158,15 @@ type StageDelta_builder struct {
 	// NOTE: This should have a maximum length of 2 when an old Attempt is made
 	// INCOMPLETE at the same time a new Attempt is written as PENDING.
 	Attempts []*StageDelta_Attempt
+	// Cancelled is true if the edit cancelled this Stage.
+	Cancelled *bool
+	// The Stage continuation_group written as part of this edit.
+	//
+	// The fields within reflect what was changed in this edit:
+	//   - `edges`, `predicate` and `resolution` are included in-whole, and mean
+	//     that this edit modified those fields.
+	//   - `resolution_events` reflects just new events resolved in this edit.
+	ContinuationGroup *Dependencies
 }
 
 func (b0 StageDelta_builder) Build() *StageDelta {
@@ -117,10 +174,15 @@ func (b0 StageDelta_builder) Build() *StageDelta {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.State != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
 		x.xxx_hidden_State = *b.State
 	}
 	x.xxx_hidden_Attempts = &b.Attempts
+	if b.Cancelled != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
+		x.xxx_hidden_Cancelled = *b.Cancelled
+	}
+	x.xxx_hidden_ContinuationGroup = b.ContinuationGroup
 	return m0
 }
 
@@ -268,11 +330,14 @@ var File_turboci_graph_orchestrator_v1_stage_delta_proto protoreflect.FileDescri
 
 const file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/stage_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xc2\x03\n" +
+	"/turboci/graph/orchestrator/v1/stage_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xf8\x04\n" +
 	"\n" +
 	"StageDelta\x12D\n" +
 	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x00R\x05state\x88\x01\x01\x12M\n" +
-	"\battempts\x18\x02 \x03(\v21.turboci.graph.orchestrator.v1.StageDelta.AttemptR\battempts\x1a\x94\x02\n" +
+	"\battempts\x18\x02 \x03(\v21.turboci.graph.orchestrator.v1.StageDelta.AttemptR\battempts\x12!\n" +
+	"\tcancelled\x18\x03 \x01(\bH\x01R\tcancelled\x88\x01\x01\x12l\n" +
+	"\x12continuation_group\x18\x04 \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
+	"\x01\bH\x02R\x11continuationGroup\x88\x01\x01\x1a\x94\x02\n" +
 	"\aAttempt\x12G\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\n" +
@@ -282,28 +347,33 @@ const file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDesc = "" +
 	"\bprogress\x18\x04 \x03(\x03R\bprogressB\r\n" +
 	"\v_identifierB\b\n" +
 	"\x06_stateB\b\n" +
-	"\x06_stateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x06_stateB\f\n" +
+	"\n" +
+	"_cancelledB\x15\n" +
+	"\x13_continuation_groupBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_stage_delta_proto_goTypes = []any{
 	(*StageDelta)(nil),         // 0: turboci.graph.orchestrator.v1.StageDelta
 	(*StageDelta_Attempt)(nil), // 1: turboci.graph.orchestrator.v1.StageDelta.Attempt
 	(StageState)(0),            // 2: turboci.graph.orchestrator.v1.StageState
-	(*v1.StageAttempt)(nil),    // 3: turboci.graph.ids.v1.StageAttempt
-	(StageAttemptState)(0),     // 4: turboci.graph.orchestrator.v1.StageAttemptState
-	(*Value)(nil),              // 5: turboci.graph.orchestrator.v1.Value
+	(*Dependencies)(nil),       // 3: turboci.graph.orchestrator.v1.Dependencies
+	(*v1.StageAttempt)(nil),    // 4: turboci.graph.ids.v1.StageAttempt
+	(StageAttemptState)(0),     // 5: turboci.graph.orchestrator.v1.StageAttemptState
+	(*Value)(nil),              // 6: turboci.graph.orchestrator.v1.Value
 }
 var file_turboci_graph_orchestrator_v1_stage_delta_proto_depIdxs = []int32{
 	2, // 0: turboci.graph.orchestrator.v1.StageDelta.state:type_name -> turboci.graph.orchestrator.v1.StageState
 	1, // 1: turboci.graph.orchestrator.v1.StageDelta.attempts:type_name -> turboci.graph.orchestrator.v1.StageDelta.Attempt
-	3, // 2: turboci.graph.orchestrator.v1.StageDelta.Attempt.identifier:type_name -> turboci.graph.ids.v1.StageAttempt
-	4, // 3: turboci.graph.orchestrator.v1.StageDelta.Attempt.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
-	5, // 4: turboci.graph.orchestrator.v1.StageDelta.Attempt.details:type_name -> turboci.graph.orchestrator.v1.Value
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	3, // 2: turboci.graph.orchestrator.v1.StageDelta.continuation_group:type_name -> turboci.graph.orchestrator.v1.Dependencies
+	4, // 3: turboci.graph.orchestrator.v1.StageDelta.Attempt.identifier:type_name -> turboci.graph.ids.v1.StageAttempt
+	5, // 4: turboci.graph.orchestrator.v1.StageDelta.Attempt.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
+	6, // 5: turboci.graph.orchestrator.v1.StageDelta.Attempt.details:type_name -> turboci.graph.orchestrator.v1.Value
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_stage_delta_proto_init() }
@@ -311,6 +381,8 @@ func file_turboci_graph_orchestrator_v1_stage_delta_proto_init() {
 	if File_turboci_graph_orchestrator_v1_stage_delta_proto != nil {
 		return
 	}
+	file_turboci_graph_orchestrator_v1_dependencies_proto_init()
+	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_state_proto_init()
 	file_turboci_graph_orchestrator_v1_value_proto_init()
