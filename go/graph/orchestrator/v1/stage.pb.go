@@ -1275,6 +1275,9 @@ type Stage_Attempt_builder struct {
 	//
 	// The states where this is set are:
 	//
+	//   - PENDING - The Orchestrator attempted to send this Stage Attempt to
+	//     the executor, but failed for some reason. The Orchestrator will try
+	//     again after this time.
 	//   - THROTTLED - The Executor explicitly asked the Orchestrator to hold
 	//     a PENDING attempt until later. The Orchestrator not to attempt to
 	//     call RunStage again until this time.
