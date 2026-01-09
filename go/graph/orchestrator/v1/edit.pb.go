@@ -424,11 +424,11 @@ type Edit_builder struct {
 	// realms.
 	//
 	// NOTE: When viewing Edits, the reader will only see the reasons for which
-	// they have read permissions (that is - two different users may see different
-	// versions of this otherwise entirely-immutable Edit).
+	// they have read permissions (that is - two different users may see
+	// different versions of this otherwise entirely-immutable Edit).
 	//
-	// By convention, these should be ordered from most to least specific, so if a
-	// client only wants to display one Reason, it should be the first in this
+	// By convention, these should be ordered from most to least specific, so if
+	// a client only wants to display one Reason, it should be the first in this
 	// list.
 	Reasons []*Edit_Reason
 	// The actual delta of this Edit.
@@ -509,6 +509,7 @@ func (*edit_Stage) isEdit_Delta() {}
 // WriteNodes).
 type Edit_Reason struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier  *v1.Identifier         `protobuf:"bytes,4,opt,name=identifier,proto3,oneof"`
 	xxx_hidden_Realm       *string                `protobuf:"bytes,1,opt,name=realm,proto3,oneof"`
 	xxx_hidden_Message     *string                `protobuf:"bytes,2,opt,name=message,proto3,oneof"`
 	xxx_hidden_Details     *[]*Value              `protobuf:"bytes,3,rep,name=details,proto3"`
@@ -543,6 +544,13 @@ func (x *Edit_Reason) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
+func (x *Edit_Reason) GetIdentifier() *v1.Identifier {
+	if x != nil {
+		return x.xxx_hidden_Identifier
+	}
+	return nil
+}
+
 func (x *Edit_Reason) GetRealm() string {
 	if x != nil {
 		if x.xxx_hidden_Realm != nil {
@@ -572,47 +580,64 @@ func (x *Edit_Reason) GetDetails() []*Value {
 	return nil
 }
 
+func (x *Edit_Reason) SetIdentifier(v *v1.Identifier) {
+	x.xxx_hidden_Identifier = v
+}
+
 func (x *Edit_Reason) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
 }
 
 func (x *Edit_Reason) SetMessage(v string) {
 	x.xxx_hidden_Message = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
 }
 
 func (x *Edit_Reason) SetDetails(v []*Value) {
 	x.xxx_hidden_Details = &v
 }
 
-func (x *Edit_Reason) HasRealm() bool {
+func (x *Edit_Reason) HasIdentifier() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+	return x.xxx_hidden_Identifier != nil
 }
 
-func (x *Edit_Reason) HasMessage() bool {
+func (x *Edit_Reason) HasRealm() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
+func (x *Edit_Reason) HasMessage() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *Edit_Reason) ClearIdentifier() {
+	x.xxx_hidden_Identifier = nil
+}
+
 func (x *Edit_Reason) ClearRealm() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
 	x.xxx_hidden_Realm = nil
 }
 
 func (x *Edit_Reason) ClearMessage() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
 	x.xxx_hidden_Message = nil
 }
 
 type Edit_Reason_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
+	// The identifier of this specific Reason.
+	Identifier *v1.Identifier
 	// The security realm for this reason.
 	//
 	// This is set by the writer which created this Edit. In WriteNodseRequest,
@@ -640,12 +665,13 @@ func (b0 Edit_Reason_builder) Build() *Edit_Reason {
 	m0 := &Edit_Reason{}
 	b, x := &b0, m0
 	_, _ = b, x
+	x.xxx_hidden_Identifier = b.Identifier
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
 		x.xxx_hidden_Realm = b.Realm
 	}
 	if b.Message != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
 		x.xxx_hidden_Message = b.Message
 	}
 	x.xxx_hidden_Details = &b.Details
@@ -656,7 +682,7 @@ var File_turboci_graph_orchestrator_v1_edit_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_edit_proto_rawDesc = "" +
 	"\n" +
-	"(turboci/graph/orchestrator/v1/edit.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_delta.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_delta.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xf0\a\n" +
+	"(turboci/graph/orchestrator/v1/edit.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_delta.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_delta.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xd4\b\n" +
 	"\x04Edit\x12N\n" +
 	"\bfor_node\x18\x01 \x01(\v2 .turboci.graph.ids.v1.IdentifierB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
 	"\x02\x02\bH\x01R\aforNode\x88\x01\x01\x12F\n" +
@@ -672,11 +698,16 @@ const file_turboci_graph_orchestrator_v1_edit_proto_rawDesc = "" +
 	"\areasons\x18\b \x03(\v2*.turboci.graph.orchestrator.v1.Edit.ReasonR\areasons\x12A\n" +
 	"\x05check\x18\t \x01(\v2).turboci.graph.orchestrator.v1.CheckDeltaH\x00R\x05check\x12A\n" +
 	"\x05stage\x18\n" +
-	" \x01(\v2).turboci.graph.orchestrator.v1.StageDeltaH\x00R\x05stage\x1a\x98\x01\n" +
-	"\x06Reason\x12\x19\n" +
-	"\x05realm\x18\x01 \x01(\tH\x00R\x05realm\x88\x01\x01\x12\x1d\n" +
-	"\amessage\x18\x02 \x01(\tH\x01R\amessage\x88\x01\x01\x12>\n" +
-	"\adetails\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetailsB\b\n" +
+	" \x01(\v2).turboci.graph.orchestrator.v1.StageDeltaH\x00R\x05stage\x1a\xfc\x01\n" +
+	"\x06Reason\x12S\n" +
+	"\n" +
+	"identifier\x18\x04 \x01(\v2 .turboci.graph.ids.v1.IdentifierB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
+	"\x02\v\fH\x00R\n" +
+	"identifier\x88\x01\x01\x12\x19\n" +
+	"\x05realm\x18\x01 \x01(\tH\x01R\x05realm\x88\x01\x01\x12\x1d\n" +
+	"\amessage\x18\x02 \x01(\tH\x02R\amessage\x88\x01\x01\x12>\n" +
+	"\adetails\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetailsB\r\n" +
+	"\v_identifierB\b\n" +
 	"\x06_realmB\n" +
 	"\n" +
 	"\b_messageB\a\n" +
@@ -713,12 +744,13 @@ var file_turboci_graph_orchestrator_v1_edit_proto_depIdxs = []int32{
 	1,  // 6: turboci.graph.orchestrator.v1.Edit.reasons:type_name -> turboci.graph.orchestrator.v1.Edit.Reason
 	6,  // 7: turboci.graph.orchestrator.v1.Edit.check:type_name -> turboci.graph.orchestrator.v1.CheckDelta
 	7,  // 8: turboci.graph.orchestrator.v1.Edit.stage:type_name -> turboci.graph.orchestrator.v1.StageDelta
-	8,  // 9: turboci.graph.orchestrator.v1.Edit.Reason.details:type_name -> turboci.graph.orchestrator.v1.Value
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	2,  // 9: turboci.graph.orchestrator.v1.Edit.Reason.identifier:type_name -> turboci.graph.ids.v1.Identifier
+	8,  // 10: turboci.graph.orchestrator.v1.Edit.Reason.details:type_name -> turboci.graph.orchestrator.v1.Value
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_edit_proto_init() }

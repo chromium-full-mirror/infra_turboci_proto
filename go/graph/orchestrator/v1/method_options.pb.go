@@ -88,40 +88,15 @@ func (b0 MethodOptions_builder) Build() *MethodOptions {
 	return m0
 }
 
-// Which permissions this RPC may check.
+// Which permissions this RPC may check, and under what conditions.
 //
 // This is purely for documentation purposes.
-//
-// Example:
-//
-//	rpc Foo(FooRequest) returns (FooResponse) {
-//	  option (turboci_rpc) = {
-//	    permission: {
-//	      name: "turboci.checks.update"
-//	      in: IDENTIFIER_KIND_CHECK
-//	      for: "Check edits"
-//	      for: "Check option edits"
-//	    }
-//	    permission: {
-//	      name: "turboci.checks.globalUpdate"
-//	      in: IDENTIFIER_KIND_WORK_PLAN
-//	      for: "Calls without StageAttemptToken"
-//	    }
-//	  };
-//	}
-//
-// This indicates that the RPC requires the permission
-// "turboci.checks.update" for all check and check option edits, and ALSO
-// requires "turboci.checks.globalUpdate" for all calls to this RPC without
-// a StageAttemptToken.
-//
-// You should also refer to the documentation of `Foo` for any additional
-// details of when these permissions are checked.
 type MethodOptions_Permission struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Name        *string                `protobuf:"bytes,1,opt,name=name,proto3,oneof"`
-	xxx_hidden_In          v1.IdentifierKind      `protobuf:"varint,2,opt,name=in,proto3,enum=turboci.graph.ids.v1.IdentifierKind,oneof"`
-	xxx_hidden_For         []string               `protobuf:"bytes,3,rep,name=for,proto3"`
+	xxx_hidden_Internal    *string                `protobuf:"bytes,1,opt,name=internal,proto3,oneof"`
+	xxx_hidden_External    *string                `protobuf:"bytes,2,opt,name=external,proto3,oneof"`
+	xxx_hidden_In          []v1.IdentifierKind    `protobuf:"varint,3,rep,packed,name=in,proto3,enum=turboci.graph.ids.v1.IdentifierKind"`
+	xxx_hidden_For         []string               `protobuf:"bytes,4,rep,name=for,proto3"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -153,23 +128,31 @@ func (x *MethodOptions_Permission) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *MethodOptions_Permission) GetName() string {
+func (x *MethodOptions_Permission) GetInternal() string {
 	if x != nil {
-		if x.xxx_hidden_Name != nil {
-			return *x.xxx_hidden_Name
+		if x.xxx_hidden_Internal != nil {
+			return *x.xxx_hidden_Internal
 		}
 		return ""
 	}
 	return ""
 }
 
-func (x *MethodOptions_Permission) GetIn() v1.IdentifierKind {
+func (x *MethodOptions_Permission) GetExternal() string {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
-			return x.xxx_hidden_In
+		if x.xxx_hidden_External != nil {
+			return *x.xxx_hidden_External
 		}
+		return ""
 	}
-	return v1.IdentifierKind(0)
+	return ""
+}
+
+func (x *MethodOptions_Permission) GetIn() []v1.IdentifierKind {
+	if x != nil {
+		return x.xxx_hidden_In
+	}
+	return nil
 }
 
 func (x *MethodOptions_Permission) GetFor() []string {
@@ -179,51 +162,59 @@ func (x *MethodOptions_Permission) GetFor() []string {
 	return nil
 }
 
-func (x *MethodOptions_Permission) SetName(v string) {
-	x.xxx_hidden_Name = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+func (x *MethodOptions_Permission) SetInternal(v string) {
+	x.xxx_hidden_Internal = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
 }
 
-func (x *MethodOptions_Permission) SetIn(v v1.IdentifierKind) {
+func (x *MethodOptions_Permission) SetExternal(v string) {
+	x.xxx_hidden_External = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
+}
+
+func (x *MethodOptions_Permission) SetIn(v []v1.IdentifierKind) {
 	x.xxx_hidden_In = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
 }
 
 func (x *MethodOptions_Permission) SetFor(v []string) {
 	x.xxx_hidden_For = v
 }
 
-func (x *MethodOptions_Permission) HasName() bool {
+func (x *MethodOptions_Permission) HasInternal() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *MethodOptions_Permission) HasIn() bool {
+func (x *MethodOptions_Permission) HasExternal() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *MethodOptions_Permission) ClearName() {
+func (x *MethodOptions_Permission) ClearInternal() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Name = nil
+	x.xxx_hidden_Internal = nil
 }
 
-func (x *MethodOptions_Permission) ClearIn() {
+func (x *MethodOptions_Permission) ClearExternal() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_In = v1.IdentifierKind_IDENTIFIER_KIND_UNKNOWN
+	x.xxx_hidden_External = nil
 }
 
 type MethodOptions_Permission_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The name of the permission.
-	Name *string
-	// The node whose realm will be checked.
-	In *v1.IdentifierKind
+	// The name of the permission checked for operations in the same
+	// workplan as the token.
+	Internal *string
+	// The name of the permission checked for operations outside the
+	// workplan of the token, or for operations with no token at all.
+	External *string
+	// The node(s) whose realm will be checked.
+	In []v1.IdentifierKind
 	// Short description of when this permission is checked.
 	For []string
 }
@@ -232,14 +223,15 @@ func (b0 MethodOptions_Permission_builder) Build() *MethodOptions_Permission {
 	m0 := &MethodOptions_Permission{}
 	b, x := &b0, m0
 	_, _ = b, x
-	if b.Name != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
-		x.xxx_hidden_Name = b.Name
+	if b.Internal != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
+		x.xxx_hidden_Internal = b.Internal
 	}
-	if b.In != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
-		x.xxx_hidden_In = *b.In
+	if b.External != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
+		x.xxx_hidden_External = b.External
 	}
+	x.xxx_hidden_In = b.In
 	x.xxx_hidden_For = b.For
 	return m0
 }
@@ -267,18 +259,19 @@ var File_turboci_graph_orchestrator_v1_method_options_proto protoreflect.FileDes
 
 const file_turboci_graph_orchestrator_v1_method_options_proto_rawDesc = "" +
 	"\n" +
-	"2turboci/graph/orchestrator/v1/method_options.proto\x12\x1dturboci.graph.orchestrator.v1\x1a google/protobuf/descriptor.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\"\xf2\x01\n" +
+	"2turboci/graph/orchestrator/v1/method_options.proto\x12\x1dturboci.graph.orchestrator.v1\x1a google/protobuf/descriptor.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\"\xa0\x02\n" +
 	"\rMethodOptions\x12\\\n" +
 	"\n" +
 	"permission\x18\x01 \x03(\v27.turboci.graph.orchestrator.v1.MethodOptions.PermissionB\x03\x88\x01\x02R\n" +
-	"permission\x1a\x82\x01\n" +
+	"permission\x1a\xb0\x01\n" +
 	"\n" +
-	"Permission\x12\x17\n" +
-	"\x04name\x18\x01 \x01(\tH\x00R\x04name\x88\x01\x01\x129\n" +
-	"\x02in\x18\x02 \x01(\x0e2$.turboci.graph.ids.v1.IdentifierKindH\x01R\x02in\x88\x01\x01\x12\x10\n" +
-	"\x03for\x18\x03 \x03(\tR\x03forB\a\n" +
-	"\x05_nameB\x05\n" +
-	"\x03_in:t\n" +
+	"Permission\x12\x1f\n" +
+	"\binternal\x18\x01 \x01(\tH\x00R\binternal\x88\x01\x01\x12\x1f\n" +
+	"\bexternal\x18\x02 \x01(\tH\x01R\bexternal\x88\x01\x01\x124\n" +
+	"\x02in\x18\x03 \x03(\x0e2$.turboci.graph.ids.v1.IdentifierKindR\x02in\x12\x10\n" +
+	"\x03for\x18\x04 \x03(\tR\x03forB\v\n" +
+	"\t_internalB\v\n" +
+	"\t_external:t\n" +
 	"\vturboci_rpc\x12\x1e.google.protobuf.MethodOptions\x18ں\xab\xfa\x01 \x01(\v2,.turboci.graph.orchestrator.v1.MethodOptionsR\n" +
 	"turbociRpc\x88\x01\x01BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 

@@ -280,13 +280,21 @@ type QueryNodesRequest_TypeInfo_builder struct {
 	// Type URLs that the caller wants to see in the response. Any child Node
 	// whose type URL is not specified here will be omitted in the response.
 	//
-	// TBD: The special value "*" means that the caller wants to see ALL types,
-	// but this requires an extra permission. Extra permission is needed to
-	// encourage clients to be explicit about what they want to reduce
-	// bandwidth, coupling and increase auditability.
+	// You may specify a URL with a trailing wildcard to indicate that you
+	// want all data whose type appears in this proto namespace. For example:
+	//   - type.googleapis.com/turboci.data.*
+	//   - type.googleapis.com/*
 	//
-	// TBD: Allow limited wildcards to include everything under some package
-	// namespace like `turboci.data.*`.
+	// Use this power wisely! This can have the following adverse affects:
+	//   - It can send your client much more data than it needs (and the server
+	//     will do more work to obtain and serialize this useless data).
+	//   - It can make coupling analysis harder; if all nodes are reading all
+	//     data, then it makes it much harder to answer "who depends on this
+	//     data type?"
+	//
+	// Good usages of this (especially the full wildcard, "*") include:
+	//   - Humans trying to debug/observe data in the graph (via UI or CLI).
+	//   - LLMs trying to analyze data in the graph.
 	Wanted []string
 	// If specified the orchestrator will encode all Values with this
 	// alternate encoding, excluding types listed in `known`.
@@ -294,13 +302,19 @@ type QueryNodesRequest_TypeInfo_builder struct {
 	// Note that the orchestrator may have an out-of-date version of the
 	// descriptors - if this happens then Value.has_unknown_fields may be set
 	// to `true`.
+	//
+	// This is intended to support:
+	//   - Humans trying to debug/observe data in the graph (via UI or CLI).
+	//   - LLMs trying to analyze data in the graph.
+	//
+	// Stage implementations, monitoring pipelines and scripts should ideally
+	// be written to directly use the original binary encoded proto data.
 	UnknownJsonpb *bool
 	// Type URLs that the caller has descriptors for. Used with
-	// `unknown_alternate_encoding` to avoid encoding types the caller does
-	// actually have descriptors for.
+	// `unknown_jsonpb` to avoid encoding types the caller does actually have
+	// descriptors for.
 	//
-	// TBD: Allow limited wildcards to include everything under some package
-	// namespace like `turboci.data.*`.
+	// Suffix wildcards in the same form as `wanted` are allowed.
 	Known []string
 }
 

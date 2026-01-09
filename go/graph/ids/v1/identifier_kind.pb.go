@@ -48,12 +48,16 @@ const (
 	IdentifierKind_IDENTIFIER_KIND_CHECK_EDIT IdentifierKind = 6
 	// An Identifier.CheckEditOption.
 	IdentifierKind_IDENTIFIER_KIND_CHECK_EDIT_OPTION IdentifierKind = 7
+	// An Identifier.CheckEditReason
+	IdentifierKind_IDENTIFIER_KIND_CHECK_EDIT_REASON IdentifierKind = 11
 	// An Identifier.Stage.
 	IdentifierKind_IDENTIFIER_KIND_STAGE IdentifierKind = 8
 	// An Identifier.StageAttempt.
 	IdentifierKind_IDENTIFIER_KIND_STAGE_ATTEMPT IdentifierKind = 9
 	// An Identifier.StageEdit.
 	IdentifierKind_IDENTIFIER_KIND_STAGE_EDIT IdentifierKind = 10
+	// An Identifier.StageEditReason
+	IdentifierKind_IDENTIFIER_KIND_STAGE_EDIT_REASON IdentifierKind = 12
 )
 
 // Enum value maps for IdentifierKind.
@@ -67,9 +71,11 @@ var (
 		5:  "IDENTIFIER_KIND_CHECK_RESULT_DATUM",
 		6:  "IDENTIFIER_KIND_CHECK_EDIT",
 		7:  "IDENTIFIER_KIND_CHECK_EDIT_OPTION",
+		11: "IDENTIFIER_KIND_CHECK_EDIT_REASON",
 		8:  "IDENTIFIER_KIND_STAGE",
 		9:  "IDENTIFIER_KIND_STAGE_ATTEMPT",
 		10: "IDENTIFIER_KIND_STAGE_EDIT",
+		12: "IDENTIFIER_KIND_STAGE_EDIT_REASON",
 	}
 	IdentifierKind_value = map[string]int32{
 		"IDENTIFIER_KIND_UNKNOWN":            0,
@@ -80,9 +86,11 @@ var (
 		"IDENTIFIER_KIND_CHECK_RESULT_DATUM": 5,
 		"IDENTIFIER_KIND_CHECK_EDIT":         6,
 		"IDENTIFIER_KIND_CHECK_EDIT_OPTION":  7,
+		"IDENTIFIER_KIND_CHECK_EDIT_REASON":  11,
 		"IDENTIFIER_KIND_STAGE":              8,
 		"IDENTIFIER_KIND_STAGE_ATTEMPT":      9,
 		"IDENTIFIER_KIND_STAGE_EDIT":         10,
+		"IDENTIFIER_KIND_STAGE_EDIT_REASON":  12,
 	}
 )
 
@@ -112,7 +120,7 @@ var File_turboci_graph_ids_v1_identifier_kind_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_ids_v1_identifier_kind_proto_rawDesc = "" +
 	"\n" +
-	"*turboci/graph/ids/v1/identifier_kind.proto\x12\x14turboci.graph.ids.v1*\xf8\x02\n" +
+	"*turboci/graph/ids/v1/identifier_kind.proto\x12\x14turboci.graph.ids.v1*\xc6\x03\n" +
 	"\x0eIdentifierKind\x12\x1b\n" +
 	"\x17IDENTIFIER_KIND_UNKNOWN\x10\x00\x12\x1d\n" +
 	"\x19IDENTIFIER_KIND_WORK_PLAN\x10\x01\x12\x19\n" +
@@ -121,11 +129,13 @@ const file_turboci_graph_ids_v1_identifier_kind_proto_rawDesc = "" +
 	"\x1cIDENTIFIER_KIND_CHECK_RESULT\x10\x04\x12&\n" +
 	"\"IDENTIFIER_KIND_CHECK_RESULT_DATUM\x10\x05\x12\x1e\n" +
 	"\x1aIDENTIFIER_KIND_CHECK_EDIT\x10\x06\x12%\n" +
-	"!IDENTIFIER_KIND_CHECK_EDIT_OPTION\x10\a\x12\x19\n" +
+	"!IDENTIFIER_KIND_CHECK_EDIT_OPTION\x10\a\x12%\n" +
+	"!IDENTIFIER_KIND_CHECK_EDIT_REASON\x10\v\x12\x19\n" +
 	"\x15IDENTIFIER_KIND_STAGE\x10\b\x12!\n" +
 	"\x1dIDENTIFIER_KIND_STAGE_ATTEMPT\x10\t\x12\x1e\n" +
 	"\x1aIDENTIFIER_KIND_STAGE_EDIT\x10\n" +
-	"B7P\x01Z3go.chromium.org/turboci/proto/go/graph/ids/v1;idspbb\x06proto3"
+	"\x12%\n" +
+	"!IDENTIFIER_KIND_STAGE_EDIT_REASON\x10\fB7P\x01Z3go.chromium.org/turboci/proto/go/graph/ids/v1;idspbb\x06proto3"
 
 var file_turboci_graph_ids_v1_identifier_kind_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_ids_v1_identifier_kind_proto_goTypes = []any{

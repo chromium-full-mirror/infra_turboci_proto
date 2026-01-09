@@ -36,7 +36,8 @@ const (
 // TurboCIOrchestrator is the API for interacting with the TurboCI
 // Orchestrator.
 type TurboCIOrchestratorClient interface {
-	// CreateWorkPlan creates a new WorkPlan.
+	// CreateWorkPlan creates a new WorkPlan and returns a Workplan Creator
+	// token, which can be used to create checks and stages in this Workplan.
 	//
 	// Currently can only create empty work plans that can later be populated via
 	// WriteNodes call.
@@ -111,7 +112,8 @@ func (c *turboCIOrchestratorClient) QueryNodes(ctx context.Context, in *v1.Query
 // TurboCIOrchestrator is the API for interacting with the TurboCI
 // Orchestrator.
 type TurboCIOrchestratorServer interface {
-	// CreateWorkPlan creates a new WorkPlan.
+	// CreateWorkPlan creates a new WorkPlan and returns a Workplan Creator
+	// token, which can be used to create checks and stages in this Workplan.
 	//
 	// Currently can only create empty work plans that can later be populated via
 	// WriteNodes call.

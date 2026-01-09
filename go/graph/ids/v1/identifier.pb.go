@@ -128,6 +128,15 @@ func (x *Identifier) GetCheckEditOption() *CheckEditOption {
 	return nil
 }
 
+func (x *Identifier) GetCheckEditReason() *CheckEditReason {
+	if x != nil {
+		if x, ok := x.xxx_hidden_Type.(*identifier_CheckEditReason); ok {
+			return x.CheckEditReason
+		}
+	}
+	return nil
+}
+
 func (x *Identifier) GetStage() *Stage {
 	if x != nil {
 		if x, ok := x.xxx_hidden_Type.(*identifier_Stage); ok {
@@ -150,6 +159,15 @@ func (x *Identifier) GetStageEdit() *StageEdit {
 	if x != nil {
 		if x, ok := x.xxx_hidden_Type.(*identifier_StageEdit); ok {
 			return x.StageEdit
+		}
+	}
+	return nil
+}
+
+func (x *Identifier) GetStageEditReason() *StageEditReason {
+	if x != nil {
+		if x, ok := x.xxx_hidden_Type.(*identifier_StageEditReason); ok {
+			return x.StageEditReason
 		}
 	}
 	return nil
@@ -211,6 +229,14 @@ func (x *Identifier) SetCheckEditOption(v *CheckEditOption) {
 	x.xxx_hidden_Type = &identifier_CheckEditOption{v}
 }
 
+func (x *Identifier) SetCheckEditReason(v *CheckEditReason) {
+	if v == nil {
+		x.xxx_hidden_Type = nil
+		return
+	}
+	x.xxx_hidden_Type = &identifier_CheckEditReason{v}
+}
+
 func (x *Identifier) SetStage(v *Stage) {
 	if v == nil {
 		x.xxx_hidden_Type = nil
@@ -233,6 +259,14 @@ func (x *Identifier) SetStageEdit(v *StageEdit) {
 		return
 	}
 	x.xxx_hidden_Type = &identifier_StageEdit{v}
+}
+
+func (x *Identifier) SetStageEditReason(v *StageEditReason) {
+	if v == nil {
+		x.xxx_hidden_Type = nil
+		return
+	}
+	x.xxx_hidden_Type = &identifier_StageEditReason{v}
 }
 
 func (x *Identifier) HasType() bool {
@@ -298,6 +332,14 @@ func (x *Identifier) HasCheckEditOption() bool {
 	return ok
 }
 
+func (x *Identifier) HasCheckEditReason() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Type.(*identifier_CheckEditReason)
+	return ok
+}
+
 func (x *Identifier) HasStage() bool {
 	if x == nil {
 		return false
@@ -319,6 +361,14 @@ func (x *Identifier) HasStageEdit() bool {
 		return false
 	}
 	_, ok := x.xxx_hidden_Type.(*identifier_StageEdit)
+	return ok
+}
+
+func (x *Identifier) HasStageEditReason() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Type.(*identifier_StageEditReason)
 	return ok
 }
 
@@ -368,6 +418,12 @@ func (x *Identifier) ClearCheckEditOption() {
 	}
 }
 
+func (x *Identifier) ClearCheckEditReason() {
+	if _, ok := x.xxx_hidden_Type.(*identifier_CheckEditReason); ok {
+		x.xxx_hidden_Type = nil
+	}
+}
+
 func (x *Identifier) ClearStage() {
 	if _, ok := x.xxx_hidden_Type.(*identifier_Stage); ok {
 		x.xxx_hidden_Type = nil
@@ -386,6 +442,12 @@ func (x *Identifier) ClearStageEdit() {
 	}
 }
 
+func (x *Identifier) ClearStageEditReason() {
+	if _, ok := x.xxx_hidden_Type.(*identifier_StageEditReason); ok {
+		x.xxx_hidden_Type = nil
+	}
+}
+
 const Identifier_Type_not_set_case case_Identifier_Type = 0
 const Identifier_WorkPlan_case case_Identifier_Type = 1
 const Identifier_Check_case case_Identifier_Type = 2
@@ -394,9 +456,11 @@ const Identifier_CheckResult_case case_Identifier_Type = 4
 const Identifier_CheckResultDatum_case case_Identifier_Type = 5
 const Identifier_CheckEdit_case case_Identifier_Type = 6
 const Identifier_CheckEditOption_case case_Identifier_Type = 7
+const Identifier_CheckEditReason_case case_Identifier_Type = 11
 const Identifier_Stage_case case_Identifier_Type = 8
 const Identifier_StageAttempt_case case_Identifier_Type = 9
 const Identifier_StageEdit_case case_Identifier_Type = 10
+const Identifier_StageEditReason_case case_Identifier_Type = 12
 
 func (x *Identifier) WhichType() case_Identifier_Type {
 	if x == nil {
@@ -417,12 +481,16 @@ func (x *Identifier) WhichType() case_Identifier_Type {
 		return Identifier_CheckEdit_case
 	case *identifier_CheckEditOption:
 		return Identifier_CheckEditOption_case
+	case *identifier_CheckEditReason:
+		return Identifier_CheckEditReason_case
 	case *identifier_Stage:
 		return Identifier_Stage_case
 	case *identifier_StageAttempt:
 		return Identifier_StageAttempt_case
 	case *identifier_StageEdit:
 		return Identifier_StageEdit_case
+	case *identifier_StageEditReason:
+		return Identifier_StageEditReason_case
 	default:
 		return Identifier_Type_not_set_case
 	}
@@ -450,12 +518,16 @@ type Identifier_builder struct {
 	CheckEdit *CheckEdit
 	// Option data for an edit to a Check.
 	CheckEditOption *CheckEditOption
+	// A reason for an edit to a Check.
+	CheckEditReason *CheckEditReason
 	// A Stage within a WorkPlan.
 	Stage *Stage
 	// A specific attempt at a Stage.
 	StageAttempt *StageAttempt
 	// An edit to a Stage.
 	StageEdit *StageEdit
+	// A reason for an edit to a Stage.
+	StageEditReason *StageEditReason
 	// -- end of xxx_hidden_Type
 }
 
@@ -484,6 +556,9 @@ func (b0 Identifier_builder) Build() *Identifier {
 	if b.CheckEditOption != nil {
 		x.xxx_hidden_Type = &identifier_CheckEditOption{b.CheckEditOption}
 	}
+	if b.CheckEditReason != nil {
+		x.xxx_hidden_Type = &identifier_CheckEditReason{b.CheckEditReason}
+	}
 	if b.Stage != nil {
 		x.xxx_hidden_Type = &identifier_Stage{b.Stage}
 	}
@@ -492,6 +567,9 @@ func (b0 Identifier_builder) Build() *Identifier {
 	}
 	if b.StageEdit != nil {
 		x.xxx_hidden_Type = &identifier_StageEdit{b.StageEdit}
+	}
+	if b.StageEditReason != nil {
+		x.xxx_hidden_Type = &identifier_StageEditReason{b.StageEditReason}
 	}
 	return m0
 }
@@ -545,6 +623,11 @@ type identifier_CheckEditOption struct {
 	CheckEditOption *CheckEditOption `protobuf:"bytes,7,opt,name=check_edit_option,json=checkEditOption,proto3,oneof"`
 }
 
+type identifier_CheckEditReason struct {
+	// A reason for an edit to a Check.
+	CheckEditReason *CheckEditReason `protobuf:"bytes,11,opt,name=check_edit_reason,json=checkEditReason,proto3,oneof"`
+}
+
 type identifier_Stage struct {
 	// A Stage within a WorkPlan.
 	Stage *Stage `protobuf:"bytes,8,opt,name=stage,proto3,oneof"`
@@ -558,6 +641,11 @@ type identifier_StageAttempt struct {
 type identifier_StageEdit struct {
 	// An edit to a Stage.
 	StageEdit *StageEdit `protobuf:"bytes,10,opt,name=stage_edit,json=stageEdit,proto3,oneof"`
+}
+
+type identifier_StageEditReason struct {
+	// A reason for an edit to a Stage.
+	StageEditReason *StageEditReason `protobuf:"bytes,12,opt,name=stage_edit_reason,json=stageEditReason,proto3,oneof"`
 }
 
 func (*identifier_WorkPlan) isIdentifier_Type() {}
@@ -574,11 +662,15 @@ func (*identifier_CheckEdit) isIdentifier_Type() {}
 
 func (*identifier_CheckEditOption) isIdentifier_Type() {}
 
+func (*identifier_CheckEditReason) isIdentifier_Type() {}
+
 func (*identifier_Stage) isIdentifier_Type() {}
 
 func (*identifier_StageAttempt) isIdentifier_Type() {}
 
 func (*identifier_StageEdit) isIdentifier_Type() {}
+
+func (*identifier_StageEditReason) isIdentifier_Type() {}
 
 // Identifies an entire TurboCI WorkPlan.
 //
@@ -1119,7 +1211,7 @@ func (b0 CheckResultDatum_builder) Build() *CheckResultDatum {
 
 // Identifies a CheckEdit within a WorkPlan.
 //
-// Serialized as "<check>:E<version>".
+// Serialized as "<check>:V<version>".
 //
 // E.g.
 // "L<check.work_plan.id>:C<check.id>:V<version.seconds>/<version.nanos>"
@@ -1331,6 +1423,114 @@ func (b0 CheckEditOption_builder) Build() *CheckEditOption {
 	return m0
 }
 
+// Identifies a Reason within a CheckEdit.
+//
+// Serialized as "<edit>:R<idx>".
+//
+// E.g.
+// "L<check.work_plan.id>:C<check.id>:V<version.seconds>/<version.nanos>:R1"
+type CheckEditReason struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Edit        *CheckEdit             `protobuf:"bytes,1,opt,name=edit,proto3,oneof"`
+	xxx_hidden_Idx         int32                  `protobuf:"varint,2,opt,name=idx,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *CheckEditReason) Reset() {
+	*x = CheckEditReason{}
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckEditReason) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckEditReason) ProtoMessage() {}
+
+func (x *CheckEditReason) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *CheckEditReason) GetEdit() *CheckEdit {
+	if x != nil {
+		return x.xxx_hidden_Edit
+	}
+	return nil
+}
+
+func (x *CheckEditReason) GetIdx() int32 {
+	if x != nil {
+		return x.xxx_hidden_Idx
+	}
+	return 0
+}
+
+func (x *CheckEditReason) SetEdit(v *CheckEdit) {
+	x.xxx_hidden_Edit = v
+}
+
+func (x *CheckEditReason) SetIdx(v int32) {
+	x.xxx_hidden_Idx = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *CheckEditReason) HasEdit() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Edit != nil
+}
+
+func (x *CheckEditReason) HasIdx() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *CheckEditReason) ClearEdit() {
+	x.xxx_hidden_Edit = nil
+}
+
+func (x *CheckEditReason) ClearIdx() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Idx = 0
+}
+
+type CheckEditReason_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The check edit that this edit belongs to.
+	Edit *CheckEdit
+	// The 1-based index of this Reason in the edit.
+	Idx *int32
+}
+
+func (b0 CheckEditReason_builder) Build() *CheckEditReason {
+	m0 := &CheckEditReason{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Edit = b.Edit
+	if b.Idx != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_Idx = *b.Idx
+	}
+	return m0
+}
+
 // Identifies a Stage within a WorkPlan.
 //
 // If the Stage has the WorkNode type, `is_worknode` will be true, otherwise it
@@ -1360,7 +1560,7 @@ type Stage struct {
 
 func (x *Stage) Reset() {
 	*x = Stage{}
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[8]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1372,7 +1572,7 @@ func (x *Stage) String() string {
 func (*Stage) ProtoMessage() {}
 
 func (x *Stage) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[8]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1509,7 +1709,7 @@ type StageAttempt struct {
 
 func (x *StageAttempt) Reset() {
 	*x = StageAttempt{}
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[9]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1521,7 +1721,7 @@ func (x *StageAttempt) String() string {
 func (*StageAttempt) ProtoMessage() {}
 
 func (x *StageAttempt) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[9]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1603,7 +1803,7 @@ func (b0 StageAttempt_builder) Build() *StageAttempt {
 
 // Identifies a Stage Edit within a WorkPlan.
 //
-// Serialized as "<stage>:E<version>".
+// Serialized as "<stage>:V<version>".
 //
 // E.g.
 // "L<stage.work_plan.id>:<stage.id>:V<version.seconds>/<version.nanos>"
@@ -1617,7 +1817,7 @@ type StageEdit struct {
 
 func (x *StageEdit) Reset() {
 	*x = StageEdit{}
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[10]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1629,7 +1829,7 @@ func (x *StageEdit) String() string {
 func (*StageEdit) ProtoMessage() {}
 
 func (x *StageEdit) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[10]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1702,11 +1902,119 @@ func (b0 StageEdit_builder) Build() *StageEdit {
 	return m0
 }
 
+// Identifies a Reason within a StageEdit.
+//
+// Serialized as "<edit>:R<idx>".
+//
+// E.g.
+// "L<stage.work_plan.id>:<stage.id>:V<version.seconds>/<version.nanos>:R1"
+type StageEditReason struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Edit        *StageEdit             `protobuf:"bytes,1,opt,name=edit,proto3,oneof"`
+	xxx_hidden_Idx         int32                  `protobuf:"varint,2,opt,name=idx,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *StageEditReason) Reset() {
+	*x = StageEditReason{}
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StageEditReason) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StageEditReason) ProtoMessage() {}
+
+func (x *StageEditReason) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *StageEditReason) GetEdit() *StageEdit {
+	if x != nil {
+		return x.xxx_hidden_Edit
+	}
+	return nil
+}
+
+func (x *StageEditReason) GetIdx() int32 {
+	if x != nil {
+		return x.xxx_hidden_Idx
+	}
+	return 0
+}
+
+func (x *StageEditReason) SetEdit(v *StageEdit) {
+	x.xxx_hidden_Edit = v
+}
+
+func (x *StageEditReason) SetIdx(v int32) {
+	x.xxx_hidden_Idx = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *StageEditReason) HasEdit() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Edit != nil
+}
+
+func (x *StageEditReason) HasIdx() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *StageEditReason) ClearEdit() {
+	x.xxx_hidden_Edit = nil
+}
+
+func (x *StageEditReason) ClearIdx() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Idx = 0
+}
+
+type StageEditReason_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The check edit that this edit belongs to.
+	Edit *StageEdit
+	// The 1-based index of this Reason in the edit.
+	Idx *int32
+}
+
+func (b0 StageEditReason_builder) Build() *StageEditReason {
+	m0 := &StageEditReason{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Edit = b.Edit
+	if b.Idx != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_Idx = *b.Idx
+	}
+	return m0
+}
+
 var File_turboci_graph_ids_v1_identifier_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_ids_v1_identifier_proto_rawDesc = "" +
 	"\n" +
-	"%turboci/graph/ids/v1/identifier.proto\x12\x14turboci.graph.ids.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc9\x05\n" +
+	"%turboci/graph/ids/v1/identifier.proto\x12\x14turboci.graph.ids.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf3\x06\n" +
 	"\n" +
 	"Identifier\x12=\n" +
 	"\twork_plan\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x00R\bworkPlan\x123\n" +
@@ -1716,12 +2024,14 @@ const file_turboci_graph_ids_v1_identifier_proto_rawDesc = "" +
 	"\x12check_result_datum\x18\x05 \x01(\v2&.turboci.graph.ids.v1.CheckResultDatumH\x00R\x10checkResultDatum\x12@\n" +
 	"\n" +
 	"check_edit\x18\x06 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\tcheckEdit\x12S\n" +
-	"\x11check_edit_option\x18\a \x01(\v2%.turboci.graph.ids.v1.CheckEditOptionH\x00R\x0fcheckEditOption\x123\n" +
+	"\x11check_edit_option\x18\a \x01(\v2%.turboci.graph.ids.v1.CheckEditOptionH\x00R\x0fcheckEditOption\x12S\n" +
+	"\x11check_edit_reason\x18\v \x01(\v2%.turboci.graph.ids.v1.CheckEditReasonH\x00R\x0fcheckEditReason\x123\n" +
 	"\x05stage\x18\b \x01(\v2\x1b.turboci.graph.ids.v1.StageH\x00R\x05stage\x12I\n" +
 	"\rstage_attempt\x18\t \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\fstageAttempt\x12@\n" +
 	"\n" +
 	"stage_edit\x18\n" +
-	" \x01(\v2\x1f.turboci.graph.ids.v1.StageEditH\x00R\tstageEditB\x06\n" +
+	" \x01(\v2\x1f.turboci.graph.ids.v1.StageEditH\x00R\tstageEdit\x12S\n" +
+	"\x11stage_edit_reason\x18\f \x01(\v2%.turboci.graph.ids.v1.StageEditReasonH\x00R\x0fstageEditReasonB\x06\n" +
 	"\x04type\"&\n" +
 	"\bWorkPlan\x12\x13\n" +
 	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01B\x05\n" +
@@ -1758,6 +2068,11 @@ const file_turboci_graph_ids_v1_identifier_proto_rawDesc = "" +
 	"check_edit\x18\x01 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\tcheckEdit\x88\x01\x01\x12\x15\n" +
 	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\r\n" +
 	"\v_check_editB\x06\n" +
+	"\x04_idx\"s\n" +
+	"\x0fCheckEditReason\x128\n" +
+	"\x04edit\x18\x01 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\x04edit\x88\x01\x01\x12\x15\n" +
+	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\a\n" +
+	"\x05_editB\x06\n" +
 	"\x04_idx\"\xa9\x01\n" +
 	"\x05Stage\x12@\n" +
 	"\twork_plan\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x00R\bworkPlan\x88\x01\x01\x12$\n" +
@@ -1778,9 +2093,14 @@ const file_turboci_graph_ids_v1_identifier_proto_rawDesc = "" +
 	"\aversion\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\aversion\x88\x01\x01B\b\n" +
 	"\x06_stageB\n" +
 	"\n" +
-	"\b_versionB7P\x01Z3go.chromium.org/turboci/proto/go/graph/ids/v1;idspbb\x06proto3"
+	"\b_version\"s\n" +
+	"\x0fStageEditReason\x128\n" +
+	"\x04edit\x18\x01 \x01(\v2\x1f.turboci.graph.ids.v1.StageEditH\x00R\x04edit\x88\x01\x01\x12\x15\n" +
+	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\a\n" +
+	"\x05_editB\x06\n" +
+	"\x04_idxB7P\x01Z3go.chromium.org/turboci/proto/go/graph/ids/v1;idspbb\x06proto3"
 
-var file_turboci_graph_ids_v1_identifier_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_turboci_graph_ids_v1_identifier_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_turboci_graph_ids_v1_identifier_proto_goTypes = []any{
 	(*Identifier)(nil),            // 0: turboci.graph.ids.v1.Identifier
 	(*WorkPlan)(nil),              // 1: turboci.graph.ids.v1.WorkPlan
@@ -1790,10 +2110,12 @@ var file_turboci_graph_ids_v1_identifier_proto_goTypes = []any{
 	(*CheckResultDatum)(nil),      // 5: turboci.graph.ids.v1.CheckResultDatum
 	(*CheckEdit)(nil),             // 6: turboci.graph.ids.v1.CheckEdit
 	(*CheckEditOption)(nil),       // 7: turboci.graph.ids.v1.CheckEditOption
-	(*Stage)(nil),                 // 8: turboci.graph.ids.v1.Stage
-	(*StageAttempt)(nil),          // 9: turboci.graph.ids.v1.StageAttempt
-	(*StageEdit)(nil),             // 10: turboci.graph.ids.v1.StageEdit
-	(*timestamppb.Timestamp)(nil), // 11: google.protobuf.Timestamp
+	(*CheckEditReason)(nil),       // 8: turboci.graph.ids.v1.CheckEditReason
+	(*Stage)(nil),                 // 9: turboci.graph.ids.v1.Stage
+	(*StageAttempt)(nil),          // 10: turboci.graph.ids.v1.StageAttempt
+	(*StageEdit)(nil),             // 11: turboci.graph.ids.v1.StageEdit
+	(*StageEditReason)(nil),       // 12: turboci.graph.ids.v1.StageEditReason
+	(*timestamppb.Timestamp)(nil), // 13: google.protobuf.Timestamp
 }
 var file_turboci_graph_ids_v1_identifier_proto_depIdxs = []int32{
 	1,  // 0: turboci.graph.ids.v1.Identifier.work_plan:type_name -> turboci.graph.ids.v1.WorkPlan
@@ -1803,25 +2125,29 @@ var file_turboci_graph_ids_v1_identifier_proto_depIdxs = []int32{
 	5,  // 4: turboci.graph.ids.v1.Identifier.check_result_datum:type_name -> turboci.graph.ids.v1.CheckResultDatum
 	6,  // 5: turboci.graph.ids.v1.Identifier.check_edit:type_name -> turboci.graph.ids.v1.CheckEdit
 	7,  // 6: turboci.graph.ids.v1.Identifier.check_edit_option:type_name -> turboci.graph.ids.v1.CheckEditOption
-	8,  // 7: turboci.graph.ids.v1.Identifier.stage:type_name -> turboci.graph.ids.v1.Stage
-	9,  // 8: turboci.graph.ids.v1.Identifier.stage_attempt:type_name -> turboci.graph.ids.v1.StageAttempt
-	10, // 9: turboci.graph.ids.v1.Identifier.stage_edit:type_name -> turboci.graph.ids.v1.StageEdit
-	1,  // 10: turboci.graph.ids.v1.Check.work_plan:type_name -> turboci.graph.ids.v1.WorkPlan
-	2,  // 11: turboci.graph.ids.v1.CheckOption.check:type_name -> turboci.graph.ids.v1.Check
-	2,  // 12: turboci.graph.ids.v1.CheckResult.check:type_name -> turboci.graph.ids.v1.Check
-	4,  // 13: turboci.graph.ids.v1.CheckResultDatum.result:type_name -> turboci.graph.ids.v1.CheckResult
-	2,  // 14: turboci.graph.ids.v1.CheckEdit.check:type_name -> turboci.graph.ids.v1.Check
-	11, // 15: turboci.graph.ids.v1.CheckEdit.version:type_name -> google.protobuf.Timestamp
-	6,  // 16: turboci.graph.ids.v1.CheckEditOption.check_edit:type_name -> turboci.graph.ids.v1.CheckEdit
-	1,  // 17: turboci.graph.ids.v1.Stage.work_plan:type_name -> turboci.graph.ids.v1.WorkPlan
-	8,  // 18: turboci.graph.ids.v1.StageAttempt.stage:type_name -> turboci.graph.ids.v1.Stage
-	8,  // 19: turboci.graph.ids.v1.StageEdit.stage:type_name -> turboci.graph.ids.v1.Stage
-	11, // 20: turboci.graph.ids.v1.StageEdit.version:type_name -> google.protobuf.Timestamp
-	21, // [21:21] is the sub-list for method output_type
-	21, // [21:21] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	8,  // 7: turboci.graph.ids.v1.Identifier.check_edit_reason:type_name -> turboci.graph.ids.v1.CheckEditReason
+	9,  // 8: turboci.graph.ids.v1.Identifier.stage:type_name -> turboci.graph.ids.v1.Stage
+	10, // 9: turboci.graph.ids.v1.Identifier.stage_attempt:type_name -> turboci.graph.ids.v1.StageAttempt
+	11, // 10: turboci.graph.ids.v1.Identifier.stage_edit:type_name -> turboci.graph.ids.v1.StageEdit
+	12, // 11: turboci.graph.ids.v1.Identifier.stage_edit_reason:type_name -> turboci.graph.ids.v1.StageEditReason
+	1,  // 12: turboci.graph.ids.v1.Check.work_plan:type_name -> turboci.graph.ids.v1.WorkPlan
+	2,  // 13: turboci.graph.ids.v1.CheckOption.check:type_name -> turboci.graph.ids.v1.Check
+	2,  // 14: turboci.graph.ids.v1.CheckResult.check:type_name -> turboci.graph.ids.v1.Check
+	4,  // 15: turboci.graph.ids.v1.CheckResultDatum.result:type_name -> turboci.graph.ids.v1.CheckResult
+	2,  // 16: turboci.graph.ids.v1.CheckEdit.check:type_name -> turboci.graph.ids.v1.Check
+	13, // 17: turboci.graph.ids.v1.CheckEdit.version:type_name -> google.protobuf.Timestamp
+	6,  // 18: turboci.graph.ids.v1.CheckEditOption.check_edit:type_name -> turboci.graph.ids.v1.CheckEdit
+	6,  // 19: turboci.graph.ids.v1.CheckEditReason.edit:type_name -> turboci.graph.ids.v1.CheckEdit
+	1,  // 20: turboci.graph.ids.v1.Stage.work_plan:type_name -> turboci.graph.ids.v1.WorkPlan
+	9,  // 21: turboci.graph.ids.v1.StageAttempt.stage:type_name -> turboci.graph.ids.v1.Stage
+	9,  // 22: turboci.graph.ids.v1.StageEdit.stage:type_name -> turboci.graph.ids.v1.Stage
+	13, // 23: turboci.graph.ids.v1.StageEdit.version:type_name -> google.protobuf.Timestamp
+	11, // 24: turboci.graph.ids.v1.StageEditReason.edit:type_name -> turboci.graph.ids.v1.StageEdit
+	25, // [25:25] is the sub-list for method output_type
+	25, // [25:25] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_ids_v1_identifier_proto_init() }
@@ -1837,9 +2163,11 @@ func file_turboci_graph_ids_v1_identifier_proto_init() {
 		(*identifier_CheckResultDatum)(nil),
 		(*identifier_CheckEdit)(nil),
 		(*identifier_CheckEditOption)(nil),
+		(*identifier_CheckEditReason)(nil),
 		(*identifier_Stage)(nil),
 		(*identifier_StageAttempt)(nil),
 		(*identifier_StageEdit)(nil),
+		(*identifier_StageEditReason)(nil),
 	}
 	file_turboci_graph_ids_v1_identifier_proto_msgTypes[1].OneofWrappers = []any{}
 	file_turboci_graph_ids_v1_identifier_proto_msgTypes[2].OneofWrappers = []any{}
@@ -1851,13 +2179,15 @@ func file_turboci_graph_ids_v1_identifier_proto_init() {
 	file_turboci_graph_ids_v1_identifier_proto_msgTypes[8].OneofWrappers = []any{}
 	file_turboci_graph_ids_v1_identifier_proto_msgTypes[9].OneofWrappers = []any{}
 	file_turboci_graph_ids_v1_identifier_proto_msgTypes[10].OneofWrappers = []any{}
+	file_turboci_graph_ids_v1_identifier_proto_msgTypes[11].OneofWrappers = []any{}
+	file_turboci_graph_ids_v1_identifier_proto_msgTypes[12].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_ids_v1_identifier_proto_rawDesc), len(file_turboci_graph_ids_v1_identifier_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
