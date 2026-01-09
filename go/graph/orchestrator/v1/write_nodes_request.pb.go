@@ -532,13 +532,14 @@ func (b0 WriteNodesRequest_DependencyGroup_builder) Build() *WriteNodesRequest_D
 
 // A single Stage.Attempt.Progress write message.
 type WriteNodesRequest_StageAttemptProgress struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Message     *string                `protobuf:"bytes,1,opt,name=message,proto3,oneof"`
-	xxx_hidden_Details     *[]*Value              `protobuf:"bytes,2,rep,name=details,proto3"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state                     protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Message        *string                `protobuf:"bytes,1,opt,name=message,proto3,oneof"`
+	xxx_hidden_Details        *[]*Value              `protobuf:"bytes,2,rep,name=details,proto3"`
+	xxx_hidden_IdempotencyKey *string                `protobuf:"bytes,3,opt,name=idempotency_key,json=idempotencyKey,proto3,oneof"`
+	XXX_raceDetectHookData    protoimpl.RaceDetectHookData
+	XXX_presence              [1]uint32
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
 }
 
 func (x *WriteNodesRequest_StageAttemptProgress) Reset() {
@@ -585,13 +586,28 @@ func (x *WriteNodesRequest_StageAttemptProgress) GetDetails() []*Value {
 	return nil
 }
 
+func (x *WriteNodesRequest_StageAttemptProgress) GetIdempotencyKey() string {
+	if x != nil {
+		if x.xxx_hidden_IdempotencyKey != nil {
+			return *x.xxx_hidden_IdempotencyKey
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *WriteNodesRequest_StageAttemptProgress) SetMessage(v string) {
 	x.xxx_hidden_Message = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
 }
 
 func (x *WriteNodesRequest_StageAttemptProgress) SetDetails(v []*Value) {
 	x.xxx_hidden_Details = &v
+}
+
+func (x *WriteNodesRequest_StageAttemptProgress) SetIdempotencyKey(v string) {
+	x.xxx_hidden_IdempotencyKey = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
 }
 
 func (x *WriteNodesRequest_StageAttemptProgress) HasMessage() bool {
@@ -601,9 +617,21 @@ func (x *WriteNodesRequest_StageAttemptProgress) HasMessage() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
+func (x *WriteNodesRequest_StageAttemptProgress) HasIdempotencyKey() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
 func (x *WriteNodesRequest_StageAttemptProgress) ClearMessage() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Message = nil
+}
+
+func (x *WriteNodesRequest_StageAttemptProgress) ClearIdempotencyKey() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_IdempotencyKey = nil
 }
 
 type WriteNodesRequest_StageAttemptProgress_builder struct {
@@ -615,6 +643,52 @@ type WriteNodesRequest_StageAttemptProgress_builder struct {
 	Message *string
 	// Machine-readable details for this progress item.
 	Details []*Value
+	// An optional field for preventing duplicate progress messages.
+	//
+	// If you don't care about duplicate progress messages on retried RPCs, you
+	// can ignore this field.
+	//
+	// Otherwise, if set, this field must be unique per progress message, per
+	// Stage Attempt.
+	//
+	// Writing multiple progress messages with the same idempotency_key, but
+	// different `message` or `details` fields is an error.
+	//
+	// It is recommended to set this field like "<thread_id>/<unique>" where
+	// <thread_id> identifies a single actor within the Executor, in the
+	// context of the current stage attempt token, and <unique> is some unique
+	// value for that actor, for the Stage Attempt.
+	//
+	// Examples:
+	//   - server/<purpose> - messages emitted by the server on behalf of a
+	//     working bot with some specific purpose (e.g. "server/final").
+	//   - bot/<sequence> etc. - messages emitted by the bot from a single
+	//     process on a machine somewhere. The process keeps <sequence> as a
+	//     simple counter in-memory.
+	//   - <uuid> - 36 bytes of stringy goodness. Hopefully your progress
+	//     messages are much longer than this :)
+	//
+	// This solves the problem where:
+	//   - you do a write with a progress message (e.g. "hello"), but fail to
+	//     get the OK response (network, cosmic rays, etc.).
+	//   - you then retry the RPC.
+	//
+	// If the WriteNodesRequest has a TransactionDetails, the retry will fail,
+	// and after getting the current Stage Attempt state, you would need to
+	// scan through the existing Progress messages to see if the message
+	// "hello" is present (assuming that "hello" is actually a unique progress
+	// message in the first place).
+	//
+	// If the WriteNodesRequest does NOT have a TransactionDetails, the new
+	// message will just be appended silently, and you will end up with two
+	// "hello" messages.
+	//
+	// Setting the idempotency_key to a per-Attempt-unique value will prevent
+	// this; this Progress message will be recorded at most once on the
+	// Attempt, and on the retry, the orchestrator will know that this message
+	// was already recorded and will be able to return OK without duplicating
+	// it.
+	IdempotencyKey *string
 }
 
 func (b0 WriteNodesRequest_StageAttemptProgress_builder) Build() *WriteNodesRequest_StageAttemptProgress {
@@ -622,10 +696,14 @@ func (b0 WriteNodesRequest_StageAttemptProgress_builder) Build() *WriteNodesRequ
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Message != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
 		x.xxx_hidden_Message = b.Message
 	}
 	x.xxx_hidden_Details = &b.Details
+	if b.IdempotencyKey != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		x.xxx_hidden_IdempotencyKey = b.IdempotencyKey
+	}
 	return m0
 }
 
@@ -1646,8 +1724,8 @@ type WriteNodesRequest_CurrentAttemptWrite_builder struct {
 	Details []*Value
 	// Progress messages to add to the current Stage Attempt.
 	//
-	// It is a good idea to do these progress updates transactionally,
-	// otherwise it's possible to double-append them.
+	// See StageAttemptProgress.idempotency_key to prevent duplicate appends on
+	// network flake.
 	Progress []*WriteNodesRequest_StageAttemptProgress
 	// A state transition to make in this write.
 	StateTransition *WriteNodesRequest_CurrentAttemptWrite_StateTransition
@@ -2599,7 +2677,7 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\x87&\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xc9&\n" +
 	"\x11WriteNodesRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12Q\n" +
 	"\areasons\x18\x02 \x03(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonR\areasons\x12Z\n" +
@@ -2619,12 +2697,14 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x06groups\x18\x02 \x03(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupR\x06groups\x12!\n" +
 	"\tthreshold\x18\x03 \x01(\x05H\x00R\tthreshold\x88\x01\x01B\f\n" +
 	"\n" +
-	"_threshold\x1a\x81\x01\n" +
+	"_threshold\x1a\xc3\x01\n" +
 	"\x14StageAttemptProgress\x12\x1d\n" +
 	"\amessage\x18\x01 \x01(\tH\x00R\amessage\x88\x01\x01\x12>\n" +
-	"\adetails\x18\x02 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetailsB\n" +
+	"\adetails\x18\x02 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetails\x12,\n" +
+	"\x0fidempotency_key\x18\x03 \x01(\tH\x01R\x0eidempotencyKey\x88\x01\x01B\n" +
 	"\n" +
-	"\b_message\x1a\xa2\x01\n" +
+	"\b_messageB\x12\n" +
+	"\x10_idempotency_key\x1a\xa2\x01\n" +
 	"\x06Reason\x12#\n" +
 	"\x05realm\x18\x01 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02 \x01H\x00R\x05realm\x88\x01\x01\x12\x1d\n" +
 	"\amessage\x18\x02 \x01(\tH\x01R\amessage\x88\x01\x01\x12>\n" +

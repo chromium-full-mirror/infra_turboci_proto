@@ -290,6 +290,13 @@ message Stage {
       // following:
       //   * turboci.graph.orchestrator.v1.ProgressEvolvePending
       optional Actor created_by = 4;
+
+      // Unique-to-this-Attempt key for this Progress message.
+      //
+      // Used to prevent duplicate Progress messages via WriteNodesRequest.
+      //
+      // See WriteNodesRequest.StageAttemptProgress.
+      optional string idempotency_key = 5;
     }
     // Append-only Executor-specefic progress messages.
     repeated Progress progress = 7;

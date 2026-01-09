@@ -1619,15 +1619,16 @@ func (b0 Stage_Attempt_StateHistoryEntry_builder) Build() *Stage_Attempt_StateHi
 // able to load just the current state of a Stage and display this
 // information in a time-oriented way.
 type Stage_Attempt_Progress struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Message     *string                `protobuf:"bytes,1,opt,name=message,proto3,oneof"`
-	xxx_hidden_Version     *Revision              `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
-	xxx_hidden_Details     *[]*Value              `protobuf:"bytes,3,rep,name=details,proto3"`
-	xxx_hidden_CreatedBy   *Actor                 `protobuf:"bytes,4,opt,name=created_by,json=createdBy,proto3,oneof"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state                     protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Message        *string                `protobuf:"bytes,1,opt,name=message,proto3,oneof"`
+	xxx_hidden_Version        *Revision              `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
+	xxx_hidden_Details        *[]*Value              `protobuf:"bytes,3,rep,name=details,proto3"`
+	xxx_hidden_CreatedBy      *Actor                 `protobuf:"bytes,4,opt,name=created_by,json=createdBy,proto3,oneof"`
+	xxx_hidden_IdempotencyKey *string                `protobuf:"bytes,5,opt,name=idempotency_key,json=idempotencyKey,proto3,oneof"`
+	XXX_raceDetectHookData    protoimpl.RaceDetectHookData
+	XXX_presence              [1]uint32
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
 }
 
 func (x *Stage_Attempt_Progress) Reset() {
@@ -1688,9 +1689,19 @@ func (x *Stage_Attempt_Progress) GetCreatedBy() *Actor {
 	return nil
 }
 
+func (x *Stage_Attempt_Progress) GetIdempotencyKey() string {
+	if x != nil {
+		if x.xxx_hidden_IdempotencyKey != nil {
+			return *x.xxx_hidden_IdempotencyKey
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *Stage_Attempt_Progress) SetMessage(v string) {
 	x.xxx_hidden_Message = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 5)
 }
 
 func (x *Stage_Attempt_Progress) SetVersion(v *Revision) {
@@ -1703,6 +1714,11 @@ func (x *Stage_Attempt_Progress) SetDetails(v []*Value) {
 
 func (x *Stage_Attempt_Progress) SetCreatedBy(v *Actor) {
 	x.xxx_hidden_CreatedBy = v
+}
+
+func (x *Stage_Attempt_Progress) SetIdempotencyKey(v string) {
+	x.xxx_hidden_IdempotencyKey = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 5)
 }
 
 func (x *Stage_Attempt_Progress) HasMessage() bool {
@@ -1726,6 +1742,13 @@ func (x *Stage_Attempt_Progress) HasCreatedBy() bool {
 	return x.xxx_hidden_CreatedBy != nil
 }
 
+func (x *Stage_Attempt_Progress) HasIdempotencyKey() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+}
+
 func (x *Stage_Attempt_Progress) ClearMessage() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Message = nil
@@ -1737,6 +1760,11 @@ func (x *Stage_Attempt_Progress) ClearVersion() {
 
 func (x *Stage_Attempt_Progress) ClearCreatedBy() {
 	x.xxx_hidden_CreatedBy = nil
+}
+
+func (x *Stage_Attempt_Progress) ClearIdempotencyKey() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	x.xxx_hidden_IdempotencyKey = nil
 }
 
 type Stage_Attempt_Progress_builder struct {
@@ -1756,6 +1784,12 @@ type Stage_Attempt_Progress_builder struct {
 	// following:
 	//   - turboci.graph.orchestrator.v1.ProgressEvolvePending
 	CreatedBy *Actor
+	// Unique-to-this-Attempt key for this Progress message.
+	//
+	// Used to prevent duplicate Progress messages via WriteNodesRequest.
+	//
+	// See WriteNodesRequest.StageAttemptProgress.
+	IdempotencyKey *string
 }
 
 func (b0 Stage_Attempt_Progress_builder) Build() *Stage_Attempt_Progress {
@@ -1763,12 +1797,16 @@ func (b0 Stage_Attempt_Progress_builder) Build() *Stage_Attempt_Progress {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Message != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 5)
 		x.xxx_hidden_Message = b.Message
 	}
 	x.xxx_hidden_Version = b.Version
 	x.xxx_hidden_Details = &b.Details
 	x.xxx_hidden_CreatedBy = b.CreatedBy
+	if b.IdempotencyKey != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 5)
+		x.xxx_hidden_IdempotencyKey = b.IdempotencyKey
+	}
 	return m0
 }
 
@@ -1776,7 +1814,7 @@ var File_turboci_graph_orchestrator_v1_stage_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/stage.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xfe\x19\n" +
+	")turboci/graph/orchestrator/v1/stage.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xc0\x1a\n" +
 	"\x05Stage\x12E\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageB\x03\xe0A\x05H\x00R\n" +
@@ -1809,7 +1847,7 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\n" +
 	"_requestedB\f\n" +
 	"\n" +
-	"_validated\x1a\xcf\v\n" +
+	"_validated\x1a\x91\f\n" +
 	"\aAttempt\x12L\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\".turboci.graph.ids.v1.StageAttemptB\x03\xe0A\x05H\x00R\n" +
@@ -1831,18 +1869,20 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05H\x01R\aversion\x88\x01\x01B\b\n" +
 	"\x06_stateB\n" +
 	"\n" +
-	"\b_version\x1a\xa2\x02\n" +
+	"\b_version\x1a\xe4\x02\n" +
 	"\bProgress\x12\x1d\n" +
 	"\amessage\x18\x01 \x01(\tH\x00R\amessage\x88\x01\x01\x12F\n" +
 	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01\x12>\n" +
 	"\adetails\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetails\x12H\n" +
 	"\n" +
-	"created_by\x18\x04 \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x02R\tcreatedBy\x88\x01\x01B\n" +
+	"created_by\x18\x04 \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x02R\tcreatedBy\x88\x01\x01\x12,\n" +
+	"\x0fidempotency_key\x18\x05 \x01(\tH\x03R\x0eidempotencyKey\x88\x01\x01B\n" +
 	"\n" +
 	"\b_messageB\n" +
 	"\n" +
 	"\b_versionB\r\n" +
-	"\v_created_byB\r\n" +
+	"\v_created_byB\x12\n" +
+	"\x10_idempotency_keyB\r\n" +
 	"\v_identifierB\n" +
 	"\n" +
 	"\b_versionB\x11\n" +
