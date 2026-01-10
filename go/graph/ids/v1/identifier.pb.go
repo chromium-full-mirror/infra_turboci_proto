@@ -1403,7 +1403,7 @@ func (x *CheckEditOption) ClearIdx() {
 type CheckEditOption_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The check that this edit belongs to.
+	// The check edit that this option belongs to.
 	CheckEdit *CheckEdit
 	// The 1-based index of this datum within the check.options list.
 	//
@@ -1431,7 +1431,7 @@ func (b0 CheckEditOption_builder) Build() *CheckEditOption {
 // "L<check.work_plan.id>:C<check.id>:V<version.seconds>/<version.nanos>:R1"
 type CheckEditReason struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Edit        *CheckEdit             `protobuf:"bytes,1,opt,name=edit,proto3,oneof"`
+	xxx_hidden_CheckEdit   *CheckEdit             `protobuf:"bytes,1,opt,name=check_edit,json=checkEdit,proto3,oneof"`
 	xxx_hidden_Idx         int32                  `protobuf:"varint,2,opt,name=idx,proto3,oneof"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
@@ -1464,9 +1464,9 @@ func (x *CheckEditReason) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *CheckEditReason) GetEdit() *CheckEdit {
+func (x *CheckEditReason) GetCheckEdit() *CheckEdit {
 	if x != nil {
-		return x.xxx_hidden_Edit
+		return x.xxx_hidden_CheckEdit
 	}
 	return nil
 }
@@ -1478,8 +1478,8 @@ func (x *CheckEditReason) GetIdx() int32 {
 	return 0
 }
 
-func (x *CheckEditReason) SetEdit(v *CheckEdit) {
-	x.xxx_hidden_Edit = v
+func (x *CheckEditReason) SetCheckEdit(v *CheckEdit) {
+	x.xxx_hidden_CheckEdit = v
 }
 
 func (x *CheckEditReason) SetIdx(v int32) {
@@ -1487,11 +1487,11 @@ func (x *CheckEditReason) SetIdx(v int32) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
 }
 
-func (x *CheckEditReason) HasEdit() bool {
+func (x *CheckEditReason) HasCheckEdit() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_Edit != nil
+	return x.xxx_hidden_CheckEdit != nil
 }
 
 func (x *CheckEditReason) HasIdx() bool {
@@ -1501,8 +1501,8 @@ func (x *CheckEditReason) HasIdx() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *CheckEditReason) ClearEdit() {
-	x.xxx_hidden_Edit = nil
+func (x *CheckEditReason) ClearCheckEdit() {
+	x.xxx_hidden_CheckEdit = nil
 }
 
 func (x *CheckEditReason) ClearIdx() {
@@ -1513,8 +1513,8 @@ func (x *CheckEditReason) ClearIdx() {
 type CheckEditReason_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The check edit that this edit belongs to.
-	Edit *CheckEdit
+	// The check edit that this reason belongs to.
+	CheckEdit *CheckEdit
 	// The 1-based index of this Reason in the edit.
 	Idx *int32
 }
@@ -1523,7 +1523,7 @@ func (b0 CheckEditReason_builder) Build() *CheckEditReason {
 	m0 := &CheckEditReason{}
 	b, x := &b0, m0
 	_, _ = b, x
-	x.xxx_hidden_Edit = b.Edit
+	x.xxx_hidden_CheckEdit = b.CheckEdit
 	if b.Idx != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
 		x.xxx_hidden_Idx = *b.Idx
@@ -1910,7 +1910,7 @@ func (b0 StageEdit_builder) Build() *StageEdit {
 // "L<stage.work_plan.id>:<stage.id>:V<version.seconds>/<version.nanos>:R1"
 type StageEditReason struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Edit        *StageEdit             `protobuf:"bytes,1,opt,name=edit,proto3,oneof"`
+	xxx_hidden_StageEdit   *StageEdit             `protobuf:"bytes,1,opt,name=stage_edit,json=stageEdit,proto3,oneof"`
 	xxx_hidden_Idx         int32                  `protobuf:"varint,2,opt,name=idx,proto3,oneof"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
@@ -1943,9 +1943,9 @@ func (x *StageEditReason) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *StageEditReason) GetEdit() *StageEdit {
+func (x *StageEditReason) GetStageEdit() *StageEdit {
 	if x != nil {
-		return x.xxx_hidden_Edit
+		return x.xxx_hidden_StageEdit
 	}
 	return nil
 }
@@ -1957,8 +1957,8 @@ func (x *StageEditReason) GetIdx() int32 {
 	return 0
 }
 
-func (x *StageEditReason) SetEdit(v *StageEdit) {
-	x.xxx_hidden_Edit = v
+func (x *StageEditReason) SetStageEdit(v *StageEdit) {
+	x.xxx_hidden_StageEdit = v
 }
 
 func (x *StageEditReason) SetIdx(v int32) {
@@ -1966,11 +1966,11 @@ func (x *StageEditReason) SetIdx(v int32) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
 }
 
-func (x *StageEditReason) HasEdit() bool {
+func (x *StageEditReason) HasStageEdit() bool {
 	if x == nil {
 		return false
 	}
-	return x.xxx_hidden_Edit != nil
+	return x.xxx_hidden_StageEdit != nil
 }
 
 func (x *StageEditReason) HasIdx() bool {
@@ -1980,8 +1980,8 @@ func (x *StageEditReason) HasIdx() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *StageEditReason) ClearEdit() {
-	x.xxx_hidden_Edit = nil
+func (x *StageEditReason) ClearStageEdit() {
+	x.xxx_hidden_StageEdit = nil
 }
 
 func (x *StageEditReason) ClearIdx() {
@@ -1992,8 +1992,8 @@ func (x *StageEditReason) ClearIdx() {
 type StageEditReason_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The check edit that this edit belongs to.
-	Edit *StageEdit
+	// The stage edit that this reason belongs to.
+	StageEdit *StageEdit
 	// The 1-based index of this Reason in the edit.
 	Idx *int32
 }
@@ -2002,7 +2002,7 @@ func (b0 StageEditReason_builder) Build() *StageEditReason {
 	m0 := &StageEditReason{}
 	b, x := &b0, m0
 	_, _ = b, x
-	x.xxx_hidden_Edit = b.Edit
+	x.xxx_hidden_StageEdit = b.StageEdit
 	if b.Idx != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
 		x.xxx_hidden_Idx = *b.Idx
@@ -2068,11 +2068,12 @@ const file_turboci_graph_ids_v1_identifier_proto_rawDesc = "" +
 	"check_edit\x18\x01 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\tcheckEdit\x88\x01\x01\x12\x15\n" +
 	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\r\n" +
 	"\v_check_editB\x06\n" +
-	"\x04_idx\"s\n" +
-	"\x0fCheckEditReason\x128\n" +
-	"\x04edit\x18\x01 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\x04edit\x88\x01\x01\x12\x15\n" +
-	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\a\n" +
-	"\x05_editB\x06\n" +
+	"\x04_idx\"\x84\x01\n" +
+	"\x0fCheckEditReason\x12C\n" +
+	"\n" +
+	"check_edit\x18\x01 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\tcheckEdit\x88\x01\x01\x12\x15\n" +
+	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\r\n" +
+	"\v_check_editB\x06\n" +
 	"\x04_idx\"\xa9\x01\n" +
 	"\x05Stage\x12@\n" +
 	"\twork_plan\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x00R\bworkPlan\x88\x01\x01\x12$\n" +
@@ -2093,11 +2094,12 @@ const file_turboci_graph_ids_v1_identifier_proto_rawDesc = "" +
 	"\aversion\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\aversion\x88\x01\x01B\b\n" +
 	"\x06_stageB\n" +
 	"\n" +
-	"\b_version\"s\n" +
-	"\x0fStageEditReason\x128\n" +
-	"\x04edit\x18\x01 \x01(\v2\x1f.turboci.graph.ids.v1.StageEditH\x00R\x04edit\x88\x01\x01\x12\x15\n" +
-	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\a\n" +
-	"\x05_editB\x06\n" +
+	"\b_version\"\x84\x01\n" +
+	"\x0fStageEditReason\x12C\n" +
+	"\n" +
+	"stage_edit\x18\x01 \x01(\v2\x1f.turboci.graph.ids.v1.StageEditH\x00R\tstageEdit\x88\x01\x01\x12\x15\n" +
+	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\r\n" +
+	"\v_stage_editB\x06\n" +
 	"\x04_idxB7P\x01Z3go.chromium.org/turboci/proto/go/graph/ids/v1;idspbb\x06proto3"
 
 var file_turboci_graph_ids_v1_identifier_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
@@ -2137,12 +2139,12 @@ var file_turboci_graph_ids_v1_identifier_proto_depIdxs = []int32{
 	2,  // 16: turboci.graph.ids.v1.CheckEdit.check:type_name -> turboci.graph.ids.v1.Check
 	13, // 17: turboci.graph.ids.v1.CheckEdit.version:type_name -> google.protobuf.Timestamp
 	6,  // 18: turboci.graph.ids.v1.CheckEditOption.check_edit:type_name -> turboci.graph.ids.v1.CheckEdit
-	6,  // 19: turboci.graph.ids.v1.CheckEditReason.edit:type_name -> turboci.graph.ids.v1.CheckEdit
+	6,  // 19: turboci.graph.ids.v1.CheckEditReason.check_edit:type_name -> turboci.graph.ids.v1.CheckEdit
 	1,  // 20: turboci.graph.ids.v1.Stage.work_plan:type_name -> turboci.graph.ids.v1.WorkPlan
 	9,  // 21: turboci.graph.ids.v1.StageAttempt.stage:type_name -> turboci.graph.ids.v1.Stage
 	9,  // 22: turboci.graph.ids.v1.StageEdit.stage:type_name -> turboci.graph.ids.v1.Stage
 	13, // 23: turboci.graph.ids.v1.StageEdit.version:type_name -> google.protobuf.Timestamp
-	11, // 24: turboci.graph.ids.v1.StageEditReason.edit:type_name -> turboci.graph.ids.v1.StageEdit
+	11, // 24: turboci.graph.ids.v1.StageEditReason.stage_edit:type_name -> turboci.graph.ids.v1.StageEdit
 	25, // [25:25] is the sub-list for method output_type
 	25, // [25:25] is the sub-list for method input_type
 	25, // [25:25] is the sub-list for extension type_name
