@@ -32,6 +32,8 @@ option java_multiple_files = true;
 // See also:
 //   * StageView (graph view object for a Stage and contained messages)
 //   * StageEditView (graph view object for Edits of a Stage)
+//
+// Next ID: 15
 message Stage {
   // The Stage's identifier.
   optional ids.v1.Stage identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
@@ -82,6 +84,10 @@ message Stage {
 
   // The current state of the Stage.
   optional StageState state = 6;
+
+  // If this stage was cancelled, this indicates the Actor which cancelled
+  // it.
+  optional Actor cancelled_by = 14;
 
   // StateHistoryEntry records the database revision (commit timestamp) when
   // each time this Stage's state changes.
@@ -155,7 +161,7 @@ message Stage {
   // TBD: Pull this into its own top-level StageAttempt entity because it will
   // need to have its own state and lifecycle/transactions.
   //
-  // Next ID: 14
+  // Next ID: 12
   message Attempt {
     // The Stage Attempt's identifier.
     optional ids.v1.StageAttempt identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
@@ -210,10 +216,6 @@ message Stage {
     //
     // In all other states, this field is unset.
     optional google.protobuf.Timestamp waiting_until = 11;
-
-    // If this stage was cancelled, this indicates the Actor which cancelled
-    // it.
-    optional Actor cancelled_by = 14;
 
     // An opaque value provided by a Stage Attempt process (i.e. a single thread
     // of execution which is servicing this Stage Attempt) which is used to

@@ -35,6 +35,8 @@ const (
 // See also:
 //   - StageView (graph view object for a Stage and contained messages)
 //   - StageEditView (graph view object for Edits of a Stage)
+//
+// Next ID: 15
 type Stage struct {
 	state                        protoimpl.MessageState      `protogen:"opaque.v1"`
 	xxx_hidden_Identifier        *v1.Stage                   `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
@@ -43,6 +45,7 @@ type Stage struct {
 	xxx_hidden_Args              *Value                      `protobuf:"bytes,4,opt,name=args,proto3,oneof"`
 	xxx_hidden_Version           *Revision                   `protobuf:"bytes,5,opt,name=version,proto3,oneof"`
 	xxx_hidden_State             StageState                  `protobuf:"varint,6,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
+	xxx_hidden_CancelledBy       *Actor                      `protobuf:"bytes,14,opt,name=cancelled_by,json=cancelledBy,proto3,oneof"`
 	xxx_hidden_StateHistory      *[]*Stage_StateHistoryEntry `protobuf:"bytes,7,rep,name=state_history,json=stateHistory,proto3"`
 	xxx_hidden_Dependencies      *Dependencies               `protobuf:"bytes,8,opt,name=dependencies,proto3,oneof"`
 	xxx_hidden_ExecutionPolicy   *Stage_ExecutionPolicyState `protobuf:"bytes,9,opt,name=execution_policy,json=executionPolicy,proto3,oneof"`
@@ -128,6 +131,13 @@ func (x *Stage) GetState() StageState {
 	return StageState_STAGE_STATE_UNKNOWN
 }
 
+func (x *Stage) GetCancelledBy() *Actor {
+	if x != nil {
+		return x.xxx_hidden_CancelledBy
+	}
+	return nil
+}
+
 func (x *Stage) GetStateHistory() []*Stage_StateHistoryEntry {
 	if x != nil {
 		if x.xxx_hidden_StateHistory != nil {
@@ -178,7 +188,7 @@ func (x *Stage) GetContinuationGroup() *Dependencies {
 
 func (x *Stage) GetConcludedReason() StageConcludedReason {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 12) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 13) {
 			return x.xxx_hidden_ConcludedReason
 		}
 	}
@@ -195,7 +205,7 @@ func (x *Stage) SetCreatedBy(v *Actor) {
 
 func (x *Stage) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 13)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 14)
 }
 
 func (x *Stage) SetArgs(v *Value) {
@@ -208,7 +218,11 @@ func (x *Stage) SetVersion(v *Revision) {
 
 func (x *Stage) SetState(v StageState) {
 	x.xxx_hidden_State = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 13)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 14)
+}
+
+func (x *Stage) SetCancelledBy(v *Actor) {
+	x.xxx_hidden_CancelledBy = v
 }
 
 func (x *Stage) SetStateHistory(v []*Stage_StateHistoryEntry) {
@@ -237,7 +251,7 @@ func (x *Stage) SetContinuationGroup(v *Dependencies) {
 
 func (x *Stage) SetConcludedReason(v StageConcludedReason) {
 	x.xxx_hidden_ConcludedReason = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 12, 13)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 13, 14)
 }
 
 func (x *Stage) HasIdentifier() bool {
@@ -282,6 +296,13 @@ func (x *Stage) HasState() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
 }
 
+func (x *Stage) HasCancelledBy() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_CancelledBy != nil
+}
+
 func (x *Stage) HasDependencies() bool {
 	if x == nil {
 		return false
@@ -307,7 +328,7 @@ func (x *Stage) HasConcludedReason() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 12)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 13)
 }
 
 func (x *Stage) ClearIdentifier() {
@@ -336,6 +357,10 @@ func (x *Stage) ClearState() {
 	x.xxx_hidden_State = StageState_STAGE_STATE_UNKNOWN
 }
 
+func (x *Stage) ClearCancelledBy() {
+	x.xxx_hidden_CancelledBy = nil
+}
+
 func (x *Stage) ClearDependencies() {
 	x.xxx_hidden_Dependencies = nil
 }
@@ -349,7 +374,7 @@ func (x *Stage) ClearContinuationGroup() {
 }
 
 func (x *Stage) ClearConcludedReason() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 12)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 13)
 	x.xxx_hidden_ConcludedReason = StageConcludedReason_STAGE_CONCLUDED_REASON_UNKNOWN
 }
 
@@ -400,6 +425,9 @@ type Stage_builder struct {
 	Version *Revision
 	// The current state of the Stage.
 	State *StageState
+	// If this stage was cancelled, this indicates the Actor which cancelled
+	// it.
+	CancelledBy *Actor
 	// Append-only list of StateHistoryEntry to record the database revision
 	// (commit timestamp) when each time this Stage's state changes.
 	StateHistory []*Stage_StateHistoryEntry
@@ -453,15 +481,16 @@ func (b0 Stage_builder) Build() *Stage {
 	x.xxx_hidden_Identifier = b.Identifier
 	x.xxx_hidden_CreatedBy = b.CreatedBy
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 13)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 14)
 		x.xxx_hidden_Realm = b.Realm
 	}
 	x.xxx_hidden_Args = b.Args
 	x.xxx_hidden_Version = b.Version
 	if b.State != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 13)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 14)
 		x.xxx_hidden_State = *b.State
 	}
+	x.xxx_hidden_CancelledBy = b.CancelledBy
 	x.xxx_hidden_StateHistory = &b.StateHistory
 	x.xxx_hidden_Dependencies = b.Dependencies
 	x.xxx_hidden_ExecutionPolicy = b.ExecutionPolicy
@@ -469,7 +498,7 @@ func (b0 Stage_builder) Build() *Stage {
 	x.xxx_hidden_Assignments = &b.Assignments
 	x.xxx_hidden_ContinuationGroup = b.ContinuationGroup
 	if b.ConcludedReason != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 12, 13)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 13, 14)
 		x.xxx_hidden_ConcludedReason = *b.ConcludedReason
 	}
 	return m0
@@ -976,7 +1005,7 @@ func (b0 Stage_ExecutionPolicyState_builder) Build() *Stage_ExecutionPolicyState
 // TBD: Pull this into its own top-level StageAttempt entity because it will
 // need to have its own state and lifecycle/transactions.
 //
-// Next ID: 14
+// Next ID: 12
 type Stage_Attempt struct {
 	state                      protoimpl.MessageState              `protogen:"opaque.v1"`
 	xxx_hidden_Identifier      *v1.StageAttempt                    `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
@@ -985,7 +1014,6 @@ type Stage_Attempt struct {
 	xxx_hidden_State           StageAttemptState                   `protobuf:"varint,3,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
 	xxx_hidden_StateHistory    *[]*Stage_Attempt_StateHistoryEntry `protobuf:"bytes,4,rep,name=state_history,json=stateHistory,proto3"`
 	xxx_hidden_WaitingUntil    *timestamppb.Timestamp              `protobuf:"bytes,11,opt,name=waiting_until,json=waitingUntil,proto3,oneof"`
-	xxx_hidden_CancelledBy     *Actor                              `protobuf:"bytes,14,opt,name=cancelled_by,json=cancelledBy,proto3,oneof"`
 	xxx_hidden_ProcessUid      *string                             `protobuf:"bytes,5,opt,name=process_uid,json=processUid,proto3,oneof"`
 	xxx_hidden_Details         *[]*Value                           `protobuf:"bytes,6,rep,name=details,proto3"`
 	xxx_hidden_Progress        *[]*Stage_Attempt_Progress          `protobuf:"bytes,7,rep,name=progress,proto3"`
@@ -1067,13 +1095,6 @@ func (x *Stage_Attempt) GetWaitingUntil() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *Stage_Attempt) GetCancelledBy() *Actor {
-	if x != nil {
-		return x.xxx_hidden_CancelledBy
-	}
-	return nil
-}
-
 func (x *Stage_Attempt) GetProcessUid() string {
 	if x != nil {
 		if x.xxx_hidden_ProcessUid != nil {
@@ -1123,7 +1144,7 @@ func (x *Stage_Attempt) SetLastHeartbeat(v *Revision) {
 
 func (x *Stage_Attempt) SetState(v StageAttemptState) {
 	x.xxx_hidden_State = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 10)
 }
 
 func (x *Stage_Attempt) SetStateHistory(v []*Stage_Attempt_StateHistoryEntry) {
@@ -1134,13 +1155,9 @@ func (x *Stage_Attempt) SetWaitingUntil(v *timestamppb.Timestamp) {
 	x.xxx_hidden_WaitingUntil = v
 }
 
-func (x *Stage_Attempt) SetCancelledBy(v *Actor) {
-	x.xxx_hidden_CancelledBy = v
-}
-
 func (x *Stage_Attempt) SetProcessUid(v string) {
 	x.xxx_hidden_ProcessUid = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 7, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 10)
 }
 
 func (x *Stage_Attempt) SetDetails(v []*Value) {
@@ -1190,18 +1207,11 @@ func (x *Stage_Attempt) HasWaitingUntil() bool {
 	return x.xxx_hidden_WaitingUntil != nil
 }
 
-func (x *Stage_Attempt) HasCancelledBy() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_CancelledBy != nil
-}
-
 func (x *Stage_Attempt) HasProcessUid() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 7)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
 }
 
 func (x *Stage_Attempt) HasExecutionPolicy() bool {
@@ -1232,12 +1242,8 @@ func (x *Stage_Attempt) ClearWaitingUntil() {
 	x.xxx_hidden_WaitingUntil = nil
 }
 
-func (x *Stage_Attempt) ClearCancelledBy() {
-	x.xxx_hidden_CancelledBy = nil
-}
-
 func (x *Stage_Attempt) ClearProcessUid() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 7)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
 	x.xxx_hidden_ProcessUid = nil
 }
 
@@ -1287,9 +1293,6 @@ type Stage_Attempt_builder struct {
 	//
 	// In all other states, this field is unset.
 	WaitingUntil *timestamppb.Timestamp
-	// If this stage was cancelled, this indicates the Actor which cancelled
-	// it.
-	CancelledBy *Actor
 	// An opaque value provided by a Stage Attempt process (i.e. a single thread
 	// of execution which is servicing this Stage Attempt) which is used to
 	// ensure that a StageAttempt is idempotently assigned to at most one single
@@ -1360,14 +1363,13 @@ func (b0 Stage_Attempt_builder) Build() *Stage_Attempt {
 	x.xxx_hidden_Version = b.Version
 	x.xxx_hidden_LastHeartbeat = b.LastHeartbeat
 	if b.State != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 10)
 		x.xxx_hidden_State = *b.State
 	}
 	x.xxx_hidden_StateHistory = &b.StateHistory
 	x.xxx_hidden_WaitingUntil = b.WaitingUntil
-	x.xxx_hidden_CancelledBy = b.CancelledBy
 	if b.ProcessUid != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 7, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 10)
 		x.xxx_hidden_ProcessUid = b.ProcessUid
 	}
 	x.xxx_hidden_Details = &b.Details
@@ -1824,17 +1826,19 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\x05realm\x18\x03 \x01(\tB\x03\xe0A\x05H\x02R\x05realm\x88\x01\x01\x12B\n" +
 	"\x04args\x18\x04 \x01(\v2$.turboci.graph.orchestrator.v1.ValueB\x03\xe0A\x05H\x03R\x04args\x88\x01\x01\x12F\n" +
 	"\aversion\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x04R\aversion\x88\x01\x01\x12D\n" +
-	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x05R\x05state\x88\x01\x01\x12[\n" +
+	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x05R\x05state\x88\x01\x01\x12L\n" +
+	"\fcancelled_by\x18\x0e \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x06R\vcancelledBy\x88\x01\x01\x12[\n" +
 	"\rstate_history\x18\a \x03(\v26.turboci.graph.orchestrator.v1.Stage.StateHistoryEntryR\fstateHistory\x12e\n" +
 	"\fdependencies\x18\b \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\x0f\xe0A\x05\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
-	"\x02\x02\bH\x06R\fdependencies\x88\x01\x01\x12i\n" +
-	"\x10execution_policy\x18\t \x01(\v29.turboci.graph.orchestrator.v1.Stage.ExecutionPolicyStateH\aR\x0fexecutionPolicy\x88\x01\x01\x12H\n" +
+	"\x02\x02\bH\aR\fdependencies\x88\x01\x01\x12i\n" +
+	"\x10execution_policy\x18\t \x01(\v29.turboci.graph.orchestrator.v1.Stage.ExecutionPolicyStateH\bR\x0fexecutionPolicy\x88\x01\x01\x12H\n" +
 	"\battempts\x18\n" +
 	" \x03(\v2,.turboci.graph.orchestrator.v1.Stage.AttemptR\battempts\x12V\n" +
 	"\vassignments\x18\v \x03(\v2/.turboci.graph.orchestrator.v1.Stage.AssignmentB\x03\xe0A\x05R\vassignments\x12l\n" +
 	"\x12continuation_group\x18\f \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\bH\bR\x11continuationGroup\x88\x01\x01\x12c\n" +
-	"\x10concluded_reason\x18\r \x01(\x0e23.turboci.graph.orchestrator.v1.StageConcludedReasonH\tR\x0fconcludedReason\x88\x01\x01\x1a\xc1\x01\n" +
+	"\x01\bH\tR\x11continuationGroup\x88\x01\x01\x12c\n" +
+	"\x10concluded_reason\x18\r \x01(\x0e23.turboci.graph.orchestrator.v1.StageConcludedReasonH\n" +
+	"R\x0fconcludedReason\x88\x01\x01\x1a\xc1\x01\n" +
 	"\x11StateHistoryEntry\x12I\n" +
 	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateB\x03\xe0A\x05H\x00R\x05state\x88\x01\x01\x12K\n" +
 	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05H\x01R\aversion\x88\x01\x01B\b\n" +
@@ -1847,7 +1851,7 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\n" +
 	"_requestedB\f\n" +
 	"\n" +
-	"_validated\x1a\x91\f\n" +
+	"_validated\x1a\xb2\v\n" +
 	"\aAttempt\x12L\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\".turboci.graph.ids.v1.StageAttemptB\x03\xe0A\x05H\x00R\n" +
@@ -1857,13 +1861,12 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	" \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\rlastHeartbeat\x88\x01\x01\x12K\n" +
 	"\x05state\x18\x03 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x03R\x05state\x88\x01\x01\x12c\n" +
 	"\rstate_history\x18\x04 \x03(\v2>.turboci.graph.orchestrator.v1.Stage.Attempt.StateHistoryEntryR\fstateHistory\x12D\n" +
-	"\rwaiting_until\x18\v \x01(\v2\x1a.google.protobuf.TimestampH\x04R\fwaitingUntil\x88\x01\x01\x12L\n" +
-	"\fcancelled_by\x18\x0e \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x05R\vcancelledBy\x88\x01\x01\x12$\n" +
-	"\vprocess_uid\x18\x05 \x01(\tH\x06R\n" +
+	"\rwaiting_until\x18\v \x01(\v2\x1a.google.protobuf.TimestampH\x04R\fwaitingUntil\x88\x01\x01\x12$\n" +
+	"\vprocess_uid\x18\x05 \x01(\tH\x05R\n" +
 	"processUid\x88\x01\x01\x12>\n" +
 	"\adetails\x18\x06 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetails\x12Q\n" +
 	"\bprogress\x18\a \x03(\v25.turboci.graph.orchestrator.v1.Stage.Attempt.ProgressR\bprogress\x12j\n" +
-	"\x10execution_policy\x18\b \x01(\v2:.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicyH\aR\x0fexecutionPolicy\x88\x01\x01\x1a\xc8\x01\n" +
+	"\x10execution_policy\x18\b \x01(\v2:.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicyH\x06R\x0fexecutionPolicy\x88\x01\x01\x1a\xc8\x01\n" +
 	"\x11StateHistoryEntry\x12P\n" +
 	"\x05state\x18\x01 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateB\x03\xe0A\x05H\x00R\x05state\x88\x01\x01\x12K\n" +
 	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05H\x01R\aversion\x88\x01\x01B\b\n" +
@@ -1888,8 +1891,7 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\b_versionB\x11\n" +
 	"\x0f_last_heartbeatB\b\n" +
 	"\x06_stateB\x10\n" +
-	"\x0e_waiting_untilB\x0f\n" +
-	"\r_cancelled_byB\x0e\n" +
+	"\x0e_waiting_untilB\x0e\n" +
 	"\f_process_uidB\x13\n" +
 	"\x11_execution_policy\x1a\xaf\x01\n" +
 	"\n" +
@@ -1906,6 +1908,7 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\n" +
 	"\b_versionB\b\n" +
 	"\x06_stateB\x0f\n" +
+	"\r_cancelled_byB\x0f\n" +
 	"\r_dependenciesB\x13\n" +
 	"\x11_execution_policyB\x15\n" +
 	"\x13_continuation_groupB\x13\n" +
@@ -1956,28 +1959,28 @@ var file_turboci_graph_orchestrator_v1_stage_proto_depIdxs = []int32{
 	11, // 2: turboci.graph.orchestrator.v1.Stage.args:type_name -> turboci.graph.orchestrator.v1.Value
 	12, // 3: turboci.graph.orchestrator.v1.Stage.version:type_name -> turboci.graph.orchestrator.v1.Revision
 	13, // 4: turboci.graph.orchestrator.v1.Stage.state:type_name -> turboci.graph.orchestrator.v1.StageState
-	3,  // 5: turboci.graph.orchestrator.v1.Stage.state_history:type_name -> turboci.graph.orchestrator.v1.Stage.StateHistoryEntry
-	14, // 6: turboci.graph.orchestrator.v1.Stage.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
-	4,  // 7: turboci.graph.orchestrator.v1.Stage.execution_policy:type_name -> turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState
-	5,  // 8: turboci.graph.orchestrator.v1.Stage.attempts:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt
-	6,  // 9: turboci.graph.orchestrator.v1.Stage.assignments:type_name -> turboci.graph.orchestrator.v1.Stage.Assignment
-	14, // 10: turboci.graph.orchestrator.v1.Stage.continuation_group:type_name -> turboci.graph.orchestrator.v1.Dependencies
-	15, // 11: turboci.graph.orchestrator.v1.Stage.concluded_reason:type_name -> turboci.graph.orchestrator.v1.StageConcludedReason
-	16, // 12: turboci.graph.orchestrator.v1.StageAttemptCurrentState.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
-	12, // 13: turboci.graph.orchestrator.v1.StageAttemptCurrentState.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	17, // 14: turboci.graph.orchestrator.v1.StageAttemptCurrentState.update_state_by:type_name -> google.protobuf.Timestamp
-	17, // 15: turboci.graph.orchestrator.v1.StageAttemptCurrentState.heartbeat_by:type_name -> google.protobuf.Timestamp
-	13, // 16: turboci.graph.orchestrator.v1.Stage.StateHistoryEntry.state:type_name -> turboci.graph.orchestrator.v1.StageState
-	12, // 17: turboci.graph.orchestrator.v1.Stage.StateHistoryEntry.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	18, // 18: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState.requested:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
-	18, // 19: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState.validated:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
-	19, // 20: turboci.graph.orchestrator.v1.Stage.Attempt.identifier:type_name -> turboci.graph.ids.v1.StageAttempt
-	12, // 21: turboci.graph.orchestrator.v1.Stage.Attempt.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	12, // 22: turboci.graph.orchestrator.v1.Stage.Attempt.last_heartbeat:type_name -> turboci.graph.orchestrator.v1.Revision
-	16, // 23: turboci.graph.orchestrator.v1.Stage.Attempt.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
-	7,  // 24: turboci.graph.orchestrator.v1.Stage.Attempt.state_history:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt.StateHistoryEntry
-	17, // 25: turboci.graph.orchestrator.v1.Stage.Attempt.waiting_until:type_name -> google.protobuf.Timestamp
-	10, // 26: turboci.graph.orchestrator.v1.Stage.Attempt.cancelled_by:type_name -> turboci.graph.orchestrator.v1.Actor
+	10, // 5: turboci.graph.orchestrator.v1.Stage.cancelled_by:type_name -> turboci.graph.orchestrator.v1.Actor
+	3,  // 6: turboci.graph.orchestrator.v1.Stage.state_history:type_name -> turboci.graph.orchestrator.v1.Stage.StateHistoryEntry
+	14, // 7: turboci.graph.orchestrator.v1.Stage.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
+	4,  // 8: turboci.graph.orchestrator.v1.Stage.execution_policy:type_name -> turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState
+	5,  // 9: turboci.graph.orchestrator.v1.Stage.attempts:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt
+	6,  // 10: turboci.graph.orchestrator.v1.Stage.assignments:type_name -> turboci.graph.orchestrator.v1.Stage.Assignment
+	14, // 11: turboci.graph.orchestrator.v1.Stage.continuation_group:type_name -> turboci.graph.orchestrator.v1.Dependencies
+	15, // 12: turboci.graph.orchestrator.v1.Stage.concluded_reason:type_name -> turboci.graph.orchestrator.v1.StageConcludedReason
+	16, // 13: turboci.graph.orchestrator.v1.StageAttemptCurrentState.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
+	12, // 14: turboci.graph.orchestrator.v1.StageAttemptCurrentState.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	17, // 15: turboci.graph.orchestrator.v1.StageAttemptCurrentState.update_state_by:type_name -> google.protobuf.Timestamp
+	17, // 16: turboci.graph.orchestrator.v1.StageAttemptCurrentState.heartbeat_by:type_name -> google.protobuf.Timestamp
+	13, // 17: turboci.graph.orchestrator.v1.Stage.StateHistoryEntry.state:type_name -> turboci.graph.orchestrator.v1.StageState
+	12, // 18: turboci.graph.orchestrator.v1.Stage.StateHistoryEntry.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	18, // 19: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState.requested:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
+	18, // 20: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState.validated:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
+	19, // 21: turboci.graph.orchestrator.v1.Stage.Attempt.identifier:type_name -> turboci.graph.ids.v1.StageAttempt
+	12, // 22: turboci.graph.orchestrator.v1.Stage.Attempt.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	12, // 23: turboci.graph.orchestrator.v1.Stage.Attempt.last_heartbeat:type_name -> turboci.graph.orchestrator.v1.Revision
+	16, // 24: turboci.graph.orchestrator.v1.Stage.Attempt.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
+	7,  // 25: turboci.graph.orchestrator.v1.Stage.Attempt.state_history:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt.StateHistoryEntry
+	17, // 26: turboci.graph.orchestrator.v1.Stage.Attempt.waiting_until:type_name -> google.protobuf.Timestamp
 	11, // 27: turboci.graph.orchestrator.v1.Stage.Attempt.details:type_name -> turboci.graph.orchestrator.v1.Value
 	8,  // 28: turboci.graph.orchestrator.v1.Stage.Attempt.progress:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt.Progress
 	20, // 29: turboci.graph.orchestrator.v1.Stage.Attempt.execution_policy:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
