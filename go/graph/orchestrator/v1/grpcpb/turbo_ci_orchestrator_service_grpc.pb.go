@@ -35,6 +35,23 @@ const (
 //
 // TurboCIOrchestrator is the API for interacting with the TurboCI
 // Orchestrator.
+//
+// These RPCs will require certain permissions, acquired via project-scoped
+// LUCI ACLs (configured via
+// https://chromium.googlesource.com/infra/luci/luci-go/+/refs/heads/main/lucicfg/doc/README.md#luci.binding),
+// for the data being acted upon. A more complete description of the LUCI
+// authorization model is at http://go/luci-authorization (Googlers only),
+// with a more sparse description available to non-Googlers at
+// https://chromium.googlesource.com/infra/luci/luci-go/+/refs/heads/main/lucicfg/doc/README.md#ACLs.
+//
+// Additional notes for understanding Turbo CI's use of this permissions model:
+// * Every message has a LUCI realm (as a `string realm` field in these protos)
+// either in the message or a containing message, and permissions to act on that
+// message are configured for the realm.
+// * Nested messages (e.g. a Check option inside of a Check) may be assigned to
+// a different realm than their parent. Permission to read or write a nested
+// message also requires the corresponding permission for all parent nodes, and
+// for the containing Workplan.
 type TurboCIOrchestratorClient interface {
 	// CreateWorkPlan creates a new WorkPlan and returns a Workplan Creator
 	// token, which can be used to create checks and stages in this Workplan.
@@ -111,6 +128,23 @@ func (c *turboCIOrchestratorClient) QueryNodes(ctx context.Context, in *v1.Query
 //
 // TurboCIOrchestrator is the API for interacting with the TurboCI
 // Orchestrator.
+//
+// These RPCs will require certain permissions, acquired via project-scoped
+// LUCI ACLs (configured via
+// https://chromium.googlesource.com/infra/luci/luci-go/+/refs/heads/main/lucicfg/doc/README.md#luci.binding),
+// for the data being acted upon. A more complete description of the LUCI
+// authorization model is at http://go/luci-authorization (Googlers only),
+// with a more sparse description available to non-Googlers at
+// https://chromium.googlesource.com/infra/luci/luci-go/+/refs/heads/main/lucicfg/doc/README.md#ACLs.
+//
+// Additional notes for understanding Turbo CI's use of this permissions model:
+// * Every message has a LUCI realm (as a `string realm` field in these protos)
+// either in the message or a containing message, and permissions to act on that
+// message are configured for the realm.
+// * Nested messages (e.g. a Check option inside of a Check) may be assigned to
+// a different realm than their parent. Permission to read or write a nested
+// message also requires the corresponding permission for all parent nodes, and
+// for the containing Workplan.
 type TurboCIOrchestratorServer interface {
 	// CreateWorkPlan creates a new WorkPlan and returns a Workplan Creator
 	// token, which can be used to create checks and stages in this Workplan.
