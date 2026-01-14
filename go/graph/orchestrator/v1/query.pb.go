@@ -1468,7 +1468,10 @@ func (b0 Query_SelectChecks_Predicate_builder) Build() *Query_SelectChecks_Predi
 // corresponding clause is not checked. At least one field must be set.
 type Query_SelectStages_Predicate struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_WithArgsType *TypeSet               `protobuf:"bytes,1,opt,name=with_args_type,json=withArgsType,proto3,oneof"`
+	xxx_hidden_State        StageState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
+	xxx_hidden_WithArgsType *TypeSet               `protobuf:"bytes,2,opt,name=with_args_type,json=withArgsType,proto3,oneof"`
+	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
+	XXX_presence            [1]uint32
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
 }
@@ -1498,6 +1501,15 @@ func (x *Query_SelectStages_Predicate) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
+func (x *Query_SelectStages_Predicate) GetState() StageState {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
+			return x.xxx_hidden_State
+		}
+	}
+	return StageState_STAGE_STATE_UNKNOWN
+}
+
 func (x *Query_SelectStages_Predicate) GetWithArgsType() *TypeSet {
 	if x != nil {
 		return x.xxx_hidden_WithArgsType
@@ -1505,8 +1517,20 @@ func (x *Query_SelectStages_Predicate) GetWithArgsType() *TypeSet {
 	return nil
 }
 
+func (x *Query_SelectStages_Predicate) SetState(v StageState) {
+	x.xxx_hidden_State = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
 func (x *Query_SelectStages_Predicate) SetWithArgsType(v *TypeSet) {
 	x.xxx_hidden_WithArgsType = v
+}
+
+func (x *Query_SelectStages_Predicate) HasState() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
 func (x *Query_SelectStages_Predicate) HasWithArgsType() bool {
@@ -1516,6 +1540,11 @@ func (x *Query_SelectStages_Predicate) HasWithArgsType() bool {
 	return x.xxx_hidden_WithArgsType != nil
 }
 
+func (x *Query_SelectStages_Predicate) ClearState() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_State = StageState_STAGE_STATE_UNKNOWN
+}
+
 func (x *Query_SelectStages_Predicate) ClearWithArgsType() {
 	x.xxx_hidden_WithArgsType = nil
 }
@@ -1523,6 +1552,8 @@ func (x *Query_SelectStages_Predicate) ClearWithArgsType() {
 type Query_SelectStages_Predicate_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
+	// Pick Stages in this state.
+	State *StageState
 	// Pick Stages with Args matching the type filter.
 	WithArgsType *TypeSet
 }
@@ -1531,6 +1562,10 @@ func (b0 Query_SelectStages_Predicate_builder) Build() *Query_SelectStages_Predi
 	m0 := &Query_SelectStages_Predicate{}
 	b, x := &b0, m0
 	_, _ = b, x
+	if b.State != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_State = *b.State
+	}
 	x.xxx_hidden_WithArgsType = b.WithArgsType
 	return m0
 }
@@ -1539,7 +1574,7 @@ var File_turboci_graph_orchestrator_v1_query_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_query_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/query.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a2turboci/graph/orchestrator/v1/revision_range.proto\x1a,turboci/graph/orchestrator/v1/type_set.proto\"\x9e\x13\n" +
+	")turboci/graph/orchestrator/v1/query.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a2turboci/graph/orchestrator/v1/revision_range.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a,turboci/graph/orchestrator/v1/type_set.proto\"\xef\x13\n" +
 	"\x05Query\x12L\n" +
 	"\x11nodes_in_workplan\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x00R\x0fnodesInWorkplan\x12q\n" +
 	"\x16nodes_across_workplans\x18\x02 \x01(\v29.turboci.graph.orchestrator.v1.Query.NodesAcrossWorkPlansH\x00R\x14nodesAcrossWorkplans\x12P\n" +
@@ -1566,13 +1601,15 @@ const file_turboci_graph_orchestrator_v1_query_proto_rawDesc = "" +
 	"\x05_kindB\b\n" +
 	"\x06_stateB\x13\n" +
 	"\x11_with_option_typeB\x18\n" +
-	"\x16_with_result_data_type\x1a\xde\x01\n" +
+	"\x16_with_result_data_type\x1a\xaf\x02\n" +
 	"\fSelectStages\x12[\n" +
 	"\n" +
 	"predicates\x18\x01 \x03(\v2;.turboci.graph.orchestrator.v1.Query.SelectStages.PredicateR\n" +
-	"predicates\x1aq\n" +
-	"\tPredicate\x12Q\n" +
-	"\x0ewith_args_type\x18\x01 \x01(\v2&.turboci.graph.orchestrator.v1.TypeSetH\x00R\fwithArgsType\x88\x01\x01B\x11\n" +
+	"predicates\x1a\xc1\x01\n" +
+	"\tPredicate\x12D\n" +
+	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x00R\x05state\x88\x01\x01\x12Q\n" +
+	"\x0ewith_args_type\x18\x02 \x01(\v2&.turboci.graph.orchestrator.v1.TypeSetH\x01R\fwithArgsType\x88\x01\x01B\b\n" +
+	"\x06_stateB\x11\n" +
 	"\x0f_with_args_type\x1aj\n" +
 	"\x12ExpandDependencies\x12K\n" +
 	"\x04mode\x18\x01 \x01(\x0e22.turboci.graph.orchestrator.v1.QueryExpandDepsModeH\x00R\x04mode\x88\x01\x01B\a\n" +
@@ -1634,6 +1671,7 @@ var file_turboci_graph_orchestrator_v1_query_proto_goTypes = []any{
 	(CheckKind)(0),                       // 16: turboci.graph.orchestrator.v1.CheckKind
 	(CheckState)(0),                      // 17: turboci.graph.orchestrator.v1.CheckState
 	(*TypeSet)(nil),                      // 18: turboci.graph.orchestrator.v1.TypeSet
+	(StageState)(0),                      // 19: turboci.graph.orchestrator.v1.StageState
 }
 var file_turboci_graph_orchestrator_v1_query_proto_depIdxs = []int32{
 	13, // 0: turboci.graph.orchestrator.v1.Query.nodes_in_workplan:type_name -> turboci.graph.ids.v1.WorkPlan
@@ -1657,12 +1695,13 @@ var file_turboci_graph_orchestrator_v1_query_proto_depIdxs = []int32{
 	17, // 18: turboci.graph.orchestrator.v1.Query.SelectChecks.Predicate.state:type_name -> turboci.graph.orchestrator.v1.CheckState
 	18, // 19: turboci.graph.orchestrator.v1.Query.SelectChecks.Predicate.with_option_type:type_name -> turboci.graph.orchestrator.v1.TypeSet
 	18, // 20: turboci.graph.orchestrator.v1.Query.SelectChecks.Predicate.with_result_data_type:type_name -> turboci.graph.orchestrator.v1.TypeSet
-	18, // 21: turboci.graph.orchestrator.v1.Query.SelectStages.Predicate.with_args_type:type_name -> turboci.graph.orchestrator.v1.TypeSet
-	22, // [22:22] is the sub-list for method output_type
-	22, // [22:22] is the sub-list for method input_type
-	22, // [22:22] is the sub-list for extension type_name
-	22, // [22:22] is the sub-list for extension extendee
-	0,  // [0:22] is the sub-list for field type_name
+	19, // 21: turboci.graph.orchestrator.v1.Query.SelectStages.Predicate.state:type_name -> turboci.graph.orchestrator.v1.StageState
+	18, // 22: turboci.graph.orchestrator.v1.Query.SelectStages.Predicate.with_args_type:type_name -> turboci.graph.orchestrator.v1.TypeSet
+	23, // [23:23] is the sub-list for method output_type
+	23, // [23:23] is the sub-list for method input_type
+	23, // [23:23] is the sub-list for extension type_name
+	23, // [23:23] is the sub-list for extension extendee
+	0,  // [0:23] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_query_proto_init() }
@@ -1674,6 +1713,7 @@ func file_turboci_graph_orchestrator_v1_query_proto_init() {
 	file_turboci_graph_orchestrator_v1_check_state_proto_init()
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_range_proto_init()
+	file_turboci_graph_orchestrator_v1_stage_state_proto_init()
 	file_turboci_graph_orchestrator_v1_type_set_proto_init()
 	file_turboci_graph_orchestrator_v1_query_proto_msgTypes[0].OneofWrappers = []any{
 		(*query_NodesInWorkplan)(nil),

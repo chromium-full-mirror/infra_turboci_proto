@@ -11,6 +11,7 @@ import "turboci/graph/orchestrator/v1/check_kind.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
 import "turboci/graph/orchestrator/v1/revision_range.proto";
+import "turboci/graph/orchestrator/v1/stage_state.proto";
 import "turboci/graph/orchestrator/v1/type_set.proto";
 
 option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
@@ -220,8 +221,11 @@ message Query {
     // Individual clauses are ANDed together. An unset field means the
     // corresponding clause is not checked. At least one field must be set.
     message Predicate {
+      // Pick Stages in this state.
+      optional StageState state = 1;
+
       // Pick Stages with Args matching the type filter.
-      optional TypeSet with_args_type = 1;
+      optional TypeSet with_args_type = 2;
     }
     // Pick Stages matching any of these predicates (they are ORed together).
     //
