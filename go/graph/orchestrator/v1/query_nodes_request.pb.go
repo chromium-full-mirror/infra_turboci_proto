@@ -194,9 +194,9 @@ func (b0 QueryNodesRequest_builder) Build() *QueryNodesRequest {
 // wants to see in Check Options, Check Results, Stage args, Edits, etc.
 type QueryNodesRequest_TypeInfo struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Wanted        []string               `protobuf:"bytes,1,rep,name=wanted,proto3"`
+	xxx_hidden_Wanted        *TypeSet               `protobuf:"bytes,1,opt,name=wanted,proto3,oneof"`
 	xxx_hidden_UnknownJsonpb bool                   `protobuf:"varint,2,opt,name=unknown_jsonpb,json=unknownJsonpb,proto3,oneof"`
-	xxx_hidden_Known         []string               `protobuf:"bytes,3,rep,name=known,proto3"`
+	xxx_hidden_Known         *TypeSet               `protobuf:"bytes,3,opt,name=known,proto3,oneof"`
 	XXX_raceDetectHookData   protoimpl.RaceDetectHookData
 	XXX_presence             [1]uint32
 	unknownFields            protoimpl.UnknownFields
@@ -228,7 +228,7 @@ func (x *QueryNodesRequest_TypeInfo) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *QueryNodesRequest_TypeInfo) GetWanted() []string {
+func (x *QueryNodesRequest_TypeInfo) GetWanted() *TypeSet {
 	if x != nil {
 		return x.xxx_hidden_Wanted
 	}
@@ -242,14 +242,14 @@ func (x *QueryNodesRequest_TypeInfo) GetUnknownJsonpb() bool {
 	return false
 }
 
-func (x *QueryNodesRequest_TypeInfo) GetKnown() []string {
+func (x *QueryNodesRequest_TypeInfo) GetKnown() *TypeSet {
 	if x != nil {
 		return x.xxx_hidden_Known
 	}
 	return nil
 }
 
-func (x *QueryNodesRequest_TypeInfo) SetWanted(v []string) {
+func (x *QueryNodesRequest_TypeInfo) SetWanted(v *TypeSet) {
 	x.xxx_hidden_Wanted = v
 }
 
@@ -258,8 +258,15 @@ func (x *QueryNodesRequest_TypeInfo) SetUnknownJsonpb(v bool) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
 }
 
-func (x *QueryNodesRequest_TypeInfo) SetKnown(v []string) {
+func (x *QueryNodesRequest_TypeInfo) SetKnown(v *TypeSet) {
 	x.xxx_hidden_Known = v
+}
+
+func (x *QueryNodesRequest_TypeInfo) HasWanted() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Wanted != nil
 }
 
 func (x *QueryNodesRequest_TypeInfo) HasUnknownJsonpb() bool {
@@ -269,18 +276,34 @@ func (x *QueryNodesRequest_TypeInfo) HasUnknownJsonpb() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
+func (x *QueryNodesRequest_TypeInfo) HasKnown() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Known != nil
+}
+
+func (x *QueryNodesRequest_TypeInfo) ClearWanted() {
+	x.xxx_hidden_Wanted = nil
+}
+
 func (x *QueryNodesRequest_TypeInfo) ClearUnknownJsonpb() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
 	x.xxx_hidden_UnknownJsonpb = false
 }
 
+func (x *QueryNodesRequest_TypeInfo) ClearKnown() {
+	x.xxx_hidden_Known = nil
+}
+
 type QueryNodesRequest_TypeInfo_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Type URLs that the caller wants to see in the response. Any child Node
-	// whose type URL is not specified here will be omitted in the response.
+	// Set of type URLs that the caller wants to see in the response. Any child
+	// Node whose type URL is not specified here will be omitted in the
+	// response.
 	//
-	// You may specify a URL with a trailing wildcard to indicate that you
+	// The set may contain an URL with a trailing wildcard to indicate that you
 	// want all data whose type appears in this proto namespace. For example:
 	//   - type.googleapis.com/turboci.data.*
 	//   - type.googleapis.com/*
@@ -295,7 +318,7 @@ type QueryNodesRequest_TypeInfo_builder struct {
 	// Good usages of this (especially the full wildcard, "*") include:
 	//   - Humans trying to debug/observe data in the graph (via UI or CLI).
 	//   - LLMs trying to analyze data in the graph.
-	Wanted []string
+	Wanted *TypeSet
 	// If specified the orchestrator will encode all Values with this
 	// alternate encoding, excluding types listed in `known`.
 	//
@@ -310,12 +333,10 @@ type QueryNodesRequest_TypeInfo_builder struct {
 	// Stage implementations, monitoring pipelines and scripts should ideally
 	// be written to directly use the original binary encoded proto data.
 	UnknownJsonpb *bool
-	// Type URLs that the caller has descriptors for. Used with
+	// Set of type URLs that the caller has descriptors for. Used with
 	// `unknown_jsonpb` to avoid encoding types the caller does actually have
 	// descriptors for.
-	//
-	// Suffix wildcards in the same form as `wanted` are allowed.
-	Known []string
+	Known *TypeSet
 }
 
 func (b0 QueryNodesRequest_TypeInfo_builder) Build() *QueryNodesRequest_TypeInfo {
@@ -554,17 +575,19 @@ var File_turboci_graph_orchestrator_v1_query_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/query_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/query.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xfa\x04\n" +
+	"7turboci/graph/orchestrator/v1/query_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/query.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a,turboci/graph/orchestrator/v1/type_set.proto\"\xea\x05\n" +
 	"\x11QueryNodesRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12[\n" +
 	"\ttype_info\x18\x02 \x01(\v29.turboci.graph.orchestrator.v1.QueryNodesRequest.TypeInfoH\x01R\btypeInfo\x88\x01\x01\x12b\n" +
 	"\aversion\x18\x03 \x01(\v2C.turboci.graph.orchestrator.v1.QueryNodesRequest.VersionRestrictionH\x02R\aversion\x88\x01\x01\x12:\n" +
-	"\x05query\x18\x04 \x03(\v2$.turboci.graph.orchestrator.v1.QueryR\x05query\x1aw\n" +
-	"\bTypeInfo\x12\x16\n" +
-	"\x06wanted\x18\x01 \x03(\tR\x06wanted\x12*\n" +
-	"\x0eunknown_jsonpb\x18\x02 \x01(\bH\x00R\runknownJsonpb\x88\x01\x01\x12\x14\n" +
-	"\x05known\x18\x03 \x03(\tR\x05knownB\x11\n" +
-	"\x0f_unknown_jsonpb\x1a\xaf\x01\n" +
+	"\x05query\x18\x04 \x03(\v2$.turboci.graph.orchestrator.v1.QueryR\x05query\x1a\xe6\x01\n" +
+	"\bTypeInfo\x12C\n" +
+	"\x06wanted\x18\x01 \x01(\v2&.turboci.graph.orchestrator.v1.TypeSetH\x00R\x06wanted\x88\x01\x01\x12*\n" +
+	"\x0eunknown_jsonpb\x18\x02 \x01(\bH\x01R\runknownJsonpb\x88\x01\x01\x12A\n" +
+	"\x05known\x18\x03 \x01(\v2&.turboci.graph.orchestrator.v1.TypeSetH\x02R\x05known\x88\x01\x01B\t\n" +
+	"\a_wantedB\x11\n" +
+	"\x0f_unknown_jsonpbB\b\n" +
+	"\x06_known\x1a\xaf\x01\n" +
 	"\x12VersionRestriction\x12C\n" +
 	"\arequire\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\arequire\x12E\n" +
 	"\bsnapshot\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\bsnapshotB\r\n" +
@@ -581,19 +604,22 @@ var file_turboci_graph_orchestrator_v1_query_nodes_request_proto_goTypes = []any
 	(*QueryNodesRequest_TypeInfo)(nil),           // 1: turboci.graph.orchestrator.v1.QueryNodesRequest.TypeInfo
 	(*QueryNodesRequest_VersionRestriction)(nil), // 2: turboci.graph.orchestrator.v1.QueryNodesRequest.VersionRestriction
 	(*Query)(nil),    // 3: turboci.graph.orchestrator.v1.Query
-	(*Revision)(nil), // 4: turboci.graph.orchestrator.v1.Revision
+	(*TypeSet)(nil),  // 4: turboci.graph.orchestrator.v1.TypeSet
+	(*Revision)(nil), // 5: turboci.graph.orchestrator.v1.Revision
 }
 var file_turboci_graph_orchestrator_v1_query_nodes_request_proto_depIdxs = []int32{
 	1, // 0: turboci.graph.orchestrator.v1.QueryNodesRequest.type_info:type_name -> turboci.graph.orchestrator.v1.QueryNodesRequest.TypeInfo
 	2, // 1: turboci.graph.orchestrator.v1.QueryNodesRequest.version:type_name -> turboci.graph.orchestrator.v1.QueryNodesRequest.VersionRestriction
 	3, // 2: turboci.graph.orchestrator.v1.QueryNodesRequest.query:type_name -> turboci.graph.orchestrator.v1.Query
-	4, // 3: turboci.graph.orchestrator.v1.QueryNodesRequest.VersionRestriction.require:type_name -> turboci.graph.orchestrator.v1.Revision
-	4, // 4: turboci.graph.orchestrator.v1.QueryNodesRequest.VersionRestriction.snapshot:type_name -> turboci.graph.orchestrator.v1.Revision
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	4, // 3: turboci.graph.orchestrator.v1.QueryNodesRequest.TypeInfo.wanted:type_name -> turboci.graph.orchestrator.v1.TypeSet
+	4, // 4: turboci.graph.orchestrator.v1.QueryNodesRequest.TypeInfo.known:type_name -> turboci.graph.orchestrator.v1.TypeSet
+	5, // 5: turboci.graph.orchestrator.v1.QueryNodesRequest.VersionRestriction.require:type_name -> turboci.graph.orchestrator.v1.Revision
+	5, // 6: turboci.graph.orchestrator.v1.QueryNodesRequest.VersionRestriction.snapshot:type_name -> turboci.graph.orchestrator.v1.Revision
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_query_nodes_request_proto_init() }
@@ -603,6 +629,7 @@ func file_turboci_graph_orchestrator_v1_query_nodes_request_proto_init() {
 	}
 	file_turboci_graph_orchestrator_v1_query_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
+	file_turboci_graph_orchestrator_v1_type_set_proto_init()
 	file_turboci_graph_orchestrator_v1_query_nodes_request_proto_msgTypes[0].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_query_nodes_request_proto_msgTypes[1].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_query_nodes_request_proto_msgTypes[2].OneofWrappers = []any{

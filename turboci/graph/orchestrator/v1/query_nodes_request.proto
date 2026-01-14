@@ -8,6 +8,7 @@ package turboci.graph.orchestrator.v1;
 
 import "turboci/graph/orchestrator/v1/query.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
+import "turboci/graph/orchestrator/v1/type_set.proto";
 
 option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
 option java_multiple_files = true;
@@ -29,10 +30,11 @@ message QueryNodesRequest {
   // TypeInfo lets the orchestrator know which auxiliary type(s) the caller
   // wants to see in Check Options, Check Results, Stage args, Edits, etc.
   message TypeInfo {
-    // Type URLs that the caller wants to see in the response. Any child Node
-    // whose type URL is not specified here will be omitted in the response.
+    // Set of type URLs that the caller wants to see in the response. Any child
+    // Node whose type URL is not specified here will be omitted in the
+    // response.
     //
-    // You may specify a URL with a trailing wildcard to indicate that you
+    // The set may contain an URL with a trailing wildcard to indicate that you
     // want all data whose type appears in this proto namespace. For example:
     //   * type.googleapis.com/turboci.data.*
     //   * type.googleapis.com/*
@@ -47,7 +49,7 @@ message QueryNodesRequest {
     // Good usages of this (especially the full wildcard, "*") include:
     //   * Humans trying to debug/observe data in the graph (via UI or CLI).
     //   * LLMs trying to analyze data in the graph.
-    repeated string wanted = 1;
+    optional TypeSet wanted = 1;
 
     // If specified the orchestrator will encode all Values with this
     // alternate encoding, excluding types listed in `known`.
@@ -64,12 +66,10 @@ message QueryNodesRequest {
     // be written to directly use the original binary encoded proto data.
     optional bool unknown_jsonpb = 2;
 
-    // Type URLs that the caller has descriptors for. Used with
+    // Set of type URLs that the caller has descriptors for. Used with
     // `unknown_jsonpb` to avoid encoding types the caller does actually have
     // descriptors for.
-    //
-    // Suffix wildcards in the same form as `wanted` are allowed.
-    repeated string known = 3;
+    optional TypeSet known = 3;
   }
   // A description of the desired Value types this query should return.
   //
