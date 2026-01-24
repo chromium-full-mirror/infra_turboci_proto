@@ -256,16 +256,11 @@ message Stage {
 
     // Details provided by the Executor about this Stage Attempt.
     //
-    // This should, ideally, be written once per datatype - if multiple writes
-    // are needed at different points in the Attempt lifecycle, consider using
-    // multiple data types which are each only written once.
+    // This may only be written once per data type.
     //
-    // Previously this was enforced to only be written once, but we considered
-    // this to be a potential danger during version rollouts where two versions
-    // of the same process wanted to write this data (e.g. during the
-    // transition to SCHEDULED, and also during the transition to
-    // RUNNING, in case synchronizing these transitions was difficult to
-    // guarantee).
+    // If a CurrentAttemptWrite would overwrite a detail with a different value,
+    // a Progress message with StageAttemptDetailOverwriteIgnored will be added
+    // to the Attempt instead.
     //
     // It can be updated by the Executor or Stage Attempt as long as the Stage
     // Attempt is not final (i.e. a state prior to COMPLETE or INCOMPLETE).
@@ -314,7 +309,7 @@ message Stage {
     // executor will reevaluate the previous validated attempt execution
     // template in stage execution policy and make adjustments when necessary.
     // The validated execution policy is sent to the Orchestrator as part of
-    // CurrentStageWrite when the executor advances the StageAttempt state
+    // CurrentAttemptWrite when the executor advances the StageAttempt state
     // PENDING -> (SCHEDULED|RUNNING).
     optional StageAttemptExecutionPolicy execution_policy = 8;
   }
@@ -445,4 +440,12 @@ message StageAttemptCurrentState {
   // If set, the timestamp for when the orchestrator expects the next
   // heartbeat.
   optional google.protobuf.Timestamp heartbeat_by = 4;
+}
+
+// StageAttemptDetailOverwriteIgnored is a Progress detail message attached
+// when a CurrentAttemptWrite call writes a Stage Attempt detail whose type is
+// already present, but with a different value.
+message StageAttemptDetailOverwriteIgnored {
+  // The type_url(s) of the detail(s) which had an overwrite attempt.
+  repeated string type_url = 1;
 }
