@@ -259,7 +259,7 @@ message Stage {
     // This may only be written once per data type.
     //
     // If a CurrentAttemptWrite would overwrite a detail with a different value,
-    // a Progress message with StageAttemptDetailOverwriteIgnored will be added
+    // a Progress message with ProgressIgnoredDetail will be added
     // to the Attempt instead.
     //
     // It can be updated by the Executor or Stage Attempt as long as the Stage
@@ -291,6 +291,7 @@ message Stage {
       // If created_by is Orchestrator, then `details` may contain the
       // following:
       //   * turboci.graph.orchestrator.v1.ProgressEvolvePending
+      //   * turboci.graph.orchestrator.v1.ProgressIgnoredDetail
       optional Actor created_by = 4;
 
       // Unique-to-this-Attempt key for this Progress message.
@@ -440,12 +441,4 @@ message StageAttemptCurrentState {
   // If set, the timestamp for when the orchestrator expects the next
   // heartbeat.
   optional google.protobuf.Timestamp heartbeat_by = 4;
-}
-
-// StageAttemptDetailOverwriteIgnored is a Progress detail message attached
-// when a CurrentAttemptWrite call writes a Stage Attempt detail whose type is
-// already present, but with a different value.
-message StageAttemptDetailOverwriteIgnored {
-  // The type_url(s) of the detail(s) which had an overwrite attempt.
-  repeated string type_url = 1;
 }

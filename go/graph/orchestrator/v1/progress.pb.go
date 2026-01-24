@@ -247,6 +247,67 @@ func (*progressEvolvePending_PreRpc) isProgressEvolvePending_Phase() {}
 
 func (*progressEvolvePending_Rpc) isProgressEvolvePending_Phase() {}
 
+// ProgressIgnoredDetail is a Progress detail message attached to Stage Attempts
+// when a CurrentAttemptWrite call writes a Stage Attempt detail whose type is
+// already present, but with a different value.
+type ProgressIgnoredDetail struct {
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_TypeUrl []string               `protobuf:"bytes,1,rep,name=type_url,json=typeUrl,proto3"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *ProgressIgnoredDetail) Reset() {
+	*x = ProgressIgnoredDetail{}
+	mi := &file_turboci_graph_orchestrator_v1_progress_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProgressIgnoredDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProgressIgnoredDetail) ProtoMessage() {}
+
+func (x *ProgressIgnoredDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_progress_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *ProgressIgnoredDetail) GetTypeUrl() []string {
+	if x != nil {
+		return x.xxx_hidden_TypeUrl
+	}
+	return nil
+}
+
+func (x *ProgressIgnoredDetail) SetTypeUrl(v []string) {
+	x.xxx_hidden_TypeUrl = v
+}
+
+type ProgressIgnoredDetail_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The type_url(s) of the detail(s) which had an overwrite attempt.
+	TypeUrl []string
+}
+
+func (b0 ProgressIgnoredDetail_builder) Build() *ProgressIgnoredDetail {
+	m0 := &ProgressIgnoredDetail{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_TypeUrl = b.TypeUrl
+	return m0
+}
+
 var File_turboci_graph_orchestrator_v1_progress_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_progress_proto_rawDesc = "" +
@@ -257,18 +318,21 @@ const file_turboci_graph_orchestrator_v1_progress_proto_rawDesc = "" +
 	"\apre_rpc\x18\x02 \x01(\v2\x12.google.rpc.StatusH\x00R\x06preRpc\x12&\n" +
 	"\x03rpc\x18\x03 \x01(\v2\x12.google.rpc.StatusH\x00R\x03rpcB\a\n" +
 	"\x05phaseB\v\n" +
-	"\t_next_tryBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\t_next_try\"2\n" +
+	"\x15ProgressIgnoredDetail\x12\x19\n" +
+	"\btype_url\x18\x01 \x03(\tR\atypeUrlBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_progress_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_turboci_graph_orchestrator_v1_progress_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_progress_proto_goTypes = []any{
 	(*ProgressEvolvePending)(nil), // 0: turboci.graph.orchestrator.v1.ProgressEvolvePending
-	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
-	(*status.Status)(nil),         // 2: google.rpc.Status
+	(*ProgressIgnoredDetail)(nil), // 1: turboci.graph.orchestrator.v1.ProgressIgnoredDetail
+	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
+	(*status.Status)(nil),         // 3: google.rpc.Status
 }
 var file_turboci_graph_orchestrator_v1_progress_proto_depIdxs = []int32{
-	1, // 0: turboci.graph.orchestrator.v1.ProgressEvolvePending.next_try:type_name -> google.protobuf.Timestamp
-	2, // 1: turboci.graph.orchestrator.v1.ProgressEvolvePending.pre_rpc:type_name -> google.rpc.Status
-	2, // 2: turboci.graph.orchestrator.v1.ProgressEvolvePending.rpc:type_name -> google.rpc.Status
+	2, // 0: turboci.graph.orchestrator.v1.ProgressEvolvePending.next_try:type_name -> google.protobuf.Timestamp
+	3, // 1: turboci.graph.orchestrator.v1.ProgressEvolvePending.pre_rpc:type_name -> google.rpc.Status
+	3, // 2: turboci.graph.orchestrator.v1.ProgressEvolvePending.rpc:type_name -> google.rpc.Status
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
@@ -291,7 +355,7 @@ func file_turboci_graph_orchestrator_v1_progress_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_progress_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_progress_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
