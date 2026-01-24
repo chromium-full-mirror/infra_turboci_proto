@@ -1717,10 +1717,9 @@ func (x *WriteNodesRequest_CurrentAttemptWrite) ClearStateTransition() {
 type WriteNodesRequest_CurrentAttemptWrite_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Adds details to the Stage Attempt.details field.
+	// Sets details in the Stage Attempt.details field.
 	//
-	// If a data type here is already present in the database, the data here
-	// must exactly equal the existing data; Otherwise the write is rejected.
+	// Overwrites any existing detail of the same type.
 	Details []*Value
 	// Progress messages to add to the current Stage Attempt.
 	//

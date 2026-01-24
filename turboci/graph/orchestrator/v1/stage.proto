@@ -256,11 +256,16 @@ message Stage {
 
     // Details provided by the Executor about this Stage Attempt.
     //
-    // This field is effectively an append-only map. The Executor and/or Stage
-    // Attempt can only write data *of a given type* ONCE to this field, and
-    // that data type must be unique within this field. If you need to add data
-    // here multiple times during the lifecycle of the attempt, use different
-    // types for each stage of that lifecycle.
+    // This should, ideally, be written once per datatype - if multiple writes
+    // are needed at different points in the Attempt lifecycle, consider using
+    // multiple data types which are each only written once.
+    //
+    // Previously this was enforced to only be written once, but we considered
+    // this to be a potential danger during version rollouts where two versions
+    // of the same process wanted to write this data (e.g. during the
+    // transition to SCHEDULED, and also during the transition to
+    // RUNNING, in case synchronizing these transitions was difficult to
+    // guarantee).
     //
     // It can be updated by the Executor or Stage Attempt as long as the Stage
     // Attempt is not final (i.e. a state prior to COMPLETE or INCOMPLETE).
