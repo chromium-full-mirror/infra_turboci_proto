@@ -104,12 +104,19 @@ message Stage {
 
   // Dependencies on other objects in the graph.
   //
-  // Stages are allowed to depend on other Checks and Stages, and will not be
-  // sent to an Executor until dependencies is resolved.
+  // Stages are allowed to depend on other Checks and Stages.
+  //
+  // All dependencies must be specified at once when the stage is
+  // inserted (unlike Check dependencies, which can be built incrementally via
+  // multiple WriteNodes calls). The Orchestrator will start tracking their
+  // resolution right away. In particular, if all dependencies are already
+  // resolved when the stage is inserted, it will appear in ATTEMPTING state
+  // right away. Otherwise it will be inserted in PLANNED state and the
+  // Orchestrator will move it into ATTEMPTING state at a later time, when
+  // dependencies are resolved.
   optional Dependencies dependencies = 8 [
     (turboci).id.allowed = IDENTIFIER_KIND_CHECK,
-    (turboci).id.allowed = IDENTIFIER_KIND_STAGE,
-    (google.api.field_behavior) = IMMUTABLE
+    (turboci).id.allowed = IDENTIFIER_KIND_STAGE
   ];
 
   // ExecutionPolicyState is the set of execution policies which define the
@@ -362,7 +369,7 @@ message Stage {
   // The workflow's intent for this Stage.
   repeated Assignment assignments = 11 [(google.api.field_behavior) = IMMUTABLE];
 
-  // A set of dependencies edges o Stages whose resolution should be treated as
+  // A set of dependencies edges of Stages whose resolution should be treated as
   // a logical part of this Stage.
   //
   // Stages included in this continuation_group MUST be created BY THIS STAGE.
@@ -377,7 +384,7 @@ message Stage {
   // this Stage would need to be directly informed of, and wait for, these new
   // Stages, which introduces a leaky abstraction.
   //
-  // If needed, this could be expanded to allow Checks later.
+  // These dependencies are mutable as long as the stage is in ATTEMPTING state.
   optional Dependencies continuation_group = 12 [(turboci).id.allowed = IDENTIFIER_KIND_STAGE];
 
   // Describes why this stage is not PLANNED or ATTEMPTING anymore.

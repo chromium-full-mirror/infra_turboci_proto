@@ -433,8 +433,16 @@ type Stage_builder struct {
 	StateHistory []*Stage_StateHistoryEntry
 	// Dependencies on other objects in the graph.
 	//
-	// Stages are allowed to depend on other Checks and Stages, and will not be
-	// sent to an Executor until dependencies is resolved.
+	// Stages are allowed to depend on other Checks and Stages.
+	//
+	// All dependencies must be specified at once when the stage is
+	// inserted (unlike Check dependencies, which can be built incrementally via
+	// multiple WriteNodes calls). The Orchestrator will start tracking their
+	// resolution right away. In particular, if all dependencies are already
+	// resolved when the stage is inserted, it will appear in ATTEMPTING state
+	// right away. Otherwise it will be inserted in PLANNED state and the
+	// Orchestrator will move it into ATTEMPTING state at a later time, when
+	// dependencies are resolved.
 	Dependencies *Dependencies
 	// Execution policy for this Stage.
 	ExecutionPolicy *Stage_ExecutionPolicyState
@@ -451,7 +459,7 @@ type Stage_builder struct {
 	Attempts []*Stage_Attempt
 	// The workflow's intent for this Stage.
 	Assignments []*Stage_Assignment
-	// A set of dependencies edges o Stages whose resolution should be treated as
+	// A set of dependencies edges of Stages whose resolution should be treated as
 	// a logical part of this Stage.
 	//
 	// Stages included in this continuation_group MUST be created BY THIS STAGE.
@@ -466,7 +474,7 @@ type Stage_builder struct {
 	// this Stage would need to be directly informed of, and wait for, these new
 	// Stages, which introduces a leaky abstraction.
 	//
-	// If needed, this could be expanded to allow Checks later.
+	// These dependencies are mutable as long as the stage is in ATTEMPTING state.
 	ContinuationGroup *Dependencies
 	// Describes why this stage is not PLANNED or ATTEMPTING anymore.
 	//
@@ -1817,7 +1825,7 @@ var File_turboci_graph_orchestrator_v1_stage_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/stage.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xc0\x1a\n" +
+	")turboci/graph/orchestrator/v1/stage.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xbd\x1a\n" +
 	"\x05Stage\x12E\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageB\x03\xe0A\x05H\x00R\n" +
@@ -1829,8 +1837,8 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\aversion\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x04R\aversion\x88\x01\x01\x12D\n" +
 	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x05R\x05state\x88\x01\x01\x12L\n" +
 	"\fcancelled_by\x18\x0e \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x06R\vcancelledBy\x88\x01\x01\x12[\n" +
-	"\rstate_history\x18\a \x03(\v26.turboci.graph.orchestrator.v1.Stage.StateHistoryEntryR\fstateHistory\x12e\n" +
-	"\fdependencies\x18\b \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\x0f\xe0A\x05\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
+	"\rstate_history\x18\a \x03(\v26.turboci.graph.orchestrator.v1.Stage.StateHistoryEntryR\fstateHistory\x12b\n" +
+	"\fdependencies\x18\b \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
 	"\x02\x02\bH\aR\fdependencies\x88\x01\x01\x12i\n" +
 	"\x10execution_policy\x18\t \x01(\v29.turboci.graph.orchestrator.v1.Stage.ExecutionPolicyStateH\bR\x0fexecutionPolicy\x88\x01\x01\x12H\n" +
 	"\battempts\x18\n" +
