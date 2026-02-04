@@ -54,7 +54,7 @@ type Value struct {
 	xxx_hidden_Value            *anypb.Any             `protobuf:"bytes,1,opt,name=value,proto3,oneof"`
 	xxx_hidden_HasUnknownFields bool                   `protobuf:"varint,2,opt,name=has_unknown_fields,json=hasUnknownFields,proto3,oneof"`
 	xxx_hidden_ValueJson        *string                `protobuf:"bytes,3,opt,name=value_json,json=valueJson,proto3,oneof"`
-	xxx_hidden_OmittedReason    OmitReason             `protobuf:"varint,4,opt,name=omitted_reason,json=omittedReason,proto3,enum=turboci.graph.orchestrator.v1.OmitReason,oneof"`
+	xxx_hidden_OmitReason       OmitReason             `protobuf:"varint,4,opt,name=omit_reason,json=omitReason,proto3,enum=turboci.graph.orchestrator.v1.OmitReason,oneof"`
 	XXX_raceDetectHookData      protoimpl.RaceDetectHookData
 	XXX_presence                [1]uint32
 	unknownFields               protoimpl.UnknownFields
@@ -110,10 +110,10 @@ func (x *Value) GetValueJson() string {
 	return ""
 }
 
-func (x *Value) GetOmittedReason() OmitReason {
+func (x *Value) GetOmitReason() OmitReason {
 	if x != nil {
 		if protoimpl.X.Present(&(x.XXX_presence[0]), 3) {
-			return x.xxx_hidden_OmittedReason
+			return x.xxx_hidden_OmitReason
 		}
 	}
 	return OmitReason_OMIT_REASON_UNKNOWN
@@ -133,8 +133,8 @@ func (x *Value) SetValueJson(v string) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
 }
 
-func (x *Value) SetOmittedReason(v OmitReason) {
-	x.xxx_hidden_OmittedReason = v
+func (x *Value) SetOmitReason(v OmitReason) {
+	x.xxx_hidden_OmitReason = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
 }
 
@@ -159,7 +159,7 @@ func (x *Value) HasValueJson() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
-func (x *Value) HasOmittedReason() bool {
+func (x *Value) HasOmitReason() bool {
 	if x == nil {
 		return false
 	}
@@ -180,9 +180,9 @@ func (x *Value) ClearValueJson() {
 	x.xxx_hidden_ValueJson = nil
 }
 
-func (x *Value) ClearOmittedReason() {
+func (x *Value) ClearOmitReason() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
-	x.xxx_hidden_OmittedReason = OmitReason_OMIT_REASON_UNKNOWN
+	x.xxx_hidden_OmitReason = OmitReason_OMIT_REASON_UNKNOWN
 }
 
 type Value_builder struct {
@@ -205,7 +205,7 @@ type Value_builder struct {
 	//
 	// A few fields may be populated even if this Value's content is omitted:
 	//   - `value.type_url` will always be populated.
-	OmittedReason *OmitReason
+	OmitReason *OmitReason
 }
 
 func (b0 Value_builder) Build() *Value {
@@ -221,9 +221,9 @@ func (b0 Value_builder) Build() *Value {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
 		x.xxx_hidden_ValueJson = b.ValueJson
 	}
-	if b.OmittedReason != nil {
+	if b.OmitReason != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
-		x.xxx_hidden_OmittedReason = *b.OmittedReason
+		x.xxx_hidden_OmitReason = *b.OmitReason
 	}
 	return m0
 }
@@ -232,17 +232,18 @@ var File_turboci_graph_orchestrator_v1_value_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_value_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/value.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\x1a/turboci/graph/orchestrator/v1/omit_reason.proto\"\xb8\x02\n" +
+	")turboci/graph/orchestrator/v1/value.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\x1a/turboci/graph/orchestrator/v1/omit_reason.proto\"\xaf\x02\n" +
 	"\x05Value\x12/\n" +
 	"\x05value\x18\x01 \x01(\v2\x14.google.protobuf.AnyH\x00R\x05value\x88\x01\x01\x126\n" +
 	"\x12has_unknown_fields\x18\x02 \x01(\bB\x03\xe0A\x03H\x01R\x10hasUnknownFields\x88\x01\x01\x12'\n" +
 	"\n" +
-	"value_json\x18\x03 \x01(\tB\x03\xe0A\x03H\x02R\tvalueJson\x88\x01\x01\x12Z\n" +
-	"\x0eomitted_reason\x18\x04 \x01(\x0e2).turboci.graph.orchestrator.v1.OmitReasonB\x03\xe0A\x03H\x03R\romittedReason\x88\x01\x01B\b\n" +
+	"value_json\x18\x03 \x01(\tB\x03\xe0A\x03H\x02R\tvalueJson\x88\x01\x01\x12T\n" +
+	"\vomit_reason\x18\x04 \x01(\x0e2).turboci.graph.orchestrator.v1.OmitReasonB\x03\xe0A\x03H\x03R\n" +
+	"omitReason\x88\x01\x01B\b\n" +
 	"\x06_valueB\x15\n" +
 	"\x13_has_unknown_fieldsB\r\n" +
-	"\v_value_jsonB\x11\n" +
-	"\x0f_omitted_reasonBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\v_value_jsonB\x0e\n" +
+	"\f_omit_reasonBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_value_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_value_proto_goTypes = []any{
@@ -252,7 +253,7 @@ var file_turboci_graph_orchestrator_v1_value_proto_goTypes = []any{
 }
 var file_turboci_graph_orchestrator_v1_value_proto_depIdxs = []int32{
 	1, // 0: turboci.graph.orchestrator.v1.Value.value:type_name -> google.protobuf.Any
-	2, // 1: turboci.graph.orchestrator.v1.Value.omitted_reason:type_name -> turboci.graph.orchestrator.v1.OmitReason
+	2, // 1: turboci.graph.orchestrator.v1.Value.omit_reason:type_name -> turboci.graph.orchestrator.v1.OmitReason
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

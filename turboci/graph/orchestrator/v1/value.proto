@@ -57,7 +57,7 @@ message Value {
   //
   // A few fields may be populated even if this Value's content is omitted:
   //   * `value.type_url` will always be populated.
-  optional OmitReason omitted_reason = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+  optional OmitReason omit_reason = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // TBD: An additional disambiguator/key in addition to value.type_url?
 
