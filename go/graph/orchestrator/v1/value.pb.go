@@ -26,62 +26,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// OmitReason details why this Value's content is omitted.
-type Value_OmitReason int32
-
-const (
-	// Default invalid value.
-	Value_OMIT_REASON_UNKNOWN Value_OmitReason = 0
-	// This Value has a type_url which was not requested by the caller.
-	//
-	// In this case `value.type_url` will be present, but other metadata (like
-	// orchestrator-visible index values) may be present as well.
-	Value_OMIT_REASON_UNWANTED Value_OmitReason = 1
-	// This Value has a type_url which WAS requested by the user, but the caller
-	// doesn't have access to it. See the surrounding Datum to see the realm to
-	// which this Value belongs.
-	//
-	// In this case ONLY `value.type_url` (and in the future any other
-	// 'disambiguator/key') will be present.
-	Value_OMIT_REASON_NO_ACCESS Value_OmitReason = 2
-)
-
-// Enum value maps for Value_OmitReason.
-var (
-	Value_OmitReason_name = map[int32]string{
-		0: "OMIT_REASON_UNKNOWN",
-		1: "OMIT_REASON_UNWANTED",
-		2: "OMIT_REASON_NO_ACCESS",
-	}
-	Value_OmitReason_value = map[string]int32{
-		"OMIT_REASON_UNKNOWN":   0,
-		"OMIT_REASON_UNWANTED":  1,
-		"OMIT_REASON_NO_ACCESS": 2,
-	}
-)
-
-func (x Value_OmitReason) Enum() *Value_OmitReason {
-	p := new(Value_OmitReason)
-	*p = x
-	return p
-}
-
-func (x Value_OmitReason) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (Value_OmitReason) Descriptor() protoreflect.EnumDescriptor {
-	return file_turboci_graph_orchestrator_v1_value_proto_enumTypes[0].Descriptor()
-}
-
-func (Value_OmitReason) Type() protoreflect.EnumType {
-	return &file_turboci_graph_orchestrator_v1_value_proto_enumTypes[0]
-}
-
-func (x Value_OmitReason) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
 // Value wraps a google.protobuf.Any but also provides a space for the server to
 // give back an alternate serialization of the Any.
 //
@@ -110,7 +54,7 @@ type Value struct {
 	xxx_hidden_Value            *anypb.Any             `protobuf:"bytes,1,opt,name=value,proto3,oneof"`
 	xxx_hidden_HasUnknownFields bool                   `protobuf:"varint,2,opt,name=has_unknown_fields,json=hasUnknownFields,proto3,oneof"`
 	xxx_hidden_ValueJson        *string                `protobuf:"bytes,3,opt,name=value_json,json=valueJson,proto3,oneof"`
-	xxx_hidden_Omitted          Value_OmitReason       `protobuf:"varint,4,opt,name=omitted,proto3,enum=turboci.graph.orchestrator.v1.Value_OmitReason,oneof"`
+	xxx_hidden_OmittedReason    OmitReason             `protobuf:"varint,4,opt,name=omitted_reason,json=omittedReason,proto3,enum=turboci.graph.orchestrator.v1.OmitReason,oneof"`
 	XXX_raceDetectHookData      protoimpl.RaceDetectHookData
 	XXX_presence                [1]uint32
 	unknownFields               protoimpl.UnknownFields
@@ -166,13 +110,13 @@ func (x *Value) GetValueJson() string {
 	return ""
 }
 
-func (x *Value) GetOmitted() Value_OmitReason {
+func (x *Value) GetOmittedReason() OmitReason {
 	if x != nil {
 		if protoimpl.X.Present(&(x.XXX_presence[0]), 3) {
-			return x.xxx_hidden_Omitted
+			return x.xxx_hidden_OmittedReason
 		}
 	}
-	return Value_OMIT_REASON_UNKNOWN
+	return OmitReason_OMIT_REASON_UNKNOWN
 }
 
 func (x *Value) SetValue(v *anypb.Any) {
@@ -189,8 +133,8 @@ func (x *Value) SetValueJson(v string) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
 }
 
-func (x *Value) SetOmitted(v Value_OmitReason) {
-	x.xxx_hidden_Omitted = v
+func (x *Value) SetOmittedReason(v OmitReason) {
+	x.xxx_hidden_OmittedReason = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
 }
 
@@ -215,7 +159,7 @@ func (x *Value) HasValueJson() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
-func (x *Value) HasOmitted() bool {
+func (x *Value) HasOmittedReason() bool {
 	if x == nil {
 		return false
 	}
@@ -236,9 +180,9 @@ func (x *Value) ClearValueJson() {
 	x.xxx_hidden_ValueJson = nil
 }
 
-func (x *Value) ClearOmitted() {
+func (x *Value) ClearOmittedReason() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
-	x.xxx_hidden_Omitted = Value_OMIT_REASON_UNKNOWN
+	x.xxx_hidden_OmittedReason = OmitReason_OMIT_REASON_UNKNOWN
 }
 
 type Value_builder struct {
@@ -254,12 +198,14 @@ type Value_builder struct {
 	HasUnknownFields *bool
 	// A ProtoJSON-serialized version of `value`.
 	ValueJson *string
-	// If true, `value.value` was pruned from this message either due to
-	// permissions (no read access in the realm containing this Value) or due to
-	// a Query filter (not in type_info.wanted).
+	// If set, the reason this Value's content was omitted. Only UNKNOWN (default
+	// value, used when the content was included) and UNWANTED and NO_ACCESS are
+	// valid for a Value; PLACEHOLDER is not valid because Values do not have
+	// child nodes.
 	//
-	// `value.type_url`, however will always be present as metadata.
-	Omitted *Value_OmitReason
+	// A few fields may be populated even if this Value's content is omitted:
+	//   - `value.type_url` will always be populated.
+	OmittedReason *OmitReason
 }
 
 func (b0 Value_builder) Build() *Value {
@@ -275,9 +221,9 @@ func (b0 Value_builder) Build() *Value {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
 		x.xxx_hidden_ValueJson = b.ValueJson
 	}
-	if b.Omitted != nil {
+	if b.OmittedReason != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
-		x.xxx_hidden_Omitted = *b.Omitted
+		x.xxx_hidden_OmittedReason = *b.OmittedReason
 	}
 	return m0
 }
@@ -286,34 +232,27 @@ var File_turboci_graph_orchestrator_v1_value_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_value_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/value.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\"\x86\x03\n" +
+	")turboci/graph/orchestrator/v1/value.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\x1a/turboci/graph/orchestrator/v1/omit_reason.proto\"\xb8\x02\n" +
 	"\x05Value\x12/\n" +
 	"\x05value\x18\x01 \x01(\v2\x14.google.protobuf.AnyH\x00R\x05value\x88\x01\x01\x126\n" +
 	"\x12has_unknown_fields\x18\x02 \x01(\bB\x03\xe0A\x03H\x01R\x10hasUnknownFields\x88\x01\x01\x12'\n" +
 	"\n" +
-	"value_json\x18\x03 \x01(\tB\x03\xe0A\x03H\x02R\tvalueJson\x88\x01\x01\x12S\n" +
-	"\aomitted\x18\x04 \x01(\x0e2/.turboci.graph.orchestrator.v1.Value.OmitReasonB\x03\xe0A\x03H\x03R\aomitted\x88\x01\x01\"Z\n" +
-	"\n" +
-	"OmitReason\x12\x17\n" +
-	"\x13OMIT_REASON_UNKNOWN\x10\x00\x12\x18\n" +
-	"\x14OMIT_REASON_UNWANTED\x10\x01\x12\x19\n" +
-	"\x15OMIT_REASON_NO_ACCESS\x10\x02B\b\n" +
+	"value_json\x18\x03 \x01(\tB\x03\xe0A\x03H\x02R\tvalueJson\x88\x01\x01\x12Z\n" +
+	"\x0eomitted_reason\x18\x04 \x01(\x0e2).turboci.graph.orchestrator.v1.OmitReasonB\x03\xe0A\x03H\x03R\romittedReason\x88\x01\x01B\b\n" +
 	"\x06_valueB\x15\n" +
 	"\x13_has_unknown_fieldsB\r\n" +
-	"\v_value_jsonB\n" +
-	"\n" +
-	"\b_omittedBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\v_value_jsonB\x11\n" +
+	"\x0f_omitted_reasonBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_value_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_value_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_value_proto_goTypes = []any{
-	(Value_OmitReason)(0), // 0: turboci.graph.orchestrator.v1.Value.OmitReason
-	(*Value)(nil),         // 1: turboci.graph.orchestrator.v1.Value
-	(*anypb.Any)(nil),     // 2: google.protobuf.Any
+	(*Value)(nil),     // 0: turboci.graph.orchestrator.v1.Value
+	(*anypb.Any)(nil), // 1: google.protobuf.Any
+	(OmitReason)(0),   // 2: turboci.graph.orchestrator.v1.OmitReason
 }
 var file_turboci_graph_orchestrator_v1_value_proto_depIdxs = []int32{
-	2, // 0: turboci.graph.orchestrator.v1.Value.value:type_name -> google.protobuf.Any
-	0, // 1: turboci.graph.orchestrator.v1.Value.omitted:type_name -> turboci.graph.orchestrator.v1.Value.OmitReason
+	1, // 0: turboci.graph.orchestrator.v1.Value.value:type_name -> google.protobuf.Any
+	2, // 1: turboci.graph.orchestrator.v1.Value.omitted_reason:type_name -> turboci.graph.orchestrator.v1.OmitReason
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -326,20 +265,20 @@ func file_turboci_graph_orchestrator_v1_value_proto_init() {
 	if File_turboci_graph_orchestrator_v1_value_proto != nil {
 		return
 	}
+	file_turboci_graph_orchestrator_v1_omit_reason_proto_init()
 	file_turboci_graph_orchestrator_v1_value_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_value_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_value_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_turboci_graph_orchestrator_v1_value_proto_goTypes,
 		DependencyIndexes: file_turboci_graph_orchestrator_v1_value_proto_depIdxs,
-		EnumInfos:         file_turboci_graph_orchestrator_v1_value_proto_enumTypes,
 		MessageInfos:      file_turboci_graph_orchestrator_v1_value_proto_msgTypes,
 	}.Build()
 	File_turboci_graph_orchestrator_v1_value_proto = out.File

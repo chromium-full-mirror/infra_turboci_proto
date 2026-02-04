@@ -12,7 +12,9 @@ import "turboci/graph/ids/v1/identifier.proto";
 import "turboci/graph/orchestrator/v1/actor.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/dependencies.proto";
+import "turboci/graph/orchestrator/v1/edit.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
+import "turboci/graph/orchestrator/v1/omit_reason.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_state.proto";
@@ -30,13 +32,22 @@ option java_multiple_files = true;
 // match `args.type_url` to actually run the Stage.
 //
 // See also:
-//   * StageView (graph view object for a Stage and contained messages)
-//   * StageEditView (graph view object for Edits of a Stage)
+//   * Identifier.Stage* (Identifiers for Stages, StageAttempts, etc.)
 //
-// Next ID: 15
+// Next ID: 17
 message Stage {
   // The Stage's identifier.
   optional ids.v1.Stage identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
+
+  // If set, the reason this Stage's content was omitted. Only UNKNOWN (default
+  // value, used when the content was included) and PLACEHOLDER are valid for a
+  // Stage, since Stages that were unwanted or inaccessible will be removed from
+  // the WorkPlan entirely.
+  //
+  // A few fields may be populated even if `omit_reason` is set:
+  //   * `identifier` will always be populated.
+  //   * `edits` may be populated.
+  optional OmitReason omit_reason = 15;
 
   // Actor which created the Stage.
   optional Actor created_by = 2 [(google.api.field_behavior) = IMMUTABLE];
@@ -168,10 +179,19 @@ message Stage {
   // TBD: Pull this into its own top-level StageAttempt entity because it will
   // need to have its own state and lifecycle/transactions.
   //
-  // Next ID: 12
+  // Next ID: 15
   message Attempt {
     // The Stage Attempt's identifier.
     optional ids.v1.StageAttempt identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
+
+    // If set, the reason this Attempt's content was omitted. Only UNKNOWN
+    // (default value, used when the content was included) and PLACEHOLDER are
+    // valid for an Attempt, since Attempts that were unwanted or inaccessible
+    // will be removed from the WorkPlan entirely.
+    //
+    // A few fields may be populated even if `omit_reason` is set:
+    //   * `identifier` will always be populated.
+    optional OmitReason omit_reason = 14;
 
     // The version of this Attempt.
     //
@@ -369,7 +389,7 @@ message Stage {
   // The workflow's intent for this Stage.
   repeated Assignment assignments = 11 [(google.api.field_behavior) = IMMUTABLE];
 
-  // A set of dependencies edges of Stages whose resolution should be treated as
+  // A set of dependencies edges to Stages whose resolution should be treated as
   // a logical part of this Stage.
   //
   // Stages included in this continuation_group MUST be created BY THIS STAGE.
@@ -391,6 +411,11 @@ message Stage {
   //
   // Set for stages that are in AWAITING_GROUP or FINAL states.
   optional StageConcludedReason concluded_reason = 13;
+
+  // StageEdits for this Stage.
+  //
+  // Sorted ascending by `version`.
+  repeated Edit edits = 16;
 }
 
 // StageAttemptClaimedFailure is a gRPC error detail message returned by

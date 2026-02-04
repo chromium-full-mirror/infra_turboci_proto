@@ -154,6 +154,14 @@ type CheckDelta_builder struct {
 	// Options written as part of this edit.
 	//
 	// NOTE: The identifier.idx will tell you which 'slots' were written.
+	//
+	// NOTE: For now, the Data here will be devoid of their 'value' field, as we
+	// expect it to sometimes be very large (potentially large content times
+	// potentially large number of edits) and there's a (small) risk that for a
+	// poorly-behaved workflow this content could exceed Spanner limits, resulting
+	// in an outage for the full orchestrator. Until we invest in code that
+	// gracefully protects us from that situation, we'll avoid storing the 'value'
+	// field.
 	Options []*Datum
 	// Result data written as part of this edit.
 	//
