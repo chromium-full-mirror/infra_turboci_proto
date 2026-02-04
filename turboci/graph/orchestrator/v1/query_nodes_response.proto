@@ -16,10 +16,8 @@ option java_multiple_files = true;
 
 // Response message for TurboCIGraphService.QueryNodes.
 message QueryNodesResponse {
-  // The WorkPlans containing nodes matching the request.
-  //
-  // Indexed by each WorkPlan's canonical string id.
-  map<string, WorkPlan> workplan = 1;
+  // The WorkPlan(s) containing nodes matching the request.
+  repeated WorkPlan workplan = 1;
 
   // A list of explicitly-selected nodes which were not found in the graph.
   repeated ids.v1.Identifier absent = 2;

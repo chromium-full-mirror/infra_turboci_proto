@@ -28,7 +28,7 @@ const (
 // Response message for TurboCIGraphService.QueryNodes.
 type QueryNodesResponse struct {
 	state                          protoimpl.MessageState    `protogen:"opaque.v1"`
-	xxx_hidden_Workplan            map[string]*WorkPlan      `protobuf:"bytes,1,rep,name=workplan,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	xxx_hidden_Workplan            *[]*WorkPlan              `protobuf:"bytes,1,rep,name=workplan,proto3"`
 	xxx_hidden_Absent              *[]*v1.Identifier         `protobuf:"bytes,2,rep,name=absent,proto3"`
 	xxx_hidden_CurrentAttemptState *StageAttemptCurrentState `protobuf:"bytes,3,opt,name=current_attempt_state,json=currentAttemptState,proto3,oneof"`
 	xxx_hidden_Version             *Revision                 `protobuf:"bytes,4,opt,name=version,proto3,oneof"`
@@ -61,9 +61,11 @@ func (x *QueryNodesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *QueryNodesResponse) GetWorkplan() map[string]*WorkPlan {
+func (x *QueryNodesResponse) GetWorkplan() []*WorkPlan {
 	if x != nil {
-		return x.xxx_hidden_Workplan
+		if x.xxx_hidden_Workplan != nil {
+			return *x.xxx_hidden_Workplan
+		}
 	}
 	return nil
 }
@@ -91,8 +93,8 @@ func (x *QueryNodesResponse) GetVersion() *Revision {
 	return nil
 }
 
-func (x *QueryNodesResponse) SetWorkplan(v map[string]*WorkPlan) {
-	x.xxx_hidden_Workplan = v
+func (x *QueryNodesResponse) SetWorkplan(v []*WorkPlan) {
+	x.xxx_hidden_Workplan = &v
 }
 
 func (x *QueryNodesResponse) SetAbsent(v []*v1.Identifier) {
@@ -132,10 +134,8 @@ func (x *QueryNodesResponse) ClearVersion() {
 type QueryNodesResponse_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The WorkPlans containing nodes matching the request.
-	//
-	// Indexed by each WorkPlan's canonical string id.
-	Workplan map[string]*WorkPlan
+	// The WorkPlan(s) containing nodes matching the request.
+	Workplan []*WorkPlan
 	// A list of explicitly-selected nodes which were not found in the graph.
 	Absent []*v1.Identifier
 	// State of the current stage attempt.
@@ -150,7 +150,7 @@ func (b0 QueryNodesResponse_builder) Build() *QueryNodesResponse {
 	m0 := &QueryNodesResponse{}
 	b, x := &b0, m0
 	_, _ = b, x
-	x.xxx_hidden_Workplan = b.Workplan
+	x.xxx_hidden_Workplan = &b.Workplan
 	x.xxx_hidden_Absent = &b.Absent
 	x.xxx_hidden_CurrentAttemptState = b.CurrentAttemptState
 	x.xxx_hidden_Version = b.Version
@@ -161,39 +161,34 @@ var File_turboci_graph_orchestrator_v1_query_nodes_response_proto protoreflect.F
 
 const file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDesc = "" +
 	"\n" +
-	"8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a,turboci/graph/orchestrator/v1/workplan.proto\"\xf1\x03\n" +
-	"\x12QueryNodesResponse\x12[\n" +
-	"\bworkplan\x18\x01 \x03(\v2?.turboci.graph.orchestrator.v1.QueryNodesResponse.WorkplanEntryR\bworkplan\x128\n" +
+	"8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a,turboci/graph/orchestrator/v1/workplan.proto\"\xf3\x02\n" +
+	"\x12QueryNodesResponse\x12C\n" +
+	"\bworkplan\x18\x01 \x03(\v2'.turboci.graph.orchestrator.v1.WorkPlanR\bworkplan\x128\n" +
 	"\x06absent\x18\x02 \x03(\v2 .turboci.graph.ids.v1.IdentifierR\x06absent\x12p\n" +
 	"\x15current_attempt_state\x18\x03 \x01(\v27.turboci.graph.orchestrator.v1.StageAttemptCurrentStateH\x00R\x13currentAttemptState\x88\x01\x01\x12F\n" +
-	"\aversion\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01\x1ad\n" +
-	"\rWorkplanEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12=\n" +
-	"\x05value\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.WorkPlanR\x05value:\x028\x01B\x18\n" +
+	"\aversion\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01B\x18\n" +
 	"\x16_current_attempt_stateB\n" +
 	"\n" +
 	"\b_versionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_goTypes = []any{
 	(*QueryNodesResponse)(nil),       // 0: turboci.graph.orchestrator.v1.QueryNodesResponse
-	nil,                              // 1: turboci.graph.orchestrator.v1.QueryNodesResponse.WorkplanEntry
+	(*WorkPlan)(nil),                 // 1: turboci.graph.orchestrator.v1.WorkPlan
 	(*v1.Identifier)(nil),            // 2: turboci.graph.ids.v1.Identifier
 	(*StageAttemptCurrentState)(nil), // 3: turboci.graph.orchestrator.v1.StageAttemptCurrentState
 	(*Revision)(nil),                 // 4: turboci.graph.orchestrator.v1.Revision
-	(*WorkPlan)(nil),                 // 5: turboci.graph.orchestrator.v1.WorkPlan
 }
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_depIdxs = []int32{
-	1, // 0: turboci.graph.orchestrator.v1.QueryNodesResponse.workplan:type_name -> turboci.graph.orchestrator.v1.QueryNodesResponse.WorkplanEntry
+	1, // 0: turboci.graph.orchestrator.v1.QueryNodesResponse.workplan:type_name -> turboci.graph.orchestrator.v1.WorkPlan
 	2, // 1: turboci.graph.orchestrator.v1.QueryNodesResponse.absent:type_name -> turboci.graph.ids.v1.Identifier
 	3, // 2: turboci.graph.orchestrator.v1.QueryNodesResponse.current_attempt_state:type_name -> turboci.graph.orchestrator.v1.StageAttemptCurrentState
 	4, // 3: turboci.graph.orchestrator.v1.QueryNodesResponse.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	5, // 4: turboci.graph.orchestrator.v1.QueryNodesResponse.WorkplanEntry.value:type_name -> turboci.graph.orchestrator.v1.WorkPlan
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_query_nodes_response_proto_init() }
@@ -211,7 +206,7 @@ func file_turboci_graph_orchestrator_v1_query_nodes_response_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
