@@ -189,9 +189,9 @@ func (x CollectStageAttempts) Number() protoreflect.EnumNumber {
 //	  │collect_checks│       │collect_stages│      Collect
 //	  └──────┬───────┘       └───────┬──────┘
 //	         │                       │
-//	         │      ┌─────────┐      │
-//	         └─────►│GraphView│◄─────┘
-//	                └─────────┘
+//	         │      ┌────────┐       │
+//	         └─────►│WorkPlan│◄──────┘
+//	                └────────┘
 //
 // See QueryNodesRequest.version for how this Query interacts with transactions.
 //

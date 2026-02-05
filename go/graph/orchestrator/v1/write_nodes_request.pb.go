@@ -969,11 +969,11 @@ type WriteNodesRequest_TransactionDetails_builder struct {
 	// A list of all nodes observed which lead to this write.
 	//
 	// This SHOULD include all nodes which your computation used as inputs
-	// for making a decision. If you locally filtered the GraphView before the
+	// for making a decision. If you locally filtered the WorkPlan before the
 	// computation, it is OK to omit nodes which were filtered out, because you
 	// would do the same write regardless of those filtered nodes' content.
 	//
-	// This MAY include nodes which were absent from the GraphView - this means
+	// This MAY include nodes which were absent from the WorkPlan - this means
 	// that the write is conditional on their absence (e.g. "I queried for X and
 	// didn't find it, so I'm doing a write based on that information. If X DOES
 	// exist at the time of the write, I want to abort and try again.").
@@ -986,7 +986,7 @@ type WriteNodesRequest_TransactionDetails_builder struct {
 	// recover make sure to do the query before you try the write again! You
 	// may be conflicting with a previous incarnation of your own process!
 	NodesObserved []*v1.Identifier
-	// The 'version' of the GraphView returned from QueryNodes.
+	// The 'version' of the WorkPlan returned from QueryNodes.
 	//
 	// If multiple queries were made in this transaction, this revision MUST be
 	// the first revision observed. Providing version.require to QueryNodes
