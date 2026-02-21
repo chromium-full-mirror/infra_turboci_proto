@@ -27,25 +27,6 @@ option java_multiple_files = true;
 // Allows atomically writing to multiple nodes (Checks, Stages) in a single
 // transaction.
 message WriteNodesRequest {
-  // RealmValue describes a Value which resides in a given security realm.
-  //
-  // This is used to write objects which appear in the graph as Datum messages.
-  message RealmValue {
-    // The realm to assign to this value (if the value is being created). If
-    // it's unset/empty, it will inherit from the realm of the object containing
-    // it (so, for Check options or result data, this would be the Check's
-    // realm).
-    //
-    // If provided, must be the absolute form "<project>:<name>".
-    //
-    // If the value is being overwritten and `realm` is provided, it must match
-    // the already-written value's realm.
-    optional string realm = 1 [(turboci).creation_only = true];
-
-    // The value to set.
-    optional Value value = 2;
-  }
-
   // An in-line representation of Dependencies.Group.
   //
   // The Orchestrator will deduplicate edges into Dependencies.edges in the
@@ -312,8 +293,8 @@ message WriteNodesRequest {
 
     // The list of Options to write/overwrite.
     //
-    // Must be unique on `RealmValue.value.type_url`.
-    repeated RealmValue options = 4 [(turboci).check.editable = CHECK_STATE_PLANNING];
+    // Must be unique on `ValueWrite.data.type_url`.
+    repeated ValueWrite options = 4 [(turboci).check.editable = CHECK_STATE_PLANNING];
 
     // Dependency predicate for this Check.
     //
@@ -340,7 +321,9 @@ message WriteNodesRequest {
     //
     // The data here will overwrite existing data of the same type in the
     // selected Result for this Stage Attempt.
-    repeated RealmValue results = 6 [(turboci).check.editable = CHECK_STATE_WAITING];
+    //
+    // Must be unique on `ValueWrite.data.type_url`.
+    repeated ValueWrite results = 6 [(turboci).check.editable = CHECK_STATE_WAITING];
 
     // If set, finalize the Check.Result.
     //
