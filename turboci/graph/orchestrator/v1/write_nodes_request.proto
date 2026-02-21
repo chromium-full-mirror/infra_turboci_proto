@@ -76,7 +76,7 @@ message WriteNodesRequest {
     optional string message = 1;
 
     // Machine-readable details for this progress item.
-    repeated Value details = 2;
+    repeated ValueWrite details = 2;
 
     // An optional field for preventing duplicate progress messages.
     //
@@ -469,7 +469,7 @@ message WriteNodesRequest {
     // Sets details in the Stage Attempt.details field.
     //
     // Overwrites any existing detail of the same type.
-    repeated Value details = 1;
+    repeated ValueWrite details = 1;
 
     // Progress messages to add to the current Stage Attempt.
     //

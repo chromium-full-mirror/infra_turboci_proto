@@ -21,7 +21,6 @@ import "turboci/graph/orchestrator/v1/stage_attempt_state.proto";
 import "turboci/graph/orchestrator/v1/stage_concluded_reason.proto";
 import "turboci/graph/orchestrator/v1/stage_execution_policy.proto";
 import "turboci/graph/orchestrator/v1/stage_state.proto";
-import "turboci/graph/orchestrator/v1/value.proto";
 import "turboci/graph/orchestrator/v1/value_ref.proto";
 
 option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
@@ -295,7 +294,7 @@ message Stage {
     // Attempt is not final (i.e. a state prior to COMPLETE or INCOMPLETE).
     //
     // Kept sorted by, and unique on, type_url.
-    repeated Value details = 6;
+    repeated ValueRef details = 6;
 
     // Attempt-specific progress information.
     //
@@ -313,7 +312,7 @@ message Stage {
       // Machine-readable details for this progress item.
       //
       // Kept sorted by, and unique on, type_url.
-      repeated Value details = 3;
+      repeated ValueRef details = 3;
 
       // The entity which created this progress message.
       //
