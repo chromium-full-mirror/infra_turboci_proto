@@ -445,8 +445,6 @@ type Stage_builder struct {
 	// and that registration will indicate which Executor should handle this
 	// Stage.
 	//
-	// Args must always have the same realm as the Stage itself.
-	//
 	// NOTE: It's assumed that args.type_url will be a sufficient routing key to
 	// the various registered Executors, but it's POSSIBLE that we may need to
 	// have multiple Executors handle exactly the same Stage type, at which point

@@ -1537,9 +1537,6 @@ type WriteNodesRequest_StageWrite_builder struct {
 	// exists and `args` is specified, the supplied args must match the existing
 	// Stages's `args` exactly.
 	//
-	// The realm of `args` must be omitted, or, if set, must exactly match
-	// `realm` after expansion of "$from_token" or "$from_container".
-	//
 	// TBD: Document executor registration/selection process.
 	Args *ValueWrite
 	// Realm to assign to this Stage.
