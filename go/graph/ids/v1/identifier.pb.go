@@ -83,15 +83,6 @@ func (x *Identifier) GetCheck() *Check {
 	return nil
 }
 
-func (x *Identifier) GetCheckOption() *CheckOption {
-	if x != nil {
-		if x, ok := x.xxx_hidden_Type.(*identifier_CheckOption); ok {
-			return x.CheckOption
-		}
-	}
-	return nil
-}
-
 func (x *Identifier) GetCheckResult() *CheckResult {
 	if x != nil {
 		if x, ok := x.xxx_hidden_Type.(*identifier_CheckResult); ok {
@@ -101,37 +92,10 @@ func (x *Identifier) GetCheckResult() *CheckResult {
 	return nil
 }
 
-func (x *Identifier) GetCheckResultDatum() *CheckResultDatum {
-	if x != nil {
-		if x, ok := x.xxx_hidden_Type.(*identifier_CheckResultDatum); ok {
-			return x.CheckResultDatum
-		}
-	}
-	return nil
-}
-
 func (x *Identifier) GetCheckEdit() *CheckEdit {
 	if x != nil {
 		if x, ok := x.xxx_hidden_Type.(*identifier_CheckEdit); ok {
 			return x.CheckEdit
-		}
-	}
-	return nil
-}
-
-func (x *Identifier) GetCheckEditOption() *CheckEditOption {
-	if x != nil {
-		if x, ok := x.xxx_hidden_Type.(*identifier_CheckEditOption); ok {
-			return x.CheckEditOption
-		}
-	}
-	return nil
-}
-
-func (x *Identifier) GetCheckEditReason() *CheckEditReason {
-	if x != nil {
-		if x, ok := x.xxx_hidden_Type.(*identifier_CheckEditReason); ok {
-			return x.CheckEditReason
 		}
 	}
 	return nil
@@ -164,15 +128,6 @@ func (x *Identifier) GetStageEdit() *StageEdit {
 	return nil
 }
 
-func (x *Identifier) GetStageEditReason() *StageEditReason {
-	if x != nil {
-		if x, ok := x.xxx_hidden_Type.(*identifier_StageEditReason); ok {
-			return x.StageEditReason
-		}
-	}
-	return nil
-}
-
 func (x *Identifier) SetWorkPlan(v *WorkPlan) {
 	if v == nil {
 		x.xxx_hidden_Type = nil
@@ -189,14 +144,6 @@ func (x *Identifier) SetCheck(v *Check) {
 	x.xxx_hidden_Type = &identifier_Check{v}
 }
 
-func (x *Identifier) SetCheckOption(v *CheckOption) {
-	if v == nil {
-		x.xxx_hidden_Type = nil
-		return
-	}
-	x.xxx_hidden_Type = &identifier_CheckOption{v}
-}
-
 func (x *Identifier) SetCheckResult(v *CheckResult) {
 	if v == nil {
 		x.xxx_hidden_Type = nil
@@ -205,36 +152,12 @@ func (x *Identifier) SetCheckResult(v *CheckResult) {
 	x.xxx_hidden_Type = &identifier_CheckResult{v}
 }
 
-func (x *Identifier) SetCheckResultDatum(v *CheckResultDatum) {
-	if v == nil {
-		x.xxx_hidden_Type = nil
-		return
-	}
-	x.xxx_hidden_Type = &identifier_CheckResultDatum{v}
-}
-
 func (x *Identifier) SetCheckEdit(v *CheckEdit) {
 	if v == nil {
 		x.xxx_hidden_Type = nil
 		return
 	}
 	x.xxx_hidden_Type = &identifier_CheckEdit{v}
-}
-
-func (x *Identifier) SetCheckEditOption(v *CheckEditOption) {
-	if v == nil {
-		x.xxx_hidden_Type = nil
-		return
-	}
-	x.xxx_hidden_Type = &identifier_CheckEditOption{v}
-}
-
-func (x *Identifier) SetCheckEditReason(v *CheckEditReason) {
-	if v == nil {
-		x.xxx_hidden_Type = nil
-		return
-	}
-	x.xxx_hidden_Type = &identifier_CheckEditReason{v}
 }
 
 func (x *Identifier) SetStage(v *Stage) {
@@ -261,14 +184,6 @@ func (x *Identifier) SetStageEdit(v *StageEdit) {
 	x.xxx_hidden_Type = &identifier_StageEdit{v}
 }
 
-func (x *Identifier) SetStageEditReason(v *StageEditReason) {
-	if v == nil {
-		x.xxx_hidden_Type = nil
-		return
-	}
-	x.xxx_hidden_Type = &identifier_StageEditReason{v}
-}
-
 func (x *Identifier) HasType() bool {
 	if x == nil {
 		return false
@@ -292,14 +207,6 @@ func (x *Identifier) HasCheck() bool {
 	return ok
 }
 
-func (x *Identifier) HasCheckOption() bool {
-	if x == nil {
-		return false
-	}
-	_, ok := x.xxx_hidden_Type.(*identifier_CheckOption)
-	return ok
-}
-
 func (x *Identifier) HasCheckResult() bool {
 	if x == nil {
 		return false
@@ -308,35 +215,11 @@ func (x *Identifier) HasCheckResult() bool {
 	return ok
 }
 
-func (x *Identifier) HasCheckResultDatum() bool {
-	if x == nil {
-		return false
-	}
-	_, ok := x.xxx_hidden_Type.(*identifier_CheckResultDatum)
-	return ok
-}
-
 func (x *Identifier) HasCheckEdit() bool {
 	if x == nil {
 		return false
 	}
 	_, ok := x.xxx_hidden_Type.(*identifier_CheckEdit)
-	return ok
-}
-
-func (x *Identifier) HasCheckEditOption() bool {
-	if x == nil {
-		return false
-	}
-	_, ok := x.xxx_hidden_Type.(*identifier_CheckEditOption)
-	return ok
-}
-
-func (x *Identifier) HasCheckEditReason() bool {
-	if x == nil {
-		return false
-	}
-	_, ok := x.xxx_hidden_Type.(*identifier_CheckEditReason)
 	return ok
 }
 
@@ -364,14 +247,6 @@ func (x *Identifier) HasStageEdit() bool {
 	return ok
 }
 
-func (x *Identifier) HasStageEditReason() bool {
-	if x == nil {
-		return false
-	}
-	_, ok := x.xxx_hidden_Type.(*identifier_StageEditReason)
-	return ok
-}
-
 func (x *Identifier) ClearType() {
 	x.xxx_hidden_Type = nil
 }
@@ -388,38 +263,14 @@ func (x *Identifier) ClearCheck() {
 	}
 }
 
-func (x *Identifier) ClearCheckOption() {
-	if _, ok := x.xxx_hidden_Type.(*identifier_CheckOption); ok {
-		x.xxx_hidden_Type = nil
-	}
-}
-
 func (x *Identifier) ClearCheckResult() {
 	if _, ok := x.xxx_hidden_Type.(*identifier_CheckResult); ok {
 		x.xxx_hidden_Type = nil
 	}
 }
 
-func (x *Identifier) ClearCheckResultDatum() {
-	if _, ok := x.xxx_hidden_Type.(*identifier_CheckResultDatum); ok {
-		x.xxx_hidden_Type = nil
-	}
-}
-
 func (x *Identifier) ClearCheckEdit() {
 	if _, ok := x.xxx_hidden_Type.(*identifier_CheckEdit); ok {
-		x.xxx_hidden_Type = nil
-	}
-}
-
-func (x *Identifier) ClearCheckEditOption() {
-	if _, ok := x.xxx_hidden_Type.(*identifier_CheckEditOption); ok {
-		x.xxx_hidden_Type = nil
-	}
-}
-
-func (x *Identifier) ClearCheckEditReason() {
-	if _, ok := x.xxx_hidden_Type.(*identifier_CheckEditReason); ok {
 		x.xxx_hidden_Type = nil
 	}
 }
@@ -442,25 +293,14 @@ func (x *Identifier) ClearStageEdit() {
 	}
 }
 
-func (x *Identifier) ClearStageEditReason() {
-	if _, ok := x.xxx_hidden_Type.(*identifier_StageEditReason); ok {
-		x.xxx_hidden_Type = nil
-	}
-}
-
 const Identifier_Type_not_set_case case_Identifier_Type = 0
 const Identifier_WorkPlan_case case_Identifier_Type = 1
 const Identifier_Check_case case_Identifier_Type = 2
-const Identifier_CheckOption_case case_Identifier_Type = 3
-const Identifier_CheckResult_case case_Identifier_Type = 4
-const Identifier_CheckResultDatum_case case_Identifier_Type = 5
-const Identifier_CheckEdit_case case_Identifier_Type = 6
-const Identifier_CheckEditOption_case case_Identifier_Type = 7
-const Identifier_CheckEditReason_case case_Identifier_Type = 11
-const Identifier_Stage_case case_Identifier_Type = 8
-const Identifier_StageAttempt_case case_Identifier_Type = 9
-const Identifier_StageEdit_case case_Identifier_Type = 10
-const Identifier_StageEditReason_case case_Identifier_Type = 12
+const Identifier_CheckResult_case case_Identifier_Type = 3
+const Identifier_CheckEdit_case case_Identifier_Type = 4
+const Identifier_Stage_case case_Identifier_Type = 5
+const Identifier_StageAttempt_case case_Identifier_Type = 6
+const Identifier_StageEdit_case case_Identifier_Type = 7
 
 func (x *Identifier) WhichType() case_Identifier_Type {
 	if x == nil {
@@ -471,26 +311,16 @@ func (x *Identifier) WhichType() case_Identifier_Type {
 		return Identifier_WorkPlan_case
 	case *identifier_Check:
 		return Identifier_Check_case
-	case *identifier_CheckOption:
-		return Identifier_CheckOption_case
 	case *identifier_CheckResult:
 		return Identifier_CheckResult_case
-	case *identifier_CheckResultDatum:
-		return Identifier_CheckResultDatum_case
 	case *identifier_CheckEdit:
 		return Identifier_CheckEdit_case
-	case *identifier_CheckEditOption:
-		return Identifier_CheckEditOption_case
-	case *identifier_CheckEditReason:
-		return Identifier_CheckEditReason_case
 	case *identifier_Stage:
 		return Identifier_Stage_case
 	case *identifier_StageAttempt:
 		return Identifier_StageAttempt_case
 	case *identifier_StageEdit:
 		return Identifier_StageEdit_case
-	case *identifier_StageEditReason:
-		return Identifier_StageEditReason_case
 	default:
 		return Identifier_Type_not_set_case
 	}
@@ -508,26 +338,16 @@ type Identifier_builder struct {
 	WorkPlan *WorkPlan
 	// A Check within a WorkPlan.
 	Check *Check
-	// Option data for a Check.
-	CheckOption *CheckOption
 	// A particular Check.Result.
 	CheckResult *CheckResult
-	// Data associated with a particular result in a Check.
-	CheckResultDatum *CheckResultDatum
 	// An edit to a Check.
 	CheckEdit *CheckEdit
-	// Option data for an edit to a Check.
-	CheckEditOption *CheckEditOption
-	// A reason for an edit to a Check.
-	CheckEditReason *CheckEditReason
 	// A Stage within a WorkPlan.
 	Stage *Stage
 	// A specific attempt at a Stage.
 	StageAttempt *StageAttempt
 	// An edit to a Stage.
 	StageEdit *StageEdit
-	// A reason for an edit to a Stage.
-	StageEditReason *StageEditReason
 	// -- end of xxx_hidden_Type
 }
 
@@ -541,23 +361,11 @@ func (b0 Identifier_builder) Build() *Identifier {
 	if b.Check != nil {
 		x.xxx_hidden_Type = &identifier_Check{b.Check}
 	}
-	if b.CheckOption != nil {
-		x.xxx_hidden_Type = &identifier_CheckOption{b.CheckOption}
-	}
 	if b.CheckResult != nil {
 		x.xxx_hidden_Type = &identifier_CheckResult{b.CheckResult}
 	}
-	if b.CheckResultDatum != nil {
-		x.xxx_hidden_Type = &identifier_CheckResultDatum{b.CheckResultDatum}
-	}
 	if b.CheckEdit != nil {
 		x.xxx_hidden_Type = &identifier_CheckEdit{b.CheckEdit}
-	}
-	if b.CheckEditOption != nil {
-		x.xxx_hidden_Type = &identifier_CheckEditOption{b.CheckEditOption}
-	}
-	if b.CheckEditReason != nil {
-		x.xxx_hidden_Type = &identifier_CheckEditReason{b.CheckEditReason}
 	}
 	if b.Stage != nil {
 		x.xxx_hidden_Type = &identifier_Stage{b.Stage}
@@ -567,9 +375,6 @@ func (b0 Identifier_builder) Build() *Identifier {
 	}
 	if b.StageEdit != nil {
 		x.xxx_hidden_Type = &identifier_StageEdit{b.StageEdit}
-	}
-	if b.StageEditReason != nil {
-		x.xxx_hidden_Type = &identifier_StageEditReason{b.StageEditReason}
 	}
 	return m0
 }
@@ -598,79 +403,44 @@ type identifier_Check struct {
 	Check *Check `protobuf:"bytes,2,opt,name=check,proto3,oneof"`
 }
 
-type identifier_CheckOption struct {
-	// Option data for a Check.
-	CheckOption *CheckOption `protobuf:"bytes,3,opt,name=check_option,json=checkOption,proto3,oneof"`
-}
-
 type identifier_CheckResult struct {
 	// A particular Check.Result.
-	CheckResult *CheckResult `protobuf:"bytes,4,opt,name=check_result,json=checkResult,proto3,oneof"`
-}
-
-type identifier_CheckResultDatum struct {
-	// Data associated with a particular result in a Check.
-	CheckResultDatum *CheckResultDatum `protobuf:"bytes,5,opt,name=check_result_datum,json=checkResultDatum,proto3,oneof"`
+	CheckResult *CheckResult `protobuf:"bytes,3,opt,name=check_result,json=checkResult,proto3,oneof"`
 }
 
 type identifier_CheckEdit struct {
 	// An edit to a Check.
-	CheckEdit *CheckEdit `protobuf:"bytes,6,opt,name=check_edit,json=checkEdit,proto3,oneof"`
-}
-
-type identifier_CheckEditOption struct {
-	// Option data for an edit to a Check.
-	CheckEditOption *CheckEditOption `protobuf:"bytes,7,opt,name=check_edit_option,json=checkEditOption,proto3,oneof"`
-}
-
-type identifier_CheckEditReason struct {
-	// A reason for an edit to a Check.
-	CheckEditReason *CheckEditReason `protobuf:"bytes,11,opt,name=check_edit_reason,json=checkEditReason,proto3,oneof"`
+	CheckEdit *CheckEdit `protobuf:"bytes,4,opt,name=check_edit,json=checkEdit,proto3,oneof"`
 }
 
 type identifier_Stage struct {
 	// A Stage within a WorkPlan.
-	Stage *Stage `protobuf:"bytes,8,opt,name=stage,proto3,oneof"`
+	Stage *Stage `protobuf:"bytes,5,opt,name=stage,proto3,oneof"`
 }
 
 type identifier_StageAttempt struct {
 	// A specific attempt at a Stage.
-	StageAttempt *StageAttempt `protobuf:"bytes,9,opt,name=stage_attempt,json=stageAttempt,proto3,oneof"`
+	StageAttempt *StageAttempt `protobuf:"bytes,6,opt,name=stage_attempt,json=stageAttempt,proto3,oneof"`
 }
 
 type identifier_StageEdit struct {
 	// An edit to a Stage.
-	StageEdit *StageEdit `protobuf:"bytes,10,opt,name=stage_edit,json=stageEdit,proto3,oneof"`
-}
-
-type identifier_StageEditReason struct {
-	// A reason for an edit to a Stage.
-	StageEditReason *StageEditReason `protobuf:"bytes,12,opt,name=stage_edit_reason,json=stageEditReason,proto3,oneof"`
+	StageEdit *StageEdit `protobuf:"bytes,7,opt,name=stage_edit,json=stageEdit,proto3,oneof"`
 }
 
 func (*identifier_WorkPlan) isIdentifier_Type() {}
 
 func (*identifier_Check) isIdentifier_Type() {}
 
-func (*identifier_CheckOption) isIdentifier_Type() {}
-
 func (*identifier_CheckResult) isIdentifier_Type() {}
 
-func (*identifier_CheckResultDatum) isIdentifier_Type() {}
-
 func (*identifier_CheckEdit) isIdentifier_Type() {}
-
-func (*identifier_CheckEditOption) isIdentifier_Type() {}
-
-func (*identifier_CheckEditReason) isIdentifier_Type() {}
 
 func (*identifier_Stage) isIdentifier_Type() {}
 
 func (*identifier_StageAttempt) isIdentifier_Type() {}
 
 func (*identifier_StageEdit) isIdentifier_Type() {}
-
-func (*identifier_StageEditReason) isIdentifier_Type() {}
 
 // Identifies an entire TurboCI WorkPlan.
 //
@@ -871,120 +641,6 @@ func (b0 Check_builder) Build() *Check {
 	return m0
 }
 
-// Identifies an option associated with a Check within a WorkPlan.
-//
-// Serializes as "<check>:O<idx>".
-//
-// E.g. "L<check.work_plan.id>:C<check.id>:O<idx>"
-//
-// A CheckOption is a single `Datum`.
-//
-// This is separate from `Check` because it may reside in a different realm
-// than the Check itself.
-type CheckOption struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Check       *Check                 `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
-	xxx_hidden_Idx         int32                  `protobuf:"varint,2,opt,name=idx,proto3,oneof"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
-}
-
-func (x *CheckOption) Reset() {
-	*x = CheckOption{}
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CheckOption) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CheckOption) ProtoMessage() {}
-
-func (x *CheckOption) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *CheckOption) GetCheck() *Check {
-	if x != nil {
-		return x.xxx_hidden_Check
-	}
-	return nil
-}
-
-func (x *CheckOption) GetIdx() int32 {
-	if x != nil {
-		return x.xxx_hidden_Idx
-	}
-	return 0
-}
-
-func (x *CheckOption) SetCheck(v *Check) {
-	x.xxx_hidden_Check = v
-}
-
-func (x *CheckOption) SetIdx(v int32) {
-	x.xxx_hidden_Idx = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
-}
-
-func (x *CheckOption) HasCheck() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Check != nil
-}
-
-func (x *CheckOption) HasIdx() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *CheckOption) ClearCheck() {
-	x.xxx_hidden_Check = nil
-}
-
-func (x *CheckOption) ClearIdx() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Idx = 0
-}
-
-type CheckOption_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// The check that this option belongs to.
-	Check *Check
-	// The 1-based index of this datum within the Check.options list.
-	//
-	// This is 1-based to distinguish it from 0/unset (which is invalid).
-	Idx *int32
-}
-
-func (b0 CheckOption_builder) Build() *CheckOption {
-	m0 := &CheckOption{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_Check = b.Check
-	if b.Idx != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
-		x.xxx_hidden_Idx = *b.Idx
-	}
-	return m0
-}
-
 // Identifies a Check Result within a WorkPlan.
 //
 // Serialized as "<check>:R<results_idx>".
@@ -1005,7 +661,7 @@ type CheckResult struct {
 
 func (x *CheckResult) Reset() {
 	*x = CheckResult{}
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[4]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1017,7 +673,7 @@ func (x *CheckResult) String() string {
 func (*CheckResult) ProtoMessage() {}
 
 func (x *CheckResult) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[4]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1097,118 +753,6 @@ func (b0 CheckResult_builder) Build() *CheckResult {
 	return m0
 }
 
-// Identifies a Datum for a Check's Result within a WorkPlan.
-//
-// Serialized as "<result>:D<results_data_idx>".
-//
-// E.g. "L<result.check.work_plan.id>:C<result.check.id>:R<result.idx>:D<idx>"
-//
-// This is separate from `Check` because it may reside in a different realm
-// than the Check itself.
-type CheckResultDatum struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Result      *CheckResult           `protobuf:"bytes,1,opt,name=result,proto3,oneof"`
-	xxx_hidden_Idx         int32                  `protobuf:"varint,2,opt,name=idx,proto3,oneof"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
-}
-
-func (x *CheckResultDatum) Reset() {
-	*x = CheckResultDatum{}
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CheckResultDatum) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CheckResultDatum) ProtoMessage() {}
-
-func (x *CheckResultDatum) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *CheckResultDatum) GetResult() *CheckResult {
-	if x != nil {
-		return x.xxx_hidden_Result
-	}
-	return nil
-}
-
-func (x *CheckResultDatum) GetIdx() int32 {
-	if x != nil {
-		return x.xxx_hidden_Idx
-	}
-	return 0
-}
-
-func (x *CheckResultDatum) SetResult(v *CheckResult) {
-	x.xxx_hidden_Result = v
-}
-
-func (x *CheckResultDatum) SetIdx(v int32) {
-	x.xxx_hidden_Idx = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
-}
-
-func (x *CheckResultDatum) HasResult() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Result != nil
-}
-
-func (x *CheckResultDatum) HasIdx() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *CheckResultDatum) ClearResult() {
-	x.xxx_hidden_Result = nil
-}
-
-func (x *CheckResultDatum) ClearIdx() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Idx = 0
-}
-
-type CheckResultDatum_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// The check resunt that this datum belongs to.
-	Result *CheckResult
-	// The 1-based index of this datum within the Check.Result.data list.
-	//
-	// This is 1-based to distinguish it from 0/unset (which is invalid).
-	Idx *int32
-}
-
-func (b0 CheckResultDatum_builder) Build() *CheckResultDatum {
-	m0 := &CheckResultDatum{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_Result = b.Result
-	if b.Idx != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
-		x.xxx_hidden_Idx = *b.Idx
-	}
-	return m0
-}
-
 // Identifies a CheckEdit within a WorkPlan.
 //
 // Serialized as "<check>:V<version>".
@@ -1225,7 +769,7 @@ type CheckEdit struct {
 
 func (x *CheckEdit) Reset() {
 	*x = CheckEdit{}
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[6]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1237,7 +781,7 @@ func (x *CheckEdit) String() string {
 func (*CheckEdit) ProtoMessage() {}
 
 func (x *CheckEdit) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[6]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1310,227 +854,6 @@ func (b0 CheckEdit_builder) Build() *CheckEdit {
 	return m0
 }
 
-// Identifies a CheckEditOption within a WorkPlan.
-//
-// Serialized as "<check_edit>:O<idx>".
-//
-// E.g.
-// "L<check_edit.check.work_plan.id>:C<check_edit.check.id>:V<check_edit.version.seconds>/<check_edit.version.nanos>:O<idx>"
-//
-// This is separate from `CheckEdit` because it may reside in a different
-// realm than the CheckEdit itself.
-type CheckEditOption struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_CheckEdit   *CheckEdit             `protobuf:"bytes,1,opt,name=check_edit,json=checkEdit,proto3,oneof"`
-	xxx_hidden_Idx         int32                  `protobuf:"varint,2,opt,name=idx,proto3,oneof"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
-}
-
-func (x *CheckEditOption) Reset() {
-	*x = CheckEditOption{}
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CheckEditOption) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CheckEditOption) ProtoMessage() {}
-
-func (x *CheckEditOption) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *CheckEditOption) GetCheckEdit() *CheckEdit {
-	if x != nil {
-		return x.xxx_hidden_CheckEdit
-	}
-	return nil
-}
-
-func (x *CheckEditOption) GetIdx() int32 {
-	if x != nil {
-		return x.xxx_hidden_Idx
-	}
-	return 0
-}
-
-func (x *CheckEditOption) SetCheckEdit(v *CheckEdit) {
-	x.xxx_hidden_CheckEdit = v
-}
-
-func (x *CheckEditOption) SetIdx(v int32) {
-	x.xxx_hidden_Idx = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
-}
-
-func (x *CheckEditOption) HasCheckEdit() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_CheckEdit != nil
-}
-
-func (x *CheckEditOption) HasIdx() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *CheckEditOption) ClearCheckEdit() {
-	x.xxx_hidden_CheckEdit = nil
-}
-
-func (x *CheckEditOption) ClearIdx() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Idx = 0
-}
-
-type CheckEditOption_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// The check edit that this option belongs to.
-	CheckEdit *CheckEdit
-	// The 1-based index of this datum within the check.options list.
-	//
-	// This is 1-based to distinguish it from 0/unset (which is invalid).
-	Idx *int32
-}
-
-func (b0 CheckEditOption_builder) Build() *CheckEditOption {
-	m0 := &CheckEditOption{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_CheckEdit = b.CheckEdit
-	if b.Idx != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
-		x.xxx_hidden_Idx = *b.Idx
-	}
-	return m0
-}
-
-// Identifies a Reason within a CheckEdit.
-//
-// Serialized as "<edit>:R<idx>".
-//
-// E.g.
-// "L<check.work_plan.id>:C<check.id>:V<version.seconds>/<version.nanos>:R1"
-type CheckEditReason struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_CheckEdit   *CheckEdit             `protobuf:"bytes,1,opt,name=check_edit,json=checkEdit,proto3,oneof"`
-	xxx_hidden_Idx         int32                  `protobuf:"varint,2,opt,name=idx,proto3,oneof"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
-}
-
-func (x *CheckEditReason) Reset() {
-	*x = CheckEditReason{}
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CheckEditReason) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CheckEditReason) ProtoMessage() {}
-
-func (x *CheckEditReason) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *CheckEditReason) GetCheckEdit() *CheckEdit {
-	if x != nil {
-		return x.xxx_hidden_CheckEdit
-	}
-	return nil
-}
-
-func (x *CheckEditReason) GetIdx() int32 {
-	if x != nil {
-		return x.xxx_hidden_Idx
-	}
-	return 0
-}
-
-func (x *CheckEditReason) SetCheckEdit(v *CheckEdit) {
-	x.xxx_hidden_CheckEdit = v
-}
-
-func (x *CheckEditReason) SetIdx(v int32) {
-	x.xxx_hidden_Idx = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
-}
-
-func (x *CheckEditReason) HasCheckEdit() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_CheckEdit != nil
-}
-
-func (x *CheckEditReason) HasIdx() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *CheckEditReason) ClearCheckEdit() {
-	x.xxx_hidden_CheckEdit = nil
-}
-
-func (x *CheckEditReason) ClearIdx() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Idx = 0
-}
-
-type CheckEditReason_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// The check edit that this reason belongs to.
-	CheckEdit *CheckEdit
-	// The 1-based index of this Reason in the edit.
-	Idx *int32
-}
-
-func (b0 CheckEditReason_builder) Build() *CheckEditReason {
-	m0 := &CheckEditReason{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_CheckEdit = b.CheckEdit
-	if b.Idx != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
-		x.xxx_hidden_Idx = *b.Idx
-	}
-	return m0
-}
-
 // Identifies a Stage within a WorkPlan.
 //
 // If the Stage has the WorkNode type, `is_worknode` will be true, otherwise it
@@ -1560,7 +883,7 @@ type Stage struct {
 
 func (x *Stage) Reset() {
 	*x = Stage{}
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[9]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1572,7 +895,7 @@ func (x *Stage) String() string {
 func (*Stage) ProtoMessage() {}
 
 func (x *Stage) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[9]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1709,7 +1032,7 @@ type StageAttempt struct {
 
 func (x *StageAttempt) Reset() {
 	*x = StageAttempt{}
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[10]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1721,7 +1044,7 @@ func (x *StageAttempt) String() string {
 func (*StageAttempt) ProtoMessage() {}
 
 func (x *StageAttempt) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[10]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1817,7 +1140,7 @@ type StageEdit struct {
 
 func (x *StageEdit) Reset() {
 	*x = StageEdit{}
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[11]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1829,7 +1152,7 @@ func (x *StageEdit) String() string {
 func (*StageEdit) ProtoMessage() {}
 
 func (x *StageEdit) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[11]
+	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1902,136 +1225,22 @@ func (b0 StageEdit_builder) Build() *StageEdit {
 	return m0
 }
 
-// Identifies a Reason within a StageEdit.
-//
-// Serialized as "<edit>:R<idx>".
-//
-// E.g.
-// "L<stage.work_plan.id>:<stage.id>:V<version.seconds>/<version.nanos>:R1"
-type StageEditReason struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_StageEdit   *StageEdit             `protobuf:"bytes,1,opt,name=stage_edit,json=stageEdit,proto3,oneof"`
-	xxx_hidden_Idx         int32                  `protobuf:"varint,2,opt,name=idx,proto3,oneof"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
-}
-
-func (x *StageEditReason) Reset() {
-	*x = StageEditReason{}
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *StageEditReason) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StageEditReason) ProtoMessage() {}
-
-func (x *StageEditReason) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_ids_v1_identifier_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *StageEditReason) GetStageEdit() *StageEdit {
-	if x != nil {
-		return x.xxx_hidden_StageEdit
-	}
-	return nil
-}
-
-func (x *StageEditReason) GetIdx() int32 {
-	if x != nil {
-		return x.xxx_hidden_Idx
-	}
-	return 0
-}
-
-func (x *StageEditReason) SetStageEdit(v *StageEdit) {
-	x.xxx_hidden_StageEdit = v
-}
-
-func (x *StageEditReason) SetIdx(v int32) {
-	x.xxx_hidden_Idx = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
-}
-
-func (x *StageEditReason) HasStageEdit() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_StageEdit != nil
-}
-
-func (x *StageEditReason) HasIdx() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *StageEditReason) ClearStageEdit() {
-	x.xxx_hidden_StageEdit = nil
-}
-
-func (x *StageEditReason) ClearIdx() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Idx = 0
-}
-
-type StageEditReason_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	// The stage edit that this reason belongs to.
-	StageEdit *StageEdit
-	// The 1-based index of this Reason in the edit.
-	Idx *int32
-}
-
-func (b0 StageEditReason_builder) Build() *StageEditReason {
-	m0 := &StageEditReason{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_StageEdit = b.StageEdit
-	if b.Idx != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
-		x.xxx_hidden_Idx = *b.Idx
-	}
-	return m0
-}
-
 var File_turboci_graph_ids_v1_identifier_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_ids_v1_identifier_proto_rawDesc = "" +
 	"\n" +
-	"%turboci/graph/ids/v1/identifier.proto\x12\x14turboci.graph.ids.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf3\x06\n" +
+	"%turboci/graph/ids/v1/identifier.proto\x12\x14turboci.graph.ids.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd4\x03\n" +
 	"\n" +
 	"Identifier\x12=\n" +
 	"\twork_plan\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x00R\bworkPlan\x123\n" +
 	"\x05check\x18\x02 \x01(\v2\x1b.turboci.graph.ids.v1.CheckH\x00R\x05check\x12F\n" +
-	"\fcheck_option\x18\x03 \x01(\v2!.turboci.graph.ids.v1.CheckOptionH\x00R\vcheckOption\x12F\n" +
-	"\fcheck_result\x18\x04 \x01(\v2!.turboci.graph.ids.v1.CheckResultH\x00R\vcheckResult\x12V\n" +
-	"\x12check_result_datum\x18\x05 \x01(\v2&.turboci.graph.ids.v1.CheckResultDatumH\x00R\x10checkResultDatum\x12@\n" +
+	"\fcheck_result\x18\x03 \x01(\v2!.turboci.graph.ids.v1.CheckResultH\x00R\vcheckResult\x12@\n" +
 	"\n" +
-	"check_edit\x18\x06 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\tcheckEdit\x12S\n" +
-	"\x11check_edit_option\x18\a \x01(\v2%.turboci.graph.ids.v1.CheckEditOptionH\x00R\x0fcheckEditOption\x12S\n" +
-	"\x11check_edit_reason\x18\v \x01(\v2%.turboci.graph.ids.v1.CheckEditReasonH\x00R\x0fcheckEditReason\x123\n" +
-	"\x05stage\x18\b \x01(\v2\x1b.turboci.graph.ids.v1.StageH\x00R\x05stage\x12I\n" +
-	"\rstage_attempt\x18\t \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\fstageAttempt\x12@\n" +
+	"check_edit\x18\x04 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\tcheckEdit\x123\n" +
+	"\x05stage\x18\x05 \x01(\v2\x1b.turboci.graph.ids.v1.StageH\x00R\x05stage\x12I\n" +
+	"\rstage_attempt\x18\x06 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\fstageAttempt\x12@\n" +
 	"\n" +
-	"stage_edit\x18\n" +
-	" \x01(\v2\x1f.turboci.graph.ids.v1.StageEditH\x00R\tstageEdit\x12S\n" +
-	"\x11stage_edit_reason\x18\f \x01(\v2%.turboci.graph.ids.v1.StageEditReasonH\x00R\x0fstageEditReasonB\x06\n" +
+	"stage_edit\x18\a \x01(\v2\x1f.turboci.graph.ids.v1.StageEditH\x00R\tstageEditB\x06\n" +
 	"\x04type\"&\n" +
 	"\bWorkPlan\x12\x13\n" +
 	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01B\x05\n" +
@@ -2042,39 +1251,17 @@ const file_turboci_graph_ids_v1_identifier_proto_rawDesc = "" +
 	"\n" +
 	"_work_planB\x05\n" +
 	"\x03_id\"n\n" +
-	"\vCheckOption\x126\n" +
-	"\x05check\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckH\x00R\x05check\x88\x01\x01\x12\x15\n" +
-	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\b\n" +
-	"\x06_checkB\x06\n" +
-	"\x04_idx\"n\n" +
 	"\vCheckResult\x126\n" +
 	"\x05check\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckH\x00R\x05check\x88\x01\x01\x12\x15\n" +
 	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\b\n" +
 	"\x06_checkB\x06\n" +
-	"\x04_idx\"|\n" +
-	"\x10CheckResultDatum\x12>\n" +
-	"\x06result\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckResultH\x00R\x06result\x88\x01\x01\x12\x15\n" +
-	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\t\n" +
-	"\a_resultB\x06\n" +
 	"\x04_idx\"\x94\x01\n" +
 	"\tCheckEdit\x126\n" +
 	"\x05check\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckH\x00R\x05check\x88\x01\x01\x129\n" +
 	"\aversion\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\aversion\x88\x01\x01B\b\n" +
 	"\x06_checkB\n" +
 	"\n" +
-	"\b_version\"\x84\x01\n" +
-	"\x0fCheckEditOption\x12C\n" +
-	"\n" +
-	"check_edit\x18\x01 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\tcheckEdit\x88\x01\x01\x12\x15\n" +
-	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\r\n" +
-	"\v_check_editB\x06\n" +
-	"\x04_idx\"\x84\x01\n" +
-	"\x0fCheckEditReason\x12C\n" +
-	"\n" +
-	"check_edit\x18\x01 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\tcheckEdit\x88\x01\x01\x12\x15\n" +
-	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\r\n" +
-	"\v_check_editB\x06\n" +
-	"\x04_idx\"\xa9\x01\n" +
+	"\b_version\"\xa9\x01\n" +
 	"\x05Stage\x12@\n" +
 	"\twork_plan\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x00R\bworkPlan\x88\x01\x01\x12$\n" +
 	"\vis_worknode\x18\x02 \x01(\bH\x01R\n" +
@@ -2094,62 +1281,41 @@ const file_turboci_graph_ids_v1_identifier_proto_rawDesc = "" +
 	"\aversion\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\aversion\x88\x01\x01B\b\n" +
 	"\x06_stageB\n" +
 	"\n" +
-	"\b_version\"\x84\x01\n" +
-	"\x0fStageEditReason\x12C\n" +
-	"\n" +
-	"stage_edit\x18\x01 \x01(\v2\x1f.turboci.graph.ids.v1.StageEditH\x00R\tstageEdit\x88\x01\x01\x12\x15\n" +
-	"\x03idx\x18\x02 \x01(\x05H\x01R\x03idx\x88\x01\x01B\r\n" +
-	"\v_stage_editB\x06\n" +
-	"\x04_idxB7P\x01Z3go.chromium.org/turboci/proto/go/graph/ids/v1;idspbb\x06proto3"
+	"\b_versionB7P\x01Z3go.chromium.org/turboci/proto/go/graph/ids/v1;idspbb\x06proto3"
 
-var file_turboci_graph_ids_v1_identifier_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_turboci_graph_ids_v1_identifier_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_turboci_graph_ids_v1_identifier_proto_goTypes = []any{
 	(*Identifier)(nil),            // 0: turboci.graph.ids.v1.Identifier
 	(*WorkPlan)(nil),              // 1: turboci.graph.ids.v1.WorkPlan
 	(*Check)(nil),                 // 2: turboci.graph.ids.v1.Check
-	(*CheckOption)(nil),           // 3: turboci.graph.ids.v1.CheckOption
-	(*CheckResult)(nil),           // 4: turboci.graph.ids.v1.CheckResult
-	(*CheckResultDatum)(nil),      // 5: turboci.graph.ids.v1.CheckResultDatum
-	(*CheckEdit)(nil),             // 6: turboci.graph.ids.v1.CheckEdit
-	(*CheckEditOption)(nil),       // 7: turboci.graph.ids.v1.CheckEditOption
-	(*CheckEditReason)(nil),       // 8: turboci.graph.ids.v1.CheckEditReason
-	(*Stage)(nil),                 // 9: turboci.graph.ids.v1.Stage
-	(*StageAttempt)(nil),          // 10: turboci.graph.ids.v1.StageAttempt
-	(*StageEdit)(nil),             // 11: turboci.graph.ids.v1.StageEdit
-	(*StageEditReason)(nil),       // 12: turboci.graph.ids.v1.StageEditReason
-	(*timestamppb.Timestamp)(nil), // 13: google.protobuf.Timestamp
+	(*CheckResult)(nil),           // 3: turboci.graph.ids.v1.CheckResult
+	(*CheckEdit)(nil),             // 4: turboci.graph.ids.v1.CheckEdit
+	(*Stage)(nil),                 // 5: turboci.graph.ids.v1.Stage
+	(*StageAttempt)(nil),          // 6: turboci.graph.ids.v1.StageAttempt
+	(*StageEdit)(nil),             // 7: turboci.graph.ids.v1.StageEdit
+	(*timestamppb.Timestamp)(nil), // 8: google.protobuf.Timestamp
 }
 var file_turboci_graph_ids_v1_identifier_proto_depIdxs = []int32{
 	1,  // 0: turboci.graph.ids.v1.Identifier.work_plan:type_name -> turboci.graph.ids.v1.WorkPlan
 	2,  // 1: turboci.graph.ids.v1.Identifier.check:type_name -> turboci.graph.ids.v1.Check
-	3,  // 2: turboci.graph.ids.v1.Identifier.check_option:type_name -> turboci.graph.ids.v1.CheckOption
-	4,  // 3: turboci.graph.ids.v1.Identifier.check_result:type_name -> turboci.graph.ids.v1.CheckResult
-	5,  // 4: turboci.graph.ids.v1.Identifier.check_result_datum:type_name -> turboci.graph.ids.v1.CheckResultDatum
-	6,  // 5: turboci.graph.ids.v1.Identifier.check_edit:type_name -> turboci.graph.ids.v1.CheckEdit
-	7,  // 6: turboci.graph.ids.v1.Identifier.check_edit_option:type_name -> turboci.graph.ids.v1.CheckEditOption
-	8,  // 7: turboci.graph.ids.v1.Identifier.check_edit_reason:type_name -> turboci.graph.ids.v1.CheckEditReason
-	9,  // 8: turboci.graph.ids.v1.Identifier.stage:type_name -> turboci.graph.ids.v1.Stage
-	10, // 9: turboci.graph.ids.v1.Identifier.stage_attempt:type_name -> turboci.graph.ids.v1.StageAttempt
-	11, // 10: turboci.graph.ids.v1.Identifier.stage_edit:type_name -> turboci.graph.ids.v1.StageEdit
-	12, // 11: turboci.graph.ids.v1.Identifier.stage_edit_reason:type_name -> turboci.graph.ids.v1.StageEditReason
-	1,  // 12: turboci.graph.ids.v1.Check.work_plan:type_name -> turboci.graph.ids.v1.WorkPlan
-	2,  // 13: turboci.graph.ids.v1.CheckOption.check:type_name -> turboci.graph.ids.v1.Check
-	2,  // 14: turboci.graph.ids.v1.CheckResult.check:type_name -> turboci.graph.ids.v1.Check
-	4,  // 15: turboci.graph.ids.v1.CheckResultDatum.result:type_name -> turboci.graph.ids.v1.CheckResult
-	2,  // 16: turboci.graph.ids.v1.CheckEdit.check:type_name -> turboci.graph.ids.v1.Check
-	13, // 17: turboci.graph.ids.v1.CheckEdit.version:type_name -> google.protobuf.Timestamp
-	6,  // 18: turboci.graph.ids.v1.CheckEditOption.check_edit:type_name -> turboci.graph.ids.v1.CheckEdit
-	6,  // 19: turboci.graph.ids.v1.CheckEditReason.check_edit:type_name -> turboci.graph.ids.v1.CheckEdit
-	1,  // 20: turboci.graph.ids.v1.Stage.work_plan:type_name -> turboci.graph.ids.v1.WorkPlan
-	9,  // 21: turboci.graph.ids.v1.StageAttempt.stage:type_name -> turboci.graph.ids.v1.Stage
-	9,  // 22: turboci.graph.ids.v1.StageEdit.stage:type_name -> turboci.graph.ids.v1.Stage
-	13, // 23: turboci.graph.ids.v1.StageEdit.version:type_name -> google.protobuf.Timestamp
-	11, // 24: turboci.graph.ids.v1.StageEditReason.stage_edit:type_name -> turboci.graph.ids.v1.StageEdit
-	25, // [25:25] is the sub-list for method output_type
-	25, // [25:25] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	3,  // 2: turboci.graph.ids.v1.Identifier.check_result:type_name -> turboci.graph.ids.v1.CheckResult
+	4,  // 3: turboci.graph.ids.v1.Identifier.check_edit:type_name -> turboci.graph.ids.v1.CheckEdit
+	5,  // 4: turboci.graph.ids.v1.Identifier.stage:type_name -> turboci.graph.ids.v1.Stage
+	6,  // 5: turboci.graph.ids.v1.Identifier.stage_attempt:type_name -> turboci.graph.ids.v1.StageAttempt
+	7,  // 6: turboci.graph.ids.v1.Identifier.stage_edit:type_name -> turboci.graph.ids.v1.StageEdit
+	1,  // 7: turboci.graph.ids.v1.Check.work_plan:type_name -> turboci.graph.ids.v1.WorkPlan
+	2,  // 8: turboci.graph.ids.v1.CheckResult.check:type_name -> turboci.graph.ids.v1.Check
+	2,  // 9: turboci.graph.ids.v1.CheckEdit.check:type_name -> turboci.graph.ids.v1.Check
+	8,  // 10: turboci.graph.ids.v1.CheckEdit.version:type_name -> google.protobuf.Timestamp
+	1,  // 11: turboci.graph.ids.v1.Stage.work_plan:type_name -> turboci.graph.ids.v1.WorkPlan
+	5,  // 12: turboci.graph.ids.v1.StageAttempt.stage:type_name -> turboci.graph.ids.v1.Stage
+	5,  // 13: turboci.graph.ids.v1.StageEdit.stage:type_name -> turboci.graph.ids.v1.Stage
+	8,  // 14: turboci.graph.ids.v1.StageEdit.version:type_name -> google.protobuf.Timestamp
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_ids_v1_identifier_proto_init() }
@@ -2160,16 +1326,11 @@ func file_turboci_graph_ids_v1_identifier_proto_init() {
 	file_turboci_graph_ids_v1_identifier_proto_msgTypes[0].OneofWrappers = []any{
 		(*identifier_WorkPlan)(nil),
 		(*identifier_Check)(nil),
-		(*identifier_CheckOption)(nil),
 		(*identifier_CheckResult)(nil),
-		(*identifier_CheckResultDatum)(nil),
 		(*identifier_CheckEdit)(nil),
-		(*identifier_CheckEditOption)(nil),
-		(*identifier_CheckEditReason)(nil),
 		(*identifier_Stage)(nil),
 		(*identifier_StageAttempt)(nil),
 		(*identifier_StageEdit)(nil),
-		(*identifier_StageEditReason)(nil),
 	}
 	file_turboci_graph_ids_v1_identifier_proto_msgTypes[1].OneofWrappers = []any{}
 	file_turboci_graph_ids_v1_identifier_proto_msgTypes[2].OneofWrappers = []any{}
@@ -2178,18 +1339,13 @@ func file_turboci_graph_ids_v1_identifier_proto_init() {
 	file_turboci_graph_ids_v1_identifier_proto_msgTypes[5].OneofWrappers = []any{}
 	file_turboci_graph_ids_v1_identifier_proto_msgTypes[6].OneofWrappers = []any{}
 	file_turboci_graph_ids_v1_identifier_proto_msgTypes[7].OneofWrappers = []any{}
-	file_turboci_graph_ids_v1_identifier_proto_msgTypes[8].OneofWrappers = []any{}
-	file_turboci_graph_ids_v1_identifier_proto_msgTypes[9].OneofWrappers = []any{}
-	file_turboci_graph_ids_v1_identifier_proto_msgTypes[10].OneofWrappers = []any{}
-	file_turboci_graph_ids_v1_identifier_proto_msgTypes[11].OneofWrappers = []any{}
-	file_turboci_graph_ids_v1_identifier_proto_msgTypes[12].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_ids_v1_identifier_proto_rawDesc), len(file_turboci_graph_ids_v1_identifier_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

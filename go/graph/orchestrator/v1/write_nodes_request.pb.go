@@ -2525,7 +2525,7 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\x8c%\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\x8a%\n" +
 	"\x11WriteNodesRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12T\n" +
 	"\x06reason\x18\x02 \x01(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonH\x01R\x06reason\x88\x01\x01\x12Z\n" +
@@ -2551,10 +2551,10 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\amessage\x18\x01 \x01(\tH\x00R\amessage\x88\x01\x01\x12C\n" +
 	"\adetails\x18\x02 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteR\adetailsB\n" +
 	"\n" +
-	"\b_message\x1a\xdb\x01\n" +
-	"\x12TransactionDetails\x12W\n" +
-	"\x0enodes_observed\x18\x01 \x03(\v2 .turboci.graph.ids.v1.IdentifierB\x0e\x82\x86\xf6\xfb\x0f\b\x12\x06\n" +
-	"\x04\x02\x03\x05\bR\rnodesObserved\x12W\n" +
+	"\b_message\x1a\xd9\x01\n" +
+	"\x12TransactionDetails\x12U\n" +
+	"\x0enodes_observed\x18\x01 \x03(\v2 .turboci.graph.ids.v1.IdentifierB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
+	"\x02\x02\x05R\rnodesObserved\x12W\n" +
 	"\x10snapshot_version\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\x0fsnapshotVersion\x88\x01\x01B\x13\n" +
 	"\x11_snapshot_version\x1a\xb4\x05\n" +
 	"\n" +
@@ -2594,7 +2594,7 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x04args\x18\x02 \x01(\v2).turboci.graph.orchestrator.v1.ValueWriteB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x01R\x04args\x88\x01\x01\x12#\n" +
 	"\x05realm\x18\x03 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x02R\x05realm\x88\x01\x01\x12y\n" +
 	"\fdependencies\x18\x04 \x01(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupB\x0e\x82\x86\xf6\xfb\x0f\b\x12\x04\n" +
-	"\x02\b\x02\x18\x01H\x03R\fdependencies\x88\x01\x01\x12\x8b\x01\n" +
+	"\x02\x05\x02\x18\x01H\x03R\fdependencies\x88\x01\x01\x12\x8b\x01\n" +
 	" requested_stage_execution_policy\x18\x05 \x01(\v23.turboci.graph.orchestrator.v1.StageExecutionPolicyB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x04R\x1drequestedStageExecutionPolicy\x88\x01\x01\x12[\n" +
 	"\vassignments\x18\x06 \x03(\v2/.turboci.graph.orchestrator.v1.Stage.AssignmentB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01R\vassignments\x12!\n" +
 	"\tcancelled\x18\a \x01(\bH\x05R\tcancelled\x88\x01\x01B\r\n" +
@@ -2642,7 +2642,7 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x11_state_transition\x1a\xae\x01\n" +
 	"\x11CurrentStageWrite\x12\x81\x01\n" +
 	"\x12continuation_group\x18\x01 \x01(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\bH\x00R\x11continuationGroup\x88\x01\x01B\x15\n" +
+	"\x01\x05H\x00R\x11continuationGroup\x88\x01\x01B\x15\n" +
 	"\x13_continuation_groupB\b\n" +
 	"\x06_tokenB\t\n" +
 	"\a_reasonB\x06\n" +

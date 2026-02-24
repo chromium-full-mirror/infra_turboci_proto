@@ -1588,7 +1588,7 @@ const file_turboci_graph_orchestrator_v1_query_proto_rawDesc = "" +
 	"\x14NodesAcrossWorkPlans\x1aQ\n" +
 	"\tNodesByID\x12D\n" +
 	"\x05nodes\x18\x02 \x03(\v2 .turboci.graph.ids.v1.IdentifierB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
-	"\x02\x02\bR\x05nodes\x1a\xfb\x03\n" +
+	"\x02\x02\x05R\x05nodes\x1a\xfb\x03\n" +
 	"\fSelectChecks\x12[\n" +
 	"\n" +
 	"predicates\x18\x01 \x03(\v2;.turboci.graph.orchestrator.v1.Query.SelectChecks.PredicateR\n" +

@@ -334,7 +334,7 @@ const file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDesc = "" +
 	"\battempts\x18\x02 \x03(\v21.turboci.graph.orchestrator.v1.StageDelta.AttemptR\battempts\x12!\n" +
 	"\tcancelled\x18\x03 \x01(\bH\x01R\tcancelled\x88\x01\x01\x12l\n" +
 	"\x12continuation_group\x18\x04 \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\bH\x02R\x11continuationGroup\x88\x01\x01\x1a\x97\x02\n" +
+	"\x01\x05H\x02R\x11continuationGroup\x88\x01\x01\x1a\x97\x02\n" +
 	"\aAttempt\x12G\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\n" +

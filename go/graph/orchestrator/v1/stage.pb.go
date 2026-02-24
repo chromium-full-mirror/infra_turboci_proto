@@ -1937,13 +1937,13 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\fcancelled_by\x18\x0e \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\aR\vcancelledBy\x88\x01\x01\x12[\n" +
 	"\rstate_history\x18\a \x03(\v26.turboci.graph.orchestrator.v1.Stage.StateHistoryEntryR\fstateHistory\x12b\n" +
 	"\fdependencies\x18\b \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
-	"\x02\x02\bH\bR\fdependencies\x88\x01\x01\x12i\n" +
+	"\x02\x02\x05H\bR\fdependencies\x88\x01\x01\x12i\n" +
 	"\x10execution_policy\x18\t \x01(\v29.turboci.graph.orchestrator.v1.Stage.ExecutionPolicyStateH\tR\x0fexecutionPolicy\x88\x01\x01\x12H\n" +
 	"\battempts\x18\n" +
 	" \x03(\v2,.turboci.graph.orchestrator.v1.Stage.AttemptR\battempts\x12V\n" +
 	"\vassignments\x18\v \x03(\v2/.turboci.graph.orchestrator.v1.Stage.AssignmentB\x03\xe0A\x05R\vassignments\x12l\n" +
 	"\x12continuation_group\x18\f \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\bH\n" +
+	"\x01\x05H\n" +
 	"R\x11continuationGroup\x88\x01\x01\x12c\n" +
 	"\x10concluded_reason\x18\r \x01(\x0e23.turboci.graph.orchestrator.v1.StageConcludedReasonH\vR\x0fconcludedReason\x88\x01\x01\x129\n" +
 	"\x05edits\x18\x10 \x03(\v2#.turboci.graph.orchestrator.v1.EditR\x05edits\x1a\xc1\x01\n" +

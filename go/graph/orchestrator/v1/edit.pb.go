@@ -594,14 +594,14 @@ const file_turboci_graph_orchestrator_v1_edit_proto_rawDesc = "" +
 	"(turboci/graph/orchestrator/v1/edit.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_delta.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_delta.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\x81\a\n" +
 	"\x04Edit\x12N\n" +
 	"\bfor_node\x18\x01 \x01(\v2 .turboci.graph.ids.v1.IdentifierB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
-	"\x02\x02\bH\x01R\aforNode\x88\x01\x01\x12F\n" +
+	"\x02\x02\x05H\x01R\aforNode\x88\x01\x01\x12F\n" +
 	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\aversion\x88\x01\x01\x12<\n" +
 	"\texpire_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampH\x03R\bexpireAt\x88\x01\x01\x12\x1e\n" +
 	"\x05realm\x18\x05 \x01(\tB\x03\xe0A\x05H\x04R\x05realm\x88\x01\x01\x12H\n" +
 	"\n" +
 	"created_by\x18\x06 \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x05R\tcreatedBy\x88\x01\x01\x12\\\n" +
 	"\x11transactional_set\x18\a \x03(\v2 .turboci.graph.ids.v1.IdentifierB\r\x82\x86\xf6\xfb\x0f\a\x12\x05\n" +
-	"\x03\x02\b\tR\x10transactionalSet\x12,\n" +
+	"\x03\x02\x05\x06R\x10transactionalSet\x12,\n" +
 	"\x0foblivious_write\x18\v \x01(\bH\x06R\x0eobliviousWrite\x88\x01\x01\x12G\n" +
 	"\x06reason\x18\b \x01(\v2*.turboci.graph.orchestrator.v1.Edit.ReasonH\aR\x06reason\x88\x01\x01\x12A\n" +
 	"\x05check\x18\t \x01(\v2).turboci.graph.orchestrator.v1.CheckDeltaH\x00R\x05check\x12A\n" +

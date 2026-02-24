@@ -215,8 +215,6 @@ message WriteNodesRequest {
     // may be conflicting with a previous incarnation of your own process!
     repeated ids.v1.Identifier nodes_observed = 1 [
       (turboci).id.allowed = IDENTIFIER_KIND_CHECK,
-      (turboci).id.allowed = IDENTIFIER_KIND_CHECK_OPTION,
-      (turboci).id.allowed = IDENTIFIER_KIND_CHECK_RESULT_DATUM,
       (turboci).id.allowed = IDENTIFIER_KIND_STAGE
     ];
 
