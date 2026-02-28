@@ -28,23 +28,25 @@ const (
 
 // WorkPlan provides a collated, partial, view of a single workplan.
 //
-// Nodes (specifically, anything which can be named with an Identifier) may be
-// omitted from the nested hierarchy under these conditions:
+// Nodes (specifically, Checks and Stages and their Edits, and StageAttempts)
+// may be omitted under these conditions:
 // - The caller does not have permission to view the node.
 // - The caller only requested a subset of possible nodes (e.g. via query/filter
 // parameters)
 // - The caller only requested a subset of the possible data types (e.g. Check
 // options)
 // - The content requested by the caller is being returned over several
-// paginated queries.
+// paginated queries and is not present in the current page.
 //
-// Nodes may be omitted entirely (not present in the hierarchical structure) or
-// included only as a "placeholder" node with only the node's identifier
-// populated. These placeholder nodes are used to represent structure in the
-// hierarchy when the node isn't otherwise populated in the results of an API
-// call returning this WorkPlan, or to represent the ordering of child nodes in
-// a list within a parent node when the parent is present but the children are
-// omitted.
+// When a node that contains child nodes (e.g. a Stage which may have
+// StageAttempts and Edits) is included, it will contain all of its child nodes
+// that match the rest of the request. These parent nodes may be included in a
+// response in order to return matching child nodes, even if the parent node
+// doesn't match the request on its own.
+//
+// Within a node, all ValueRefs will be present, but they may reference the
+// digest of a ValueData that is not present in the WorkPlan based on the
+// parameters the caller provides in the request.
 type WorkPlan struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Identifier  *v1.WorkPlan           `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
