@@ -14,6 +14,7 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
 	reflect "reflect"
 	unsafe "unsafe"
 )
@@ -92,7 +93,7 @@ func (x *ValueRef) GetDigest() string {
 	return ""
 }
 
-func (x *ValueRef) GetInline() *ValueData {
+func (x *ValueRef) GetInline() *anypb.Any {
 	if x != nil {
 		if x, ok := x.xxx_hidden_Data.(*valueRef_Inline); ok {
 			return x.Inline
@@ -124,7 +125,7 @@ func (x *ValueRef) SetDigest(v string) {
 	x.xxx_hidden_Data = &valueRef_Digest{v}
 }
 
-func (x *ValueRef) SetInline(v *ValueData) {
+func (x *ValueRef) SetInline(v *anypb.Any) {
 	if v == nil {
 		x.xxx_hidden_Data = nil
 		return
@@ -251,14 +252,18 @@ type ValueRef_builder struct {
 	//
 	// This indicates that the data must be retrieved from the `value_data` map
 	// in the response (or from some other CAS system using `digest` as the
-	// effective key)
+	// effective key).
 	Digest *string
 	// Inline contains the actual data, if the orchestrator decided that this
 	// data was too small/unique to store indirectly via `digest`.
 	//
-	// It is expected that clients will always use a library function to manage
-	// the possible states of this oneof (digest, inline binary, inline JSON).
-	Inline *ValueData
+	// It is expected that clients will always use a library function to handle
+	// inline vs. digest-referenced data. Server-provided JSON via ValueData
+	// will always be provided via digest, rather than stored inline.
+	//
+	// See [ValueDigest] for how to compute `digest` from `inline`, should
+	// it be necessary.
+	Inline *anypb.Any
 	// -- end of xxx_hidden_Data
 	// If set, the reason this ValueRef's content was omitted from the response.
 	//
@@ -315,7 +320,7 @@ type valueRef_Digest struct {
 	//
 	// This indicates that the data must be retrieved from the `value_data` map
 	// in the response (or from some other CAS system using `digest` as the
-	// effective key)
+	// effective key).
 	Digest string `protobuf:"bytes,3,opt,name=digest,proto3,oneof"`
 }
 
@@ -323,9 +328,13 @@ type valueRef_Inline struct {
 	// Inline contains the actual data, if the orchestrator decided that this
 	// data was too small/unique to store indirectly via `digest`.
 	//
-	// It is expected that clients will always use a library function to manage
-	// the possible states of this oneof (digest, inline binary, inline JSON).
-	Inline *ValueData `protobuf:"bytes,4,opt,name=inline,proto3,oneof"`
+	// It is expected that clients will always use a library function to handle
+	// inline vs. digest-referenced data. Server-provided JSON via ValueData
+	// will always be provided via digest, rather than stored inline.
+	//
+	// See [ValueDigest] for how to compute `digest` from `inline`, should
+	// it be necessary.
+	Inline *anypb.Any `protobuf:"bytes,4,opt,name=inline,proto3,oneof"`
 }
 
 func (*valueRef_Digest) isValueRef_Data() {}
@@ -336,12 +345,12 @@ var File_turboci_graph_orchestrator_v1_value_ref_proto protoreflect.FileDescript
 
 const file_turboci_graph_orchestrator_v1_value_ref_proto_rawDesc = "" +
 	"\n" +
-	"-turboci/graph/orchestrator/v1/value_ref.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a/turboci/graph/orchestrator/v1/omit_reason.proto\x1a.turboci/graph/orchestrator/v1/value_data.proto\"\xa8\x02\n" +
+	"-turboci/graph/orchestrator/v1/value_ref.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\x1a/turboci/graph/orchestrator/v1/omit_reason.proto\"\x94\x02\n" +
 	"\bValueRef\x12\x1e\n" +
 	"\btype_url\x18\x01 \x01(\tH\x01R\atypeUrl\x88\x01\x01\x12\x19\n" +
 	"\x05realm\x18\x02 \x01(\tH\x02R\x05realm\x88\x01\x01\x12\x18\n" +
-	"\x06digest\x18\x03 \x01(\tH\x00R\x06digest\x12B\n" +
-	"\x06inline\x18\x04 \x01(\v2(.turboci.graph.orchestrator.v1.ValueDataH\x00R\x06inline\x12T\n" +
+	"\x06digest\x18\x03 \x01(\tH\x00R\x06digest\x12.\n" +
+	"\x06inline\x18\x04 \x01(\v2\x14.google.protobuf.AnyH\x00R\x06inline\x12T\n" +
 	"\vomit_reason\x18\x05 \x01(\x0e2).turboci.graph.orchestrator.v1.OmitReasonB\x03\xe0A\x03H\x03R\n" +
 	"omitReason\x88\x01\x01B\x06\n" +
 	"\x04dataB\v\n" +
@@ -352,11 +361,11 @@ const file_turboci_graph_orchestrator_v1_value_ref_proto_rawDesc = "" +
 var file_turboci_graph_orchestrator_v1_value_ref_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_value_ref_proto_goTypes = []any{
 	(*ValueRef)(nil),  // 0: turboci.graph.orchestrator.v1.ValueRef
-	(*ValueData)(nil), // 1: turboci.graph.orchestrator.v1.ValueData
+	(*anypb.Any)(nil), // 1: google.protobuf.Any
 	(OmitReason)(0),   // 2: turboci.graph.orchestrator.v1.OmitReason
 }
 var file_turboci_graph_orchestrator_v1_value_ref_proto_depIdxs = []int32{
-	1, // 0: turboci.graph.orchestrator.v1.ValueRef.inline:type_name -> turboci.graph.orchestrator.v1.ValueData
+	1, // 0: turboci.graph.orchestrator.v1.ValueRef.inline:type_name -> google.protobuf.Any
 	2, // 1: turboci.graph.orchestrator.v1.ValueRef.omit_reason:type_name -> turboci.graph.orchestrator.v1.OmitReason
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
@@ -371,7 +380,6 @@ func file_turboci_graph_orchestrator_v1_value_ref_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_omit_reason_proto_init()
-	file_turboci_graph_orchestrator_v1_value_data_proto_init()
 	file_turboci_graph_orchestrator_v1_value_ref_proto_msgTypes[0].OneofWrappers = []any{
 		(*valueRef_Digest)(nil),
 		(*valueRef_Inline)(nil),
