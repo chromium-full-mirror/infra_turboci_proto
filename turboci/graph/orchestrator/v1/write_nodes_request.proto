@@ -17,6 +17,7 @@ import "turboci/graph/orchestrator/v1/stage.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto";
 import "turboci/graph/orchestrator/v1/stage_execution_policy.proto";
 import "turboci/graph/orchestrator/v1/value.proto";
+import "turboci/graph/orchestrator/v1/value_write.proto";
 
 option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
 option java_multiple_files = true;
@@ -378,35 +379,28 @@ message WriteNodesRequest {
     // The arguments of the Stage.
     //
     // A Stage MUST have `args` - if this write would create the Stage and
-    // `args` is omitted, the write will be rejected.
+    // `args` is omitted, the write will be rejected. If the Stage already
+    // exists and `args` is specified, the supplied args must match the existing
+    // Stages's `args` exactly.
+    //
+    // The realm of `args` must be omitted, or, if set, must exactly match
+    // `realm` after expansion of "$from_token" or "$from_container".
     //
     // TBD: Document executor registration/selection process.
-    //
-    // TBD: What to do on double-creation? Do we compare args (protobuf
-    // serialization is not canonical/deterministic, but in practice if the
-    // same process creates the same stage twice, it will likely have the same
-    // args).
-    //
-    // We could just accept 'same type' == OK and ignore the value, but this
-    // feels a bit wishy-washy.
-    optional Value args = 2 [(turboci).creation_only = true];
+    optional ValueWrite args = 2 [(turboci).creation_only = true];
 
     // Realm to assign to this Stage.
     //
-    // If provided, must be the absolute form "<project>:<name>".
+    // If provided, must be the absolute form "<project>:<name>", or a
+    // special form "$from_token" or "$from_container". "$from_token" works
+    // as documented in [ValueWrite]. "$from_container" means "the same realm
+    // as the WorkPlan".
     //
     // If the Stage already exists, this will only result in an error if it
     // doesn't match the existing realm.
     //
-    // If absent the written Stage will copy its realm from the implied realm of
-    // the `token`. For Stage Attempt tokens, this will be the Stage's realm,
-    // and for Creator tokens, this will be the WorkPlan's realm.
-    //
-    // If `token` is unset and this field is absent, the write will be rejected.
-    optional string realm = 3 [
-      (turboci).creation_only = true,
-      (turboci).realm_inherits_writer = true
-    ];
+    // Defaults to "$from_token" if unset while creating a Stage.
+    optional string realm = 3 [(turboci).creation_only = true];
 
     // Dependency predicate for this Stage.
     //
