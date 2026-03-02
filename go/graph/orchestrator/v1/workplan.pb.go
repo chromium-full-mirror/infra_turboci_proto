@@ -28,31 +28,32 @@ const (
 
 // WorkPlan provides a collated, partial, view of a single workplan.
 //
-// Nodes (specifically, anything which can be named with an Identifier) may be
-// omitted from the nested hierarchy under these conditions:
+// Nodes (specifically, Checks and Stages and their Edits, and StageAttempts)
+// may be omitted under these conditions:
 // - The caller does not have permission to view the node.
 // - The caller only requested a subset of possible nodes (e.g. via query/filter
 // parameters)
 // - The caller only requested a subset of the possible data types (e.g. Check
 // options)
 // - The content requested by the caller is being returned over several
-// paginated queries.
+// paginated queries and is not present in the current page.
 //
-// Nodes may be omitted entirely (not present in the hierarchical structure) or
-// included only as a "placeholder" node with only the node's identifier
-// populated. These placeholder nodes are used to represent structure in the
-// hierarchy when the node isn't otherwise populated in the results of an API
-// call returning this WorkPlan, or to represent the ordering of child nodes in
-// a list within a parent node when the parent is present but the children are
-// omitted.
+// When a node that contains child nodes (e.g. a Stage which may have
+// StageAttempts and Edits) is included, it will contain all of its child nodes
+// that match the rest of the request. These parent nodes may be included in a
+// response in order to return matching child nodes, even if the parent node
+// doesn't match the request on its own.
+//
+// Within a node, all ValueRefs will be present, but they may reference the
+// digest of a ValueData that is not present in the WorkPlan based on the
+// parameters the caller provides in the request.
 type WorkPlan struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Identifier  *v1.WorkPlan           `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
-	xxx_hidden_OmitReason  OmitReason             `protobuf:"varint,2,opt,name=omit_reason,json=omitReason,proto3,enum=turboci.graph.orchestrator.v1.OmitReason,oneof"`
-	xxx_hidden_Version     *Revision              `protobuf:"bytes,3,opt,name=version,proto3,oneof"`
-	xxx_hidden_Realm       *string                `protobuf:"bytes,4,opt,name=realm,proto3,oneof"`
-	xxx_hidden_Checks      *[]*Check              `protobuf:"bytes,5,rep,name=checks,proto3"`
-	xxx_hidden_Stages      *[]*Stage              `protobuf:"bytes,6,rep,name=stages,proto3"`
+	xxx_hidden_Version     *Revision              `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
+	xxx_hidden_Realm       *string                `protobuf:"bytes,3,opt,name=realm,proto3,oneof"`
+	xxx_hidden_Checks      *[]*Check              `protobuf:"bytes,4,rep,name=checks,proto3"`
+	xxx_hidden_Stages      *[]*Stage              `protobuf:"bytes,5,rep,name=stages,proto3"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -89,15 +90,6 @@ func (x *WorkPlan) GetIdentifier() *v1.WorkPlan {
 		return x.xxx_hidden_Identifier
 	}
 	return nil
-}
-
-func (x *WorkPlan) GetOmitReason() OmitReason {
-	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
-			return x.xxx_hidden_OmitReason
-		}
-	}
-	return OmitReason_OMIT_REASON_UNKNOWN
 }
 
 func (x *WorkPlan) GetVersion() *Revision {
@@ -139,18 +131,13 @@ func (x *WorkPlan) SetIdentifier(v *v1.WorkPlan) {
 	x.xxx_hidden_Identifier = v
 }
 
-func (x *WorkPlan) SetOmitReason(v OmitReason) {
-	x.xxx_hidden_OmitReason = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 6)
-}
-
 func (x *WorkPlan) SetVersion(v *Revision) {
 	x.xxx_hidden_Version = v
 }
 
 func (x *WorkPlan) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 6)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 5)
 }
 
 func (x *WorkPlan) SetChecks(v []*Check) {
@@ -168,13 +155,6 @@ func (x *WorkPlan) HasIdentifier() bool {
 	return x.xxx_hidden_Identifier != nil
 }
 
-func (x *WorkPlan) HasOmitReason() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
 func (x *WorkPlan) HasVersion() bool {
 	if x == nil {
 		return false
@@ -186,16 +166,11 @@ func (x *WorkPlan) HasRealm() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
 func (x *WorkPlan) ClearIdentifier() {
 	x.xxx_hidden_Identifier = nil
-}
-
-func (x *WorkPlan) ClearOmitReason() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_OmitReason = OmitReason_OMIT_REASON_UNKNOWN
 }
 
 func (x *WorkPlan) ClearVersion() {
@@ -203,7 +178,7 @@ func (x *WorkPlan) ClearVersion() {
 }
 
 func (x *WorkPlan) ClearRealm() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
 	x.xxx_hidden_Realm = nil
 }
 
@@ -212,14 +187,6 @@ type WorkPlan_builder struct {
 
 	// The WorkPlan to which all nodes in this WorkPlan belong.
 	Identifier *v1.WorkPlan
-	// If set, the reason this WorkPlan's content was omitted. Only UNKNOWN
-	// (default value, used when the content was included) and PLACEHOLDER are
-	// valid for a WorkPlan.
-	//
-	// A few fields may be populated even if `omit_reason` is set:
-	//   - `identifier` will always be populated.
-	//   - `checks` and `stages` may be partially populated.
-	OmitReason *OmitReason
 	// When a WorkPlan is returned from a read operation (e.g. QueryNodes),
 	// version will be the Revision of the WorkPlan row used to prepare this
 	// WorkPlan.
@@ -237,13 +204,9 @@ func (b0 WorkPlan_builder) Build() *WorkPlan {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Identifier = b.Identifier
-	if b.OmitReason != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 6)
-		x.xxx_hidden_OmitReason = *b.OmitReason
-	}
 	x.xxx_hidden_Version = b.Version
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 6)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 5)
 		x.xxx_hidden_Realm = b.Realm
 	}
 	x.xxx_hidden_Checks = &b.Checks
@@ -255,19 +218,16 @@ var File_turboci_graph_orchestrator_v1_workplan_proto protoreflect.FileDescripto
 
 const file_turboci_graph_orchestrator_v1_workplan_proto_rawDesc = "" +
 	"\n" +
-	",turboci/graph/orchestrator/v1/workplan.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/check.proto\x1a/turboci/graph/orchestrator/v1/omit_reason.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\xb9\x03\n" +
+	",turboci/graph/orchestrator/v1/workplan.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/check.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\xd8\x02\n" +
 	"\bWorkPlan\x12C\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x00R\n" +
-	"identifier\x88\x01\x01\x12O\n" +
-	"\vomit_reason\x18\x02 \x01(\x0e2).turboci.graph.orchestrator.v1.OmitReasonH\x01R\n" +
-	"omitReason\x88\x01\x01\x12F\n" +
-	"\aversion\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\aversion\x88\x01\x01\x12\x1e\n" +
-	"\x05realm\x18\x04 \x01(\tB\x03\xe0A\x05H\x03R\x05realm\x88\x01\x01\x12<\n" +
-	"\x06checks\x18\x05 \x03(\v2$.turboci.graph.orchestrator.v1.CheckR\x06checks\x12<\n" +
-	"\x06stages\x18\x06 \x03(\v2$.turboci.graph.orchestrator.v1.StageR\x06stagesB\r\n" +
-	"\v_identifierB\x0e\n" +
-	"\f_omit_reasonB\n" +
+	"identifier\x88\x01\x01\x12F\n" +
+	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01\x12\x1e\n" +
+	"\x05realm\x18\x03 \x01(\tB\x03\xe0A\x05H\x02R\x05realm\x88\x01\x01\x12<\n" +
+	"\x06checks\x18\x04 \x03(\v2$.turboci.graph.orchestrator.v1.CheckR\x06checks\x12<\n" +
+	"\x06stages\x18\x05 \x03(\v2$.turboci.graph.orchestrator.v1.StageR\x06stagesB\r\n" +
+	"\v_identifierB\n" +
 	"\n" +
 	"\b_versionB\b\n" +
 	"\x06_realmBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
@@ -276,22 +236,20 @@ var file_turboci_graph_orchestrator_v1_workplan_proto_msgTypes = make([]protoimp
 var file_turboci_graph_orchestrator_v1_workplan_proto_goTypes = []any{
 	(*WorkPlan)(nil),    // 0: turboci.graph.orchestrator.v1.WorkPlan
 	(*v1.WorkPlan)(nil), // 1: turboci.graph.ids.v1.WorkPlan
-	(OmitReason)(0),     // 2: turboci.graph.orchestrator.v1.OmitReason
-	(*Revision)(nil),    // 3: turboci.graph.orchestrator.v1.Revision
-	(*Check)(nil),       // 4: turboci.graph.orchestrator.v1.Check
-	(*Stage)(nil),       // 5: turboci.graph.orchestrator.v1.Stage
+	(*Revision)(nil),    // 2: turboci.graph.orchestrator.v1.Revision
+	(*Check)(nil),       // 3: turboci.graph.orchestrator.v1.Check
+	(*Stage)(nil),       // 4: turboci.graph.orchestrator.v1.Stage
 }
 var file_turboci_graph_orchestrator_v1_workplan_proto_depIdxs = []int32{
 	1, // 0: turboci.graph.orchestrator.v1.WorkPlan.identifier:type_name -> turboci.graph.ids.v1.WorkPlan
-	2, // 1: turboci.graph.orchestrator.v1.WorkPlan.omit_reason:type_name -> turboci.graph.orchestrator.v1.OmitReason
-	3, // 2: turboci.graph.orchestrator.v1.WorkPlan.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	4, // 3: turboci.graph.orchestrator.v1.WorkPlan.checks:type_name -> turboci.graph.orchestrator.v1.Check
-	5, // 4: turboci.graph.orchestrator.v1.WorkPlan.stages:type_name -> turboci.graph.orchestrator.v1.Stage
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	2, // 1: turboci.graph.orchestrator.v1.WorkPlan.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	3, // 2: turboci.graph.orchestrator.v1.WorkPlan.checks:type_name -> turboci.graph.orchestrator.v1.Check
+	4, // 3: turboci.graph.orchestrator.v1.WorkPlan.stages:type_name -> turboci.graph.orchestrator.v1.Stage
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_workplan_proto_init() }
@@ -300,7 +258,6 @@ func file_turboci_graph_orchestrator_v1_workplan_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_check_proto_init()
-	file_turboci_graph_orchestrator_v1_omit_reason_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_proto_init()
 	file_turboci_graph_orchestrator_v1_workplan_proto_msgTypes[0].OneofWrappers = []any{}

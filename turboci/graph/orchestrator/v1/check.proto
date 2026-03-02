@@ -11,13 +11,12 @@ import "turboci/graph/ids/v1/identifier.proto";
 import "turboci/graph/orchestrator/v1/actor.proto";
 import "turboci/graph/orchestrator/v1/check_kind.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
-import "turboci/graph/orchestrator/v1/datum.proto";
 import "turboci/graph/orchestrator/v1/dependencies.proto";
 import "turboci/graph/orchestrator/v1/edit.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
-import "turboci/graph/orchestrator/v1/omit_reason.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_state.proto";
+import "turboci/graph/orchestrator/v1/value_ref.proto";
 
 option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
 option java_multiple_files = true;
@@ -39,29 +38,11 @@ option java_multiple_files = true;
 //
 // Checks are not, themselves, executable, but Stages are the executable nodes
 // which operate to plan and resolve Checks.
-//
-// Options and Result Data are held as protobuf Any messages in Datum objects
-// which are children of this Check. Each Datum can be assigned to a different
-// security realm (allowing for public/private inputs/outputs for the same
-// Check).
-//
-// See also:
-//   * Identifier.Check* (Identifiers for Checks, CheckOptions, etc.)
 message Check {
   // The Check's identifier.
   //
   // `identifier.id` is provided by the Stage which creates this Check.
   optional ids.v1.Check identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
-
-  // If set, the reason this Check's content was omitted. Only UNKNOWN
-  // (default value, used when the content was included) and PLACEHOLDER are
-  // valid for a Check, since Checks that were unwanted or inaccessible will be
-  // removed from the WorkPlan entirely.
-  //
-  // A few fields may be populated even if `omit_reason` is set:
-  //   * `identifier` will always be populated.
-  //   * `options`, `results` and `edits` may be populated.
-  optional OmitReason omit_reason = 11;
 
   // Actor which created the Check.
   optional Actor created_by = 2 [(google.api.field_behavior) = IMMUTABLE];
@@ -83,11 +64,6 @@ message Check {
   // The version of this Check.
   //
   // Updated any time fields in this Check change.
-  //
-  // Note that changing the data in an existing Check Option or a Check Result
-  // Datum does not change any field data in this message, and thus will not
-  // change this version number (adding a new entry in `options` or in
-  // a `Result.data` would, however).
   optional Revision version = 5;
 
   // The current state of the Check.
@@ -137,11 +113,8 @@ message Check {
   // Orchestrator will ensure that the option types here are registered to be
   // valid for this Check's kind.
   //
-  // This field is kept unique by `type_url`, and will reflect the insertion
-  // order of when each type_url was first added. Note that Datum have
-  // a revision value which is independent of the Check's revision value - Stage
-  // Attempts writing option data can do so without altering the Check itself.
-  repeated Datum options = 9 [(turboci).check.editable = CHECK_STATE_PLANNING];
+  // This field is kept sorted, and unique, by `type_url`.
+  repeated ValueRef options = 9 [(turboci).check.editable = CHECK_STATE_PLANNING];
 
   // A Result is a container of result data for a Check.
   //
@@ -154,16 +127,6 @@ message Check {
   message Result {
     // Identifier for this Result.
     optional ids.v1.CheckResult identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
-
-    // If set, the reason this Result's content was omitted. Only UNKNOWN
-    // (default value, used when the content was included) and PLACEHOLDER are
-    // valid for a Result, since Results are included with their parent Check so
-    // they cannot be filtered on their own.
-    //
-    // A few fields may be populated even if `omit_reason` is set:
-    //   * `identifier` will always be populated.
-    //   * `data` may be populated.
-    optional OmitReason omit_reason = 11;
 
     // The entity which created this Result.
     //
@@ -178,18 +141,11 @@ message Check {
     //
     // NOTE: Most data should be stored in ResultDB via turboci.ResultStorage.
     //
-    // This field is kept unique by `type_url`, and will reflect the insertion
-    // order of when each type_url was first added. Note that Datum have
-    // a revision value which is independent of the Check's revision value
-    // - Stage Attempts writing result data can do so without altering the
-    // Check itself.
+    // This field is kept sorted, and unique, by `type_url`.
     //
     // Orchestrator will ensure that the option types here are registered to be
     // valid for this Check's kind.
-    //
-    // All data will have an Identifier of kind
-    // IDENTIFIER_KIND_CHECK_RESULT_DATUM.
-    repeated Datum data = 4;
+    repeated ValueRef data = 4;
 
     // The database revision (commit timestamp) at which this Result is
     // finalized.
@@ -217,16 +173,12 @@ message Check {
   // data for this Check, you would see 3 Result messages. Similarly, if you
   // had one Stage with 3 Attempts, all 3 of which add result data for this
   // check, you would see 3 Result messages.
-  //
-  // Check.version is advanced when a new Result is added, or new data types are
-  // added to an existing Result. However, CheckEdits will still be produced for
-  // each write to each Result datum.
   repeated Result results = 10 [(turboci).check.editable = CHECK_STATE_WAITING];
 
   // Edits for this Check.
   //
   // Sorted ascending by `version`.
-  repeated Edit edits = 12;
+  repeated Edit edits = 11;
 
   // TBD: Add another field for 'Resolved-To' edges to Checks for the case where
   // this Check is 'underspecified' and the Workflow resolves/evolves it to

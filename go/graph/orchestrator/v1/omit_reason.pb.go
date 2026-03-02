@@ -28,11 +28,6 @@ const (
 // Identifier will be present (maybe plus "disambiguator" fields if the node has
 // those), but no other fields will be populated other than references to other
 // nodes if this node is necessary to represent the graph structure.
-//
-// When a node qualifies for both OMIT_REASON_PLACEHOLDER and another reason,
-// the other reason will be chosen. When merging partial results across a
-// paginated query, callers should choose the other reason over
-// OMIT_REASON_PLACEHOLDER for the merged object.
 type OmitReason int32
 
 const (
@@ -45,11 +40,6 @@ const (
 	// This node WAS requested by the user, but the caller doesn't have access to
 	// it due to the caller's permissions in the realm associated with the node.
 	OmitReason_OMIT_REASON_NO_ACCESS OmitReason = 2
-	// This node was included because we needed it to represent some aspect of the
-	// graph's structure when we would not otherwise have included the node. This
-	// could be a parent node to hold a child being returned, or a representation
-	// of the order of nodes in a list.
-	OmitReason_OMIT_REASON_PLACEHOLDER OmitReason = 3
 )
 
 // Enum value maps for OmitReason.
@@ -58,13 +48,11 @@ var (
 		0: "OMIT_REASON_UNKNOWN",
 		1: "OMIT_REASON_UNWANTED",
 		2: "OMIT_REASON_NO_ACCESS",
-		3: "OMIT_REASON_PLACEHOLDER",
 	}
 	OmitReason_value = map[string]int32{
-		"OMIT_REASON_UNKNOWN":     0,
-		"OMIT_REASON_UNWANTED":    1,
-		"OMIT_REASON_NO_ACCESS":   2,
-		"OMIT_REASON_PLACEHOLDER": 3,
+		"OMIT_REASON_UNKNOWN":   0,
+		"OMIT_REASON_UNWANTED":  1,
+		"OMIT_REASON_NO_ACCESS": 2,
 	}
 )
 
@@ -94,13 +82,12 @@ var File_turboci_graph_orchestrator_v1_omit_reason_proto protoreflect.FileDescri
 
 const file_turboci_graph_orchestrator_v1_omit_reason_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/omit_reason.proto\x12\x1dturboci.graph.orchestrator.v1*w\n" +
+	"/turboci/graph/orchestrator/v1/omit_reason.proto\x12\x1dturboci.graph.orchestrator.v1*Z\n" +
 	"\n" +
 	"OmitReason\x12\x17\n" +
 	"\x13OMIT_REASON_UNKNOWN\x10\x00\x12\x18\n" +
 	"\x14OMIT_REASON_UNWANTED\x10\x01\x12\x19\n" +
-	"\x15OMIT_REASON_NO_ACCESS\x10\x02\x12\x1b\n" +
-	"\x17OMIT_REASON_PLACEHOLDER\x10\x03BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x15OMIT_REASON_NO_ACCESS\x10\x02BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_omit_reason_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_omit_reason_proto_goTypes = []any{

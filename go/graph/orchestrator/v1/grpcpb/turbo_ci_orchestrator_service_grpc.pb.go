@@ -27,6 +27,7 @@ const (
 	TurboCIOrchestrator_CreateWorkPlan_FullMethodName = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/CreateWorkPlan"
 	TurboCIOrchestrator_WriteNodes_FullMethodName     = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/WriteNodes"
 	TurboCIOrchestrator_QueryNodes_FullMethodName     = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/QueryNodes"
+	TurboCIOrchestrator_ReadWorkPlan_FullMethodName   = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/ReadWorkPlan"
 )
 
 // TurboCIOrchestratorClient is the client API for TurboCIOrchestrator service.
@@ -71,7 +72,11 @@ type TurboCIOrchestratorClient interface {
 	// an error detail, and the client is expected to respect the indicated
 	// state.
 	WriteNodes(ctx context.Context, in *v1.WriteNodesRequest, opts ...grpc.CallOption) (*v1.WriteNodesResponse, error)
-	// QueryNodes allows querying nodes in a fairly simple way.
+	// QueryNodes allows querying nodes in a fairly simple way. It allows
+	// selecting a subset of the nodes within the workplan, as well as expansion
+	// to include related/nearby nodes if desired, allowing callers to get limited
+	// subsets of the workplan. If retrieving all nodes of one or more types, call
+	// ReadWorkPlan instead.
 	//
 	// In the future we may add a more advanced API to open up more of GQL's
 	// underlying expressiveness.
@@ -82,6 +87,40 @@ type TurboCIOrchestratorClient interface {
 	// an error detail, and the client is expected to respect the indicated
 	// state.
 	QueryNodes(ctx context.Context, in *v1.QueryNodesRequest, opts ...grpc.CallOption) (*v1.QueryNodesResponse, error)
+	// ReadWorkPlan retrieves a single WorkPlan plus its component nodes of the
+	// specified types, whose revision is >= the revision value in the request.
+	//
+	// A caller that wants to receive incremental updates can first retrieve all
+	// content for the workplan by leaving `since_version` unset in their initial
+	// request. Subsequent requests can set `since_version` to the `version` from
+	// the previous response, requesting only nodes that have been updated since
+	// that revision.
+	//
+	// Since most updates to StageAttempts do not update the Stage's revision, it
+	// is possible to have StageAttempts and StageEdits that match the query
+	// criteria when their parent Stage does not. In those cases, the Stage will
+	// be returned to contain the StageAttempts and StageEdits.
+	//
+	// Callers can specify which ValueRefs should have their content returned as
+	// part of the request and which should have their content excluded. This can
+	// be specified based on the ValueRef's `type_url` (to let callers request
+	// only proto content they care about) or based on the type of node that
+	// contains the ValueRef (to let callers include ValueRef data for certain
+	// node types but not others, e.g. including ValueRef data for Checks and
+	// Stages but not for Edits). See ReadWorkPlanRequest.value_filter for
+	// details.
+	//
+	// This request supports pagination, to allow retrieval of WorkPlans with too
+	// many nodes for a single request. This means that callers that receive a
+	// WorkPlan from a paginated query cannot assume that the WorkPlan from a
+	// single page result contains all nodes in the WorkPlan, and must merge
+	// WorkPlans across all pages of the query.
+	//
+	// Aside from filtering on timestamp and node types and applying ACLs, it is
+	// not expected that this RPC will support options for filtering the returned
+	// nodes. For more targeted querying of only certain nodes within a workplan,
+	// use QueryNodes instead.
+	ReadWorkPlan(ctx context.Context, in *v1.ReadWorkPlanRequest, opts ...grpc.CallOption) (*v1.ReadWorkPlanResponse, error)
 }
 
 type turboCIOrchestratorClient struct {
@@ -116,6 +155,16 @@ func (c *turboCIOrchestratorClient) QueryNodes(ctx context.Context, in *v1.Query
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(v1.QueryNodesResponse)
 	err := c.cc.Invoke(ctx, TurboCIOrchestrator_QueryNodes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *turboCIOrchestratorClient) ReadWorkPlan(ctx context.Context, in *v1.ReadWorkPlanRequest, opts ...grpc.CallOption) (*v1.ReadWorkPlanResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(v1.ReadWorkPlanResponse)
+	err := c.cc.Invoke(ctx, TurboCIOrchestrator_ReadWorkPlan_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +213,11 @@ type TurboCIOrchestratorServer interface {
 	// an error detail, and the client is expected to respect the indicated
 	// state.
 	WriteNodes(context.Context, *v1.WriteNodesRequest) (*v1.WriteNodesResponse, error)
-	// QueryNodes allows querying nodes in a fairly simple way.
+	// QueryNodes allows querying nodes in a fairly simple way. It allows
+	// selecting a subset of the nodes within the workplan, as well as expansion
+	// to include related/nearby nodes if desired, allowing callers to get limited
+	// subsets of the workplan. If retrieving all nodes of one or more types, call
+	// ReadWorkPlan instead.
 	//
 	// In the future we may add a more advanced API to open up more of GQL's
 	// underlying expressiveness.
@@ -175,6 +228,40 @@ type TurboCIOrchestratorServer interface {
 	// an error detail, and the client is expected to respect the indicated
 	// state.
 	QueryNodes(context.Context, *v1.QueryNodesRequest) (*v1.QueryNodesResponse, error)
+	// ReadWorkPlan retrieves a single WorkPlan plus its component nodes of the
+	// specified types, whose revision is >= the revision value in the request.
+	//
+	// A caller that wants to receive incremental updates can first retrieve all
+	// content for the workplan by leaving `since_version` unset in their initial
+	// request. Subsequent requests can set `since_version` to the `version` from
+	// the previous response, requesting only nodes that have been updated since
+	// that revision.
+	//
+	// Since most updates to StageAttempts do not update the Stage's revision, it
+	// is possible to have StageAttempts and StageEdits that match the query
+	// criteria when their parent Stage does not. In those cases, the Stage will
+	// be returned to contain the StageAttempts and StageEdits.
+	//
+	// Callers can specify which ValueRefs should have their content returned as
+	// part of the request and which should have their content excluded. This can
+	// be specified based on the ValueRef's `type_url` (to let callers request
+	// only proto content they care about) or based on the type of node that
+	// contains the ValueRef (to let callers include ValueRef data for certain
+	// node types but not others, e.g. including ValueRef data for Checks and
+	// Stages but not for Edits). See ReadWorkPlanRequest.value_filter for
+	// details.
+	//
+	// This request supports pagination, to allow retrieval of WorkPlans with too
+	// many nodes for a single request. This means that callers that receive a
+	// WorkPlan from a paginated query cannot assume that the WorkPlan from a
+	// single page result contains all nodes in the WorkPlan, and must merge
+	// WorkPlans across all pages of the query.
+	//
+	// Aside from filtering on timestamp and node types and applying ACLs, it is
+	// not expected that this RPC will support options for filtering the returned
+	// nodes. For more targeted querying of only certain nodes within a workplan,
+	// use QueryNodes instead.
+	ReadWorkPlan(context.Context, *v1.ReadWorkPlanRequest) (*v1.ReadWorkPlanResponse, error)
 	mustEmbedUnimplementedTurboCIOrchestratorServer()
 }
 
@@ -193,6 +280,9 @@ func (UnimplementedTurboCIOrchestratorServer) WriteNodes(context.Context, *v1.Wr
 }
 func (UnimplementedTurboCIOrchestratorServer) QueryNodes(context.Context, *v1.QueryNodesRequest) (*v1.QueryNodesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryNodes not implemented")
+}
+func (UnimplementedTurboCIOrchestratorServer) ReadWorkPlan(context.Context, *v1.ReadWorkPlanRequest) (*v1.ReadWorkPlanResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ReadWorkPlan not implemented")
 }
 func (UnimplementedTurboCIOrchestratorServer) mustEmbedUnimplementedTurboCIOrchestratorServer() {}
 func (UnimplementedTurboCIOrchestratorServer) testEmbeddedByValue()                             {}
@@ -269,6 +359,24 @@ func _TurboCIOrchestrator_QueryNodes_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TurboCIOrchestrator_ReadWorkPlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.ReadWorkPlanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TurboCIOrchestratorServer).ReadWorkPlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TurboCIOrchestrator_ReadWorkPlan_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TurboCIOrchestratorServer).ReadWorkPlan(ctx, req.(*v1.ReadWorkPlanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TurboCIOrchestrator_ServiceDesc is the grpc.ServiceDesc for TurboCIOrchestrator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -287,6 +395,10 @@ var TurboCIOrchestrator_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "QueryNodes",
 			Handler:    _TurboCIOrchestrator_QueryNodes_Handler,
+		},
+		{
+			MethodName: "ReadWorkPlan",
+			Handler:    _TurboCIOrchestrator_ReadWorkPlan_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
