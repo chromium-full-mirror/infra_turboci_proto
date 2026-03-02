@@ -14,13 +14,14 @@ import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/dependencies.proto";
 import "turboci/graph/orchestrator/v1/edit.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
+import "turboci/graph/orchestrator/v1/omit_reason.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_state.proto";
 import "turboci/graph/orchestrator/v1/stage_concluded_reason.proto";
 import "turboci/graph/orchestrator/v1/stage_execution_policy.proto";
 import "turboci/graph/orchestrator/v1/stage_state.proto";
-import "turboci/graph/orchestrator/v1/value_ref.proto";
+import "turboci/graph/orchestrator/v1/value.proto";
 
 option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
 option java_multiple_files = true;
@@ -33,10 +34,20 @@ option java_multiple_files = true;
 // See also:
 //   * Identifier.Stage* (Identifiers for Stages, StageAttempts, etc.)
 //
-// Next ID: 16
+// Next ID: 17
 message Stage {
   // The Stage's identifier.
   optional ids.v1.Stage identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
+
+  // If set, the reason this Stage's content was omitted. Only UNKNOWN (default
+  // value, used when the content was included) and PLACEHOLDER are valid for a
+  // Stage, since Stages that were unwanted or inaccessible will be removed from
+  // the WorkPlan entirely.
+  //
+  // A few fields may be populated even if `omit_reason` is set:
+  //   * `identifier` will always be populated.
+  //   * `edits` may be populated.
+  optional OmitReason omit_reason = 15;
 
   // Actor which created the Stage.
   optional Actor created_by = 2 [(google.api.field_behavior) = IMMUTABLE];
@@ -49,9 +60,10 @@ message Stage {
 
   // The arguments of the Stage.
   //
-  // The type of this ValueRef must be pre-registered with the Orchestrator,
-  // and that registration will indicate which Executor should handle this
-  // Stage.
+  // `identifier` is always empty.
+  //
+  // The type of this Datum must be pre-registered with the Orchestrator, and
+  // that registration will indicate which Executor should handle this Stage.
   //
   // NOTE: It's assumed that args.type_url will be a sufficient routing key to
   // the various registered Executors, but it's POSSIBLE that we may need to
@@ -65,20 +77,20 @@ message Stage {
   //     type_url) instead of just type_url.
   //
   // Looking at WorkNode, there are definitely multiple executor types which
-  // accept the same arguments in WorkParameters, but these could be
-  // represented by adding a new field to WorkParameters. There is also the
-  // PARTIAL_RERUN executor type which is used when duplicating WorkNodes, but
-  // this seems like it will be handled differently with Checks (i.e. Checks of
-  // the same options would be added, and new Results of the cached results
-  // would be added. There wouldn't be a need to add placeholder Stages into
-  // such a graph). There are also some executor types which serve as a way to
-  // separate ACLs, but we expect this to be handled by realms.
-  optional ValueRef args = 4 [(google.api.field_behavior) = IMMUTABLE];
+  // accept the same arguments in WorkParameters, but these could be represented
+  // by adding a new field to WorkParameters. There is also the PARTIAL_RERUN
+  // executor type which is used when duplicating WorkNodes, but this seems like
+  // it will be handled differently with Checks (i.e. Checks of the same options
+  // would be added, and new Results of the cached results would be added. There
+  // wouldn't be a need to add placeholder Stages into such a graph). There
+  // are also some executor types which serve as a way to separate ACLs, but
+  // we expect this to be handled by realms.
+  optional Value args = 4 [(google.api.field_behavior) = IMMUTABLE];
 
   // The version of this Stage.
   //
-  // Updated any time fields in this Stage change, which includes adding a new
-  // Attempt to the Stage but does not include edits to an Attempt.
+  // Updated any time fields in this Stage change, which includes all changes to
+  // the active Stage Attempt (if state is ATTEMPTING).
   optional Revision version = 5;
 
   // The current state of the Stage.
@@ -167,10 +179,19 @@ message Stage {
   // TBD: Pull this into its own top-level StageAttempt entity because it will
   // need to have its own state and lifecycle/transactions.
   //
-  // Next ID: 9, then 12
+  // Next ID: 15
   message Attempt {
     // The Stage Attempt's identifier.
     optional ids.v1.StageAttempt identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
+
+    // If set, the reason this Attempt's content was omitted. Only UNKNOWN
+    // (default value, used when the content was included) and PLACEHOLDER are
+    // valid for an Attempt, since Attempts that were unwanted or inaccessible
+    // will be removed from the WorkPlan entirely.
+    //
+    // A few fields may be populated even if `omit_reason` is set:
+    //   * `identifier` will always be populated.
+    optional OmitReason omit_reason = 14;
 
     // The version of this Attempt.
     //
@@ -272,7 +293,7 @@ message Stage {
     // Attempt is not final (i.e. a state prior to COMPLETE or INCOMPLETE).
     //
     // Kept sorted by, and unique on, type_url.
-    repeated ValueRef details = 6;
+    repeated Value details = 6;
 
     // Attempt-specific progress information.
     //
@@ -290,7 +311,7 @@ message Stage {
       // Machine-readable details for this progress item.
       //
       // Kept sorted by, and unique on, type_url.
-      repeated ValueRef details = 3;
+      repeated Value details = 3;
 
       // The entity which created this progress message.
       //
@@ -307,7 +328,7 @@ message Stage {
       // See WriteNodesRequest.StageAttemptProgress.
       optional string idempotency_key = 5;
     }
-    // Append-only Executor-specific progress messages.
+    // Append-only Executor-specefic progress messages.
     repeated Progress progress = 7;
 
     // Actual execution policy for this StageAttempt.
@@ -394,7 +415,7 @@ message Stage {
   // StageEdits for this Stage.
   //
   // Sorted ascending by `version`.
-  repeated Edit edits = 15;
+  repeated Edit edits = 16;
 }
 
 // StageAttemptClaimedFailure is a gRPC error detail message returned by

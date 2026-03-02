@@ -43,9 +43,18 @@ const (
 //
 // Checks are not, themselves, executable, but Stages are the executable nodes
 // which operate to plan and resolve Checks.
+//
+// Options and Result Data are held as protobuf Any messages in Datum objects
+// which are children of this Check. Each Datum can be assigned to a different
+// security realm (allowing for public/private inputs/outputs for the same
+// Check).
+//
+// See also:
+//   - Identifier.Check* (Identifiers for Checks, CheckOptions, etc.)
 type Check struct {
 	state                   protoimpl.MessageState      `protogen:"opaque.v1"`
 	xxx_hidden_Identifier   *v1.Check                   `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_OmitReason   OmitReason                  `protobuf:"varint,11,opt,name=omit_reason,json=omitReason,proto3,enum=turboci.graph.orchestrator.v1.OmitReason,oneof"`
 	xxx_hidden_CreatedBy    *Actor                      `protobuf:"bytes,2,opt,name=created_by,json=createdBy,proto3,oneof"`
 	xxx_hidden_Kind         CheckKind                   `protobuf:"varint,3,opt,name=kind,proto3,enum=turboci.graph.orchestrator.v1.CheckKind,oneof"`
 	xxx_hidden_Realm        *string                     `protobuf:"bytes,4,opt,name=realm,proto3,oneof"`
@@ -53,9 +62,9 @@ type Check struct {
 	xxx_hidden_State        CheckState                  `protobuf:"varint,6,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
 	xxx_hidden_StateHistory *[]*Check_StateHistoryEntry `protobuf:"bytes,7,rep,name=state_history,json=stateHistory,proto3"`
 	xxx_hidden_Dependencies *Dependencies               `protobuf:"bytes,8,opt,name=dependencies,proto3,oneof"`
-	xxx_hidden_Options      *[]*ValueRef                `protobuf:"bytes,9,rep,name=options,proto3"`
+	xxx_hidden_Options      *[]*Datum                   `protobuf:"bytes,9,rep,name=options,proto3"`
 	xxx_hidden_Results      *[]*Check_Result            `protobuf:"bytes,10,rep,name=results,proto3"`
-	xxx_hidden_Edits        *[]*Edit                    `protobuf:"bytes,11,rep,name=edits,proto3"`
+	xxx_hidden_Edits        *[]*Edit                    `protobuf:"bytes,12,rep,name=edits,proto3"`
 	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
 	XXX_presence            [1]uint32
 	unknownFields           protoimpl.UnknownFields
@@ -94,6 +103,15 @@ func (x *Check) GetIdentifier() *v1.Check {
 	return nil
 }
 
+func (x *Check) GetOmitReason() OmitReason {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
+			return x.xxx_hidden_OmitReason
+		}
+	}
+	return OmitReason_OMIT_REASON_UNKNOWN
+}
+
 func (x *Check) GetCreatedBy() *Actor {
 	if x != nil {
 		return x.xxx_hidden_CreatedBy
@@ -103,7 +121,7 @@ func (x *Check) GetCreatedBy() *Actor {
 
 func (x *Check) GetKind() CheckKind {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 2) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 3) {
 			return x.xxx_hidden_Kind
 		}
 	}
@@ -129,7 +147,7 @@ func (x *Check) GetVersion() *Revision {
 
 func (x *Check) GetState() CheckState {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 5) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 6) {
 			return x.xxx_hidden_State
 		}
 	}
@@ -152,7 +170,7 @@ func (x *Check) GetDependencies() *Dependencies {
 	return nil
 }
 
-func (x *Check) GetOptions() []*ValueRef {
+func (x *Check) GetOptions() []*Datum {
 	if x != nil {
 		if x.xxx_hidden_Options != nil {
 			return *x.xxx_hidden_Options
@@ -183,18 +201,23 @@ func (x *Check) SetIdentifier(v *v1.Check) {
 	x.xxx_hidden_Identifier = v
 }
 
+func (x *Check) SetOmitReason(v OmitReason) {
+	x.xxx_hidden_OmitReason = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 12)
+}
+
 func (x *Check) SetCreatedBy(v *Actor) {
 	x.xxx_hidden_CreatedBy = v
 }
 
 func (x *Check) SetKind(v CheckKind) {
 	x.xxx_hidden_Kind = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 12)
 }
 
 func (x *Check) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 12)
 }
 
 func (x *Check) SetVersion(v *Revision) {
@@ -203,7 +226,7 @@ func (x *Check) SetVersion(v *Revision) {
 
 func (x *Check) SetState(v CheckState) {
 	x.xxx_hidden_State = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 12)
 }
 
 func (x *Check) SetStateHistory(v []*Check_StateHistoryEntry) {
@@ -214,7 +237,7 @@ func (x *Check) SetDependencies(v *Dependencies) {
 	x.xxx_hidden_Dependencies = v
 }
 
-func (x *Check) SetOptions(v []*ValueRef) {
+func (x *Check) SetOptions(v []*Datum) {
 	x.xxx_hidden_Options = &v
 }
 
@@ -233,6 +256,13 @@ func (x *Check) HasIdentifier() bool {
 	return x.xxx_hidden_Identifier != nil
 }
 
+func (x *Check) HasOmitReason() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
 func (x *Check) HasCreatedBy() bool {
 	if x == nil {
 		return false
@@ -244,14 +274,14 @@ func (x *Check) HasKind() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
 func (x *Check) HasRealm() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
 }
 
 func (x *Check) HasVersion() bool {
@@ -265,7 +295,7 @@ func (x *Check) HasState() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
 }
 
 func (x *Check) HasDependencies() bool {
@@ -279,17 +309,22 @@ func (x *Check) ClearIdentifier() {
 	x.xxx_hidden_Identifier = nil
 }
 
+func (x *Check) ClearOmitReason() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_OmitReason = OmitReason_OMIT_REASON_UNKNOWN
+}
+
 func (x *Check) ClearCreatedBy() {
 	x.xxx_hidden_CreatedBy = nil
 }
 
 func (x *Check) ClearKind() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
 	x.xxx_hidden_Kind = CheckKind_CHECK_KIND_UNKNOWN
 }
 
 func (x *Check) ClearRealm() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
 	x.xxx_hidden_Realm = nil
 }
 
@@ -298,7 +333,7 @@ func (x *Check) ClearVersion() {
 }
 
 func (x *Check) ClearState() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
 	x.xxx_hidden_State = CheckState_CHECK_STATE_UNKNOWN
 }
 
@@ -313,6 +348,15 @@ type Check_builder struct {
 	//
 	// `identifier.id` is provided by the Stage which creates this Check.
 	Identifier *v1.Check
+	// If set, the reason this Check's content was omitted. Only UNKNOWN
+	// (default value, used when the content was included) and PLACEHOLDER are
+	// valid for a Check, since Checks that were unwanted or inaccessible will be
+	// removed from the WorkPlan entirely.
+	//
+	// A few fields may be populated even if `omit_reason` is set:
+	//   - `identifier` will always be populated.
+	//   - `options`, `results` and `edits` may be populated.
+	OmitReason *OmitReason
 	// Actor which created the Check.
 	CreatedBy *Actor
 	// The coarse-grained kind of this Check.
@@ -330,6 +374,11 @@ type Check_builder struct {
 	// The version of this Check.
 	//
 	// Updated any time fields in this Check change.
+	//
+	// Note that changing the data in an existing Check Option or a Check Result
+	// Datum does not change any field data in this message, and thus will not
+	// change this version number (adding a new entry in `options` or in
+	// a `Result.data` would, however).
 	Version *Revision
 	// The current state of the Check.
 	State *CheckState
@@ -366,8 +415,11 @@ type Check_builder struct {
 	// Orchestrator will ensure that the option types here are registered to be
 	// valid for this Check's kind.
 	//
-	// This field is kept sorted, and unique, by `type_url`.
-	Options []*ValueRef
+	// This field is kept unique by `type_url`, and will reflect the insertion
+	// order of when each type_url was first added. Note that Datum have
+	// a revision value which is independent of the Check's revision value - Stage
+	// Attempts writing option data can do so without altering the Check itself.
+	Options []*Datum
 	// The list of Results this Check has.
 	//
 	// Any time a StageAttempt adds new result *data* for this Check for the first
@@ -377,6 +429,10 @@ type Check_builder struct {
 	// data for this Check, you would see 3 Result messages. Similarly, if you
 	// had one Stage with 3 Attempts, all 3 of which add result data for this
 	// check, you would see 3 Result messages.
+	//
+	// Check.version is advanced when a new Result is added, or new data types are
+	// added to an existing Result. However, CheckEdits will still be produced for
+	// each write to each Result datum.
 	Results []*Check_Result
 	// Edits for this Check.
 	//
@@ -389,18 +445,22 @@ func (b0 Check_builder) Build() *Check {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Identifier = b.Identifier
+	if b.OmitReason != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 12)
+		x.xxx_hidden_OmitReason = *b.OmitReason
+	}
 	x.xxx_hidden_CreatedBy = b.CreatedBy
 	if b.Kind != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 12)
 		x.xxx_hidden_Kind = *b.Kind
 	}
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 12)
 		x.xxx_hidden_Realm = b.Realm
 	}
 	x.xxx_hidden_Version = b.Version
 	if b.State != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 12)
 		x.xxx_hidden_State = *b.State
 	}
 	x.xxx_hidden_StateHistory = &b.StateHistory
@@ -528,9 +588,10 @@ func (b0 Check_StateHistoryEntry_builder) Build() *Check_StateHistoryEntry {
 type Check_Result struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Identifier   *v1.CheckResult        `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_OmitReason   OmitReason             `protobuf:"varint,11,opt,name=omit_reason,json=omitReason,proto3,enum=turboci.graph.orchestrator.v1.OmitReason,oneof"`
 	xxx_hidden_Owner        *Actor                 `protobuf:"bytes,2,opt,name=owner,proto3,oneof"`
 	xxx_hidden_CreatedAt    *Revision              `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3,oneof"`
-	xxx_hidden_Data         *[]*ValueRef           `protobuf:"bytes,4,rep,name=data,proto3"`
+	xxx_hidden_Data         *[]*Datum              `protobuf:"bytes,4,rep,name=data,proto3"`
 	xxx_hidden_FinalizedAt  *Revision              `protobuf:"bytes,5,opt,name=finalized_at,json=finalizedAt,proto3,oneof"`
 	xxx_hidden_AttemptState StageAttemptState      `protobuf:"varint,6,opt,name=attempt_state,json=attemptState,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
 	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
@@ -571,6 +632,15 @@ func (x *Check_Result) GetIdentifier() *v1.CheckResult {
 	return nil
 }
 
+func (x *Check_Result) GetOmitReason() OmitReason {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
+			return x.xxx_hidden_OmitReason
+		}
+	}
+	return OmitReason_OMIT_REASON_UNKNOWN
+}
+
 func (x *Check_Result) GetOwner() *Actor {
 	if x != nil {
 		return x.xxx_hidden_Owner
@@ -585,7 +655,7 @@ func (x *Check_Result) GetCreatedAt() *Revision {
 	return nil
 }
 
-func (x *Check_Result) GetData() []*ValueRef {
+func (x *Check_Result) GetData() []*Datum {
 	if x != nil {
 		if x.xxx_hidden_Data != nil {
 			return *x.xxx_hidden_Data
@@ -603,7 +673,7 @@ func (x *Check_Result) GetFinalizedAt() *Revision {
 
 func (x *Check_Result) GetAttemptState() StageAttemptState {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 5) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 6) {
 			return x.xxx_hidden_AttemptState
 		}
 	}
@@ -614,6 +684,11 @@ func (x *Check_Result) SetIdentifier(v *v1.CheckResult) {
 	x.xxx_hidden_Identifier = v
 }
 
+func (x *Check_Result) SetOmitReason(v OmitReason) {
+	x.xxx_hidden_OmitReason = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 7)
+}
+
 func (x *Check_Result) SetOwner(v *Actor) {
 	x.xxx_hidden_Owner = v
 }
@@ -622,7 +697,7 @@ func (x *Check_Result) SetCreatedAt(v *Revision) {
 	x.xxx_hidden_CreatedAt = v
 }
 
-func (x *Check_Result) SetData(v []*ValueRef) {
+func (x *Check_Result) SetData(v []*Datum) {
 	x.xxx_hidden_Data = &v
 }
 
@@ -632,7 +707,7 @@ func (x *Check_Result) SetFinalizedAt(v *Revision) {
 
 func (x *Check_Result) SetAttemptState(v StageAttemptState) {
 	x.xxx_hidden_AttemptState = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 6)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 7)
 }
 
 func (x *Check_Result) HasIdentifier() bool {
@@ -640,6 +715,13 @@ func (x *Check_Result) HasIdentifier() bool {
 		return false
 	}
 	return x.xxx_hidden_Identifier != nil
+}
+
+func (x *Check_Result) HasOmitReason() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
 func (x *Check_Result) HasOwner() bool {
@@ -667,11 +749,16 @@ func (x *Check_Result) HasAttemptState() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
 }
 
 func (x *Check_Result) ClearIdentifier() {
 	x.xxx_hidden_Identifier = nil
+}
+
+func (x *Check_Result) ClearOmitReason() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_OmitReason = OmitReason_OMIT_REASON_UNKNOWN
 }
 
 func (x *Check_Result) ClearOwner() {
@@ -687,7 +774,7 @@ func (x *Check_Result) ClearFinalizedAt() {
 }
 
 func (x *Check_Result) ClearAttemptState() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
 	x.xxx_hidden_AttemptState = StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
 }
 
@@ -696,6 +783,15 @@ type Check_Result_builder struct {
 
 	// Identifier for this Result.
 	Identifier *v1.CheckResult
+	// If set, the reason this Result's content was omitted. Only UNKNOWN
+	// (default value, used when the content was included) and PLACEHOLDER are
+	// valid for a Result, since Results are included with their parent Check so
+	// they cannot be filtered on their own.
+	//
+	// A few fields may be populated even if `omit_reason` is set:
+	//   - `identifier` will always be populated.
+	//   - `data` may be populated.
+	OmitReason *OmitReason
 	// The entity which created this Result.
 	//
 	// This is the only entity which can modify this Result.
@@ -707,11 +803,18 @@ type Check_Result_builder struct {
 	//
 	// NOTE: Most data should be stored in ResultDB via turboci.ResultStorage.
 	//
-	// This field is kept sorted, and unique, by `type_url`.
+	// This field is kept unique by `type_url`, and will reflect the insertion
+	// order of when each type_url was first added. Note that Datum have
+	// a revision value which is independent of the Check's revision value
+	// - Stage Attempts writing result data can do so without altering the
+	// Check itself.
 	//
 	// Orchestrator will ensure that the option types here are registered to be
 	// valid for this Check's kind.
-	Data []*ValueRef
+	//
+	// All data will have an Identifier of kind
+	// IDENTIFIER_KIND_CHECK_RESULT_DATUM.
+	Data []*Datum
 	// The database revision (commit timestamp) at which this Result is
 	// finalized.
 	//
@@ -734,12 +837,16 @@ func (b0 Check_Result_builder) Build() *Check_Result {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Identifier = b.Identifier
+	if b.OmitReason != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 7)
+		x.xxx_hidden_OmitReason = *b.OmitReason
+	}
 	x.xxx_hidden_Owner = b.Owner
 	x.xxx_hidden_CreatedAt = b.CreatedAt
 	x.xxx_hidden_Data = &b.Data
 	x.xxx_hidden_FinalizedAt = b.FinalizedAt
 	if b.AttemptState != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 6)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 7)
 		x.xxx_hidden_AttemptState = *b.AttemptState
 	}
 	return m0
@@ -749,21 +856,23 @@ var File_turboci_graph_orchestrator_v1_check_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a(turboci/graph/orchestrator/v1/edit.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\xf1\f\n" +
+	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a)turboci/graph/orchestrator/v1/datum.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a(turboci/graph/orchestrator/v1/edit.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a/turboci/graph/orchestrator/v1/omit_reason.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\"\xad\x0e\n" +
 	"\x05Check\x12E\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckB\x03\xe0A\x05H\x00R\n" +
-	"identifier\x88\x01\x01\x12M\n" +
+	"identifier\x88\x01\x01\x12O\n" +
+	"\vomit_reason\x18\v \x01(\x0e2).turboci.graph.orchestrator.v1.OmitReasonH\x01R\n" +
+	"omitReason\x88\x01\x01\x12M\n" +
 	"\n" +
-	"created_by\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x05H\x01R\tcreatedBy\x88\x01\x01\x12F\n" +
-	"\x04kind\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\x03\xe0A\x05H\x02R\x04kind\x88\x01\x01\x12\x1e\n" +
-	"\x05realm\x18\x04 \x01(\tB\x03\xe0A\x05H\x03R\x05realm\x88\x01\x01\x12F\n" +
-	"\aversion\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x04R\aversion\x88\x01\x01\x12D\n" +
-	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x05R\x05state\x88\x01\x01\x12[\n" +
+	"created_by\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x05H\x02R\tcreatedBy\x88\x01\x01\x12F\n" +
+	"\x04kind\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\x03\xe0A\x05H\x03R\x04kind\x88\x01\x01\x12\x1e\n" +
+	"\x05realm\x18\x04 \x01(\tB\x03\xe0A\x05H\x04R\x05realm\x88\x01\x01\x12F\n" +
+	"\aversion\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x05R\aversion\x88\x01\x01\x12D\n" +
+	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x06R\x05state\x88\x01\x01\x12[\n" +
 	"\rstate_history\x18\a \x03(\v26.turboci.graph.orchestrator.v1.Check.StateHistoryEntryR\fstateHistory\x12a\n" +
 	"\fdependencies\x18\b \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\x02H\x06R\fdependencies\x88\x01\x01\x12M\n" +
-	"\aoptions\x18\t \x03(\v2'.turboci.graph.orchestrator.v1.ValueRefB\n" +
+	"\x01\x02H\aR\fdependencies\x88\x01\x01\x12J\n" +
+	"\aoptions\x18\t \x03(\v2$.turboci.graph.orchestrator.v1.DatumB\n" +
 	"\x82\x86\xf6\xfb\x0f\x04\n" +
 	"\x02\b\n" +
 	"R\aoptions\x12Q\n" +
@@ -771,29 +880,33 @@ const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	" \x03(\v2+.turboci.graph.orchestrator.v1.Check.ResultB\n" +
 	"\x82\x86\xf6\xfb\x0f\x04\n" +
 	"\x02\b\x1eR\aresults\x129\n" +
-	"\x05edits\x18\v \x03(\v2#.turboci.graph.orchestrator.v1.EditR\x05edits\x1a\xc1\x01\n" +
+	"\x05edits\x18\f \x03(\v2#.turboci.graph.orchestrator.v1.EditR\x05edits\x1a\xc1\x01\n" +
 	"\x11StateHistoryEntry\x12I\n" +
 	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateB\x03\xe0A\x05H\x00R\x05state\x88\x01\x01\x12K\n" +
 	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05H\x01R\aversion\x88\x01\x01B\b\n" +
 	"\x06_stateB\n" +
 	"\n" +
-	"\b_version\x1a\xa2\x04\n" +
+	"\b_version\x1a\x80\x05\n" +
 	"\x06Result\x12K\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckResultB\x03\xe0A\x05H\x00R\n" +
-	"identifier\x88\x01\x01\x12D\n" +
-	"\x05owner\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x05H\x01R\x05owner\x88\x01\x01\x12P\n" +
+	"identifier\x88\x01\x01\x12O\n" +
+	"\vomit_reason\x18\v \x01(\x0e2).turboci.graph.orchestrator.v1.OmitReasonH\x01R\n" +
+	"omitReason\x88\x01\x01\x12D\n" +
+	"\x05owner\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x05H\x02R\x05owner\x88\x01\x01\x12P\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05H\x02R\tcreatedAt\x88\x01\x01\x12;\n" +
-	"\x04data\x18\x04 \x03(\v2'.turboci.graph.orchestrator.v1.ValueRefR\x04data\x12O\n" +
-	"\ffinalized_at\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x03R\vfinalizedAt\x88\x01\x01\x12Z\n" +
-	"\rattempt_state\x18\x06 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x04R\fattemptState\x88\x01\x01B\r\n" +
-	"\v_identifierB\b\n" +
+	"created_at\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05H\x03R\tcreatedAt\x88\x01\x01\x128\n" +
+	"\x04data\x18\x04 \x03(\v2$.turboci.graph.orchestrator.v1.DatumR\x04data\x12O\n" +
+	"\ffinalized_at\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x04R\vfinalizedAt\x88\x01\x01\x12Z\n" +
+	"\rattempt_state\x18\x06 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x05R\fattemptState\x88\x01\x01B\r\n" +
+	"\v_identifierB\x0e\n" +
+	"\f_omit_reasonB\b\n" +
 	"\x06_ownerB\r\n" +
 	"\v_created_atB\x0f\n" +
 	"\r_finalized_atB\x10\n" +
 	"\x0e_attempt_stateB\r\n" +
-	"\v_identifierB\r\n" +
+	"\v_identifierB\x0e\n" +
+	"\f_omit_reasonB\r\n" +
 	"\v_created_byB\a\n" +
 	"\x05_kindB\b\n" +
 	"\x06_realmB\n" +
@@ -808,40 +921,43 @@ var file_turboci_graph_orchestrator_v1_check_proto_goTypes = []any{
 	(*Check_StateHistoryEntry)(nil), // 1: turboci.graph.orchestrator.v1.Check.StateHistoryEntry
 	(*Check_Result)(nil),            // 2: turboci.graph.orchestrator.v1.Check.Result
 	(*v1.Check)(nil),                // 3: turboci.graph.ids.v1.Check
-	(*Actor)(nil),                   // 4: turboci.graph.orchestrator.v1.Actor
-	(CheckKind)(0),                  // 5: turboci.graph.orchestrator.v1.CheckKind
-	(*Revision)(nil),                // 6: turboci.graph.orchestrator.v1.Revision
-	(CheckState)(0),                 // 7: turboci.graph.orchestrator.v1.CheckState
-	(*Dependencies)(nil),            // 8: turboci.graph.orchestrator.v1.Dependencies
-	(*ValueRef)(nil),                // 9: turboci.graph.orchestrator.v1.ValueRef
-	(*Edit)(nil),                    // 10: turboci.graph.orchestrator.v1.Edit
-	(*v1.CheckResult)(nil),          // 11: turboci.graph.ids.v1.CheckResult
-	(StageAttemptState)(0),          // 12: turboci.graph.orchestrator.v1.StageAttemptState
+	(OmitReason)(0),                 // 4: turboci.graph.orchestrator.v1.OmitReason
+	(*Actor)(nil),                   // 5: turboci.graph.orchestrator.v1.Actor
+	(CheckKind)(0),                  // 6: turboci.graph.orchestrator.v1.CheckKind
+	(*Revision)(nil),                // 7: turboci.graph.orchestrator.v1.Revision
+	(CheckState)(0),                 // 8: turboci.graph.orchestrator.v1.CheckState
+	(*Dependencies)(nil),            // 9: turboci.graph.orchestrator.v1.Dependencies
+	(*Datum)(nil),                   // 10: turboci.graph.orchestrator.v1.Datum
+	(*Edit)(nil),                    // 11: turboci.graph.orchestrator.v1.Edit
+	(*v1.CheckResult)(nil),          // 12: turboci.graph.ids.v1.CheckResult
+	(StageAttemptState)(0),          // 13: turboci.graph.orchestrator.v1.StageAttemptState
 }
 var file_turboci_graph_orchestrator_v1_check_proto_depIdxs = []int32{
 	3,  // 0: turboci.graph.orchestrator.v1.Check.identifier:type_name -> turboci.graph.ids.v1.Check
-	4,  // 1: turboci.graph.orchestrator.v1.Check.created_by:type_name -> turboci.graph.orchestrator.v1.Actor
-	5,  // 2: turboci.graph.orchestrator.v1.Check.kind:type_name -> turboci.graph.orchestrator.v1.CheckKind
-	6,  // 3: turboci.graph.orchestrator.v1.Check.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	7,  // 4: turboci.graph.orchestrator.v1.Check.state:type_name -> turboci.graph.orchestrator.v1.CheckState
-	1,  // 5: turboci.graph.orchestrator.v1.Check.state_history:type_name -> turboci.graph.orchestrator.v1.Check.StateHistoryEntry
-	8,  // 6: turboci.graph.orchestrator.v1.Check.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
-	9,  // 7: turboci.graph.orchestrator.v1.Check.options:type_name -> turboci.graph.orchestrator.v1.ValueRef
-	2,  // 8: turboci.graph.orchestrator.v1.Check.results:type_name -> turboci.graph.orchestrator.v1.Check.Result
-	10, // 9: turboci.graph.orchestrator.v1.Check.edits:type_name -> turboci.graph.orchestrator.v1.Edit
-	7,  // 10: turboci.graph.orchestrator.v1.Check.StateHistoryEntry.state:type_name -> turboci.graph.orchestrator.v1.CheckState
-	6,  // 11: turboci.graph.orchestrator.v1.Check.StateHistoryEntry.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	11, // 12: turboci.graph.orchestrator.v1.Check.Result.identifier:type_name -> turboci.graph.ids.v1.CheckResult
-	4,  // 13: turboci.graph.orchestrator.v1.Check.Result.owner:type_name -> turboci.graph.orchestrator.v1.Actor
-	6,  // 14: turboci.graph.orchestrator.v1.Check.Result.created_at:type_name -> turboci.graph.orchestrator.v1.Revision
-	9,  // 15: turboci.graph.orchestrator.v1.Check.Result.data:type_name -> turboci.graph.orchestrator.v1.ValueRef
-	6,  // 16: turboci.graph.orchestrator.v1.Check.Result.finalized_at:type_name -> turboci.graph.orchestrator.v1.Revision
-	12, // 17: turboci.graph.orchestrator.v1.Check.Result.attempt_state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
-	18, // [18:18] is the sub-list for method output_type
-	18, // [18:18] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	4,  // 1: turboci.graph.orchestrator.v1.Check.omit_reason:type_name -> turboci.graph.orchestrator.v1.OmitReason
+	5,  // 2: turboci.graph.orchestrator.v1.Check.created_by:type_name -> turboci.graph.orchestrator.v1.Actor
+	6,  // 3: turboci.graph.orchestrator.v1.Check.kind:type_name -> turboci.graph.orchestrator.v1.CheckKind
+	7,  // 4: turboci.graph.orchestrator.v1.Check.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	8,  // 5: turboci.graph.orchestrator.v1.Check.state:type_name -> turboci.graph.orchestrator.v1.CheckState
+	1,  // 6: turboci.graph.orchestrator.v1.Check.state_history:type_name -> turboci.graph.orchestrator.v1.Check.StateHistoryEntry
+	9,  // 7: turboci.graph.orchestrator.v1.Check.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
+	10, // 8: turboci.graph.orchestrator.v1.Check.options:type_name -> turboci.graph.orchestrator.v1.Datum
+	2,  // 9: turboci.graph.orchestrator.v1.Check.results:type_name -> turboci.graph.orchestrator.v1.Check.Result
+	11, // 10: turboci.graph.orchestrator.v1.Check.edits:type_name -> turboci.graph.orchestrator.v1.Edit
+	8,  // 11: turboci.graph.orchestrator.v1.Check.StateHistoryEntry.state:type_name -> turboci.graph.orchestrator.v1.CheckState
+	7,  // 12: turboci.graph.orchestrator.v1.Check.StateHistoryEntry.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	12, // 13: turboci.graph.orchestrator.v1.Check.Result.identifier:type_name -> turboci.graph.ids.v1.CheckResult
+	4,  // 14: turboci.graph.orchestrator.v1.Check.Result.omit_reason:type_name -> turboci.graph.orchestrator.v1.OmitReason
+	5,  // 15: turboci.graph.orchestrator.v1.Check.Result.owner:type_name -> turboci.graph.orchestrator.v1.Actor
+	7,  // 16: turboci.graph.orchestrator.v1.Check.Result.created_at:type_name -> turboci.graph.orchestrator.v1.Revision
+	10, // 17: turboci.graph.orchestrator.v1.Check.Result.data:type_name -> turboci.graph.orchestrator.v1.Datum
+	7,  // 18: turboci.graph.orchestrator.v1.Check.Result.finalized_at:type_name -> turboci.graph.orchestrator.v1.Revision
+	13, // 19: turboci.graph.orchestrator.v1.Check.Result.attempt_state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
+	20, // [20:20] is the sub-list for method output_type
+	20, // [20:20] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_check_proto_init() }
@@ -852,12 +968,13 @@ func file_turboci_graph_orchestrator_v1_check_proto_init() {
 	file_turboci_graph_orchestrator_v1_actor_proto_init()
 	file_turboci_graph_orchestrator_v1_check_kind_proto_init()
 	file_turboci_graph_orchestrator_v1_check_state_proto_init()
+	file_turboci_graph_orchestrator_v1_datum_proto_init()
 	file_turboci_graph_orchestrator_v1_dependencies_proto_init()
 	file_turboci_graph_orchestrator_v1_edit_proto_init()
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
+	file_turboci_graph_orchestrator_v1_omit_reason_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_init()
-	file_turboci_graph_orchestrator_v1_value_ref_proto_init()
 	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[0].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[1].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_check_proto_msgTypes[2].OneofWrappers = []any{}

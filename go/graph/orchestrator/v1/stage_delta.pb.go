@@ -191,7 +191,7 @@ type StageDelta_Attempt struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Identifier  *v1.StageAttempt       `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
 	xxx_hidden_State       StageAttemptState      `protobuf:"varint,2,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
-	xxx_hidden_Details     *[]*ValueRef           `protobuf:"bytes,3,rep,name=details,proto3"`
+	xxx_hidden_Details     *[]*Value              `protobuf:"bytes,3,rep,name=details,proto3"`
 	xxx_hidden_Progress    []int64                `protobuf:"varint,4,rep,packed,name=progress,proto3"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
@@ -240,7 +240,7 @@ func (x *StageDelta_Attempt) GetState() StageAttemptState {
 	return StageAttemptState_STAGE_ATTEMPT_STATE_UNKNOWN
 }
 
-func (x *StageDelta_Attempt) GetDetails() []*ValueRef {
+func (x *StageDelta_Attempt) GetDetails() []*Value {
 	if x != nil {
 		if x.xxx_hidden_Details != nil {
 			return *x.xxx_hidden_Details
@@ -265,7 +265,7 @@ func (x *StageDelta_Attempt) SetState(v StageAttemptState) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
 }
 
-func (x *StageDelta_Attempt) SetDetails(v []*ValueRef) {
+func (x *StageDelta_Attempt) SetDetails(v []*Value) {
 	x.xxx_hidden_Details = &v
 }
 
@@ -304,7 +304,10 @@ type StageDelta_Attempt_builder struct {
 	// The state that the Attempt entered as part of this Edit.
 	State *StageAttemptState
 	// Details written as part of this edit.
-	Details []*ValueRef
+	//
+	// NOTE: For now, the Value here will be devoid of content other than
+	// `type_url`.
+	Details []*Value
 	// The index of the progress message(s) written as part of this edit.
 	Progress []int64
 }
@@ -327,20 +330,20 @@ var File_turboci_graph_orchestrator_v1_stage_delta_proto protoreflect.FileDescri
 
 const file_turboci_graph_orchestrator_v1_stage_delta_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/stage_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\xfb\x04\n" +
+	"/turboci/graph/orchestrator/v1/stage_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a)turboci/graph/orchestrator/v1/value.proto\"\xf8\x04\n" +
 	"\n" +
 	"StageDelta\x12D\n" +
 	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x00R\x05state\x88\x01\x01\x12M\n" +
 	"\battempts\x18\x02 \x03(\v21.turboci.graph.orchestrator.v1.StageDelta.AttemptR\battempts\x12!\n" +
 	"\tcancelled\x18\x03 \x01(\bH\x01R\tcancelled\x88\x01\x01\x12l\n" +
 	"\x12continuation_group\x18\x04 \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\x05H\x02R\x11continuationGroup\x88\x01\x01\x1a\x97\x02\n" +
+	"\x01\bH\x02R\x11continuationGroup\x88\x01\x01\x1a\x94\x02\n" +
 	"\aAttempt\x12G\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\n" +
 	"identifier\x88\x01\x01\x12K\n" +
-	"\x05state\x18\x02 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x01R\x05state\x88\x01\x01\x12A\n" +
-	"\adetails\x18\x03 \x03(\v2'.turboci.graph.orchestrator.v1.ValueRefR\adetails\x12\x1a\n" +
+	"\x05state\x18\x02 \x01(\x0e20.turboci.graph.orchestrator.v1.StageAttemptStateH\x01R\x05state\x88\x01\x01\x12>\n" +
+	"\adetails\x18\x03 \x03(\v2$.turboci.graph.orchestrator.v1.ValueR\adetails\x12\x1a\n" +
 	"\bprogress\x18\x04 \x03(\x03R\bprogressB\r\n" +
 	"\v_identifierB\b\n" +
 	"\x06_stateB\b\n" +
@@ -357,7 +360,7 @@ var file_turboci_graph_orchestrator_v1_stage_delta_proto_goTypes = []any{
 	(*Dependencies)(nil),       // 3: turboci.graph.orchestrator.v1.Dependencies
 	(*v1.StageAttempt)(nil),    // 4: turboci.graph.ids.v1.StageAttempt
 	(StageAttemptState)(0),     // 5: turboci.graph.orchestrator.v1.StageAttemptState
-	(*ValueRef)(nil),           // 6: turboci.graph.orchestrator.v1.ValueRef
+	(*Value)(nil),              // 6: turboci.graph.orchestrator.v1.Value
 }
 var file_turboci_graph_orchestrator_v1_stage_delta_proto_depIdxs = []int32{
 	2, // 0: turboci.graph.orchestrator.v1.StageDelta.state:type_name -> turboci.graph.orchestrator.v1.StageState
@@ -365,7 +368,7 @@ var file_turboci_graph_orchestrator_v1_stage_delta_proto_depIdxs = []int32{
 	3, // 2: turboci.graph.orchestrator.v1.StageDelta.continuation_group:type_name -> turboci.graph.orchestrator.v1.Dependencies
 	4, // 3: turboci.graph.orchestrator.v1.StageDelta.Attempt.identifier:type_name -> turboci.graph.ids.v1.StageAttempt
 	5, // 4: turboci.graph.orchestrator.v1.StageDelta.Attempt.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
-	6, // 5: turboci.graph.orchestrator.v1.StageDelta.Attempt.details:type_name -> turboci.graph.orchestrator.v1.ValueRef
+	6, // 5: turboci.graph.orchestrator.v1.StageDelta.Attempt.details:type_name -> turboci.graph.orchestrator.v1.Value
 	6, // [6:6] is the sub-list for method output_type
 	6, // [6:6] is the sub-list for method input_type
 	6, // [6:6] is the sub-list for extension type_name
@@ -382,7 +385,7 @@ func file_turboci_graph_orchestrator_v1_stage_delta_proto_init() {
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_attempt_state_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_state_proto_init()
-	file_turboci_graph_orchestrator_v1_value_ref_proto_init()
+	file_turboci_graph_orchestrator_v1_value_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes[0].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_stage_delta_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}

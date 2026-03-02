@@ -92,17 +92,15 @@ func (b0 MethodOptions_builder) Build() *MethodOptions {
 //
 // This is purely for documentation purposes.
 type MethodOptions_Permission struct {
-	state                               protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Internal                 *string                `protobuf:"bytes,1,opt,name=internal,proto3,oneof"`
-	xxx_hidden_External                 *string                `protobuf:"bytes,2,opt,name=external,proto3,oneof"`
-	xxx_hidden_In                       []v1.IdentifierKind    `protobuf:"varint,3,rep,packed,name=in,proto3,enum=turboci.graph.ids.v1.IdentifierKind"`
-	xxx_hidden_InValueRealm             bool                   `protobuf:"varint,4,opt,name=in_value_realm,json=inValueRealm,proto3,oneof"`
-	xxx_hidden_PotentiallyConditionalOn []string               `protobuf:"bytes,5,rep,name=potentially_conditional_on,json=potentiallyConditionalOn,proto3"`
-	xxx_hidden_For                      []string               `protobuf:"bytes,6,rep,name=for,proto3"`
-	XXX_raceDetectHookData              protoimpl.RaceDetectHookData
-	XXX_presence                        [1]uint32
-	unknownFields                       protoimpl.UnknownFields
-	sizeCache                           protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Internal    *string                `protobuf:"bytes,1,opt,name=internal,proto3,oneof"`
+	xxx_hidden_External    *string                `protobuf:"bytes,2,opt,name=external,proto3,oneof"`
+	xxx_hidden_In          []v1.IdentifierKind    `protobuf:"varint,3,rep,packed,name=in,proto3,enum=turboci.graph.ids.v1.IdentifierKind"`
+	xxx_hidden_For         []string               `protobuf:"bytes,4,rep,name=for,proto3"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *MethodOptions_Permission) Reset() {
@@ -157,20 +155,6 @@ func (x *MethodOptions_Permission) GetIn() []v1.IdentifierKind {
 	return nil
 }
 
-func (x *MethodOptions_Permission) GetInValueRealm() bool {
-	if x != nil {
-		return x.xxx_hidden_InValueRealm
-	}
-	return false
-}
-
-func (x *MethodOptions_Permission) GetPotentiallyConditionalOn() []string {
-	if x != nil {
-		return x.xxx_hidden_PotentiallyConditionalOn
-	}
-	return nil
-}
-
 func (x *MethodOptions_Permission) GetFor() []string {
 	if x != nil {
 		return x.xxx_hidden_For
@@ -180,25 +164,16 @@ func (x *MethodOptions_Permission) GetFor() []string {
 
 func (x *MethodOptions_Permission) SetInternal(v string) {
 	x.xxx_hidden_Internal = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 6)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
 }
 
 func (x *MethodOptions_Permission) SetExternal(v string) {
 	x.xxx_hidden_External = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 6)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
 }
 
 func (x *MethodOptions_Permission) SetIn(v []v1.IdentifierKind) {
 	x.xxx_hidden_In = v
-}
-
-func (x *MethodOptions_Permission) SetInValueRealm(v bool) {
-	x.xxx_hidden_InValueRealm = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 6)
-}
-
-func (x *MethodOptions_Permission) SetPotentiallyConditionalOn(v []string) {
-	x.xxx_hidden_PotentiallyConditionalOn = v
 }
 
 func (x *MethodOptions_Permission) SetFor(v []string) {
@@ -219,13 +194,6 @@ func (x *MethodOptions_Permission) HasExternal() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *MethodOptions_Permission) HasInValueRealm() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
-}
-
 func (x *MethodOptions_Permission) ClearInternal() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Internal = nil
@@ -234,11 +202,6 @@ func (x *MethodOptions_Permission) ClearInternal() {
 func (x *MethodOptions_Permission) ClearExternal() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
 	x.xxx_hidden_External = nil
-}
-
-func (x *MethodOptions_Permission) ClearInValueRealm() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
-	x.xxx_hidden_InValueRealm = false
 }
 
 type MethodOptions_Permission_builder struct {
@@ -252,11 +215,6 @@ type MethodOptions_Permission_builder struct {
 	External *string
 	// The node(s) whose realm will be checked.
 	In []v1.IdentifierKind
-	// The permission is checked in the Value (ValueWrite/ValueRef) realm.
-	InValueRealm *bool
-	// Conditional attribute names against which a permission binding may be
-	// granted conditionally.
-	PotentiallyConditionalOn []string
 	// Short description of when this permission is checked.
 	For []string
 }
@@ -266,19 +224,14 @@ func (b0 MethodOptions_Permission_builder) Build() *MethodOptions_Permission {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Internal != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 6)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
 		x.xxx_hidden_Internal = b.Internal
 	}
 	if b.External != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 6)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
 		x.xxx_hidden_External = b.External
 	}
 	x.xxx_hidden_In = b.In
-	if b.InValueRealm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 6)
-		x.xxx_hidden_InValueRealm = *b.InValueRealm
-	}
-	x.xxx_hidden_PotentiallyConditionalOn = b.PotentiallyConditionalOn
 	x.xxx_hidden_For = b.For
 	return m0
 }
@@ -306,22 +259,19 @@ var File_turboci_graph_orchestrator_v1_method_options_proto protoreflect.FileDes
 
 const file_turboci_graph_orchestrator_v1_method_options_proto_rawDesc = "" +
 	"\n" +
-	"2turboci/graph/orchestrator/v1/method_options.proto\x12\x1dturboci.graph.orchestrator.v1\x1a google/protobuf/descriptor.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\"\x9c\x03\n" +
+	"2turboci/graph/orchestrator/v1/method_options.proto\x12\x1dturboci.graph.orchestrator.v1\x1a google/protobuf/descriptor.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\"\xa0\x02\n" +
 	"\rMethodOptions\x12\\\n" +
 	"\n" +
 	"permission\x18\x01 \x03(\v27.turboci.graph.orchestrator.v1.MethodOptions.PermissionB\x03\x88\x01\x02R\n" +
-	"permission\x1a\xac\x02\n" +
+	"permission\x1a\xb0\x01\n" +
 	"\n" +
 	"Permission\x12\x1f\n" +
 	"\binternal\x18\x01 \x01(\tH\x00R\binternal\x88\x01\x01\x12\x1f\n" +
 	"\bexternal\x18\x02 \x01(\tH\x01R\bexternal\x88\x01\x01\x124\n" +
-	"\x02in\x18\x03 \x03(\x0e2$.turboci.graph.ids.v1.IdentifierKindR\x02in\x12)\n" +
-	"\x0ein_value_realm\x18\x04 \x01(\bH\x02R\finValueRealm\x88\x01\x01\x12<\n" +
-	"\x1apotentially_conditional_on\x18\x05 \x03(\tR\x18potentiallyConditionalOn\x12\x10\n" +
-	"\x03for\x18\x06 \x03(\tR\x03forB\v\n" +
+	"\x02in\x18\x03 \x03(\x0e2$.turboci.graph.ids.v1.IdentifierKindR\x02in\x12\x10\n" +
+	"\x03for\x18\x04 \x03(\tR\x03forB\v\n" +
 	"\t_internalB\v\n" +
-	"\t_externalB\x11\n" +
-	"\x0f_in_value_realm:t\n" +
+	"\t_external:t\n" +
 	"\vturboci_rpc\x12\x1e.google.protobuf.MethodOptions\x18ں\xab\xfa\x01 \x01(\v2,.turboci.graph.orchestrator.v1.MethodOptionsR\n" +
 	"turbociRpc\x88\x01\x01BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
