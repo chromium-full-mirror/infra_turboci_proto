@@ -26,6 +26,11 @@ const (
 
 // Specifies the subset of the fields to return from Values in nodes matching a
 // query.
+//
+// Note: The `_VALUE` token must not be the last token in the enum name, since
+// the Java proto implementation appends `_VALUE` to enums, causing Java-only
+// collisions between e.g. VALUE_MASK_TYPE and VALUE_MASK_TYPE_VALUE if we were
+// to allow the latter.
 type ValueMask int32
 
 const (
@@ -33,8 +38,8 @@ const (
 	ValueMask_VALUE_MASK_UNKNOWN ValueMask = 0
 	// Collect only `value.type_url`.
 	ValueMask_VALUE_MASK_TYPE ValueMask = 1
-	// Collect `value.type_url` and `value.value`.
-	ValueMask_VALUE_MASK_TYPE_VALUE ValueMask = 2
+	// Collect `value.value` and `value.type_url`.
+	ValueMask_VALUE_MASK_VALUE_TYPE ValueMask = 2
 )
 
 // Enum value maps for ValueMask.
@@ -42,12 +47,12 @@ var (
 	ValueMask_name = map[int32]string{
 		0: "VALUE_MASK_UNKNOWN",
 		1: "VALUE_MASK_TYPE",
-		2: "VALUE_MASK_TYPE_VALUE",
+		2: "VALUE_MASK_VALUE_TYPE",
 	}
 	ValueMask_value = map[string]int32{
 		"VALUE_MASK_UNKNOWN":    0,
 		"VALUE_MASK_TYPE":       1,
-		"VALUE_MASK_TYPE_VALUE": 2,
+		"VALUE_MASK_VALUE_TYPE": 2,
 	}
 )
 
@@ -81,7 +86,7 @@ const file_turboci_graph_orchestrator_v1_value_mask_proto_rawDesc = "" +
 	"\tValueMask\x12\x16\n" +
 	"\x12VALUE_MASK_UNKNOWN\x10\x00\x12\x13\n" +
 	"\x0fVALUE_MASK_TYPE\x10\x01\x12\x19\n" +
-	"\x15VALUE_MASK_TYPE_VALUE\x10\x02BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x15VALUE_MASK_VALUE_TYPE\x10\x02BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_value_mask_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_value_mask_proto_goTypes = []any{
