@@ -400,8 +400,7 @@ message WriteNodesRequest {
     // The requested execution policy of the Stage.
     //
     // If the Stage already exists, this will only result in an error if this
-    // requested policy doesn't match doesn't match the existing requested
-    // policy.
+    // requested policy doesn't match the existing requested policy.
     //
     // If this write creates the stage and the requested_stage_execution_policy
     // is omitted, the stage will get the default StageExecutionPolicy from the
@@ -450,6 +449,11 @@ message WriteNodesRequest {
     message StateTransition {
       // Throttled indicates that the Executor can run this Attempt, just not
       // right now.
+      //
+      // Can only be used for attempts in PENDING or THROTTLED state. If the
+      // attempt is already running, use Incomplete instead (since some work was
+      // done, but it was incomplete) with `throttle_next_attempt_until` field
+      // set.
       message Throttled {
         // Specifies that the Stage Attempt should not be made PENDING again
         // (and thus sent to the Executor via RunStage) until this time.
@@ -529,10 +533,23 @@ message WriteNodesRequest {
       message Incomplete {
         // Controls if this Stage should make another Attempt.
         //
-        // If true, then no new Attempt is made, even if policy would permit one.
+        // If true, then no new Attempt is made, even if policy would permit
+        // one.
         //
         // Optional.
         optional bool block_new_attempts = 1;
+
+        // The earliest time the next attempt should start running.
+        //
+        // If set, a new Attempt (if allowed by the policy at all) will be
+        // created in THROTTLED state and will start running no sooner
+        // than the given timestamp.
+        //
+        // If unset, a new Attempt will be created in AWAITING_RETRY state and
+        // it will start running after some delay picked by the Orchestrator
+        // itself (using randomized exponential backoff based on the number of
+        // previous incomplete attempts).
+        optional google.protobuf.Timestamp throttle_next_attempt_until = 2;
       }
 
       // Required - the state that this StateTransition wants to move

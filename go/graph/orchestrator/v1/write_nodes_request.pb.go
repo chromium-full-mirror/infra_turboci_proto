@@ -1431,8 +1431,7 @@ type WriteNodesRequest_StageWrite_builder struct {
 	// The requested execution policy of the Stage.
 	//
 	// If the Stage already exists, this will only result in an error if this
-	// requested policy doesn't match doesn't match the existing requested
-	// policy.
+	// requested policy doesn't match the existing requested policy.
 	//
 	// If this write creates the stage and the requested_stage_execution_policy
 	// is omitted, the stage will get the default StageExecutionPolicy from the
@@ -2062,6 +2061,11 @@ func (*writeNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete_) isWrit
 
 // Throttled indicates that the Executor can run this Attempt, just not
 // right now.
+//
+// Can only be used for attempts in PENDING or THROTTLED state. If the
+// attempt is already running, use Incomplete instead (since some work was
+// done, but it was incomplete) with `throttle_next_attempt_until` field
+// set.
 type WriteNodesRequest_CurrentAttemptWrite_StateTransition_Throttled struct {
 	state            protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Until *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=until,proto3,oneof"`
@@ -2442,12 +2446,13 @@ func (b0 WriteNodesRequest_CurrentAttemptWrite_StateTransition_Complete_builder)
 // during test execution (and such a failure may not be due to the test
 // itself), etc.)
 type WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete struct {
-	state                       protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_BlockNewAttempts bool                   `protobuf:"varint,1,opt,name=block_new_attempts,json=blockNewAttempts,proto3,oneof"`
-	XXX_raceDetectHookData      protoimpl.RaceDetectHookData
-	XXX_presence                [1]uint32
-	unknownFields               protoimpl.UnknownFields
-	sizeCache                   protoimpl.SizeCache
+	state                               protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_BlockNewAttempts         bool                   `protobuf:"varint,1,opt,name=block_new_attempts,json=blockNewAttempts,proto3,oneof"`
+	xxx_hidden_ThrottleNextAttemptUntil *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=throttle_next_attempt_until,json=throttleNextAttemptUntil,proto3,oneof"`
+	XXX_raceDetectHookData              protoimpl.RaceDetectHookData
+	XXX_presence                        [1]uint32
+	unknownFields                       protoimpl.UnknownFields
+	sizeCache                           protoimpl.SizeCache
 }
 
 func (x *WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete) Reset() {
@@ -2482,9 +2487,20 @@ func (x *WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete) GetBl
 	return false
 }
 
+func (x *WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete) GetThrottleNextAttemptUntil() *timestamppb.Timestamp {
+	if x != nil {
+		return x.xxx_hidden_ThrottleNextAttemptUntil
+	}
+	return nil
+}
+
 func (x *WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete) SetBlockNewAttempts(v bool) {
 	x.xxx_hidden_BlockNewAttempts = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete) SetThrottleNextAttemptUntil(v *timestamppb.Timestamp) {
+	x.xxx_hidden_ThrottleNextAttemptUntil = v
 }
 
 func (x *WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete) HasBlockNewAttempts() bool {
@@ -2494,9 +2510,20 @@ func (x *WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete) HasBl
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
+func (x *WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete) HasThrottleNextAttemptUntil() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_ThrottleNextAttemptUntil != nil
+}
+
 func (x *WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete) ClearBlockNewAttempts() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_BlockNewAttempts = false
+}
+
+func (x *WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete) ClearThrottleNextAttemptUntil() {
+	x.xxx_hidden_ThrottleNextAttemptUntil = nil
 }
 
 type WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete_builder struct {
@@ -2504,10 +2531,22 @@ type WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete_builder st
 
 	// Controls if this Stage should make another Attempt.
 	//
-	// If true, then no new Attempt is made, even if policy would permit one.
+	// If true, then no new Attempt is made, even if policy would permit
+	// one.
 	//
 	// Optional.
 	BlockNewAttempts *bool
+	// The earliest time the next attempt should start running.
+	//
+	// If set, a new Attempt (if allowed by the policy at all) will be
+	// created in THROTTLED state and will start running no sooner
+	// than the given timestamp.
+	//
+	// If unset, a new Attempt will be created in AWAITING_RETRY state and
+	// it will start running after some delay picked by the Orchestrator
+	// itself (using randomized exponential backoff based on the number of
+	// previous incomplete attempts).
+	ThrottleNextAttemptUntil *timestamppb.Timestamp
 }
 
 func (b0 WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete_builder) Build() *WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete {
@@ -2515,9 +2554,10 @@ func (b0 WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete_builde
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.BlockNewAttempts != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
 		x.xxx_hidden_BlockNewAttempts = *b.BlockNewAttempts
 	}
+	x.xxx_hidden_ThrottleNextAttemptUntil = b.ThrottleNextAttemptUntil
 	return m0
 }
 
@@ -2525,7 +2565,7 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\x8a%\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\x8b&\n" +
 	"\x11WriteNodesRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12T\n" +
 	"\x06reason\x18\x02 \x01(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonH\x01R\x06reason\x88\x01\x01\x12Z\n" +
@@ -2604,12 +2644,11 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\r_dependenciesB#\n" +
 	"!_requested_stage_execution_policyB\f\n" +
 	"\n" +
-	"_cancelled\x1a\xc2\r\n" +
+	"_cancelled\x1a\xc3\x0e\n" +
 	"\x13CurrentAttemptWrite\x12C\n" +
 	"\adetails\x18\x01 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteR\adetails\x12a\n" +
 	"\bprogress\x18\x02 \x03(\v2E.turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttemptProgressR\bprogress\x12\x84\x01\n" +
-	"\x10state_transition\x18\x03 \x01(\v2T.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentAttemptWrite.StateTransitionH\x00R\x0fstateTransition\x88\x01\x01\x1a\xe6\n" +
-	"\n" +
+	"\x10state_transition\x18\x03 \x01(\v2T.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentAttemptWrite.StateTransitionH\x00R\x0fstateTransition\x88\x01\x01\x1a\xe7\v\n" +
 	"\x0fStateTransition\x12~\n" +
 	"\tthrottled\x18\x01 \x01(\v2^.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentAttemptWrite.StateTransition.ThrottledH\x00R\tthrottled\x12~\n" +
 	"\tscheduled\x18\x02 \x01(\v2^.turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentAttemptWrite.StateTransition.ScheduledH\x00R\tscheduled\x12x\n" +
@@ -2633,11 +2672,13 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\f_process_uid\x1a\r\n" +
 	"\vTearingDown\x1a\n" +
 	"\n" +
-	"\bComplete\x1aV\n" +
+	"\bComplete\x1a\xd6\x01\n" +
 	"\n" +
 	"Incomplete\x121\n" +
-	"\x12block_new_attempts\x18\x01 \x01(\bH\x00R\x10blockNewAttempts\x88\x01\x01B\x15\n" +
-	"\x13_block_new_attemptsB\x0f\n" +
+	"\x12block_new_attempts\x18\x01 \x01(\bH\x00R\x10blockNewAttempts\x88\x01\x01\x12^\n" +
+	"\x1bthrottle_next_attempt_until\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\x18throttleNextAttemptUntil\x88\x01\x01B\x15\n" +
+	"\x13_block_new_attemptsB\x1e\n" +
+	"\x1c_throttle_next_attempt_untilB\x0f\n" +
 	"\rdesired_stateB\x13\n" +
 	"\x11_state_transition\x1a\xae\x01\n" +
 	"\x11CurrentStageWrite\x12\x81\x01\n" +
@@ -2718,11 +2759,12 @@ var file_turboci_graph_orchestrator_v1_write_nodes_request_proto_depIdxs = []int
 	26, // 33: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentAttemptWrite.StateTransition.Throttled.until:type_name -> google.protobuf.Timestamp
 	27, // 34: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentAttemptWrite.StateTransition.Scheduled.attempt_execution_policy:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
 	27, // 35: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentAttemptWrite.StateTransition.Running.attempt_execution_policy:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
-	36, // [36:36] is the sub-list for method output_type
-	36, // [36:36] is the sub-list for method input_type
-	36, // [36:36] is the sub-list for extension type_name
-	36, // [36:36] is the sub-list for extension extendee
-	0,  // [0:36] is the sub-list for field type_name
+	26, // 36: turboci.graph.orchestrator.v1.WriteNodesRequest.CurrentAttemptWrite.StateTransition.Incomplete.throttle_next_attempt_until:type_name -> google.protobuf.Timestamp
+	37, // [37:37] is the sub-list for method output_type
+	37, // [37:37] is the sub-list for method input_type
+	37, // [37:37] is the sub-list for extension type_name
+	37, // [37:37] is the sub-list for extension extendee
+	0,  // [0:37] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_write_nodes_request_proto_init() }

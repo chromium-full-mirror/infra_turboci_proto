@@ -14,6 +14,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	unsafe "unsafe"
 )
@@ -33,6 +34,7 @@ type StageExecutionPolicy struct {
 	xxx_hidden_StageTimeout                   *durationpb.Duration         `protobuf:"bytes,2,opt,name=stage_timeout,json=stageTimeout,proto3,oneof"`
 	xxx_hidden_ExecuteAtLeastOneAttempt       bool                         `protobuf:"varint,3,opt,name=execute_at_least_one_attempt,json=executeAtLeastOneAttempt,proto3,oneof"`
 	xxx_hidden_AttemptExecutionPolicyTemplate *StageAttemptExecutionPolicy `protobuf:"bytes,4,opt,name=attempt_execution_policy_template,json=attemptExecutionPolicyTemplate,proto3,oneof"`
+	xxx_hidden_ThrottleFirstAttemptUntil      *timestamppb.Timestamp       `protobuf:"bytes,5,opt,name=throttle_first_attempt_until,json=throttleFirstAttemptUntil,proto3,oneof"`
 	XXX_raceDetectHookData                    protoimpl.RaceDetectHookData
 	XXX_presence                              [1]uint32
 	unknownFields                             protoimpl.UnknownFields
@@ -92,6 +94,13 @@ func (x *StageExecutionPolicy) GetAttemptExecutionPolicyTemplate() *StageAttempt
 	return nil
 }
 
+func (x *StageExecutionPolicy) GetThrottleFirstAttemptUntil() *timestamppb.Timestamp {
+	if x != nil {
+		return x.xxx_hidden_ThrottleFirstAttemptUntil
+	}
+	return nil
+}
+
 func (x *StageExecutionPolicy) SetRetry(v *StageExecutionPolicy_Retry) {
 	x.xxx_hidden_Retry = v
 }
@@ -102,11 +111,15 @@ func (x *StageExecutionPolicy) SetStageTimeout(v *durationpb.Duration) {
 
 func (x *StageExecutionPolicy) SetExecuteAtLeastOneAttempt(v bool) {
 	x.xxx_hidden_ExecuteAtLeastOneAttempt = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 5)
 }
 
 func (x *StageExecutionPolicy) SetAttemptExecutionPolicyTemplate(v *StageAttemptExecutionPolicy) {
 	x.xxx_hidden_AttemptExecutionPolicyTemplate = v
+}
+
+func (x *StageExecutionPolicy) SetThrottleFirstAttemptUntil(v *timestamppb.Timestamp) {
+	x.xxx_hidden_ThrottleFirstAttemptUntil = v
 }
 
 func (x *StageExecutionPolicy) HasRetry() bool {
@@ -137,6 +150,13 @@ func (x *StageExecutionPolicy) HasAttemptExecutionPolicyTemplate() bool {
 	return x.xxx_hidden_AttemptExecutionPolicyTemplate != nil
 }
 
+func (x *StageExecutionPolicy) HasThrottleFirstAttemptUntil() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_ThrottleFirstAttemptUntil != nil
+}
+
 func (x *StageExecutionPolicy) ClearRetry() {
 	x.xxx_hidden_Retry = nil
 }
@@ -152,6 +172,10 @@ func (x *StageExecutionPolicy) ClearExecuteAtLeastOneAttempt() {
 
 func (x *StageExecutionPolicy) ClearAttemptExecutionPolicyTemplate() {
 	x.xxx_hidden_AttemptExecutionPolicyTemplate = nil
+}
+
+func (x *StageExecutionPolicy) ClearThrottleFirstAttemptUntil() {
+	x.xxx_hidden_ThrottleFirstAttemptUntil = nil
 }
 
 type StageExecutionPolicy_builder struct {
@@ -207,6 +231,16 @@ type StageExecutionPolicy_builder struct {
 	// executor may augment the policy by merging the requested policy and what
 	// is in the configs.
 	AttemptExecutionPolicyTemplate *StageAttemptExecutionPolicy
+	// If set, specifies the earliest time the stage is allowed to run.
+	//
+	// If the stage is unblocked before that time, its first attempt will be
+	// created in THROTTLED state and it won't start running until the given time.
+	// If the stage is unblocked past that time, it will start running its first
+	// attempt right away.
+	//
+	// If unset, the stage will start running its first attempt as soon as it is
+	// unblocked.
+	ThrottleFirstAttemptUntil *timestamppb.Timestamp
 }
 
 func (b0 StageExecutionPolicy_builder) Build() *StageExecutionPolicy {
@@ -216,10 +250,11 @@ func (b0 StageExecutionPolicy_builder) Build() *StageExecutionPolicy {
 	x.xxx_hidden_Retry = b.Retry
 	x.xxx_hidden_StageTimeout = b.StageTimeout
 	if b.ExecuteAtLeastOneAttempt != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 5)
 		x.xxx_hidden_ExecuteAtLeastOneAttempt = *b.ExecuteAtLeastOneAttempt
 	}
 	x.xxx_hidden_AttemptExecutionPolicyTemplate = b.AttemptExecutionPolicyTemplate
+	x.xxx_hidden_ThrottleFirstAttemptUntil = b.ThrottleFirstAttemptUntil
 	return m0
 }
 
@@ -322,12 +357,13 @@ var File_turboci_graph_orchestrator_v1_stage_execution_policy_proto protoreflect
 
 const file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_rawDesc = "" +
 	"\n" +
-	":turboci/graph/orchestrator/v1/stage_execution_policy.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1egoogle/protobuf/duration.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\"\xa5\x04\n" +
+	":turboci/graph/orchestrator/v1/stage_execution_policy.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\"\xa8\x05\n" +
 	"\x14StageExecutionPolicy\x12T\n" +
 	"\x05retry\x18\x01 \x01(\v29.turboci.graph.orchestrator.v1.StageExecutionPolicy.RetryH\x00R\x05retry\x88\x01\x01\x12C\n" +
 	"\rstage_timeout\x18\x02 \x01(\v2\x19.google.protobuf.DurationH\x01R\fstageTimeout\x88\x01\x01\x12C\n" +
 	"\x1cexecute_at_least_one_attempt\x18\x03 \x01(\bH\x02R\x18executeAtLeastOneAttempt\x88\x01\x01\x12\x8a\x01\n" +
-	"!attempt_execution_policy_template\x18\x04 \x01(\v2:.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicyH\x03R\x1eattemptExecutionPolicyTemplate\x88\x01\x01\x1a=\n" +
+	"!attempt_execution_policy_template\x18\x04 \x01(\v2:.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicyH\x03R\x1eattemptExecutionPolicyTemplate\x88\x01\x01\x12`\n" +
+	"\x1cthrottle_first_attempt_until\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampH\x04R\x19throttleFirstAttemptUntil\x88\x01\x01\x1a=\n" +
 	"\x05Retry\x12$\n" +
 	"\vmax_retries\x18\x01 \x01(\x05H\x00R\n" +
 	"maxRetries\x88\x01\x01B\x0e\n" +
@@ -335,7 +371,8 @@ const file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_rawDesc = 
 	"\x06_retryB\x10\n" +
 	"\x0e_stage_timeoutB\x1f\n" +
 	"\x1d_execute_at_least_one_attemptB$\n" +
-	"\"_attempt_execution_policy_templateBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\"_attempt_execution_policy_templateB\x1f\n" +
+	"\x1d_throttle_first_attempt_untilBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_goTypes = []any{
@@ -343,16 +380,18 @@ var file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_goTypes = []
 	(*StageExecutionPolicy_Retry)(nil),  // 1: turboci.graph.orchestrator.v1.StageExecutionPolicy.Retry
 	(*durationpb.Duration)(nil),         // 2: google.protobuf.Duration
 	(*StageAttemptExecutionPolicy)(nil), // 3: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
+	(*timestamppb.Timestamp)(nil),       // 4: google.protobuf.Timestamp
 }
 var file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_depIdxs = []int32{
 	1, // 0: turboci.graph.orchestrator.v1.StageExecutionPolicy.retry:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy.Retry
 	2, // 1: turboci.graph.orchestrator.v1.StageExecutionPolicy.stage_timeout:type_name -> google.protobuf.Duration
 	3, // 2: turboci.graph.orchestrator.v1.StageExecutionPolicy.attempt_execution_policy_template:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	4, // 3: turboci.graph.orchestrator.v1.StageExecutionPolicy.throttle_first_attempt_until:type_name -> google.protobuf.Timestamp
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_stage_execution_policy_proto_init() }
