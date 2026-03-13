@@ -33,7 +33,7 @@ type CheckDelta struct {
 	xxx_hidden_State        CheckState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
 	xxx_hidden_Dependencies *Dependencies          `protobuf:"bytes,2,opt,name=dependencies,proto3,oneof"`
 	xxx_hidden_Options      *[]*ValueRef           `protobuf:"bytes,3,rep,name=options,proto3"`
-	xxx_hidden_Result       *[]*CheckDelta_Result  `protobuf:"bytes,4,rep,name=result,proto3"`
+	xxx_hidden_Results      *[]*CheckDelta_Result  `protobuf:"bytes,4,rep,name=results,proto3"`
 	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
 	XXX_presence            [1]uint32
 	unknownFields           protoimpl.UnknownFields
@@ -90,10 +90,10 @@ func (x *CheckDelta) GetOptions() []*ValueRef {
 	return nil
 }
 
-func (x *CheckDelta) GetResult() []*CheckDelta_Result {
+func (x *CheckDelta) GetResults() []*CheckDelta_Result {
 	if x != nil {
-		if x.xxx_hidden_Result != nil {
-			return *x.xxx_hidden_Result
+		if x.xxx_hidden_Results != nil {
+			return *x.xxx_hidden_Results
 		}
 	}
 	return nil
@@ -112,8 +112,8 @@ func (x *CheckDelta) SetOptions(v []*ValueRef) {
 	x.xxx_hidden_Options = &v
 }
 
-func (x *CheckDelta) SetResult(v []*CheckDelta_Result) {
-	x.xxx_hidden_Result = &v
+func (x *CheckDelta) SetResults(v []*CheckDelta_Result) {
+	x.xxx_hidden_Results = &v
 }
 
 func (x *CheckDelta) HasState() bool {
@@ -164,7 +164,7 @@ type CheckDelta_builder struct {
 	// will only contain a single Result.
 	//
 	// Unique and sorted on `Result.identifier`.
-	Result []*CheckDelta_Result
+	Results []*CheckDelta_Result
 }
 
 func (b0 CheckDelta_builder) Build() *CheckDelta {
@@ -177,7 +177,7 @@ func (b0 CheckDelta_builder) Build() *CheckDelta {
 	}
 	x.xxx_hidden_Dependencies = b.Dependencies
 	x.xxx_hidden_Options = &b.Options
-	x.xxx_hidden_Result = &b.Result
+	x.xxx_hidden_Results = &b.Results
 	return m0
 }
 
@@ -345,14 +345,14 @@ var File_turboci_graph_orchestrator_v1_check_delta_proto protoreflect.FileDescri
 
 const file_turboci_graph_orchestrator_v1_check_delta_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/check_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\xd8\x04\n" +
+	"/turboci/graph/orchestrator/v1/check_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\xda\x04\n" +
 	"\n" +
 	"CheckDelta\x12D\n" +
 	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\x05state\x88\x01\x01\x12a\n" +
 	"\fdependencies\x18\x02 \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
 	"\x01\x02H\x01R\fdependencies\x88\x01\x01\x12A\n" +
-	"\aoptions\x18\x03 \x03(\v2'.turboci.graph.orchestrator.v1.ValueRefR\aoptions\x12H\n" +
-	"\x06result\x18\x04 \x03(\v20.turboci.graph.orchestrator.v1.CheckDelta.ResultR\x06result\x1a\xf8\x01\n" +
+	"\aoptions\x18\x03 \x03(\v2'.turboci.graph.orchestrator.v1.ValueRefR\aoptions\x12J\n" +
+	"\aresults\x18\x04 \x03(\v20.turboci.graph.orchestrator.v1.CheckDelta.ResultR\aresults\x1a\xf8\x01\n" +
 	"\x06Result\x12F\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2!.turboci.graph.ids.v1.CheckResultH\x00R\n" +
@@ -381,7 +381,7 @@ var file_turboci_graph_orchestrator_v1_check_delta_proto_depIdxs = []int32{
 	2, // 0: turboci.graph.orchestrator.v1.CheckDelta.state:type_name -> turboci.graph.orchestrator.v1.CheckState
 	3, // 1: turboci.graph.orchestrator.v1.CheckDelta.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
 	4, // 2: turboci.graph.orchestrator.v1.CheckDelta.options:type_name -> turboci.graph.orchestrator.v1.ValueRef
-	1, // 3: turboci.graph.orchestrator.v1.CheckDelta.result:type_name -> turboci.graph.orchestrator.v1.CheckDelta.Result
+	1, // 3: turboci.graph.orchestrator.v1.CheckDelta.results:type_name -> turboci.graph.orchestrator.v1.CheckDelta.Result
 	5, // 4: turboci.graph.orchestrator.v1.CheckDelta.Result.identifier:type_name -> turboci.graph.ids.v1.CheckResult
 	4, // 5: turboci.graph.orchestrator.v1.CheckDelta.Result.data:type_name -> turboci.graph.orchestrator.v1.ValueRef
 	6, // [6:6] is the sub-list for method output_type
