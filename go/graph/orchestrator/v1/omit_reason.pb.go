@@ -24,22 +24,30 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// OmitReason details why the containing node's content is omitted. The node's
-// Identifier will be present (maybe plus "disambiguator" fields if the node has
-// those), but no other fields will be populated other than references to other
-// nodes if this node is necessary to represent the graph structure.
+// OmitReason details why the containing ValueRef's content is omitted.
 type OmitReason int32
 
 const (
 	// Default value. Indicates that the content for which this value applies was
 	// included, so no omit reason is applicable.
 	OmitReason_OMIT_REASON_UNKNOWN OmitReason = 0
-	// This node was not requested by the caller. For example a Value that has a
-	// type_url which was not requested by the caller.
+	// This ValueRef was not requested by the caller. For example a Value that has
+	// a type_url which was not requested by the caller.
+	//
+	// The TypeURL, realm and digest (if the ValueRef was not inline) will remain
+	// in the ValueRef.
 	OmitReason_OMIT_REASON_UNWANTED OmitReason = 1
-	// This node WAS requested by the user, but the caller doesn't have access to
-	// it due to the caller's permissions in the realm associated with the node.
+	// This ValueRef WAS requested by the user, but the caller doesn't have access
+	// to it due to the caller's permissions in the realm associated with the
+	// ValueRef.
+	//
+	// The TypeURL and realm will remain in the ValueRef.
 	OmitReason_OMIT_REASON_NO_ACCESS OmitReason = 2
+	// This ValueRef was not found in the orchestrator's CAS backing store (or
+	// the value was expired).
+	//
+	// The TypeURL, realm and digest will remain in the ValueRef.
+	OmitReason_OMIT_REASON_MISSING OmitReason = 3
 )
 
 // Enum value maps for OmitReason.
@@ -48,11 +56,13 @@ var (
 		0: "OMIT_REASON_UNKNOWN",
 		1: "OMIT_REASON_UNWANTED",
 		2: "OMIT_REASON_NO_ACCESS",
+		3: "OMIT_REASON_MISSING",
 	}
 	OmitReason_value = map[string]int32{
 		"OMIT_REASON_UNKNOWN":   0,
 		"OMIT_REASON_UNWANTED":  1,
 		"OMIT_REASON_NO_ACCESS": 2,
+		"OMIT_REASON_MISSING":   3,
 	}
 )
 
@@ -82,12 +92,13 @@ var File_turboci_graph_orchestrator_v1_omit_reason_proto protoreflect.FileDescri
 
 const file_turboci_graph_orchestrator_v1_omit_reason_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/omit_reason.proto\x12\x1dturboci.graph.orchestrator.v1*Z\n" +
+	"/turboci/graph/orchestrator/v1/omit_reason.proto\x12\x1dturboci.graph.orchestrator.v1*s\n" +
 	"\n" +
 	"OmitReason\x12\x17\n" +
 	"\x13OMIT_REASON_UNKNOWN\x10\x00\x12\x18\n" +
 	"\x14OMIT_REASON_UNWANTED\x10\x01\x12\x19\n" +
-	"\x15OMIT_REASON_NO_ACCESS\x10\x02BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x15OMIT_REASON_NO_ACCESS\x10\x02\x12\x17\n" +
+	"\x13OMIT_REASON_MISSING\x10\x03BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_omit_reason_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_omit_reason_proto_goTypes = []any{
