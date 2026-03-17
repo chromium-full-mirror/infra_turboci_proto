@@ -25,6 +25,60 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// DataConversionFailure indicates why a ValueData was not successfully
+// converted to JSON from Binary.
+type DataConversionFailure int32
+
+const (
+	// The default, unknown, value for the failure.
+	DataConversionFailure_DATA_CONVERSION_FAILURE_UNKNOWN DataConversionFailure = 0
+	// The data could not be converted because the descriptor was missing.
+	DataConversionFailure_DATA_CONVERSION_FAILURE_NO_DESCRIPTOR DataConversionFailure = 1
+	// The data could not be converted due to an error.
+	//
+	// Usually this indicates that the server had an incompatible descriptor.
+	// This could happen if the protos in question had backwards incompatible
+	// changes made to their proto definitions, but the server and client are
+	// using different versions of the descriptor.
+	DataConversionFailure_DATA_CONVERSION_FAILURE_ERROR DataConversionFailure = 2
+)
+
+// Enum value maps for DataConversionFailure.
+var (
+	DataConversionFailure_name = map[int32]string{
+		0: "DATA_CONVERSION_FAILURE_UNKNOWN",
+		1: "DATA_CONVERSION_FAILURE_NO_DESCRIPTOR",
+		2: "DATA_CONVERSION_FAILURE_ERROR",
+	}
+	DataConversionFailure_value = map[string]int32{
+		"DATA_CONVERSION_FAILURE_UNKNOWN":       0,
+		"DATA_CONVERSION_FAILURE_NO_DESCRIPTOR": 1,
+		"DATA_CONVERSION_FAILURE_ERROR":         2,
+	}
+)
+
+func (x DataConversionFailure) Enum() *DataConversionFailure {
+	p := new(DataConversionFailure)
+	*p = x
+	return p
+}
+
+func (x DataConversionFailure) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (DataConversionFailure) Descriptor() protoreflect.EnumDescriptor {
+	return file_turboci_graph_orchestrator_v1_value_data_proto_enumTypes[0].Descriptor()
+}
+
+func (DataConversionFailure) Type() protoreflect.EnumType {
+	return &file_turboci_graph_orchestrator_v1_value_data_proto_enumTypes[0]
+}
+
+func (x DataConversionFailure) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
 // ValueData holds actual data (via either binary or JSONPB encoded protobuf)
 // embedded inside of a TurboCI node (Checks/Stages) and referenced via
 // [ValueRef].
@@ -38,10 +92,13 @@ const (
 // transform these into [ValueRef] and ValueData, and choose via heruistics to
 // either store the ValueData inline in the [ValueRef] or referenced via digest.
 type ValueData struct {
-	state           protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Data isValueData_Data       `protobuf_oneof:"data"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state                        protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Data              isValueData_Data       `protobuf_oneof:"data"`
+	xxx_hidden_ConversionFailure DataConversionFailure  `protobuf:"varint,3,opt,name=conversion_failure,json=conversionFailure,proto3,enum=turboci.graph.orchestrator.v1.DataConversionFailure,oneof"`
+	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
+	XXX_presence                 [1]uint32
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
 }
 
 func (x *ValueData) Reset() {
@@ -87,6 +144,15 @@ func (x *ValueData) GetJson() *ValueData_JsonAny {
 	return nil
 }
 
+func (x *ValueData) GetConversionFailure() DataConversionFailure {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
+			return x.xxx_hidden_ConversionFailure
+		}
+	}
+	return DataConversionFailure_DATA_CONVERSION_FAILURE_UNKNOWN
+}
+
 func (x *ValueData) SetBinary(v *anypb.Any) {
 	if v == nil {
 		x.xxx_hidden_Data = nil
@@ -101,6 +167,11 @@ func (x *ValueData) SetJson(v *ValueData_JsonAny) {
 		return
 	}
 	x.xxx_hidden_Data = &valueData_Json{v}
+}
+
+func (x *ValueData) SetConversionFailure(v DataConversionFailure) {
+	x.xxx_hidden_ConversionFailure = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
 }
 
 func (x *ValueData) HasData() bool {
@@ -126,6 +197,13 @@ func (x *ValueData) HasJson() bool {
 	return ok
 }
 
+func (x *ValueData) HasConversionFailure() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
 func (x *ValueData) ClearData() {
 	x.xxx_hidden_Data = nil
 }
@@ -140,6 +218,11 @@ func (x *ValueData) ClearJson() {
 	if _, ok := x.xxx_hidden_Data.(*valueData_Json); ok {
 		x.xxx_hidden_Data = nil
 	}
+}
+
+func (x *ValueData) ClearConversionFailure() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_ConversionFailure = DataConversionFailure_DATA_CONVERSION_FAILURE_UNKNOWN
 }
 
 const ValueData_Data_not_set_case case_ValueData_Data = 0
@@ -171,6 +254,9 @@ type ValueData_builder struct {
 	// JSON encoded data.
 	Json *ValueData_JsonAny
 	// -- end of xxx_hidden_Data
+	// If set, indicates that the ValueData was requested in JSON form, but
+	// could not be converted.
+	ConversionFailure *DataConversionFailure
 }
 
 func (b0 ValueData_builder) Build() *ValueData {
@@ -182,6 +268,10 @@ func (b0 ValueData_builder) Build() *ValueData {
 	}
 	if b.Json != nil {
 		x.xxx_hidden_Data = &valueData_Json{b.Json}
+	}
+	if b.ConversionFailure != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_ConversionFailure = *b.ConversionFailure
 	}
 	return m0
 }
@@ -367,10 +457,11 @@ var File_turboci_graph_orchestrator_v1_value_data_proto protoreflect.FileDescrip
 
 const file_turboci_graph_orchestrator_v1_value_data_proto_rawDesc = "" +
 	"\n" +
-	".turboci/graph/orchestrator/v1/value_data.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x19google/protobuf/any.proto\"\xb3\x02\n" +
+	".turboci/graph/orchestrator/v1/value_data.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x19google/protobuf/any.proto\"\xb4\x03\n" +
 	"\tValueData\x12.\n" +
 	"\x06binary\x18\x01 \x01(\v2\x14.google.protobuf.AnyH\x00R\x06binary\x12F\n" +
-	"\x04json\x18\x02 \x01(\v20.turboci.graph.orchestrator.v1.ValueData.JsonAnyH\x00R\x04json\x1a\xa5\x01\n" +
+	"\x04json\x18\x02 \x01(\v20.turboci.graph.orchestrator.v1.ValueData.JsonAnyH\x00R\x04json\x12h\n" +
+	"\x12conversion_failure\x18\x03 \x01(\x0e24.turboci.graph.orchestrator.v1.DataConversionFailureH\x01R\x11conversionFailure\x88\x01\x01\x1a\xa5\x01\n" +
 	"\aJsonAny\x12\x1e\n" +
 	"\btype_url\x18\x01 \x01(\tH\x00R\atypeUrl\x88\x01\x01\x12\x19\n" +
 	"\x05value\x18\x02 \x01(\tH\x01R\x05value\x88\x01\x01\x121\n" +
@@ -378,22 +469,30 @@ const file_turboci_graph_orchestrator_v1_value_data_proto_rawDesc = "" +
 	"\t_type_urlB\b\n" +
 	"\x06_valueB\x15\n" +
 	"\x13_has_unknown_fieldsB\x06\n" +
-	"\x04dataBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x04dataB\x15\n" +
+	"\x13_conversion_failure*\x8a\x01\n" +
+	"\x15DataConversionFailure\x12#\n" +
+	"\x1fDATA_CONVERSION_FAILURE_UNKNOWN\x10\x00\x12)\n" +
+	"%DATA_CONVERSION_FAILURE_NO_DESCRIPTOR\x10\x01\x12!\n" +
+	"\x1dDATA_CONVERSION_FAILURE_ERROR\x10\x02BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
+var file_turboci_graph_orchestrator_v1_value_data_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_value_data_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_value_data_proto_goTypes = []any{
-	(*ValueData)(nil),         // 0: turboci.graph.orchestrator.v1.ValueData
-	(*ValueData_JsonAny)(nil), // 1: turboci.graph.orchestrator.v1.ValueData.JsonAny
-	(*anypb.Any)(nil),         // 2: google.protobuf.Any
+	(DataConversionFailure)(0), // 0: turboci.graph.orchestrator.v1.DataConversionFailure
+	(*ValueData)(nil),          // 1: turboci.graph.orchestrator.v1.ValueData
+	(*ValueData_JsonAny)(nil),  // 2: turboci.graph.orchestrator.v1.ValueData.JsonAny
+	(*anypb.Any)(nil),          // 3: google.protobuf.Any
 }
 var file_turboci_graph_orchestrator_v1_value_data_proto_depIdxs = []int32{
-	2, // 0: turboci.graph.orchestrator.v1.ValueData.binary:type_name -> google.protobuf.Any
-	1, // 1: turboci.graph.orchestrator.v1.ValueData.json:type_name -> turboci.graph.orchestrator.v1.ValueData.JsonAny
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 0: turboci.graph.orchestrator.v1.ValueData.binary:type_name -> google.protobuf.Any
+	2, // 1: turboci.graph.orchestrator.v1.ValueData.json:type_name -> turboci.graph.orchestrator.v1.ValueData.JsonAny
+	0, // 2: turboci.graph.orchestrator.v1.ValueData.conversion_failure:type_name -> turboci.graph.orchestrator.v1.DataConversionFailure
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_value_data_proto_init() }
@@ -411,13 +510,14 @@ func file_turboci_graph_orchestrator_v1_value_data_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_value_data_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_value_data_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_turboci_graph_orchestrator_v1_value_data_proto_goTypes,
 		DependencyIndexes: file_turboci_graph_orchestrator_v1_value_data_proto_depIdxs,
+		EnumInfos:         file_turboci_graph_orchestrator_v1_value_data_proto_enumTypes,
 		MessageInfos:      file_turboci_graph_orchestrator_v1_value_data_proto_msgTypes,
 	}.Build()
 	File_turboci_graph_orchestrator_v1_value_data_proto = out.File
