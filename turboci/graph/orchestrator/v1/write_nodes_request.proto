@@ -256,23 +256,15 @@ message WriteNodesRequest {
     // the check's realm (or in the realm of the option/result data).
     optional ids.v1.Check identifier = 1;
 
-    // Realm to assign to this check.
+    // Realm to assign to this Check.
     //
-    // If provided, must be the absolute form "<project>:<name>".
+    // If provided, must be the absolute form "<project>:<name>", or a
+    // special form "$from_token" or "$from_container". "$from_token" works
+    // as documented in [ValueWrite]. "$from_container" means "the same realm
+    // as the WorkPlan".
     //
-    // If this is set, and the Check DOES already exist, this MUST match the
-    // existing realm.
-    //
-    // If absent and this CheckWrite creates the Check, the written Check will
-    // copy its realm from the implied realm of the `token`. For Stage Attempt
-    // tokens, this will be the Stage's realm, and for Creator tokens, this
-    // will be the WorkPlan's realm.
-    //
-    // If `token` is unset and this field is absent, the write will be rejected.
-    optional string realm = 2 [
-      (turboci).creation_only = true,
-      (turboci).realm_inherits_writer = true
-    ];
+    // If omitted, it means that this check must already exist.
+    optional string realm = 2 [(turboci).creation_only = true];
 
     // Kind to assign to this check.
     //
