@@ -287,7 +287,8 @@ const file_turboci_graph_orchestrator_v1_read_workplan_request_proto_rawDesc = "
 	"\vworkplan_id\x18\x02 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x01R\n" +
 	"workplanId\x88\x01\x01\x12e\n" +
 	"\x13included_node_types\x18\x03 \x03(\x0e2$.turboci.graph.ids.v1.IdentifierKindB\x0f\x82\x86\xf6\xfb\x0f\t\x12\a\n" +
-	"\x05\x02\x04\x05\x06\aR\x11includedNodeTypes\x12Q\n" +
+	"\x05\x02\x06\b\t\n" +
+	"R\x11includedNodeTypes\x12Q\n" +
 	"\rsince_version\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\fsinceVersion\x88\x01\x01\x12R\n" +
 	"\fvalue_filter\x18\x05 \x01(\v2*.turboci.graph.orchestrator.v1.ValueFilterH\x03R\vvalueFilter\x88\x01\x01\x12.\n" +
 	"\x10pagination_token\x18\x06 \x01(\tH\x04R\x0fpaginationToken\x88\x01\x01B\b\n" +

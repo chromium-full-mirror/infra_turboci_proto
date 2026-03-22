@@ -2594,7 +2594,7 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\b_message\x1a\xd9\x01\n" +
 	"\x12TransactionDetails\x12U\n" +
 	"\x0enodes_observed\x18\x01 \x03(\v2 .turboci.graph.ids.v1.IdentifierB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
-	"\x02\x02\x05R\rnodesObserved\x12W\n" +
+	"\x02\x02\bR\rnodesObserved\x12W\n" +
 	"\x10snapshot_version\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\x0fsnapshotVersion\x88\x01\x01B\x13\n" +
 	"\x11_snapshot_version\x1a\xb4\x05\n" +
 	"\n" +
@@ -2634,7 +2634,7 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x04args\x18\x02 \x01(\v2).turboci.graph.orchestrator.v1.ValueWriteB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x01R\x04args\x88\x01\x01\x12#\n" +
 	"\x05realm\x18\x03 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x02R\x05realm\x88\x01\x01\x12y\n" +
 	"\fdependencies\x18\x04 \x01(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupB\x0e\x82\x86\xf6\xfb\x0f\b\x12\x04\n" +
-	"\x02\x05\x02\x18\x01H\x03R\fdependencies\x88\x01\x01\x12\x8b\x01\n" +
+	"\x02\b\x02\x18\x01H\x03R\fdependencies\x88\x01\x01\x12\x8b\x01\n" +
 	" requested_stage_execution_policy\x18\x05 \x01(\v23.turboci.graph.orchestrator.v1.StageExecutionPolicyB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x04R\x1drequestedStageExecutionPolicy\x88\x01\x01\x12[\n" +
 	"\vassignments\x18\x06 \x03(\v2/.turboci.graph.orchestrator.v1.Stage.AssignmentB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01R\vassignments\x12!\n" +
 	"\tcancelled\x18\a \x01(\bH\x05R\tcancelled\x88\x01\x01B\r\n" +
@@ -2683,7 +2683,7 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x11_state_transition\x1a\xae\x01\n" +
 	"\x11CurrentStageWrite\x12\x81\x01\n" +
 	"\x12continuation_group\x18\x01 \x01(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\x05H\x00R\x11continuationGroup\x88\x01\x01B\x15\n" +
+	"\x01\bH\x00R\x11continuationGroup\x88\x01\x01B\x15\n" +
 	"\x13_continuation_groupB\b\n" +
 	"\x06_tokenB\t\n" +
 	"\a_reasonB\x06\n" +

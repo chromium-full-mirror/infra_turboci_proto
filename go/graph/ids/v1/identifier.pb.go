@@ -296,11 +296,11 @@ func (x *Identifier) ClearStageEdit() {
 const Identifier_Type_not_set_case case_Identifier_Type = 0
 const Identifier_WorkPlan_case case_Identifier_Type = 1
 const Identifier_Check_case case_Identifier_Type = 2
-const Identifier_CheckResult_case case_Identifier_Type = 3
-const Identifier_CheckEdit_case case_Identifier_Type = 4
-const Identifier_Stage_case case_Identifier_Type = 5
-const Identifier_StageAttempt_case case_Identifier_Type = 6
-const Identifier_StageEdit_case case_Identifier_Type = 7
+const Identifier_CheckResult_case case_Identifier_Type = 4
+const Identifier_CheckEdit_case case_Identifier_Type = 6
+const Identifier_Stage_case case_Identifier_Type = 8
+const Identifier_StageAttempt_case case_Identifier_Type = 9
+const Identifier_StageEdit_case case_Identifier_Type = 10
 
 func (x *Identifier) WhichType() case_Identifier_Type {
 	if x == nil {
@@ -405,27 +405,27 @@ type identifier_Check struct {
 
 type identifier_CheckResult struct {
 	// A particular Check.Result.
-	CheckResult *CheckResult `protobuf:"bytes,3,opt,name=check_result,json=checkResult,proto3,oneof"`
+	CheckResult *CheckResult `protobuf:"bytes,4,opt,name=check_result,json=checkResult,proto3,oneof"`
 }
 
 type identifier_CheckEdit struct {
 	// An edit to a Check.
-	CheckEdit *CheckEdit `protobuf:"bytes,4,opt,name=check_edit,json=checkEdit,proto3,oneof"`
+	CheckEdit *CheckEdit `protobuf:"bytes,6,opt,name=check_edit,json=checkEdit,proto3,oneof"`
 }
 
 type identifier_Stage struct {
 	// A Stage within a WorkPlan.
-	Stage *Stage `protobuf:"bytes,5,opt,name=stage,proto3,oneof"`
+	Stage *Stage `protobuf:"bytes,8,opt,name=stage,proto3,oneof"`
 }
 
 type identifier_StageAttempt struct {
 	// A specific attempt at a Stage.
-	StageAttempt *StageAttempt `protobuf:"bytes,6,opt,name=stage_attempt,json=stageAttempt,proto3,oneof"`
+	StageAttempt *StageAttempt `protobuf:"bytes,9,opt,name=stage_attempt,json=stageAttempt,proto3,oneof"`
 }
 
 type identifier_StageEdit struct {
 	// An edit to a Stage.
-	StageEdit *StageEdit `protobuf:"bytes,7,opt,name=stage_edit,json=stageEdit,proto3,oneof"`
+	StageEdit *StageEdit `protobuf:"bytes,10,opt,name=stage_edit,json=stageEdit,proto3,oneof"`
 }
 
 func (*identifier_WorkPlan) isIdentifier_Type() {}
@@ -1229,19 +1229,20 @@ var File_turboci_graph_ids_v1_identifier_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_ids_v1_identifier_proto_rawDesc = "" +
 	"\n" +
-	"%turboci/graph/ids/v1/identifier.proto\x12\x14turboci.graph.ids.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd4\x03\n" +
+	"%turboci/graph/ids/v1/identifier.proto\x12\x14turboci.graph.ids.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9b\x04\n" +
 	"\n" +
 	"Identifier\x12=\n" +
 	"\twork_plan\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x00R\bworkPlan\x123\n" +
 	"\x05check\x18\x02 \x01(\v2\x1b.turboci.graph.ids.v1.CheckH\x00R\x05check\x12F\n" +
-	"\fcheck_result\x18\x03 \x01(\v2!.turboci.graph.ids.v1.CheckResultH\x00R\vcheckResult\x12@\n" +
+	"\fcheck_result\x18\x04 \x01(\v2!.turboci.graph.ids.v1.CheckResultH\x00R\vcheckResult\x12@\n" +
 	"\n" +
-	"check_edit\x18\x04 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\tcheckEdit\x123\n" +
-	"\x05stage\x18\x05 \x01(\v2\x1b.turboci.graph.ids.v1.StageH\x00R\x05stage\x12I\n" +
-	"\rstage_attempt\x18\x06 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\fstageAttempt\x12@\n" +
+	"check_edit\x18\x06 \x01(\v2\x1f.turboci.graph.ids.v1.CheckEditH\x00R\tcheckEdit\x123\n" +
+	"\x05stage\x18\b \x01(\v2\x1b.turboci.graph.ids.v1.StageH\x00R\x05stage\x12I\n" +
+	"\rstage_attempt\x18\t \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x00R\fstageAttempt\x12@\n" +
 	"\n" +
-	"stage_edit\x18\a \x01(\v2\x1f.turboci.graph.ids.v1.StageEditH\x00R\tstageEditB\x06\n" +
-	"\x04type\"&\n" +
+	"stage_edit\x18\n" +
+	" \x01(\v2\x1f.turboci.graph.ids.v1.StageEditH\x00R\tstageEditB\x06\n" +
+	"\x04typeJ\x04\b\x03\x10\x04J\x04\b\x05\x10\x06J\x04\b\a\x10\bR\fcheck_optionR\x12check_result_datumR\x11check_edit_option\"&\n" +
 	"\bWorkPlan\x12\x13\n" +
 	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01B\x05\n" +
 	"\x03_id\"s\n" +
