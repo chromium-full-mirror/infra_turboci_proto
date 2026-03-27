@@ -35,21 +35,23 @@ const (
 //
 // Edit Deltas are designed to be quite slim. Heavy bits of the delta (like
 // Option Data) will be stored separately from this Edit.
+//
+// Next ID: 14
 type Edit struct {
-	state                       protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_ForNode          *v1.Identifier         `protobuf:"bytes,1,opt,name=for_node,json=forNode,proto3,oneof"`
-	xxx_hidden_Version          *Revision              `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
-	xxx_hidden_ExpireAt         *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=expire_at,json=expireAt,proto3,oneof"`
-	xxx_hidden_Realm            *string                `protobuf:"bytes,5,opt,name=realm,proto3,oneof"`
-	xxx_hidden_CreatedBy        *Actor                 `protobuf:"bytes,6,opt,name=created_by,json=createdBy,proto3,oneof"`
-	xxx_hidden_TransactionalSet *[]*v1.Identifier      `protobuf:"bytes,7,rep,name=transactional_set,json=transactionalSet,proto3"`
-	xxx_hidden_ObliviousWrite   bool                   `protobuf:"varint,11,opt,name=oblivious_write,json=obliviousWrite,proto3,oneof"`
-	xxx_hidden_Reason           *Edit_Reason           `protobuf:"bytes,8,opt,name=reason,proto3,oneof"`
-	xxx_hidden_Delta            isEdit_Delta           `protobuf_oneof:"delta"`
-	XXX_raceDetectHookData      protoimpl.RaceDetectHookData
-	XXX_presence                [1]uint32
-	unknownFields               protoimpl.UnknownFields
-	sizeCache                   protoimpl.SizeCache
+	state                   protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_ForNode      *v1.Identifier         `protobuf:"bytes,1,opt,name=for_node,json=forNode,proto3,oneof"`
+	xxx_hidden_Version      *Revision              `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
+	xxx_hidden_ExpireAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=expire_at,json=expireAt,proto3,oneof"`
+	xxx_hidden_Realm        *string                `protobuf:"bytes,5,opt,name=realm,proto3,oneof"`
+	xxx_hidden_CreatedBy    *Actor                 `protobuf:"bytes,6,opt,name=created_by,json=createdBy,proto3,oneof"`
+	xxx_hidden_Txn          *TransactionDetails    `protobuf:"bytes,12,opt,name=txn,proto3,oneof"`
+	xxx_hidden_WriteNodeSet *[]*v1.Identifier      `protobuf:"bytes,13,rep,name=write_node_set,json=writeNodeSet,proto3"`
+	xxx_hidden_Reason       *Edit_Reason           `protobuf:"bytes,8,opt,name=reason,proto3,oneof"`
+	xxx_hidden_Delta        isEdit_Delta           `protobuf_oneof:"delta"`
+	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
+	XXX_presence            [1]uint32
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *Edit) Reset() {
@@ -115,20 +117,20 @@ func (x *Edit) GetCreatedBy() *Actor {
 	return nil
 }
 
-func (x *Edit) GetTransactionalSet() []*v1.Identifier {
+func (x *Edit) GetTxn() *TransactionDetails {
 	if x != nil {
-		if x.xxx_hidden_TransactionalSet != nil {
-			return *x.xxx_hidden_TransactionalSet
-		}
+		return x.xxx_hidden_Txn
 	}
 	return nil
 }
 
-func (x *Edit) GetObliviousWrite() bool {
+func (x *Edit) GetWriteNodeSet() []*v1.Identifier {
 	if x != nil {
-		return x.xxx_hidden_ObliviousWrite
+		if x.xxx_hidden_WriteNodeSet != nil {
+			return *x.xxx_hidden_WriteNodeSet
+		}
 	}
-	return false
+	return nil
 }
 
 func (x *Edit) GetReason() *Edit_Reason {
@@ -177,13 +179,12 @@ func (x *Edit) SetCreatedBy(v *Actor) {
 	x.xxx_hidden_CreatedBy = v
 }
 
-func (x *Edit) SetTransactionalSet(v []*v1.Identifier) {
-	x.xxx_hidden_TransactionalSet = &v
+func (x *Edit) SetTxn(v *TransactionDetails) {
+	x.xxx_hidden_Txn = v
 }
 
-func (x *Edit) SetObliviousWrite(v bool) {
-	x.xxx_hidden_ObliviousWrite = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 9)
+func (x *Edit) SetWriteNodeSet(v []*v1.Identifier) {
+	x.xxx_hidden_WriteNodeSet = &v
 }
 
 func (x *Edit) SetReason(v *Edit_Reason) {
@@ -241,11 +242,11 @@ func (x *Edit) HasCreatedBy() bool {
 	return x.xxx_hidden_CreatedBy != nil
 }
 
-func (x *Edit) HasObliviousWrite() bool {
+func (x *Edit) HasTxn() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
+	return x.xxx_hidden_Txn != nil
 }
 
 func (x *Edit) HasReason() bool {
@@ -299,9 +300,8 @@ func (x *Edit) ClearCreatedBy() {
 	x.xxx_hidden_CreatedBy = nil
 }
 
-func (x *Edit) ClearObliviousWrite() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
-	x.xxx_hidden_ObliviousWrite = false
+func (x *Edit) ClearTxn() {
+	x.xxx_hidden_Txn = nil
 }
 
 func (x *Edit) ClearReason() {
@@ -368,34 +368,27 @@ type Edit_builder struct {
 	Realm *string
 	// The entity which generated this Edit.
 	CreatedBy *Actor
-	// This is the set of nodes which were included in the same WriteNodes
-	// RPC as this Edit (one per `checks`, `stages`, and/or
-	// `current_stage_write`). For simplicity, this will also always include
-	// `for_node`.
-	//
-	// This may contain more nodes than were actually written in the case of
-	// a partially applied write, e.g.
-	//
-	//   - One writer writes Check["foo", BUILD]
-	//   - Another writer writes Check["foo", BUILD], Check["bar", BUILD].
-	//
-	// In this case, the edit on "bar" from the second write will include "foo"
-	// in this set because the requested write is compatible with the state of
-	// "foo".
-	//
-	// This can only happen with WriteNodes requests with `txn` unset (i.e.
-	// 'oblivious writes').
-	//
-	// If you need to detect this, load e.g. `Check["foo"] / Edit[version]`. If
-	// the edit does not exist, then it means foo was already written before this
+	// This is a copy of `txn` from the WriteNodes request which generated this
 	// Edit.
-	TransactionalSet []*v1.Identifier
-	// If set, then the WriteNodes which created this edit was done as an
-	// 'oblivious' write - that is, `txn` was not supplied in WriteNodseRequest.
 	//
-	// This is intended to be a hint when debugging that a non-transactional
-	// write could be an issue.
-	ObliviousWrite *bool
+	// Will be unset if the RPC was an `oblivious write` (that is; `txn` was
+	// unset).
+	//
+	// For Orchestrator-generated changes (see `created_by`), this may be empty
+	// (even if the orchestrator implementation is not actually making an
+	// oblivious change).
+	Txn *TransactionDetails
+	// This is the set of node writes ids from the WriteNodes request which
+	// generated this Edit, one per `checks`, `stages`, `current_stage`, and/or
+	// `current_attempt`).
+	//
+	// Note that this will be a superset of the actual nodes written; If the
+	// transaction determines that a write to a given target node is a no-op,
+	// there will be no corresponding edit on the target node with the same
+	// version.
+	//
+	// For Orchestrator-generated changes, this may be empty.
+	WriteNodeSet []*v1.Identifier
 	// The writer-provided reason for this Edit.
 	Reason *Edit_Reason
 	// The actual delta of this Edit.
@@ -424,11 +417,8 @@ func (b0 Edit_builder) Build() *Edit {
 		x.xxx_hidden_Realm = b.Realm
 	}
 	x.xxx_hidden_CreatedBy = b.CreatedBy
-	x.xxx_hidden_TransactionalSet = &b.TransactionalSet
-	if b.ObliviousWrite != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 9)
-		x.xxx_hidden_ObliviousWrite = *b.ObliviousWrite
-	}
+	x.xxx_hidden_Txn = b.Txn
+	x.xxx_hidden_WriteNodeSet = &b.WriteNodeSet
 	x.xxx_hidden_Reason = b.Reason
 	if b.Check != nil {
 		x.xxx_hidden_Delta = &edit_Check{b.Check}
@@ -592,7 +582,7 @@ var File_turboci_graph_orchestrator_v1_edit_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_edit_proto_rawDesc = "" +
 	"\n" +
-	"(turboci/graph/orchestrator/v1/edit.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_delta.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_delta.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\x81\a\n" +
+	"(turboci/graph/orchestrator/v1/edit.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_delta.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_delta.proto\x1a7turboci/graph/orchestrator/v1/transaction_details.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\x96\a\n" +
 	"\x04Edit\x12N\n" +
 	"\bfor_node\x18\x01 \x01(\v2 .turboci.graph.ids.v1.IdentifierB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
 	"\x02\x02\bH\x01R\aforNode\x88\x01\x01\x12F\n" +
@@ -600,10 +590,10 @@ const file_turboci_graph_orchestrator_v1_edit_proto_rawDesc = "" +
 	"\texpire_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampH\x03R\bexpireAt\x88\x01\x01\x12\x1e\n" +
 	"\x05realm\x18\x05 \x01(\tB\x03\xe0A\x05H\x04R\x05realm\x88\x01\x01\x12H\n" +
 	"\n" +
-	"created_by\x18\x06 \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x05R\tcreatedBy\x88\x01\x01\x12\\\n" +
-	"\x11transactional_set\x18\a \x03(\v2 .turboci.graph.ids.v1.IdentifierB\r\x82\x86\xf6\xfb\x0f\a\x12\x05\n" +
-	"\x03\x02\b\tR\x10transactionalSet\x12,\n" +
-	"\x0foblivious_write\x18\v \x01(\bH\x06R\x0eobliviousWrite\x88\x01\x01\x12G\n" +
+	"created_by\x18\x06 \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x05R\tcreatedBy\x88\x01\x01\x12H\n" +
+	"\x03txn\x18\f \x01(\v21.turboci.graph.orchestrator.v1.TransactionDetailsH\x06R\x03txn\x88\x01\x01\x12U\n" +
+	"\x0ewrite_node_set\x18\r \x03(\v2 .turboci.graph.ids.v1.IdentifierB\r\x82\x86\xf6\xfb\x0f\a\x12\x05\n" +
+	"\x03\x02\b\tR\fwriteNodeSet\x12G\n" +
 	"\x06reason\x18\b \x01(\v2*.turboci.graph.orchestrator.v1.Edit.ReasonH\aR\x06reason\x88\x01\x01\x12A\n" +
 	"\x05check\x18\t \x01(\v2).turboci.graph.orchestrator.v1.CheckDeltaH\x00R\x05check\x12A\n" +
 	"\x05stage\x18\n" +
@@ -620,9 +610,9 @@ const file_turboci_graph_orchestrator_v1_edit_proto_rawDesc = "" +
 	"\n" +
 	"_expire_atB\b\n" +
 	"\x06_realmB\r\n" +
-	"\v_created_byB\x12\n" +
-	"\x10_oblivious_writeB\t\n" +
-	"\a_reasonBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\v_created_byB\x06\n" +
+	"\x04_txnB\t\n" +
+	"\a_reasonJ\x04\b\a\x10\bJ\x04\b\v\x10\fBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_edit_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_edit_proto_goTypes = []any{
@@ -632,25 +622,27 @@ var file_turboci_graph_orchestrator_v1_edit_proto_goTypes = []any{
 	(*Revision)(nil),              // 3: turboci.graph.orchestrator.v1.Revision
 	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
 	(*Actor)(nil),                 // 5: turboci.graph.orchestrator.v1.Actor
-	(*CheckDelta)(nil),            // 6: turboci.graph.orchestrator.v1.CheckDelta
-	(*StageDelta)(nil),            // 7: turboci.graph.orchestrator.v1.StageDelta
-	(*ValueRef)(nil),              // 8: turboci.graph.orchestrator.v1.ValueRef
+	(*TransactionDetails)(nil),    // 6: turboci.graph.orchestrator.v1.TransactionDetails
+	(*CheckDelta)(nil),            // 7: turboci.graph.orchestrator.v1.CheckDelta
+	(*StageDelta)(nil),            // 8: turboci.graph.orchestrator.v1.StageDelta
+	(*ValueRef)(nil),              // 9: turboci.graph.orchestrator.v1.ValueRef
 }
 var file_turboci_graph_orchestrator_v1_edit_proto_depIdxs = []int32{
-	2, // 0: turboci.graph.orchestrator.v1.Edit.for_node:type_name -> turboci.graph.ids.v1.Identifier
-	3, // 1: turboci.graph.orchestrator.v1.Edit.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	4, // 2: turboci.graph.orchestrator.v1.Edit.expire_at:type_name -> google.protobuf.Timestamp
-	5, // 3: turboci.graph.orchestrator.v1.Edit.created_by:type_name -> turboci.graph.orchestrator.v1.Actor
-	2, // 4: turboci.graph.orchestrator.v1.Edit.transactional_set:type_name -> turboci.graph.ids.v1.Identifier
-	1, // 5: turboci.graph.orchestrator.v1.Edit.reason:type_name -> turboci.graph.orchestrator.v1.Edit.Reason
-	6, // 6: turboci.graph.orchestrator.v1.Edit.check:type_name -> turboci.graph.orchestrator.v1.CheckDelta
-	7, // 7: turboci.graph.orchestrator.v1.Edit.stage:type_name -> turboci.graph.orchestrator.v1.StageDelta
-	8, // 8: turboci.graph.orchestrator.v1.Edit.Reason.details:type_name -> turboci.graph.orchestrator.v1.ValueRef
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	2,  // 0: turboci.graph.orchestrator.v1.Edit.for_node:type_name -> turboci.graph.ids.v1.Identifier
+	3,  // 1: turboci.graph.orchestrator.v1.Edit.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	4,  // 2: turboci.graph.orchestrator.v1.Edit.expire_at:type_name -> google.protobuf.Timestamp
+	5,  // 3: turboci.graph.orchestrator.v1.Edit.created_by:type_name -> turboci.graph.orchestrator.v1.Actor
+	6,  // 4: turboci.graph.orchestrator.v1.Edit.txn:type_name -> turboci.graph.orchestrator.v1.TransactionDetails
+	2,  // 5: turboci.graph.orchestrator.v1.Edit.write_node_set:type_name -> turboci.graph.ids.v1.Identifier
+	1,  // 6: turboci.graph.orchestrator.v1.Edit.reason:type_name -> turboci.graph.orchestrator.v1.Edit.Reason
+	7,  // 7: turboci.graph.orchestrator.v1.Edit.check:type_name -> turboci.graph.orchestrator.v1.CheckDelta
+	8,  // 8: turboci.graph.orchestrator.v1.Edit.stage:type_name -> turboci.graph.orchestrator.v1.StageDelta
+	9,  // 9: turboci.graph.orchestrator.v1.Edit.Reason.details:type_name -> turboci.graph.orchestrator.v1.ValueRef
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_edit_proto_init() }
@@ -663,6 +655,7 @@ func file_turboci_graph_orchestrator_v1_edit_proto_init() {
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_delta_proto_init()
+	file_turboci_graph_orchestrator_v1_transaction_details_proto_init()
 	file_turboci_graph_orchestrator_v1_value_ref_proto_init()
 	file_turboci_graph_orchestrator_v1_edit_proto_msgTypes[0].OneofWrappers = []any{
 		(*edit_Check)(nil),
