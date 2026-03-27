@@ -567,7 +567,8 @@ type Edit_Reason_builder struct {
 	// first in this list for a given type_url should be a superset of the
 	// others.
 	//
-	// These are be unique by (type_url, realm)
+	// These are be unique by (type_url, realm), and partially ordered by
+	// type_url.
 	//
 	// NOTE: When viewing Edits, the reader will only see the details for which
 	// they have read permissions (that is - two different users may see

@@ -193,12 +193,10 @@ func (b0 FieldOptions_builder) Build() *FieldOptions {
 
 // CheckFieldOptions are field options which apply to Check messages.
 type FieldOptions_CheckFieldOptions struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Editable    CheckState             `protobuf:"varint,1,opt,name=editable,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Editable []CheckState           `protobuf:"varint,1,rep,packed,name=editable,proto3,enum=turboci.graph.orchestrator.v1.CheckState"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *FieldOptions_CheckFieldOptions) Reset() {
@@ -226,30 +224,15 @@ func (x *FieldOptions_CheckFieldOptions) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *FieldOptions_CheckFieldOptions) GetEditable() CheckState {
+func (x *FieldOptions_CheckFieldOptions) GetEditable() []CheckState {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
-			return x.xxx_hidden_Editable
-		}
+		return x.xxx_hidden_Editable
 	}
-	return CheckState_CHECK_STATE_UNKNOWN
+	return nil
 }
 
-func (x *FieldOptions_CheckFieldOptions) SetEditable(v CheckState) {
+func (x *FieldOptions_CheckFieldOptions) SetEditable(v []CheckState) {
 	x.xxx_hidden_Editable = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
-}
-
-func (x *FieldOptions_CheckFieldOptions) HasEditable() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
-}
-
-func (x *FieldOptions_CheckFieldOptions) ClearEditable() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Editable = CheckState_CHECK_STATE_UNKNOWN
 }
 
 type FieldOptions_CheckFieldOptions_builder struct {
@@ -268,17 +251,14 @@ type FieldOptions_CheckFieldOptions_builder struct {
 	//	    (turboci).check.editable = CHECK_STATE_PLANNING
 	//	  ];
 	//	}
-	Editable *CheckState
+	Editable []CheckState
 }
 
 func (b0 FieldOptions_CheckFieldOptions_builder) Build() *FieldOptions_CheckFieldOptions {
 	m0 := &FieldOptions_CheckFieldOptions{}
 	b, x := &b0, m0
 	_, _ = b, x
-	if b.Editable != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
-		x.xxx_hidden_Editable = *b.Editable
-	}
+	x.xxx_hidden_Editable = b.Editable
 	return m0
 }
 
@@ -376,15 +356,14 @@ var File_turboci_graph_orchestrator_v1_field_options_proto protoreflect.FileDesc
 
 const file_turboci_graph_orchestrator_v1_field_options_proto_rawDesc = "" +
 	"\n" +
-	"1turboci/graph/orchestrator/v1/field_options.proto\x12\x1dturboci.graph.orchestrator.v1\x1a google/protobuf/descriptor.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\"\xa3\x04\n" +
+	"1turboci/graph/orchestrator/v1/field_options.proto\x12\x1dturboci.graph.orchestrator.v1\x1a google/protobuf/descriptor.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\"\x91\x04\n" +
 	"\fFieldOptions\x12X\n" +
 	"\x05check\x18\x01 \x01(\v2=.turboci.graph.orchestrator.v1.FieldOptions.CheckFieldOptionsH\x00R\x05check\x88\x01\x01\x12R\n" +
 	"\x02id\x18\x02 \x01(\v2=.turboci.graph.orchestrator.v1.FieldOptions.IdentifierOptionsH\x01R\x02id\x88\x01\x01\x12(\n" +
 	"\rcreation_only\x18\x03 \x01(\bH\x02R\fcreationOnly\x88\x01\x01\x127\n" +
-	"\x15realm_inherits_writer\x18\x04 \x01(\bH\x03R\x13realmInheritsWriter\x88\x01\x01\x1al\n" +
-	"\x11CheckFieldOptions\x12J\n" +
-	"\beditable\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\beditable\x88\x01\x01B\v\n" +
-	"\t_editable\x1aW\n" +
+	"\x15realm_inherits_writer\x18\x04 \x01(\bH\x03R\x13realmInheritsWriter\x88\x01\x01\x1aZ\n" +
+	"\x11CheckFieldOptions\x12E\n" +
+	"\beditable\x18\x01 \x03(\x0e2).turboci.graph.orchestrator.v1.CheckStateR\beditable\x1aW\n" +
 	"\x11IdentifierOptions\x12B\n" +
 	"\aallowed\x18\x01 \x03(\x0e2$.turboci.graph.ids.v1.IdentifierKindB\x02\x10\x01R\aallowedB\b\n" +
 	"\x06_checkB\x05\n" +
@@ -423,7 +402,6 @@ func file_turboci_graph_orchestrator_v1_field_options_proto_init() {
 	}
 	file_turboci_graph_orchestrator_v1_check_state_proto_init()
 	file_turboci_graph_orchestrator_v1_field_options_proto_msgTypes[0].OneofWrappers = []any{}
-	file_turboci_graph_orchestrator_v1_field_options_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

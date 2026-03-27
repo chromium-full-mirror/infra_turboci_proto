@@ -143,8 +143,12 @@ message WriteNodesRequest {
     // These are optional, but are meant to be a way to communicate
     // machine-readable context for this write.
     //
-    // These must be unique by (type_url, realm), and their order will be
-    // preserved in the generated Edit messages.
+    // These must be unique by (type_url, realm), and they will be
+    // stably-sorted by type_url in the generated Edit messages (e.g. for pairs
+    // of (type_url, realm), [(a, R2), (b, R3), (a, R1)] would be sorted to
+    // [(a, R2), (a, R1), (b, R3)]). This order is compatible with the
+    // expectations of the `Find` and `Lookup` methods in
+    // go.chromium.org/luci/turboci/value.
     //
     // By convention, these should be ordered from most to least specific, so
     // if a client has permission for multiple details of the same type, the
@@ -304,7 +308,10 @@ message WriteNodesRequest {
     // selected Result for this Stage Attempt.
     //
     // Must be unique on `ValueWrite.data.type_url`.
-    repeated ValueWrite results = 6 [(turboci).check.editable = CHECK_STATE_WAITING];
+    repeated ValueWrite results = 6 [
+      (turboci).check.editable = CHECK_STATE_PLANNED,
+      (turboci).check.editable = CHECK_STATE_WAITING
+    ];
 
     // If set, finalize the Check.Result.
     //

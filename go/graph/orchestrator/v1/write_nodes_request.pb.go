@@ -690,8 +690,12 @@ type WriteNodesRequest_Reason_builder struct {
 	// These are optional, but are meant to be a way to communicate
 	// machine-readable context for this write.
 	//
-	// These must be unique by (type_url, realm), and their order will be
-	// preserved in the generated Edit messages.
+	// These must be unique by (type_url, realm), and they will be
+	// stably-sorted by type_url in the generated Edit messages (e.g. for pairs
+	// of (type_url, realm), [(a, R2), (b, R3), (a, R1)] would be sorted to
+	// [(a, R2), (a, R1), (b, R3)]). This order is compatible with the
+	// expectations of the `Find` and `Lookup` methods in
+	// go.chromium.org/luci/turboci/value.
 	//
 	// By convention, these should be ordered from most to least specific, so
 	// if a client has permission for multiple details of the same type, the
@@ -2560,7 +2564,7 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\x89&\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\x8e&\n" +
 	"\x11WriteNodesRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12T\n" +
 	"\x06reason\x18\x02 \x01(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonH\x01R\x06reason\x88\x01\x01\x12Z\n" +
@@ -2591,28 +2595,30 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x0enodes_observed\x18\x01 \x03(\v2 .turboci.graph.ids.v1.IdentifierB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
 	"\x02\x02\bR\rnodesObserved\x12W\n" +
 	"\x10snapshot_version\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\x0fsnapshotVersion\x88\x01\x01B\x13\n" +
-	"\x11_snapshot_version\x1a\xb2\x05\n" +
+	"\x11_snapshot_version\x1a\xb7\x05\n" +
 	"\n" +
 	"CheckWrite\x12@\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckH\x00R\n" +
 	"identifier\x88\x01\x01\x12#\n" +
 	"\x05realm\x18\x02 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x01R\x05realm\x88\x01\x01\x12K\n" +
-	"\x04kind\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x02R\x04kind\x88\x01\x01\x12O\n" +
-	"\aoptions\x18\x04 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteB\n" +
-	"\x82\x86\xf6\xfb\x0f\x04\n" +
-	"\x02\b\n" +
-	"R\aoptions\x12z\n" +
-	"\fdependencies\x18\x05 \x01(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupB\x0f\x82\x86\xf6\xfb\x0f\t\n" +
-	"\x02\b\n" +
+	"\x04kind\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x02R\x04kind\x88\x01\x01\x12P\n" +
+	"\aoptions\x18\x04 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteB\v\x82\x86\xf6\xfb\x0f\x05\n" +
+	"\x03\n" +
+	"\x01\n" +
+	"R\aoptions\x12{\n" +
+	"\fdependencies\x18\x05 \x01(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupB\x10\x82\x86\xf6\xfb\x0f\n" +
+	"\n" +
+	"\x03\n" +
+	"\x01\n" +
 	"\x12\x03\n" +
-	"\x01\x02H\x03R\fdependencies\x88\x01\x01\x12O\n" +
-	"\aresults\x18\x06 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteB\n" +
-	"\x82\x86\xf6\xfb\x0f\x04\n" +
-	"\x02\b\x1eR\aresults\x12:\n" +
-	"\x10finalize_results\x18\a \x01(\bB\n" +
-	"\x82\x86\xf6\xfb\x0f\x04\n" +
-	"\x02\b\x1eH\x04R\x0ffinalizeResults\x88\x01\x01\x12D\n" +
+	"\x01\x02H\x03R\fdependencies\x88\x01\x01\x12Q\n" +
+	"\aresults\x18\x06 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteB\f\x82\x86\xf6\xfb\x0f\x06\n" +
+	"\x04\n" +
+	"\x02\x14\x1eR\aresults\x12;\n" +
+	"\x10finalize_results\x18\a \x01(\bB\v\x82\x86\xf6\xfb\x0f\x05\n" +
+	"\x03\n" +
+	"\x01\x1eH\x04R\x0ffinalizeResults\x88\x01\x01\x12D\n" +
 	"\x05state\x18\b \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x05R\x05state\x88\x01\x01B\r\n" +
 	"\v_identifierB\b\n" +
 	"\x06_realmB\a\n" +

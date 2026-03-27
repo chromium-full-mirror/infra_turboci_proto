@@ -55,14 +55,14 @@ const (
 	// PLANNED indicates that the workflow has finished planning this Check,
 	// but one or more dependencies of the Check are still unfulfilled.
 	//
-	// While in the PLANNED state, the Check is immutable, aside from the
-	// resolution of its dependencies.
+	// Once in the PLANNED state, the Check's options are immutable, and the
+	// Check's dependencies are in the process of resolution.
 	CheckState_CHECK_STATE_PLANNED CheckState = 20
-	// WAITING indicates that the workflow has finished planning this Check,
-	// and it is unblocked (dependencies have been sufficiently fulfilled),
-	// but the Check does not yet have a complete set of Results.
+	// WAITING indicates that the workflow has finished planning this Check, and
+	// it is unblocked (dependencies have been satisfied), but the Check does not
+	// yet have a complete set of Results.
 	//
-	// While in the WAITING state, the Check may have Results added to it.
+	// Once in the WAITING state, the Check's dependencies are immutable.
 	CheckState_CHECK_STATE_WAITING CheckState = 30
 	// FINAL indicates that this Check is fully immutable.
 	//

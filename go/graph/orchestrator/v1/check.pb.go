@@ -340,13 +340,13 @@ type Check_builder struct {
 	//
 	// Checks may only depend on other Checks.
 	//
-	// While the check is in PLANNING state, its dependencies can be mutated
+	// While the check is in the PLANNING state, its dependencies can be mutated
 	// freely via WriteNodes calls.
 	//
 	// Once the Check is moved into PLANNED state by a WriteNodes call,
 	// dependencies are "locked" and the Orchestrator starts tracking their
 	// resolution. Once they are resolved, the Orchestrator will switch the check
-	// into WAITING state.
+	// into the WAITING state.
 	Dependencies *Dependencies
 	// Options form the bulk of 'how to answer this Check'.
 	//
@@ -749,7 +749,7 @@ var File_turboci_graph_orchestrator_v1_check_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a(turboci/graph/orchestrator/v1/edit.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\xf1\f\n" +
+	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a(turboci/graph/orchestrator/v1/edit.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\xf4\f\n" +
 	"\x05Check\x12E\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckB\x03\xe0A\x05H\x00R\n" +
@@ -762,15 +762,15 @@ const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x05R\x05state\x88\x01\x01\x12[\n" +
 	"\rstate_history\x18\a \x03(\v26.turboci.graph.orchestrator.v1.Check.StateHistoryEntryR\fstateHistory\x12a\n" +
 	"\fdependencies\x18\b \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\x02H\x06R\fdependencies\x88\x01\x01\x12M\n" +
-	"\aoptions\x18\t \x03(\v2'.turboci.graph.orchestrator.v1.ValueRefB\n" +
-	"\x82\x86\xf6\xfb\x0f\x04\n" +
-	"\x02\b\n" +
-	"R\aoptions\x12Q\n" +
+	"\x01\x02H\x06R\fdependencies\x88\x01\x01\x12N\n" +
+	"\aoptions\x18\t \x03(\v2'.turboci.graph.orchestrator.v1.ValueRefB\v\x82\x86\xf6\xfb\x0f\x05\n" +
+	"\x03\n" +
+	"\x01\n" +
+	"R\aoptions\x12S\n" +
 	"\aresults\x18\n" +
-	" \x03(\v2+.turboci.graph.orchestrator.v1.Check.ResultB\n" +
-	"\x82\x86\xf6\xfb\x0f\x04\n" +
-	"\x02\b\x1eR\aresults\x129\n" +
+	" \x03(\v2+.turboci.graph.orchestrator.v1.Check.ResultB\f\x82\x86\xf6\xfb\x0f\x06\n" +
+	"\x04\n" +
+	"\x02\x14\x1eR\aresults\x129\n" +
 	"\x05edits\x18\v \x03(\v2#.turboci.graph.orchestrator.v1.EditR\x05edits\x1a\xc1\x01\n" +
 	"\x11StateHistoryEntry\x12I\n" +
 	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateB\x03\xe0A\x05H\x00R\x05state\x88\x01\x01\x12K\n" +
