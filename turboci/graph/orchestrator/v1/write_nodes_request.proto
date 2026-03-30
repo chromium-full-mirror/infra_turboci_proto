@@ -221,7 +221,7 @@ message WriteNodesRequest {
 
     // Write data to a Result for this Check.
     //
-    // The Result to write in is keyed on:
+    // The Result to write to is automatically keyed on:
     //   * The Stage Attempt (if `token` is provided)
     //   * The caller's identity (if `token` is absent)
     //
@@ -235,7 +235,7 @@ message WriteNodesRequest {
     // selected Result for this Stage Attempt.
     //
     // Must be unique on `ValueWrite.data.type_url`.
-    repeated ValueWrite results = 6 [
+    repeated ValueWrite result_data = 6 [
       (turboci).check.editable = CHECK_STATE_PLANNED,
       (turboci).check.editable = CHECK_STATE_WAITING
     ];

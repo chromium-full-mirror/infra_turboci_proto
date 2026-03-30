@@ -723,7 +723,7 @@ type WriteNodesRequest_CheckWrite struct {
 	xxx_hidden_Kind            CheckKind                          `protobuf:"varint,3,opt,name=kind,proto3,enum=turboci.graph.orchestrator.v1.CheckKind,oneof"`
 	xxx_hidden_Options         *[]*ValueWrite                     `protobuf:"bytes,4,rep,name=options,proto3"`
 	xxx_hidden_Dependencies    *WriteNodesRequest_DependencyGroup `protobuf:"bytes,5,opt,name=dependencies,proto3,oneof"`
-	xxx_hidden_Results         *[]*ValueWrite                     `protobuf:"bytes,6,rep,name=results,proto3"`
+	xxx_hidden_ResultData      *[]*ValueWrite                     `protobuf:"bytes,6,rep,name=result_data,json=resultData,proto3"`
 	xxx_hidden_FinalizeResults bool                               `protobuf:"varint,7,opt,name=finalize_results,json=finalizeResults,proto3,oneof"`
 	xxx_hidden_State           CheckState                         `protobuf:"varint,8,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
 	XXX_raceDetectHookData     protoimpl.RaceDetectHookData
@@ -799,10 +799,10 @@ func (x *WriteNodesRequest_CheckWrite) GetDependencies() *WriteNodesRequest_Depe
 	return nil
 }
 
-func (x *WriteNodesRequest_CheckWrite) GetResults() []*ValueWrite {
+func (x *WriteNodesRequest_CheckWrite) GetResultData() []*ValueWrite {
 	if x != nil {
-		if x.xxx_hidden_Results != nil {
-			return *x.xxx_hidden_Results
+		if x.xxx_hidden_ResultData != nil {
+			return *x.xxx_hidden_ResultData
 		}
 	}
 	return nil
@@ -846,8 +846,8 @@ func (x *WriteNodesRequest_CheckWrite) SetDependencies(v *WriteNodesRequest_Depe
 	x.xxx_hidden_Dependencies = v
 }
 
-func (x *WriteNodesRequest_CheckWrite) SetResults(v []*ValueWrite) {
-	x.xxx_hidden_Results = &v
+func (x *WriteNodesRequest_CheckWrite) SetResultData(v []*ValueWrite) {
+	x.xxx_hidden_ResultData = &v
 }
 
 func (x *WriteNodesRequest_CheckWrite) SetFinalizeResults(v bool) {
@@ -969,7 +969,7 @@ type WriteNodesRequest_CheckWrite_builder struct {
 	Dependencies *WriteNodesRequest_DependencyGroup
 	// Write data to a Result for this Check.
 	//
-	// The Result to write in is keyed on:
+	// The Result to write to is automatically keyed on:
 	//   - The Stage Attempt (if `token` is provided)
 	//   - The caller's identity (if `token` is absent)
 	//
@@ -983,7 +983,7 @@ type WriteNodesRequest_CheckWrite_builder struct {
 	// selected Result for this Stage Attempt.
 	//
 	// Must be unique on `ValueWrite.data.type_url`.
-	Results []*ValueWrite
+	ResultData []*ValueWrite
 	// If set, finalize the Check.Result.
 	//
 	// No more data may be written to the Result from the caller after this is
@@ -1011,7 +1011,7 @@ func (b0 WriteNodesRequest_CheckWrite_builder) Build() *WriteNodesRequest_CheckW
 	}
 	x.xxx_hidden_Options = &b.Options
 	x.xxx_hidden_Dependencies = b.Dependencies
-	x.xxx_hidden_Results = &b.Results
+	x.xxx_hidden_ResultData = &b.ResultData
 	if b.FinalizeResults != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 8)
 		x.xxx_hidden_FinalizeResults = *b.FinalizeResults
@@ -2414,7 +2414,7 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/transaction_details.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\xa0$\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/transaction_details.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\xa7$\n" +
 	"\x11WriteNodesRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12T\n" +
 	"\x06reason\x18\x02 \x01(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonH\x01R\x06reason\x88\x01\x01\x12H\n" +
@@ -2440,7 +2440,7 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\amessage\x18\x01 \x01(\tH\x00R\amessage\x88\x01\x01\x12C\n" +
 	"\adetails\x18\x02 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteR\adetailsB\n" +
 	"\n" +
-	"\b_message\x1a\xb7\x05\n" +
+	"\b_message\x1a\xbe\x05\n" +
 	"\n" +
 	"CheckWrite\x12@\n" +
 	"\n" +
@@ -2457,10 +2457,11 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x03\n" +
 	"\x01\n" +
 	"\x12\x03\n" +
-	"\x01\x02H\x03R\fdependencies\x88\x01\x01\x12Q\n" +
-	"\aresults\x18\x06 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteB\f\x82\x86\xf6\xfb\x0f\x06\n" +
+	"\x01\x02H\x03R\fdependencies\x88\x01\x01\x12X\n" +
+	"\vresult_data\x18\x06 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteB\f\x82\x86\xf6\xfb\x0f\x06\n" +
 	"\x04\n" +
-	"\x02\x14\x1eR\aresults\x12;\n" +
+	"\x02\x14\x1eR\n" +
+	"resultData\x12;\n" +
 	"\x10finalize_results\x18\a \x01(\bB\v\x82\x86\xf6\xfb\x0f\x05\n" +
 	"\x03\n" +
 	"\x01\x1eH\x04R\x0ffinalizeResults\x88\x01\x01\x12D\n" +
@@ -2580,7 +2581,7 @@ var file_turboci_graph_orchestrator_v1_write_nodes_request_proto_depIdxs = []int
 	19, // 11: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.kind:type_name -> turboci.graph.orchestrator.v1.CheckKind
 	17, // 12: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.options:type_name -> turboci.graph.orchestrator.v1.ValueWrite
 	1,  // 13: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.dependencies:type_name -> turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroup
-	17, // 14: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.results:type_name -> turboci.graph.orchestrator.v1.ValueWrite
+	17, // 14: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.result_data:type_name -> turboci.graph.orchestrator.v1.ValueWrite
 	20, // 15: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.state:type_name -> turboci.graph.orchestrator.v1.CheckState
 	21, // 16: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.identifier:type_name -> turboci.graph.ids.v1.Stage
 	17, // 17: turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite.args:type_name -> turboci.graph.orchestrator.v1.ValueWrite
