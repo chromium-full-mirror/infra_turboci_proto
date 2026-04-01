@@ -49,6 +49,7 @@ type ValueFilter struct {
 	xxx_hidden_StageAttemptProgressDetails     ValueMask              `protobuf:"varint,8,opt,name=stage_attempt_progress_details,json=stageAttemptProgressDetails,proto3,enum=turboci.graph.orchestrator.v1.ValueMask,oneof"`
 	xxx_hidden_StageEditAttemptDetails         ValueMask              `protobuf:"varint,9,opt,name=stage_edit_attempt_details,json=stageEditAttemptDetails,proto3,enum=turboci.graph.orchestrator.v1.ValueMask,oneof"`
 	xxx_hidden_StageEditAttemptProgressDetails ValueMask              `protobuf:"varint,10,opt,name=stage_edit_attempt_progress_details,json=stageEditAttemptProgressDetails,proto3,enum=turboci.graph.orchestrator.v1.ValueMask,oneof"`
+	xxx_hidden_StageLegacyWorknode             ValueMask              `protobuf:"varint,11,opt,name=stage_legacy_worknode,json=stageLegacyWorknode,proto3,enum=turboci.graph.orchestrator.v1.ValueMask,oneof"`
 	XXX_raceDetectHookData                     protoimpl.RaceDetectHookData
 	XXX_presence                               [1]uint32
 	unknownFields                              protoimpl.UnknownFields
@@ -168,53 +169,67 @@ func (x *ValueFilter) GetStageEditAttemptProgressDetails() ValueMask {
 	return ValueMask_VALUE_MASK_UNKNOWN
 }
 
+func (x *ValueFilter) GetStageLegacyWorknode() ValueMask {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 10) {
+			return x.xxx_hidden_StageLegacyWorknode
+		}
+	}
+	return ValueMask_VALUE_MASK_UNKNOWN
+}
+
 func (x *ValueFilter) SetTypeInfo(v *TypeInfo) {
 	x.xxx_hidden_TypeInfo = v
 }
 
 func (x *ValueFilter) SetCheckOptions(v ValueMask) {
 	x.xxx_hidden_CheckOptions = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 10)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 11)
 }
 
 func (x *ValueFilter) SetCheckResultData(v ValueMask) {
 	x.xxx_hidden_CheckResultData = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 10)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 11)
 }
 
 func (x *ValueFilter) SetCheckEditOptions(v ValueMask) {
 	x.xxx_hidden_CheckEditOptions = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 10)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 11)
 }
 
 func (x *ValueFilter) SetCheckEditResultData(v ValueMask) {
 	x.xxx_hidden_CheckEditResultData = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 10)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 11)
 }
 
 func (x *ValueFilter) SetStageArgs(v ValueMask) {
 	x.xxx_hidden_StageArgs = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 10)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 11)
 }
 
 func (x *ValueFilter) SetStageAttemptDetails(v ValueMask) {
 	x.xxx_hidden_StageAttemptDetails = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 10)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 11)
 }
 
 func (x *ValueFilter) SetStageAttemptProgressDetails(v ValueMask) {
 	x.xxx_hidden_StageAttemptProgressDetails = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 7, 10)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 7, 11)
 }
 
 func (x *ValueFilter) SetStageEditAttemptDetails(v ValueMask) {
 	x.xxx_hidden_StageEditAttemptDetails = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 8, 10)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 8, 11)
 }
 
 func (x *ValueFilter) SetStageEditAttemptProgressDetails(v ValueMask) {
 	x.xxx_hidden_StageEditAttemptProgressDetails = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 9, 10)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 9, 11)
+}
+
+func (x *ValueFilter) SetStageLegacyWorknode(v ValueMask) {
+	x.xxx_hidden_StageLegacyWorknode = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 10, 11)
 }
 
 func (x *ValueFilter) HasTypeInfo() bool {
@@ -287,6 +302,13 @@ func (x *ValueFilter) HasStageEditAttemptProgressDetails() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 9)
 }
 
+func (x *ValueFilter) HasStageLegacyWorknode() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 10)
+}
+
 func (x *ValueFilter) ClearTypeInfo() {
 	x.xxx_hidden_TypeInfo = nil
 }
@@ -336,6 +358,11 @@ func (x *ValueFilter) ClearStageEditAttemptProgressDetails() {
 	x.xxx_hidden_StageEditAttemptProgressDetails = ValueMask_VALUE_MASK_UNKNOWN
 }
 
+func (x *ValueFilter) ClearStageLegacyWorknode() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 10)
+	x.xxx_hidden_StageLegacyWorknode = ValueMask_VALUE_MASK_UNKNOWN
+}
+
 type ValueFilter_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
@@ -359,6 +386,8 @@ type ValueFilter_builder struct {
 	StageEditAttemptDetails *ValueMask
 	// ValueMask for Values in Edit.stage.attempts.progress.details.
 	StageEditAttemptProgressDetails *ValueMask
+	// ValueMask for Values in Stage.legacy.worknode.
+	StageLegacyWorknode *ValueMask
 }
 
 func (b0 ValueFilter_builder) Build() *ValueFilter {
@@ -367,40 +396,44 @@ func (b0 ValueFilter_builder) Build() *ValueFilter {
 	_, _ = b, x
 	x.xxx_hidden_TypeInfo = b.TypeInfo
 	if b.CheckOptions != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 10)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 11)
 		x.xxx_hidden_CheckOptions = *b.CheckOptions
 	}
 	if b.CheckResultData != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 10)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 11)
 		x.xxx_hidden_CheckResultData = *b.CheckResultData
 	}
 	if b.CheckEditOptions != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 10)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 11)
 		x.xxx_hidden_CheckEditOptions = *b.CheckEditOptions
 	}
 	if b.CheckEditResultData != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 10)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 11)
 		x.xxx_hidden_CheckEditResultData = *b.CheckEditResultData
 	}
 	if b.StageArgs != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 10)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 11)
 		x.xxx_hidden_StageArgs = *b.StageArgs
 	}
 	if b.StageAttemptDetails != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 10)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 11)
 		x.xxx_hidden_StageAttemptDetails = *b.StageAttemptDetails
 	}
 	if b.StageAttemptProgressDetails != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 7, 10)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 7, 11)
 		x.xxx_hidden_StageAttemptProgressDetails = *b.StageAttemptProgressDetails
 	}
 	if b.StageEditAttemptDetails != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 8, 10)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 8, 11)
 		x.xxx_hidden_StageEditAttemptDetails = *b.StageEditAttemptDetails
 	}
 	if b.StageEditAttemptProgressDetails != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 9, 10)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 9, 11)
 		x.xxx_hidden_StageEditAttemptProgressDetails = *b.StageEditAttemptProgressDetails
+	}
+	if b.StageLegacyWorknode != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 10, 11)
+		x.xxx_hidden_StageLegacyWorknode = *b.StageLegacyWorknode
 	}
 	return m0
 }
@@ -409,7 +442,8 @@ var File_turboci_graph_orchestrator_v1_value_filter_proto protoreflect.FileDescr
 
 const file_turboci_graph_orchestrator_v1_value_filter_proto_rawDesc = "" +
 	"\n" +
-	"0turboci/graph/orchestrator/v1/value_filter.proto\x12\x1dturboci.graph.orchestrator.v1\x1a-turboci/graph/orchestrator/v1/type_info.proto\x1a.turboci/graph/orchestrator/v1/value_mask.proto\"\xd1\t\n" +
+	"0turboci/graph/orchestrator/v1/value_filter.proto\x12\x1dturboci.graph.orchestrator.v1\x1a-turboci/graph/orchestrator/v1/type_info.proto\x1a.turboci/graph/orchestrator/v1/value_mask.proto\"\xce\n" +
+	"\n" +
 	"\vValueFilter\x12I\n" +
 	"\ttype_info\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.TypeInfoH\x00R\btypeInfo\x88\x01\x01\x12R\n" +
 	"\rcheck_options\x18\x02 \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\x01R\fcheckOptions\x88\x01\x01\x12Y\n" +
@@ -422,7 +456,9 @@ const file_turboci_graph_orchestrator_v1_value_filter_proto_rawDesc = "" +
 	"\x1estage_attempt_progress_details\x18\b \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\aR\x1bstageAttemptProgressDetails\x88\x01\x01\x12j\n" +
 	"\x1astage_edit_attempt_details\x18\t \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\bR\x17stageEditAttemptDetails\x88\x01\x01\x12{\n" +
 	"#stage_edit_attempt_progress_details\x18\n" +
-	" \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\tR\x1fstageEditAttemptProgressDetails\x88\x01\x01B\f\n" +
+	" \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\tR\x1fstageEditAttemptProgressDetails\x88\x01\x01\x12a\n" +
+	"\x15stage_legacy_worknode\x18\v \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\n" +
+	"R\x13stageLegacyWorknode\x88\x01\x01B\f\n" +
 	"\n" +
 	"_type_infoB\x10\n" +
 	"\x0e_check_optionsB\x14\n" +
@@ -433,7 +469,8 @@ const file_turboci_graph_orchestrator_v1_value_filter_proto_rawDesc = "" +
 	"\x16_stage_attempt_detailsB!\n" +
 	"\x1f_stage_attempt_progress_detailsB\x1d\n" +
 	"\x1b_stage_edit_attempt_detailsB&\n" +
-	"$_stage_edit_attempt_progress_detailsBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"$_stage_edit_attempt_progress_detailsB\x18\n" +
+	"\x16_stage_legacy_worknodeBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_value_filter_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_value_filter_proto_goTypes = []any{
@@ -452,11 +489,12 @@ var file_turboci_graph_orchestrator_v1_value_filter_proto_depIdxs = []int32{
 	2,  // 7: turboci.graph.orchestrator.v1.ValueFilter.stage_attempt_progress_details:type_name -> turboci.graph.orchestrator.v1.ValueMask
 	2,  // 8: turboci.graph.orchestrator.v1.ValueFilter.stage_edit_attempt_details:type_name -> turboci.graph.orchestrator.v1.ValueMask
 	2,  // 9: turboci.graph.orchestrator.v1.ValueFilter.stage_edit_attempt_progress_details:type_name -> turboci.graph.orchestrator.v1.ValueMask
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	2,  // 10: turboci.graph.orchestrator.v1.ValueFilter.stage_legacy_worknode:type_name -> turboci.graph.orchestrator.v1.ValueMask
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_value_filter_proto_init() }

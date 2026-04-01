@@ -35,7 +35,7 @@ const (
 // See also:
 //   - Identifier.Stage* (Identifiers for Stages, StageAttempts, etc.)
 //
-// Next ID: 16
+// Next ID: 17
 type Stage struct {
 	state                        protoimpl.MessageState      `protogen:"opaque.v1"`
 	xxx_hidden_Identifier        *v1.Stage                   `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
@@ -45,6 +45,7 @@ type Stage struct {
 	xxx_hidden_Version           *Revision                   `protobuf:"bytes,5,opt,name=version,proto3,oneof"`
 	xxx_hidden_State             StageState                  `protobuf:"varint,6,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
 	xxx_hidden_CancelledBy       *Actor                      `protobuf:"bytes,14,opt,name=cancelled_by,json=cancelledBy,proto3,oneof"`
+	xxx_hidden_Legacy            *Stage_Legacy               `protobuf:"bytes,16,opt,name=legacy,proto3,oneof"`
 	xxx_hidden_StateHistory      *[]*Stage_StateHistoryEntry `protobuf:"bytes,7,rep,name=state_history,json=stateHistory,proto3"`
 	xxx_hidden_Dependencies      *Dependencies               `protobuf:"bytes,8,opt,name=dependencies,proto3,oneof"`
 	xxx_hidden_ExecutionPolicy   *Stage_ExecutionPolicyState `protobuf:"bytes,9,opt,name=execution_policy,json=executionPolicy,proto3,oneof"`
@@ -138,6 +139,13 @@ func (x *Stage) GetCancelledBy() *Actor {
 	return nil
 }
 
+func (x *Stage) GetLegacy() *Stage_Legacy {
+	if x != nil {
+		return x.xxx_hidden_Legacy
+	}
+	return nil
+}
+
 func (x *Stage) GetStateHistory() []*Stage_StateHistoryEntry {
 	if x != nil {
 		if x.xxx_hidden_StateHistory != nil {
@@ -188,7 +196,7 @@ func (x *Stage) GetContinuationGroup() *Dependencies {
 
 func (x *Stage) GetConcludedReason() StageConcludedReason {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 13) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 14) {
 			return x.xxx_hidden_ConcludedReason
 		}
 	}
@@ -214,7 +222,7 @@ func (x *Stage) SetCreatedBy(v *Actor) {
 
 func (x *Stage) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 15)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 16)
 }
 
 func (x *Stage) SetArgs(v *ValueRef) {
@@ -227,11 +235,15 @@ func (x *Stage) SetVersion(v *Revision) {
 
 func (x *Stage) SetState(v StageState) {
 	x.xxx_hidden_State = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 15)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 16)
 }
 
 func (x *Stage) SetCancelledBy(v *Actor) {
 	x.xxx_hidden_CancelledBy = v
+}
+
+func (x *Stage) SetLegacy(v *Stage_Legacy) {
+	x.xxx_hidden_Legacy = v
 }
 
 func (x *Stage) SetStateHistory(v []*Stage_StateHistoryEntry) {
@@ -260,7 +272,7 @@ func (x *Stage) SetContinuationGroup(v *Dependencies) {
 
 func (x *Stage) SetConcludedReason(v StageConcludedReason) {
 	x.xxx_hidden_ConcludedReason = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 13, 15)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 14, 16)
 }
 
 func (x *Stage) SetEdits(v []*Edit) {
@@ -316,6 +328,13 @@ func (x *Stage) HasCancelledBy() bool {
 	return x.xxx_hidden_CancelledBy != nil
 }
 
+func (x *Stage) HasLegacy() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Legacy != nil
+}
+
 func (x *Stage) HasDependencies() bool {
 	if x == nil {
 		return false
@@ -341,7 +360,7 @@ func (x *Stage) HasConcludedReason() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 13)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 14)
 }
 
 func (x *Stage) ClearIdentifier() {
@@ -374,6 +393,10 @@ func (x *Stage) ClearCancelledBy() {
 	x.xxx_hidden_CancelledBy = nil
 }
 
+func (x *Stage) ClearLegacy() {
+	x.xxx_hidden_Legacy = nil
+}
+
 func (x *Stage) ClearDependencies() {
 	x.xxx_hidden_Dependencies = nil
 }
@@ -387,7 +410,7 @@ func (x *Stage) ClearContinuationGroup() {
 }
 
 func (x *Stage) ClearConcludedReason() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 13)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 14)
 	x.xxx_hidden_ConcludedReason = StageConcludedReason_STAGE_CONCLUDED_REASON_UNKNOWN
 }
 
@@ -440,6 +463,11 @@ type Stage_builder struct {
 	// If this stage was cancelled, this indicates the Actor which cancelled
 	// it.
 	CancelledBy *Actor
+	// Set only for stages that represent legacy WorkNodes.
+	//
+	// Such stages are submitted either via legacy WorkPlan API or as a special
+	// kind of a Stage (with `args` having type TBD).
+	Legacy *Stage_Legacy
 	// Append-only list of StateHistoryEntry to record the database revision
 	// (commit timestamp) when each time this Stage's state changes.
 	StateHistory []*Stage_StateHistoryEntry
@@ -505,16 +533,17 @@ func (b0 Stage_builder) Build() *Stage {
 	x.xxx_hidden_Identifier = b.Identifier
 	x.xxx_hidden_CreatedBy = b.CreatedBy
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 15)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 16)
 		x.xxx_hidden_Realm = b.Realm
 	}
 	x.xxx_hidden_Args = b.Args
 	x.xxx_hidden_Version = b.Version
 	if b.State != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 15)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 16)
 		x.xxx_hidden_State = *b.State
 	}
 	x.xxx_hidden_CancelledBy = b.CancelledBy
+	x.xxx_hidden_Legacy = b.Legacy
 	x.xxx_hidden_StateHistory = &b.StateHistory
 	x.xxx_hidden_Dependencies = b.Dependencies
 	x.xxx_hidden_ExecutionPolicy = b.ExecutionPolicy
@@ -522,7 +551,7 @@ func (b0 Stage_builder) Build() *Stage {
 	x.xxx_hidden_Assignments = &b.Assignments
 	x.xxx_hidden_ContinuationGroup = b.ContinuationGroup
 	if b.ConcludedReason != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 13, 15)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 14, 16)
 		x.xxx_hidden_ConcludedReason = *b.ConcludedReason
 	}
 	x.xxx_hidden_Edits = &b.Edits
@@ -802,6 +831,121 @@ func (b0 StageAttemptCurrentState_builder) Build() *StageAttemptCurrentState {
 	return m0
 }
 
+// Set for stages that represent legacy WorkNodes.
+type Stage_Legacy struct {
+	state                       protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Worknode         *ValueRef              `protobuf:"bytes,1,opt,name=worknode,proto3,oneof"`
+	xxx_hidden_WorkExecutorType int32                  `protobuf:"varint,2,opt,name=work_executor_type,json=workExecutorType,proto3,oneof"`
+	XXX_raceDetectHookData      protoimpl.RaceDetectHookData
+	XXX_presence                [1]uint32
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
+}
+
+func (x *Stage_Legacy) Reset() {
+	*x = Stage_Legacy{}
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Stage_Legacy) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Stage_Legacy) ProtoMessage() {}
+
+func (x *Stage_Legacy) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Stage_Legacy) GetWorknode() *ValueRef {
+	if x != nil {
+		return x.xxx_hidden_Worknode
+	}
+	return nil
+}
+
+func (x *Stage_Legacy) GetWorkExecutorType() int32 {
+	if x != nil {
+		return x.xxx_hidden_WorkExecutorType
+	}
+	return 0
+}
+
+func (x *Stage_Legacy) SetWorknode(v *ValueRef) {
+	x.xxx_hidden_Worknode = v
+}
+
+func (x *Stage_Legacy) SetWorkExecutorType(v int32) {
+	x.xxx_hidden_WorkExecutorType = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *Stage_Legacy) HasWorknode() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Worknode != nil
+}
+
+func (x *Stage_Legacy) HasWorkExecutorType() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Stage_Legacy) ClearWorknode() {
+	x.xxx_hidden_Worknode = nil
+}
+
+func (x *Stage_Legacy) ClearWorkExecutorType() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_WorkExecutorType = 0
+}
+
+type Stage_Legacy_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fully populated encoded WorkNode proto.
+	//
+	// Note the value of this field is changing over lifetime of the stage. It
+	// matches identically to what the legacy WorkPlan API returns.
+	//
+	// Type URL is type.googleapis.com/wireless.android.launchcontrol.WorkNode.
+	// The realm always matches the realm of the stage.
+	//
+	// This field, just like other ValueRef fields, is a subject of type
+	// filtering and JSON encoding during reads.
+	Worknode *ValueRef
+	// The WorkExecutorType as extracted from `worknode`.
+	//
+	// Have it as a separate field is useful for skipping decoding large proto
+	// during ACL checks (that just need the executor type).
+	WorkExecutorType *int32
+}
+
+func (b0 Stage_Legacy_builder) Build() *Stage_Legacy {
+	m0 := &Stage_Legacy{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Worknode = b.Worknode
+	if b.WorkExecutorType != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_WorkExecutorType = *b.WorkExecutorType
+	}
+	return m0
+}
+
 // StateHistoryEntry records the database revision (commit timestamp) when
 // each time this Stage's state changes.
 type Stage_StateHistoryEntry struct {
@@ -816,7 +960,7 @@ type Stage_StateHistoryEntry struct {
 
 func (x *Stage_StateHistoryEntry) Reset() {
 	*x = Stage_StateHistoryEntry{}
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[3]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -828,7 +972,7 @@ func (x *Stage_StateHistoryEntry) String() string {
 func (*Stage_StateHistoryEntry) ProtoMessage() {}
 
 func (x *Stage_StateHistoryEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[3]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -926,7 +1070,7 @@ type Stage_ExecutionPolicyState struct {
 
 func (x *Stage_ExecutionPolicyState) Reset() {
 	*x = Stage_ExecutionPolicyState{}
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[4]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -938,7 +1082,7 @@ func (x *Stage_ExecutionPolicyState) String() string {
 func (*Stage_ExecutionPolicyState) ProtoMessage() {}
 
 func (x *Stage_ExecutionPolicyState) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[4]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1051,7 +1195,7 @@ type Stage_Attempt struct {
 
 func (x *Stage_Attempt) Reset() {
 	*x = Stage_Attempt{}
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[5]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1063,7 +1207,7 @@ func (x *Stage_Attempt) String() string {
 func (*Stage_Attempt) ProtoMessage() {}
 
 func (x *Stage_Attempt) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[5]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1417,7 +1561,7 @@ type Stage_Assignment struct {
 
 func (x *Stage_Assignment) Reset() {
 	*x = Stage_Assignment{}
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[6]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1429,7 +1573,7 @@ func (x *Stage_Assignment) String() string {
 func (*Stage_Assignment) ProtoMessage() {}
 
 func (x *Stage_Assignment) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[6]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1547,7 +1691,7 @@ type Stage_Attempt_StateHistoryEntry struct {
 
 func (x *Stage_Attempt_StateHistoryEntry) Reset() {
 	*x = Stage_Attempt_StateHistoryEntry{}
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[7]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1559,7 +1703,7 @@ func (x *Stage_Attempt_StateHistoryEntry) String() string {
 func (*Stage_Attempt_StateHistoryEntry) ProtoMessage() {}
 
 func (x *Stage_Attempt_StateHistoryEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[7]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1660,7 +1804,7 @@ type Stage_Attempt_Progress struct {
 
 func (x *Stage_Attempt_Progress) Reset() {
 	*x = Stage_Attempt_Progress{}
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[8]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1672,7 +1816,7 @@ func (x *Stage_Attempt_Progress) String() string {
 func (*Stage_Attempt_Progress) ProtoMessage() {}
 
 func (x *Stage_Attempt_Progress) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[8]
+	mi := &file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1842,7 +1986,7 @@ var File_turboci_graph_orchestrator_v1_stage_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/stage.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a(turboci/graph/orchestrator/v1/edit.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\x81\x1b\n" +
+	")turboci/graph/orchestrator/v1/stage.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a(turboci/graph/orchestrator/v1/edit.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\x82\x1d\n" +
 	"\x05Stage\x12E\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageB\x03\xe0A\x05H\x00R\n" +
@@ -1853,19 +1997,25 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\x04args\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.ValueRefB\x03\xe0A\x05H\x03R\x04args\x88\x01\x01\x12F\n" +
 	"\aversion\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x04R\aversion\x88\x01\x01\x12D\n" +
 	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x05R\x05state\x88\x01\x01\x12L\n" +
-	"\fcancelled_by\x18\x0e \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x06R\vcancelledBy\x88\x01\x01\x12[\n" +
+	"\fcancelled_by\x18\x0e \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x06R\vcancelledBy\x88\x01\x01\x12H\n" +
+	"\x06legacy\x18\x10 \x01(\v2+.turboci.graph.orchestrator.v1.Stage.LegacyH\aR\x06legacy\x88\x01\x01\x12[\n" +
 	"\rstate_history\x18\a \x03(\v26.turboci.graph.orchestrator.v1.Stage.StateHistoryEntryR\fstateHistory\x12b\n" +
 	"\fdependencies\x18\b \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
-	"\x02\x02\bH\aR\fdependencies\x88\x01\x01\x12i\n" +
-	"\x10execution_policy\x18\t \x01(\v29.turboci.graph.orchestrator.v1.Stage.ExecutionPolicyStateH\bR\x0fexecutionPolicy\x88\x01\x01\x12H\n" +
+	"\x02\x02\bH\bR\fdependencies\x88\x01\x01\x12i\n" +
+	"\x10execution_policy\x18\t \x01(\v29.turboci.graph.orchestrator.v1.Stage.ExecutionPolicyStateH\tR\x0fexecutionPolicy\x88\x01\x01\x12H\n" +
 	"\battempts\x18\n" +
 	" \x03(\v2,.turboci.graph.orchestrator.v1.Stage.AttemptR\battempts\x12V\n" +
 	"\vassignments\x18\v \x03(\v2/.turboci.graph.orchestrator.v1.Stage.AssignmentB\x03\xe0A\x05R\vassignments\x12l\n" +
 	"\x12continuation_group\x18\f \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\bH\tR\x11continuationGroup\x88\x01\x01\x12c\n" +
-	"\x10concluded_reason\x18\r \x01(\x0e23.turboci.graph.orchestrator.v1.StageConcludedReasonH\n" +
-	"R\x0fconcludedReason\x88\x01\x01\x129\n" +
-	"\x05edits\x18\x0f \x03(\v2#.turboci.graph.orchestrator.v1.EditR\x05edits\x1a\xc1\x01\n" +
+	"\x01\bH\n" +
+	"R\x11continuationGroup\x88\x01\x01\x12c\n" +
+	"\x10concluded_reason\x18\r \x01(\x0e23.turboci.graph.orchestrator.v1.StageConcludedReasonH\vR\x0fconcludedReason\x88\x01\x01\x129\n" +
+	"\x05edits\x18\x0f \x03(\v2#.turboci.graph.orchestrator.v1.EditR\x05edits\x1a\xa9\x01\n" +
+	"\x06Legacy\x12H\n" +
+	"\bworknode\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.ValueRefH\x00R\bworknode\x88\x01\x01\x121\n" +
+	"\x12work_executor_type\x18\x02 \x01(\x05H\x01R\x10workExecutorType\x88\x01\x01B\v\n" +
+	"\t_worknodeB\x15\n" +
+	"\x13_work_executor_type\x1a\xc1\x01\n" +
 	"\x11StateHistoryEntry\x12I\n" +
 	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateB\x03\xe0A\x05H\x00R\x05state\x88\x01\x01\x12K\n" +
 	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionB\x03\xe0A\x05H\x01R\aversion\x88\x01\x01B\b\n" +
@@ -1935,7 +2085,8 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\n" +
 	"\b_versionB\b\n" +
 	"\x06_stateB\x0f\n" +
-	"\r_cancelled_byB\x0f\n" +
+	"\r_cancelled_byB\t\n" +
+	"\a_legacyB\x0f\n" +
 	"\r_dependenciesB\x13\n" +
 	"\x11_execution_policyB\x15\n" +
 	"\x13_continuation_groupB\x13\n" +
@@ -1954,77 +2105,80 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\x10_update_state_byB\x0f\n" +
 	"\r_heartbeat_byBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_stage_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_turboci_graph_orchestrator_v1_stage_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_turboci_graph_orchestrator_v1_stage_proto_goTypes = []any{
 	(*Stage)(nil),                           // 0: turboci.graph.orchestrator.v1.Stage
 	(*StageAttemptClaimedFailure)(nil),      // 1: turboci.graph.orchestrator.v1.StageAttemptClaimedFailure
 	(*StageAttemptCurrentState)(nil),        // 2: turboci.graph.orchestrator.v1.StageAttemptCurrentState
-	(*Stage_StateHistoryEntry)(nil),         // 3: turboci.graph.orchestrator.v1.Stage.StateHistoryEntry
-	(*Stage_ExecutionPolicyState)(nil),      // 4: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState
-	(*Stage_Attempt)(nil),                   // 5: turboci.graph.orchestrator.v1.Stage.Attempt
-	(*Stage_Assignment)(nil),                // 6: turboci.graph.orchestrator.v1.Stage.Assignment
-	(*Stage_Attempt_StateHistoryEntry)(nil), // 7: turboci.graph.orchestrator.v1.Stage.Attempt.StateHistoryEntry
-	(*Stage_Attempt_Progress)(nil),          // 8: turboci.graph.orchestrator.v1.Stage.Attempt.Progress
-	(*v1.Stage)(nil),                        // 9: turboci.graph.ids.v1.Stage
-	(*Actor)(nil),                           // 10: turboci.graph.orchestrator.v1.Actor
-	(*ValueRef)(nil),                        // 11: turboci.graph.orchestrator.v1.ValueRef
-	(*Revision)(nil),                        // 12: turboci.graph.orchestrator.v1.Revision
-	(StageState)(0),                         // 13: turboci.graph.orchestrator.v1.StageState
-	(*Dependencies)(nil),                    // 14: turboci.graph.orchestrator.v1.Dependencies
-	(StageConcludedReason)(0),               // 15: turboci.graph.orchestrator.v1.StageConcludedReason
-	(*Edit)(nil),                            // 16: turboci.graph.orchestrator.v1.Edit
-	(StageAttemptState)(0),                  // 17: turboci.graph.orchestrator.v1.StageAttemptState
-	(*timestamppb.Timestamp)(nil),           // 18: google.protobuf.Timestamp
-	(*StageExecutionPolicy)(nil),            // 19: turboci.graph.orchestrator.v1.StageExecutionPolicy
-	(*v1.StageAttempt)(nil),                 // 20: turboci.graph.ids.v1.StageAttempt
-	(*StageAttemptExecutionPolicy)(nil),     // 21: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
-	(*v1.Check)(nil),                        // 22: turboci.graph.ids.v1.Check
-	(CheckState)(0),                         // 23: turboci.graph.orchestrator.v1.CheckState
+	(*Stage_Legacy)(nil),                    // 3: turboci.graph.orchestrator.v1.Stage.Legacy
+	(*Stage_StateHistoryEntry)(nil),         // 4: turboci.graph.orchestrator.v1.Stage.StateHistoryEntry
+	(*Stage_ExecutionPolicyState)(nil),      // 5: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState
+	(*Stage_Attempt)(nil),                   // 6: turboci.graph.orchestrator.v1.Stage.Attempt
+	(*Stage_Assignment)(nil),                // 7: turboci.graph.orchestrator.v1.Stage.Assignment
+	(*Stage_Attempt_StateHistoryEntry)(nil), // 8: turboci.graph.orchestrator.v1.Stage.Attempt.StateHistoryEntry
+	(*Stage_Attempt_Progress)(nil),          // 9: turboci.graph.orchestrator.v1.Stage.Attempt.Progress
+	(*v1.Stage)(nil),                        // 10: turboci.graph.ids.v1.Stage
+	(*Actor)(nil),                           // 11: turboci.graph.orchestrator.v1.Actor
+	(*ValueRef)(nil),                        // 12: turboci.graph.orchestrator.v1.ValueRef
+	(*Revision)(nil),                        // 13: turboci.graph.orchestrator.v1.Revision
+	(StageState)(0),                         // 14: turboci.graph.orchestrator.v1.StageState
+	(*Dependencies)(nil),                    // 15: turboci.graph.orchestrator.v1.Dependencies
+	(StageConcludedReason)(0),               // 16: turboci.graph.orchestrator.v1.StageConcludedReason
+	(*Edit)(nil),                            // 17: turboci.graph.orchestrator.v1.Edit
+	(StageAttemptState)(0),                  // 18: turboci.graph.orchestrator.v1.StageAttemptState
+	(*timestamppb.Timestamp)(nil),           // 19: google.protobuf.Timestamp
+	(*StageExecutionPolicy)(nil),            // 20: turboci.graph.orchestrator.v1.StageExecutionPolicy
+	(*v1.StageAttempt)(nil),                 // 21: turboci.graph.ids.v1.StageAttempt
+	(*StageAttemptExecutionPolicy)(nil),     // 22: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
+	(*v1.Check)(nil),                        // 23: turboci.graph.ids.v1.Check
+	(CheckState)(0),                         // 24: turboci.graph.orchestrator.v1.CheckState
 }
 var file_turboci_graph_orchestrator_v1_stage_proto_depIdxs = []int32{
-	9,  // 0: turboci.graph.orchestrator.v1.Stage.identifier:type_name -> turboci.graph.ids.v1.Stage
-	10, // 1: turboci.graph.orchestrator.v1.Stage.created_by:type_name -> turboci.graph.orchestrator.v1.Actor
-	11, // 2: turboci.graph.orchestrator.v1.Stage.args:type_name -> turboci.graph.orchestrator.v1.ValueRef
-	12, // 3: turboci.graph.orchestrator.v1.Stage.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	13, // 4: turboci.graph.orchestrator.v1.Stage.state:type_name -> turboci.graph.orchestrator.v1.StageState
-	10, // 5: turboci.graph.orchestrator.v1.Stage.cancelled_by:type_name -> turboci.graph.orchestrator.v1.Actor
-	3,  // 6: turboci.graph.orchestrator.v1.Stage.state_history:type_name -> turboci.graph.orchestrator.v1.Stage.StateHistoryEntry
-	14, // 7: turboci.graph.orchestrator.v1.Stage.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
-	4,  // 8: turboci.graph.orchestrator.v1.Stage.execution_policy:type_name -> turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState
-	5,  // 9: turboci.graph.orchestrator.v1.Stage.attempts:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt
-	6,  // 10: turboci.graph.orchestrator.v1.Stage.assignments:type_name -> turboci.graph.orchestrator.v1.Stage.Assignment
-	14, // 11: turboci.graph.orchestrator.v1.Stage.continuation_group:type_name -> turboci.graph.orchestrator.v1.Dependencies
-	15, // 12: turboci.graph.orchestrator.v1.Stage.concluded_reason:type_name -> turboci.graph.orchestrator.v1.StageConcludedReason
-	16, // 13: turboci.graph.orchestrator.v1.Stage.edits:type_name -> turboci.graph.orchestrator.v1.Edit
-	17, // 14: turboci.graph.orchestrator.v1.StageAttemptCurrentState.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
-	12, // 15: turboci.graph.orchestrator.v1.StageAttemptCurrentState.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	18, // 16: turboci.graph.orchestrator.v1.StageAttemptCurrentState.update_state_by:type_name -> google.protobuf.Timestamp
-	18, // 17: turboci.graph.orchestrator.v1.StageAttemptCurrentState.heartbeat_by:type_name -> google.protobuf.Timestamp
-	13, // 18: turboci.graph.orchestrator.v1.Stage.StateHistoryEntry.state:type_name -> turboci.graph.orchestrator.v1.StageState
-	12, // 19: turboci.graph.orchestrator.v1.Stage.StateHistoryEntry.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	19, // 20: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState.requested:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
-	19, // 21: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState.validated:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
-	20, // 22: turboci.graph.orchestrator.v1.Stage.Attempt.identifier:type_name -> turboci.graph.ids.v1.StageAttempt
-	12, // 23: turboci.graph.orchestrator.v1.Stage.Attempt.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	12, // 24: turboci.graph.orchestrator.v1.Stage.Attempt.last_heartbeat:type_name -> turboci.graph.orchestrator.v1.Revision
-	17, // 25: turboci.graph.orchestrator.v1.Stage.Attempt.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
-	7,  // 26: turboci.graph.orchestrator.v1.Stage.Attempt.state_history:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt.StateHistoryEntry
-	18, // 27: turboci.graph.orchestrator.v1.Stage.Attempt.waiting_until:type_name -> google.protobuf.Timestamp
-	11, // 28: turboci.graph.orchestrator.v1.Stage.Attempt.details:type_name -> turboci.graph.orchestrator.v1.ValueRef
-	8,  // 29: turboci.graph.orchestrator.v1.Stage.Attempt.progress:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt.Progress
-	21, // 30: turboci.graph.orchestrator.v1.Stage.Attempt.execution_policy:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
-	22, // 31: turboci.graph.orchestrator.v1.Stage.Assignment.target:type_name -> turboci.graph.ids.v1.Check
-	23, // 32: turboci.graph.orchestrator.v1.Stage.Assignment.goal_state:type_name -> turboci.graph.orchestrator.v1.CheckState
-	17, // 33: turboci.graph.orchestrator.v1.Stage.Attempt.StateHistoryEntry.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
-	12, // 34: turboci.graph.orchestrator.v1.Stage.Attempt.StateHistoryEntry.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	12, // 35: turboci.graph.orchestrator.v1.Stage.Attempt.Progress.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	11, // 36: turboci.graph.orchestrator.v1.Stage.Attempt.Progress.details:type_name -> turboci.graph.orchestrator.v1.ValueRef
-	10, // 37: turboci.graph.orchestrator.v1.Stage.Attempt.Progress.created_by:type_name -> turboci.graph.orchestrator.v1.Actor
-	38, // [38:38] is the sub-list for method output_type
-	38, // [38:38] is the sub-list for method input_type
-	38, // [38:38] is the sub-list for extension type_name
-	38, // [38:38] is the sub-list for extension extendee
-	0,  // [0:38] is the sub-list for field type_name
+	10, // 0: turboci.graph.orchestrator.v1.Stage.identifier:type_name -> turboci.graph.ids.v1.Stage
+	11, // 1: turboci.graph.orchestrator.v1.Stage.created_by:type_name -> turboci.graph.orchestrator.v1.Actor
+	12, // 2: turboci.graph.orchestrator.v1.Stage.args:type_name -> turboci.graph.orchestrator.v1.ValueRef
+	13, // 3: turboci.graph.orchestrator.v1.Stage.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	14, // 4: turboci.graph.orchestrator.v1.Stage.state:type_name -> turboci.graph.orchestrator.v1.StageState
+	11, // 5: turboci.graph.orchestrator.v1.Stage.cancelled_by:type_name -> turboci.graph.orchestrator.v1.Actor
+	3,  // 6: turboci.graph.orchestrator.v1.Stage.legacy:type_name -> turboci.graph.orchestrator.v1.Stage.Legacy
+	4,  // 7: turboci.graph.orchestrator.v1.Stage.state_history:type_name -> turboci.graph.orchestrator.v1.Stage.StateHistoryEntry
+	15, // 8: turboci.graph.orchestrator.v1.Stage.dependencies:type_name -> turboci.graph.orchestrator.v1.Dependencies
+	5,  // 9: turboci.graph.orchestrator.v1.Stage.execution_policy:type_name -> turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState
+	6,  // 10: turboci.graph.orchestrator.v1.Stage.attempts:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt
+	7,  // 11: turboci.graph.orchestrator.v1.Stage.assignments:type_name -> turboci.graph.orchestrator.v1.Stage.Assignment
+	15, // 12: turboci.graph.orchestrator.v1.Stage.continuation_group:type_name -> turboci.graph.orchestrator.v1.Dependencies
+	16, // 13: turboci.graph.orchestrator.v1.Stage.concluded_reason:type_name -> turboci.graph.orchestrator.v1.StageConcludedReason
+	17, // 14: turboci.graph.orchestrator.v1.Stage.edits:type_name -> turboci.graph.orchestrator.v1.Edit
+	18, // 15: turboci.graph.orchestrator.v1.StageAttemptCurrentState.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
+	13, // 16: turboci.graph.orchestrator.v1.StageAttemptCurrentState.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	19, // 17: turboci.graph.orchestrator.v1.StageAttemptCurrentState.update_state_by:type_name -> google.protobuf.Timestamp
+	19, // 18: turboci.graph.orchestrator.v1.StageAttemptCurrentState.heartbeat_by:type_name -> google.protobuf.Timestamp
+	12, // 19: turboci.graph.orchestrator.v1.Stage.Legacy.worknode:type_name -> turboci.graph.orchestrator.v1.ValueRef
+	14, // 20: turboci.graph.orchestrator.v1.Stage.StateHistoryEntry.state:type_name -> turboci.graph.orchestrator.v1.StageState
+	13, // 21: turboci.graph.orchestrator.v1.Stage.StateHistoryEntry.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	20, // 22: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState.requested:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
+	20, // 23: turboci.graph.orchestrator.v1.Stage.ExecutionPolicyState.validated:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
+	21, // 24: turboci.graph.orchestrator.v1.Stage.Attempt.identifier:type_name -> turboci.graph.ids.v1.StageAttempt
+	13, // 25: turboci.graph.orchestrator.v1.Stage.Attempt.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	13, // 26: turboci.graph.orchestrator.v1.Stage.Attempt.last_heartbeat:type_name -> turboci.graph.orchestrator.v1.Revision
+	18, // 27: turboci.graph.orchestrator.v1.Stage.Attempt.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
+	8,  // 28: turboci.graph.orchestrator.v1.Stage.Attempt.state_history:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt.StateHistoryEntry
+	19, // 29: turboci.graph.orchestrator.v1.Stage.Attempt.waiting_until:type_name -> google.protobuf.Timestamp
+	12, // 30: turboci.graph.orchestrator.v1.Stage.Attempt.details:type_name -> turboci.graph.orchestrator.v1.ValueRef
+	9,  // 31: turboci.graph.orchestrator.v1.Stage.Attempt.progress:type_name -> turboci.graph.orchestrator.v1.Stage.Attempt.Progress
+	22, // 32: turboci.graph.orchestrator.v1.Stage.Attempt.execution_policy:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy
+	23, // 33: turboci.graph.orchestrator.v1.Stage.Assignment.target:type_name -> turboci.graph.ids.v1.Check
+	24, // 34: turboci.graph.orchestrator.v1.Stage.Assignment.goal_state:type_name -> turboci.graph.orchestrator.v1.CheckState
+	18, // 35: turboci.graph.orchestrator.v1.Stage.Attempt.StateHistoryEntry.state:type_name -> turboci.graph.orchestrator.v1.StageAttemptState
+	13, // 36: turboci.graph.orchestrator.v1.Stage.Attempt.StateHistoryEntry.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	13, // 37: turboci.graph.orchestrator.v1.Stage.Attempt.Progress.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	12, // 38: turboci.graph.orchestrator.v1.Stage.Attempt.Progress.details:type_name -> turboci.graph.orchestrator.v1.ValueRef
+	11, // 39: turboci.graph.orchestrator.v1.Stage.Attempt.Progress.created_by:type_name -> turboci.graph.orchestrator.v1.Actor
+	40, // [40:40] is the sub-list for method output_type
+	40, // [40:40] is the sub-list for method input_type
+	40, // [40:40] is the sub-list for extension type_name
+	40, // [40:40] is the sub-list for extension extendee
+	0,  // [0:40] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_stage_proto_init() }
@@ -2053,13 +2207,14 @@ func file_turboci_graph_orchestrator_v1_stage_proto_init() {
 	file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[6].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[7].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[8].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_stage_proto_msgTypes[9].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_stage_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_stage_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
