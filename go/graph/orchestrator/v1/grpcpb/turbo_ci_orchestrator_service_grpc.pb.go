@@ -24,10 +24,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TurboCIOrchestrator_CreateWorkPlan_FullMethodName = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/CreateWorkPlan"
-	TurboCIOrchestrator_WriteNodes_FullMethodName     = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/WriteNodes"
-	TurboCIOrchestrator_QueryNodes_FullMethodName     = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/QueryNodes"
-	TurboCIOrchestrator_ReadWorkPlan_FullMethodName   = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/ReadWorkPlan"
+	TurboCIOrchestrator_CreateWorkPlan_FullMethodName      = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/CreateWorkPlan"
+	TurboCIOrchestrator_WriteNodes_FullMethodName          = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/WriteNodes"
+	TurboCIOrchestrator_QueryNodes_FullMethodName          = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/QueryNodes"
+	TurboCIOrchestrator_ReadWorkPlan_FullMethodName        = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/ReadWorkPlan"
+	TurboCIOrchestrator_AllocateWorkNodeIDs_FullMethodName = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/AllocateWorkNodeIDs"
 )
 
 // TurboCIOrchestratorClient is the client API for TurboCIOrchestrator service.
@@ -121,6 +122,15 @@ type TurboCIOrchestratorClient interface {
 	// nodes. For more targeted querying of only certain nodes within a workplan,
 	// use QueryNodes instead.
 	ReadWorkPlan(ctx context.Context, in *v1.ReadWorkPlanRequest, opts ...grpc.CallOption) (*v1.ReadWorkPlanResponse, error)
+	// AllocateWorkNodeIDs generates a bunch of WorkNode Stage identifiers that
+	// are compatible with WorkPlan API and which are guaranteed to be unused yet.
+	//
+	// They then can be passed to WriteNodes to create new WorkNode stages. Note
+	// this should only be used for compatibility with WorkPlan API. Non-worknode
+	// stages must use more meaningful string-based identifiers instead and
+	// guarantee their uniqueness (or non-uniqueness) based on what the stage
+	// actually does.
+	AllocateWorkNodeIDs(ctx context.Context, in *v1.AllocateWorkNodeIDsRequest, opts ...grpc.CallOption) (*v1.AllocateWorkNodeIDsResponse, error)
 }
 
 type turboCIOrchestratorClient struct {
@@ -165,6 +175,16 @@ func (c *turboCIOrchestratorClient) ReadWorkPlan(ctx context.Context, in *v1.Rea
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(v1.ReadWorkPlanResponse)
 	err := c.cc.Invoke(ctx, TurboCIOrchestrator_ReadWorkPlan_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *turboCIOrchestratorClient) AllocateWorkNodeIDs(ctx context.Context, in *v1.AllocateWorkNodeIDsRequest, opts ...grpc.CallOption) (*v1.AllocateWorkNodeIDsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(v1.AllocateWorkNodeIDsResponse)
+	err := c.cc.Invoke(ctx, TurboCIOrchestrator_AllocateWorkNodeIDs_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -262,6 +282,15 @@ type TurboCIOrchestratorServer interface {
 	// nodes. For more targeted querying of only certain nodes within a workplan,
 	// use QueryNodes instead.
 	ReadWorkPlan(context.Context, *v1.ReadWorkPlanRequest) (*v1.ReadWorkPlanResponse, error)
+	// AllocateWorkNodeIDs generates a bunch of WorkNode Stage identifiers that
+	// are compatible with WorkPlan API and which are guaranteed to be unused yet.
+	//
+	// They then can be passed to WriteNodes to create new WorkNode stages. Note
+	// this should only be used for compatibility with WorkPlan API. Non-worknode
+	// stages must use more meaningful string-based identifiers instead and
+	// guarantee their uniqueness (or non-uniqueness) based on what the stage
+	// actually does.
+	AllocateWorkNodeIDs(context.Context, *v1.AllocateWorkNodeIDsRequest) (*v1.AllocateWorkNodeIDsResponse, error)
 	mustEmbedUnimplementedTurboCIOrchestratorServer()
 }
 
@@ -283,6 +312,9 @@ func (UnimplementedTurboCIOrchestratorServer) QueryNodes(context.Context, *v1.Qu
 }
 func (UnimplementedTurboCIOrchestratorServer) ReadWorkPlan(context.Context, *v1.ReadWorkPlanRequest) (*v1.ReadWorkPlanResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ReadWorkPlan not implemented")
+}
+func (UnimplementedTurboCIOrchestratorServer) AllocateWorkNodeIDs(context.Context, *v1.AllocateWorkNodeIDsRequest) (*v1.AllocateWorkNodeIDsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AllocateWorkNodeIDs not implemented")
 }
 func (UnimplementedTurboCIOrchestratorServer) mustEmbedUnimplementedTurboCIOrchestratorServer() {}
 func (UnimplementedTurboCIOrchestratorServer) testEmbeddedByValue()                             {}
@@ -377,6 +409,24 @@ func _TurboCIOrchestrator_ReadWorkPlan_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TurboCIOrchestrator_AllocateWorkNodeIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.AllocateWorkNodeIDsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TurboCIOrchestratorServer).AllocateWorkNodeIDs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TurboCIOrchestrator_AllocateWorkNodeIDs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TurboCIOrchestratorServer).AllocateWorkNodeIDs(ctx, req.(*v1.AllocateWorkNodeIDsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TurboCIOrchestrator_ServiceDesc is the grpc.ServiceDesc for TurboCIOrchestrator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -399,6 +449,10 @@ var TurboCIOrchestrator_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReadWorkPlan",
 			Handler:    _TurboCIOrchestrator_ReadWorkPlan_Handler,
+		},
+		{
+			MethodName: "AllocateWorkNodeIDs",
+			Handler:    _TurboCIOrchestrator_AllocateWorkNodeIDs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
