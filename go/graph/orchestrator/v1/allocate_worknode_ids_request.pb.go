@@ -151,6 +151,8 @@ type AllocateWorkNodeIDsRequest_builder struct {
 	// set, plan IDs must match.
 	WorkplanId *v1.WorkPlan
 	// How many work node IDs to generate.
+	//
+	// Must be larger than 0 and no more than 1000.
 	Count *int32
 }
 
