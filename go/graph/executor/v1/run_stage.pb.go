@@ -30,6 +30,7 @@ const (
 type RunStageRequest struct {
 	state                        protoimpl.MessageState   `protogen:"opaque.v1"`
 	xxx_hidden_Stage             *v1.Stage                `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`
+	xxx_hidden_Workplan          *v1.WorkPlan             `protobuf:"bytes,5,opt,name=workplan,proto3,oneof"`
 	xxx_hidden_ValueData         map[string]*v1.ValueData `protobuf:"bytes,4,rep,name=value_data,json=valueData,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	xxx_hidden_Attempt           *v11.StageAttempt        `protobuf:"bytes,2,opt,name=attempt,proto3,oneof"`
 	xxx_hidden_StageAttemptToken *string                  `protobuf:"bytes,3,opt,name=stage_attempt_token,json=stageAttemptToken,proto3,oneof"`
@@ -71,6 +72,13 @@ func (x *RunStageRequest) GetStage() *v1.Stage {
 	return nil
 }
 
+func (x *RunStageRequest) GetWorkplan() *v1.WorkPlan {
+	if x != nil {
+		return x.xxx_hidden_Workplan
+	}
+	return nil
+}
+
 func (x *RunStageRequest) GetValueData() map[string]*v1.ValueData {
 	if x != nil {
 		return x.xxx_hidden_ValueData
@@ -99,6 +107,10 @@ func (x *RunStageRequest) SetStage(v *v1.Stage) {
 	x.xxx_hidden_Stage = v
 }
 
+func (x *RunStageRequest) SetWorkplan(v *v1.WorkPlan) {
+	x.xxx_hidden_Workplan = v
+}
+
 func (x *RunStageRequest) SetValueData(v map[string]*v1.ValueData) {
 	x.xxx_hidden_ValueData = v
 }
@@ -109,7 +121,7 @@ func (x *RunStageRequest) SetAttempt(v *v11.StageAttempt) {
 
 func (x *RunStageRequest) SetStageAttemptToken(v string) {
 	x.xxx_hidden_StageAttemptToken = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 5)
 }
 
 func (x *RunStageRequest) HasStage() bool {
@@ -117,6 +129,13 @@ func (x *RunStageRequest) HasStage() bool {
 		return false
 	}
 	return x.xxx_hidden_Stage != nil
+}
+
+func (x *RunStageRequest) HasWorkplan() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Workplan != nil
 }
 
 func (x *RunStageRequest) HasAttempt() bool {
@@ -130,11 +149,15 @@ func (x *RunStageRequest) HasStageAttemptToken() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
 }
 
 func (x *RunStageRequest) ClearStage() {
 	x.xxx_hidden_Stage = nil
+}
+
+func (x *RunStageRequest) ClearWorkplan() {
+	x.xxx_hidden_Workplan = nil
 }
 
 func (x *RunStageRequest) ClearAttempt() {
@@ -142,7 +165,7 @@ func (x *RunStageRequest) ClearAttempt() {
 }
 
 func (x *RunStageRequest) ClearStageAttemptToken() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
 	x.xxx_hidden_StageAttemptToken = nil
 }
 
@@ -151,6 +174,10 @@ type RunStageRequest_builder struct {
 
 	// Stage to run.
 	Stage *v1.Stage
+	// The partial view of the parent work plan.
+	//
+	// Stages and Checks are omitted.
+	Workplan *v1.WorkPlan
 	// A map containing [ValueData] for `stage`.
 	//
 	// This is key'd by [ValueRef].digest.
@@ -168,10 +195,11 @@ func (b0 RunStageRequest_builder) Build() *RunStageRequest {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Stage = b.Stage
+	x.xxx_hidden_Workplan = b.Workplan
 	x.xxx_hidden_ValueData = b.ValueData
 	x.xxx_hidden_Attempt = b.Attempt
 	if b.StageAttemptToken != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 5)
 		x.xxx_hidden_StageAttemptToken = b.StageAttemptToken
 	}
 	return m0
@@ -225,17 +253,19 @@ var File_turboci_graph_executor_v1_run_stage_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_executor_v1_run_stage_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/executor/v1/run_stage.proto\x12\x19turboci.graph.executor.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a.turboci/graph/orchestrator/v1/value_data.proto\"\xba\x03\n" +
+	")turboci/graph/executor/v1/run_stage.proto\x12\x19turboci.graph.executor.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a.turboci/graph/orchestrator/v1/value_data.proto\x1a,turboci/graph/orchestrator/v1/workplan.proto\"\x91\x04\n" +
 	"\x0fRunStageRequest\x12?\n" +
-	"\x05stage\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.StageH\x00R\x05stage\x88\x01\x01\x12X\n" +
+	"\x05stage\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.StageH\x00R\x05stage\x88\x01\x01\x12H\n" +
+	"\bworkplan\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.WorkPlanH\x01R\bworkplan\x88\x01\x01\x12X\n" +
 	"\n" +
 	"value_data\x18\x04 \x03(\v29.turboci.graph.executor.v1.RunStageRequest.ValueDataEntryR\tvalueData\x12A\n" +
-	"\aattempt\x18\x02 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x01R\aattempt\x88\x01\x01\x123\n" +
-	"\x13stage_attempt_token\x18\x03 \x01(\tH\x02R\x11stageAttemptToken\x88\x01\x01\x1af\n" +
+	"\aattempt\x18\x02 \x01(\v2\".turboci.graph.ids.v1.StageAttemptH\x02R\aattempt\x88\x01\x01\x123\n" +
+	"\x13stage_attempt_token\x18\x03 \x01(\tH\x03R\x11stageAttemptToken\x88\x01\x01\x1af\n" +
 	"\x0eValueDataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12>\n" +
 	"\x05value\x18\x02 \x01(\v2(.turboci.graph.orchestrator.v1.ValueDataR\x05value:\x028\x01B\b\n" +
-	"\x06_stageB\n" +
+	"\x06_stageB\v\n" +
+	"\t_workplanB\n" +
 	"\n" +
 	"\b_attemptB\x16\n" +
 	"\x14_stage_attempt_token\"\x12\n" +
@@ -247,19 +277,21 @@ var file_turboci_graph_executor_v1_run_stage_proto_goTypes = []any{
 	(*RunStageResponse)(nil), // 1: turboci.graph.executor.v1.RunStageResponse
 	nil,                      // 2: turboci.graph.executor.v1.RunStageRequest.ValueDataEntry
 	(*v1.Stage)(nil),         // 3: turboci.graph.orchestrator.v1.Stage
-	(*v11.StageAttempt)(nil), // 4: turboci.graph.ids.v1.StageAttempt
-	(*v1.ValueData)(nil),     // 5: turboci.graph.orchestrator.v1.ValueData
+	(*v1.WorkPlan)(nil),      // 4: turboci.graph.orchestrator.v1.WorkPlan
+	(*v11.StageAttempt)(nil), // 5: turboci.graph.ids.v1.StageAttempt
+	(*v1.ValueData)(nil),     // 6: turboci.graph.orchestrator.v1.ValueData
 }
 var file_turboci_graph_executor_v1_run_stage_proto_depIdxs = []int32{
 	3, // 0: turboci.graph.executor.v1.RunStageRequest.stage:type_name -> turboci.graph.orchestrator.v1.Stage
-	2, // 1: turboci.graph.executor.v1.RunStageRequest.value_data:type_name -> turboci.graph.executor.v1.RunStageRequest.ValueDataEntry
-	4, // 2: turboci.graph.executor.v1.RunStageRequest.attempt:type_name -> turboci.graph.ids.v1.StageAttempt
-	5, // 3: turboci.graph.executor.v1.RunStageRequest.ValueDataEntry.value:type_name -> turboci.graph.orchestrator.v1.ValueData
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	4, // 1: turboci.graph.executor.v1.RunStageRequest.workplan:type_name -> turboci.graph.orchestrator.v1.WorkPlan
+	2, // 2: turboci.graph.executor.v1.RunStageRequest.value_data:type_name -> turboci.graph.executor.v1.RunStageRequest.ValueDataEntry
+	5, // 3: turboci.graph.executor.v1.RunStageRequest.attempt:type_name -> turboci.graph.ids.v1.StageAttempt
+	6, // 4: turboci.graph.executor.v1.RunStageRequest.ValueDataEntry.value:type_name -> turboci.graph.orchestrator.v1.ValueData
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_executor_v1_run_stage_proto_init() }

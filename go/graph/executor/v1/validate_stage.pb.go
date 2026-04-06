@@ -29,6 +29,7 @@ const (
 type ValidateStageRequest struct {
 	state                protoimpl.MessageState   `protogen:"opaque.v1"`
 	xxx_hidden_Stage     *v1.Stage                `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`
+	xxx_hidden_Workplan  *v1.WorkPlan             `protobuf:"bytes,5,opt,name=workplan,proto3,oneof"`
 	xxx_hidden_ValueData map[string]*v1.ValueData `protobuf:"bytes,4,rep,name=value_data,json=valueData,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
@@ -66,6 +67,13 @@ func (x *ValidateStageRequest) GetStage() *v1.Stage {
 	return nil
 }
 
+func (x *ValidateStageRequest) GetWorkplan() *v1.WorkPlan {
+	if x != nil {
+		return x.xxx_hidden_Workplan
+	}
+	return nil
+}
+
 func (x *ValidateStageRequest) GetValueData() map[string]*v1.ValueData {
 	if x != nil {
 		return x.xxx_hidden_ValueData
@@ -75,6 +83,10 @@ func (x *ValidateStageRequest) GetValueData() map[string]*v1.ValueData {
 
 func (x *ValidateStageRequest) SetStage(v *v1.Stage) {
 	x.xxx_hidden_Stage = v
+}
+
+func (x *ValidateStageRequest) SetWorkplan(v *v1.WorkPlan) {
+	x.xxx_hidden_Workplan = v
 }
 
 func (x *ValidateStageRequest) SetValueData(v map[string]*v1.ValueData) {
@@ -88,8 +100,19 @@ func (x *ValidateStageRequest) HasStage() bool {
 	return x.xxx_hidden_Stage != nil
 }
 
+func (x *ValidateStageRequest) HasWorkplan() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Workplan != nil
+}
+
 func (x *ValidateStageRequest) ClearStage() {
 	x.xxx_hidden_Stage = nil
+}
+
+func (x *ValidateStageRequest) ClearWorkplan() {
+	x.xxx_hidden_Workplan = nil
 }
 
 type ValidateStageRequest_builder struct {
@@ -97,6 +120,10 @@ type ValidateStageRequest_builder struct {
 
 	// Stage to validate.
 	Stage *v1.Stage
+	// The partial view of the parent work plan.
+	//
+	// Stages and Checks are omitted.
+	Workplan *v1.WorkPlan
 	// A map containing [ValueData] for `stage`.
 	//
 	// This is key'd by [ValueRef].digest.
@@ -108,6 +135,7 @@ func (b0 ValidateStageRequest_builder) Build() *ValidateStageRequest {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Stage = b.Stage
+	x.xxx_hidden_Workplan = b.Workplan
 	x.xxx_hidden_ValueData = b.ValueData
 	return m0
 }
@@ -116,6 +144,7 @@ func (b0 ValidateStageRequest_builder) Build() *ValidateStageRequest {
 type ValidateStageResponse struct {
 	state                           protoimpl.MessageState   `protogen:"opaque.v1"`
 	xxx_hidden_StageExecutionPolicy *v1.StageExecutionPolicy `protobuf:"bytes,1,opt,name=stage_execution_policy,json=stageExecutionPolicy,proto3,oneof"`
+	xxx_hidden_StageServiceAccounts []string                 `protobuf:"bytes,2,rep,name=stage_service_accounts,json=stageServiceAccounts,proto3"`
 	unknownFields                   protoimpl.UnknownFields
 	sizeCache                       protoimpl.SizeCache
 }
@@ -152,8 +181,19 @@ func (x *ValidateStageResponse) GetStageExecutionPolicy() *v1.StageExecutionPoli
 	return nil
 }
 
+func (x *ValidateStageResponse) GetStageServiceAccounts() []string {
+	if x != nil {
+		return x.xxx_hidden_StageServiceAccounts
+	}
+	return nil
+}
+
 func (x *ValidateStageResponse) SetStageExecutionPolicy(v *v1.StageExecutionPolicy) {
 	x.xxx_hidden_StageExecutionPolicy = v
+}
+
+func (x *ValidateStageResponse) SetStageServiceAccounts(v []string) {
+	x.xxx_hidden_StageServiceAccounts = v
 }
 
 func (x *ValidateStageResponse) HasStageExecutionPolicy() bool {
@@ -179,6 +219,19 @@ type ValidateStageResponse_builder struct {
 	//
 	// Required.
 	StageExecutionPolicy *v1.StageExecutionPolicy
+	// Service accounts the stage can potentially use to call Turbo CI APIs.
+	//
+	// The stage attempt token passed to RunStage will be bound to these accounts
+	// (i.e. it can only be presented together with credentials of some account
+	// in this set). These accounts will be subjected to an ACL check that
+	// verifies they are allowed to be used in the work plan at all.
+	//
+	// Each entry is either an email or a special value "EUC", which means
+	// the stage will use the end user credentials of whoever submitted it to
+	// call Turbo CI APIs.
+	//
+	// If omitted, defaults to ["EUC"].
+	StageServiceAccounts []string
 }
 
 func (b0 ValidateStageResponse_builder) Build() *ValidateStageResponse {
@@ -186,6 +239,7 @@ func (b0 ValidateStageResponse_builder) Build() *ValidateStageResponse {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_StageExecutionPolicy = b.StageExecutionPolicy
+	x.xxx_hidden_StageServiceAccounts = b.StageServiceAccounts
 	return m0
 }
 
@@ -193,17 +247,20 @@ var File_turboci_graph_executor_v1_validate_stage_proto protoreflect.FileDescrip
 
 const file_turboci_graph_executor_v1_validate_stage_proto_rawDesc = "" +
 	"\n" +
-	".turboci/graph/executor/v1/validate_stage.proto\x12\x19turboci.graph.executor.v1\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a.turboci/graph/orchestrator/v1/value_data.proto\"\xa8\x02\n" +
+	".turboci/graph/executor/v1/validate_stage.proto\x12\x19turboci.graph.executor.v1\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a.turboci/graph/orchestrator/v1/value_data.proto\x1a,turboci/graph/orchestrator/v1/workplan.proto\"\xff\x02\n" +
 	"\x14ValidateStageRequest\x12?\n" +
-	"\x05stage\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.StageH\x00R\x05stage\x88\x01\x01\x12]\n" +
+	"\x05stage\x18\x01 \x01(\v2$.turboci.graph.orchestrator.v1.StageH\x00R\x05stage\x88\x01\x01\x12H\n" +
+	"\bworkplan\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.WorkPlanH\x01R\bworkplan\x88\x01\x01\x12]\n" +
 	"\n" +
 	"value_data\x18\x04 \x03(\v2>.turboci.graph.executor.v1.ValidateStageRequest.ValueDataEntryR\tvalueData\x1af\n" +
 	"\x0eValueDataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12>\n" +
 	"\x05value\x18\x02 \x01(\v2(.turboci.graph.orchestrator.v1.ValueDataR\x05value:\x028\x01B\b\n" +
-	"\x06_stage\"\xa2\x01\n" +
+	"\x06_stageB\v\n" +
+	"\t_workplan\"\xd8\x01\n" +
 	"\x15ValidateStageResponse\x12n\n" +
-	"\x16stage_execution_policy\x18\x01 \x01(\v23.turboci.graph.orchestrator.v1.StageExecutionPolicyH\x00R\x14stageExecutionPolicy\x88\x01\x01B\x19\n" +
+	"\x16stage_execution_policy\x18\x01 \x01(\v23.turboci.graph.orchestrator.v1.StageExecutionPolicyH\x00R\x14stageExecutionPolicy\x88\x01\x01\x124\n" +
+	"\x16stage_service_accounts\x18\x02 \x03(\tR\x14stageServiceAccountsB\x19\n" +
 	"\x17_stage_execution_policyBAP\x01Z=go.chromium.org/turboci/proto/go/graph/executor/v1;executorpbb\x06proto3"
 
 var file_turboci_graph_executor_v1_validate_stage_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
@@ -212,19 +269,21 @@ var file_turboci_graph_executor_v1_validate_stage_proto_goTypes = []any{
 	(*ValidateStageResponse)(nil),   // 1: turboci.graph.executor.v1.ValidateStageResponse
 	nil,                             // 2: turboci.graph.executor.v1.ValidateStageRequest.ValueDataEntry
 	(*v1.Stage)(nil),                // 3: turboci.graph.orchestrator.v1.Stage
-	(*v1.StageExecutionPolicy)(nil), // 4: turboci.graph.orchestrator.v1.StageExecutionPolicy
-	(*v1.ValueData)(nil),            // 5: turboci.graph.orchestrator.v1.ValueData
+	(*v1.WorkPlan)(nil),             // 4: turboci.graph.orchestrator.v1.WorkPlan
+	(*v1.StageExecutionPolicy)(nil), // 5: turboci.graph.orchestrator.v1.StageExecutionPolicy
+	(*v1.ValueData)(nil),            // 6: turboci.graph.orchestrator.v1.ValueData
 }
 var file_turboci_graph_executor_v1_validate_stage_proto_depIdxs = []int32{
 	3, // 0: turboci.graph.executor.v1.ValidateStageRequest.stage:type_name -> turboci.graph.orchestrator.v1.Stage
-	2, // 1: turboci.graph.executor.v1.ValidateStageRequest.value_data:type_name -> turboci.graph.executor.v1.ValidateStageRequest.ValueDataEntry
-	4, // 2: turboci.graph.executor.v1.ValidateStageResponse.stage_execution_policy:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
-	5, // 3: turboci.graph.executor.v1.ValidateStageRequest.ValueDataEntry.value:type_name -> turboci.graph.orchestrator.v1.ValueData
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	4, // 1: turboci.graph.executor.v1.ValidateStageRequest.workplan:type_name -> turboci.graph.orchestrator.v1.WorkPlan
+	2, // 2: turboci.graph.executor.v1.ValidateStageRequest.value_data:type_name -> turboci.graph.executor.v1.ValidateStageRequest.ValueDataEntry
+	5, // 3: turboci.graph.executor.v1.ValidateStageResponse.stage_execution_policy:type_name -> turboci.graph.orchestrator.v1.StageExecutionPolicy
+	6, // 4: turboci.graph.executor.v1.ValidateStageRequest.ValueDataEntry.value:type_name -> turboci.graph.orchestrator.v1.ValueData
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_executor_v1_validate_stage_proto_init() }
