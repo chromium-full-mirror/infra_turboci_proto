@@ -96,14 +96,14 @@ func (x ValueHashAlgo) Number() protoreflect.EnumNumber {
 //
 // Serialized as:
 //
-//	BASE64_URLSAFE(hash || varint(size_bytes) || byte(algo))
+//	BASE64_URLSAFE(hash || uvarint(size_bytes) || byte(algo))
 //
 // And de-serialized as:
 //
 //	rawDecoded = BASE64_URLSAFE_dec(encoded)
 //	algo = ALGOS[rawDecoded[-1]]
 //	rawHash = rawDecoded[algo.len]
-//	size = varintDecode(rawDecoded[algo.len:-1])
+//	size = uvarintDecode(rawDecoded[algo.len:-1])
 //
 // This puts `hash` at the front, rather than `algo`, in order to help uses of
 // the ValueDigest as a primary key to avoid hotspotting. For the same reason,
@@ -112,7 +112,7 @@ func (x ValueHashAlgo) Number() protoreflect.EnumNumber {
 type ValueDigest struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Hash        []byte                 `protobuf:"bytes,1,opt,name=hash,proto3,oneof"`
-	xxx_hidden_SizeBytes   int64                  `protobuf:"varint,2,opt,name=size_bytes,json=sizeBytes,proto3,oneof"`
+	xxx_hidden_SizeBytes   uint64                 `protobuf:"varint,2,opt,name=size_bytes,json=sizeBytes,proto3,oneof"`
 	xxx_hidden_Algo        ValueHashAlgo          `protobuf:"varint,3,opt,name=algo,proto3,enum=turboci.graph.orchestrator.v1.ValueHashAlgo,oneof"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
@@ -152,7 +152,7 @@ func (x *ValueDigest) GetHash() []byte {
 	return nil
 }
 
-func (x *ValueDigest) GetSizeBytes() int64 {
+func (x *ValueDigest) GetSizeBytes() uint64 {
 	if x != nil {
 		return x.xxx_hidden_SizeBytes
 	}
@@ -176,7 +176,7 @@ func (x *ValueDigest) SetHash(v []byte) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
 }
 
-func (x *ValueDigest) SetSizeBytes(v int64) {
+func (x *ValueDigest) SetSizeBytes(v uint64) {
 	x.xxx_hidden_SizeBytes = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
 }
@@ -228,7 +228,7 @@ type ValueDigest_builder struct {
 	// Required. The raw bytes of the hash.
 	Hash []byte
 	// Required. The size of the hashed data in bytes.
-	SizeBytes *int64
+	SizeBytes *uint64
 	// Required. The algorithm used to compute `hash`.
 	Algo *ValueHashAlgo
 }
@@ -260,7 +260,7 @@ const file_turboci_graph_orchestrator_v1_value_digest_proto_rawDesc = "" +
 	"\vValueDigest\x12\x17\n" +
 	"\x04hash\x18\x01 \x01(\fH\x00R\x04hash\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"size_bytes\x18\x02 \x01(\x03H\x01R\tsizeBytes\x88\x01\x01\x12E\n" +
+	"size_bytes\x18\x02 \x01(\x04H\x01R\tsizeBytes\x88\x01\x01\x12E\n" +
 	"\x04algo\x18\x03 \x01(\x0e2,.turboci.graph.orchestrator.v1.ValueHashAlgoH\x02R\x04algo\x88\x01\x01B\a\n" +
 	"\x05_hashB\r\n" +
 	"\v_size_bytesB\a\n" +
