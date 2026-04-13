@@ -157,3 +157,14 @@ def CheckPyFormat(input_api, output_api):
           version='3.2',
           pylintrc='.pylintrc',
       ))
+
+
+def CheckPyTests(input_api, output_api):
+  return input_api.RunTests([
+      input_api.Command(
+          name='build.py test_python',
+          cmd=['build.py', 'test_python', '-v'],
+          kwargs={'cwd': input_api.PresubmitLocalPath()},
+          message=output_api.PresubmitError,
+      )
+  ])

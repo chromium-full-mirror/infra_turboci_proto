@@ -435,6 +435,23 @@ def task_store_descriptors(mode: None | str = None):
     f.write(gzipped)
 
 
+def task_test_python(verbose: None | str = None):
+  """Runs python unittests."""
+  args = [
+      'vpython3',
+      '-m',
+      'unittest',
+      'discover',
+      '--buffer',
+      '--locals',
+      '--start-directory',
+      _RepoRoot / 'py',
+  ]
+  if verbose in ('-v', '--verbose'):
+    args.append('-v')
+  check_call(args)
+
+
 def task_all():
   """Shorthand to run all presubmit checks."""
   fail = False
@@ -459,6 +476,7 @@ def task_all():
         task_breaking,
         task_compile_stubs,
         task_store_descriptors,
+        task_test_python,
     )
 
     for i, fn in enumerate(allTasks):
