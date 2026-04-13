@@ -4,6 +4,13 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+"""Build is a helper script for performing all tasks in this repo.
+
+Run it without arguments to find available tasks and their documentation.
+
+Typically this is run as `build.py all` to do all the things.
+"""
+
 from __future__ import annotations
 
 import collections
@@ -38,25 +45,25 @@ _env['PATH'] = os.path.pathsep.join(
 
 def check_output(cmd: list[str | Path]) -> str | NoReturn:
   print(f"running: {' '.join(str(c) for c in cmd)}")
-  p = subprocess.Popen(
+  with subprocess.Popen(
       cmd,
       cwd=_RepoRoot,
       env=_env,
       stdout=subprocess.PIPE,
       stderr=sys.stderr,
       encoding='utf-8',
-  )
-  out, _ = p.communicate(None)
-  if p.returncode != 0:
-    sys.exit(p.returncode)
-  return out
+  ) as p:
+    out, _ = p.communicate(None)
+    if p.returncode != 0:
+      sys.exit(p.returncode)
+    return out
 
 
 def check_call(cmd: list[str | Path]):
   scmd: list[str] = [str(x) for x in cmd]
   if len(scmd) == 2 and scmd[0] == 'protoc' and scmd[1].startswith('@'):
-    args = open(scmd[1][1:]).read()
-    print(f"running: protoc {args}")
+    with open(scmd[1][1:], encoding='utf-8') as args:
+      print(f"running: protoc {args.read()}")
   else:
     print(f"running: {' '.join(str(c) for c in scmd)}")
   ret = subprocess.call(scmd, cwd=_RepoRoot, env=_env)
@@ -115,9 +122,10 @@ def task_breaking(basis: None | str = None):
   if basis is None:
     basis = check_output(['git', 'mark-merge-base']).split()[-1]
     if basis == 'None':
-      # In a `bot_update` style checkout, mark-merge-base may return None.
-      # In this context, HEAD~1 is correct because the CL was cherry-picked onto
-      # the appropriate parent context (previous CL or current ref value).
+      # In a `bot_update` style checkout, mark-merge-base may return
+      # None. In this context, HEAD~1 is correct because the CL was
+      # cherry-picked onto the appropriate parent context (previous CL or
+      # current ref value).
       basis = 'HEAD~1'
   check_call(['buf', 'breaking', '--against', f'.git#ref={basis}'])
 
@@ -136,24 +144,26 @@ def _task_check_service_definitions(desc: FileDescriptorSet):
   ok = True
   per_namespace: dict[str, set[str]] = {}
   for file in desc.file:
-    if file.service:
-      to_add = per_namespace.get(file.package)
-      if not to_add:
-        to_add = set()
-        per_namespace[file.package] = to_add
-      to_add.update(s.name for s in file.service)
-      other_types = []
-      for msg in file.message_type:
-        other_types.append(f'message {msg.name}')
-      for enum in file.enum_type:
-        other_types.append(f'enum {enum.name}')
-      for ext in file.extension:
-        other_types.append(f'ext {ext.name}')
-      if other_types:
-        ok = False
-        print(f'{file.name}: found other types along with service definition:')
-        for typ in other_types:
-          print(f'  {typ}')
+    if not file.service:
+      continue
+    to_add = per_namespace.get(file.package)
+    if not to_add:
+      to_add = set()
+      per_namespace[file.package] = to_add
+    to_add.update(s.name for s in file.service)
+    other_types = []
+    for msg in file.message_type:
+      other_types.append(f'message {msg.name}')
+    for enum in file.enum_type:
+      other_types.append(f'enum {enum.name}')
+    for ext in file.extension:
+      other_types.append(f'ext {ext.name}')
+    if not other_types:
+      continue
+    ok = False
+    print(f'{file.name}: found other types along with service definition:')
+    for typ in other_types:
+      print(f'  {typ}')
 
   for ns, services in per_namespace.items():
     if len(services) > 1:
@@ -207,12 +217,12 @@ def _task_check_go_package(desc: FileDescriptorSet):
       expectOption = f'{expectPkg}/grpcpb;{pkgname}grpcpb'
     else:
       if filename.endswith('_service'):
-        print(f'{file.name}: bad filename: must not have _service suffix.')
+        print(f'{file.name}: bad filename: has _service suffix.')
       expectOption = f'{expectPkg};{pkgname}pb'
     expectOption = f'go.chromium.org/turboci/proto/go/{expectOption}'
 
     if (got := file.options.go_package) != expectOption:
-      print(f'{file.name}: bad go_package {got!r}: wanted {expectOption!r}')
+      print(f'{file.name}: bad go_package {got!r}: want {expectOption!r}')
       ok = False
 
   if not ok:
@@ -233,10 +243,8 @@ def _check_message_fields(
       # In proto3, the presence of `proto3_optional` means the `optional`
       # keyword was used.
       if not field.proto3_optional:
-        errors.append(
-            f'{file_name}: {message.name}.{field.name}: '
-            'Non-repeated, non-oneof field must use the `optional` keyword.'
-        )
+        errors.append(f'{file_name}: {message.name}.{field.name}: Non-repeated,'
+                      ' non-oneof field must use the `optional` keyword.')
 
   for nested_message in message.nested_type:
     if not nested_message.options.map_entry:
@@ -244,7 +252,8 @@ def _check_message_fields(
 
 
 def _task_check_all_fields_optional(desc: FileDescriptorSet):
-  """Checks that every non-repeated, non-oneof field uses the 'optional' keyword."""
+  """Checks that every non-repeated, non-oneof field uses the 'optional'
+    keyword."""
   errors = []
   for file in desc.file:
     for message in file.message_type:
@@ -257,7 +266,8 @@ def _task_check_all_fields_optional(desc: FileDescriptorSet):
 
 
 def task_check_all_fields_optional():
-  """Checks that every non-repeated, non-oneof field uses the 'optional' keyword."""
+  """Checks that every non-repeated, non-oneof field uses the 'optional'
+    keyword."""
   with _fds() as fds:
     _task_check_all_fields_optional(fds)
 
@@ -279,11 +289,14 @@ def quick_glob(pattern: str) -> list[str]:
   return sorted(glob.glob(pattern, root_dir=_RepoRoot, recursive=True))
 
 
-def task_compile_desc(outfile: None | str = None, include_imports: bool = False):
+def task_compile_desc(
+    outfile: None | str = None,
+    include_imports: bool = False,
+):
   """Runs `protoc` to ensure all protos can compile to a proto descriptor.
 
-  The descriptor is discarded, unless outfile is provided.
-  """
+    The descriptor is discarded, unless outfile is provided.
+    """
   if outfile is None:
     guardFn = tempfile.NamedTemporaryFile
   else:
@@ -314,7 +327,8 @@ def _fds():
     yield fds
 
 
-def _install_stubs(flavor: str, check: bool, src: Path, pattern: str, dst: Path):
+def _install_stubs(flavor: str, check: bool, src: Path, pattern: str,
+                   dst: Path):
   newFiles: list[str] = glob.glob(pattern, recursive=True, root_dir=src)
 
   if not check:
@@ -332,9 +346,10 @@ def _install_stubs(flavor: str, check: bool, src: Path, pattern: str, dst: Path)
 
   report['missing in repo'] = want - got
   report['extra in repo'] = got - want
-  _, report['with diff'], errs = filecmp.cmpfiles(
-      dst, src, want.intersection(got), shallow=False
-  )
+  _, report['with diff'], errs = filecmp.cmpfiles(dst,
+                                                  src,
+                                                  want.intersection(got),
+                                                  shallow=False)
   if errs:
     for err in errs:
       print('error for file', err)
@@ -371,8 +386,8 @@ def task_compile_stubs(mode: None | str = None):
   # build to tempdir to implement mode=check
   with tempfile.TemporaryDirectory(dir=_RepoRoot) as tdir:
     tpth = Path(tdir)
-    tgo = tpth/'go'
-    tpy = tpth/'py'
+    tgo = tpth / 'go'
+    tpy = tpth / 'py'
     tgo.mkdir()
     tpy.mkdir()
     protoc(
@@ -380,7 +395,7 @@ def task_compile_stubs(mode: None | str = None):
         f'--go_opt=module={goModule}',
         f'--go-grpc_out={tgo}',
         f'--go-grpc_opt=module={goModule}',
-        f'--go_opt=default_api_level=API_OPAQUE',
+        '--go_opt=default_api_level=API_OPAQUE',
         f'--python_out={tpy}',
         f'--pyi_out={tpy}',
     )
@@ -389,8 +404,8 @@ def task_compile_stubs(mode: None | str = None):
     if not check:
       task_clean()
 
-    _install_stubs('go', check, tgo, '**/*.pb.go', _RepoRoot/'go')
-    _install_stubs('py', check, tpy, '**/*.*', _RepoRoot/'py')
+    _install_stubs('go', check, tgo, '**/*.pb.go', _RepoRoot / 'go')
+    _install_stubs('py', check, tpy, '**/*.*', _RepoRoot / 'py')
 
 
 def task_store_descriptors(mode: None | str = None):
@@ -410,11 +425,11 @@ def task_store_descriptors(mode: None | str = None):
   gzipped = gzip.compress(raw, mtime=1)
 
   if mode == 'check':
-    existing = open(descPath, 'rb').read()
-    if existing != gzipped:
-      print('stored descriptors bundle is out of date')
-      sys.exit(1)
-    return
+    with open(descPath, 'rb') as existing:
+      if existing.read() != gzipped:
+        print('stored descriptors bundle is out of date')
+        sys.exit(1)
+      return
 
   with open(descPath, 'wb') as f:
     f.write(gzipped)
@@ -425,6 +440,7 @@ def task_all():
   fail = False
 
   with _fds() as fds:
+
     def check_service_definitions():
       _task_check_service_definitions(fds)
 
@@ -461,16 +477,16 @@ def task_all():
 
 
 def main(args: list[str]):
-  # Note: this is probably too cute - if argument parsing ever gets more serious
-  # than "subcommand with one additional optional positional argument", it would
-  # be best to convert this to argparse.
+  # Note: this is probably too cute - if argument parsing ever gets more
+  # serious than "subcommand with one additional optional positional
+  # argument", it would be best to convert this to argparse.
   tasks = {
       name.removeprefix('task_'): value
       for name, value in globals().items()
       if name.startswith('task_')
   }
 
-  def help() -> NoReturn:
+  def _help() -> NoReturn:
     print(f'Usage: {sys.argv[0]} [cmd] [additional args...]')
     print()
     print('Commands:')
@@ -481,13 +497,13 @@ def main(args: list[str]):
     sys.exit(1)
 
   if not args:
-    help()
+    _help()
 
   cmd = args[0]
   fn = tasks.get(cmd)
 
   if fn is None:
-    help()
+    _help()
 
   fn(*args[1:])
   print('ok')

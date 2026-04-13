@@ -48,13 +48,13 @@ def CheckGoSumOnlyRequiresFirstParty(input_api, output_api):
     if pkg.startswith(ALLOWED_PREFIXES):
       continue
 
-    ret.append(output_api.PresubmitError(
-        f'go.mod:{linenum+1} - bad requirement {pkg!r}'
-    ))
+    ret.append(
+        output_api.PresubmitError(
+            f'go.mod:{linenum+1} - bad requirement {pkg!r}'))
 
   if ret:
-    ret.append(output_api.PresubmitError(
-        f'go.mod - only allowed to require packages in {ALLOWED_PREFIXES}.'
-    ))
+    ret.append(
+        output_api.PresubmitError(
+            f'go.mod - only require packages in {ALLOWED_PREFIXES}.'))
 
   return ret
