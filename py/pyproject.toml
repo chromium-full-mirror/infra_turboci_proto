@@ -1,0 +1,17 @@
+[project]
+name = "turboci"
+version = "0.0.1"
+authors = [
+  { name="Chromium Authors", },
+]
+description = "Helper library for manipulating TurboCI protos."
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+		"Development Status :: 3 - Alpha",
+		"Topic :: Software Development :: Libraries",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+]
+license = "Apache-2.0"
+license-files = ["LICENSE"]

@@ -88,13 +88,14 @@ def CheckAllFieldsOptional(input_api, output_api):
 
 def CheckLicense(input_api, output_api):
   input_api.DEFAULT_FILES_TO_CHECK += (r'.+\.proto$',)
+  input_api.DEFAULT_FILES_TO_SKIP += (r'.+_pb2\.pyi?$',)
   return input_api.canned_checks.CheckLicense(input_api, output_api)
 
 
-def CheckGoStubs(input_api, output_api):
+def CheckStubs(input_api, output_api):
   return input_api.RunTests([input_api.Command(
-      name='build.py compile_go check',
-      cmd=['build.py', 'compile_go', 'check'],
+      name='build.py compile_stubs check',
+      cmd=['build.py', 'compile_stubs', 'check'],
       kwargs={'cwd': input_api.PresubmitLocalPath()},
       message=output_api.PresubmitError,
   )])

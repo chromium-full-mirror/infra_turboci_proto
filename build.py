@@ -53,12 +53,13 @@ def check_output(cmd: list[str | Path]) -> str | NoReturn:
 
 
 def check_call(cmd: list[str | Path]):
-  if len(cmd) == 2 and cmd[0] == 'protoc' and cmd[1].startswith('@'):
-    args = open(cmd[1][1:]).read()
+  scmd: list[str] = [str(x) for x in cmd]
+  if len(scmd) == 2 and scmd[0] == 'protoc' and scmd[1].startswith('@'):
+    args = open(scmd[1][1:]).read()
     print(f"running: protoc {args}")
   else:
-    print(f"running: {' '.join(str(c) for c in cmd)}")
-  ret = subprocess.call(cmd, cwd=_RepoRoot, env=_env)
+    print(f"running: {' '.join(str(c) for c in scmd)}")
+  ret = subprocess.call(scmd, cwd=_RepoRoot, env=_env)
   if ret != 0:
     sys.exit(ret)
 
@@ -67,6 +68,8 @@ def task_clean():
   """Removes all generated files."""
   print('cleaning go/**/*.pb.go')
   for file in quick_glob('go/**/*.pb.go'):
+    os.remove(_RepoRoot / file)
+  for file in quick_glob('py/**/*_pb2.py*'):
     os.remove(_RepoRoot / file)
 
 
@@ -311,71 +314,83 @@ def _fds():
     yield fds
 
 
-def task_compile_go(mode: None | str = None):
-  """Runs `protoc` to compile all Go stubs.
+def _install_stubs(flavor: str, check: bool, src: Path, pattern: str, dst: Path):
+  newFiles: list[str] = glob.glob(pattern, recursive=True, root_dir=src)
+
+  if not check:
+    for file in newFiles:
+      print(f'{flavor}: {file}')
+      target = dst / file
+      os.makedirs(target.parent, exist_ok=True)
+      os.rename(src / file, target)
+    return
+
+  got = set(glob.glob(pattern, recursive=True, root_dir=src))
+  want = set(newFiles)
+
+  report = {}
+
+  report['missing in repo'] = want - got
+  report['extra in repo'] = got - want
+  _, report['with diff'], errs = filecmp.cmpfiles(
+      dst, src, want.intersection(got), shallow=False
+  )
+  if errs:
+    for err in errs:
+      print('error for file', err)
+    sys.exit(1)
+
+  if all(not value for value in report.values()):
+    return  # ok!
+
+  relDst = dst.relative_to(_RepoRoot)
+  for category, files in sorted(report.items()):
+    if files:
+      print(f'{category}:')
+      for file in files:
+        print(f'  {relDst}/{file}')
+
+  sys.exit(1)
+
+
+def task_compile_stubs(mode: None | str = None):
+  """Runs `protoc` to compile all Go and Python stubs.
 
   If `mode` is `check`, then this will just check that the currently generated
   stubs are correct and will not write to disk.
 
   Example:
-    build.py compile_go check
+    build.py compile_stubs check
   """
   if mode not in (None, 'check'):
-    print(f'compile_go: unknown mode={mode!r}')
+    print(f'compile_stubs: unknown mode={mode!r}')
     sys.exit(1)
 
-  goRoot = _RepoRoot / 'go'
-  module = 'go.chromium.org/turboci/proto/go'
+  goModule = 'go.chromium.org/turboci/proto/go'
 
   # build to tempdir to implement mode=check
   with tempfile.TemporaryDirectory(dir=_RepoRoot) as tdir:
+    tpth = Path(tdir)
+    tgo = tpth/'go'
+    tpy = tpth/'py'
+    tgo.mkdir()
+    tpy.mkdir()
     protoc(
-        f'--go_out={tdir}',
-        f'--go_opt=module={module}',
-        f'--go-grpc_out={tdir}',
-        f'--go-grpc_opt=module={module}',
+        f'--go_out={tgo}',
+        f'--go_opt=module={goModule}',
+        f'--go-grpc_out={tgo}',
+        f'--go-grpc_opt=module={goModule}',
         f'--go_opt=default_api_level=API_OPAQUE',
+        f'--python_out={tpy}',
+        f'--pyi_out={tpy}',
     )
 
-    newFiles = []
-    # Transform all "_grpc.pb.go" files:
-    for file in glob.glob('**/*.pb.go', recursive=True, root_dir=tdir):
-      newFiles.append(file)
-
-    if not mode:
+    check = mode == 'check'
+    if not check:
       task_clean()
-      for file in newFiles:
-        print(file)
-        target = goRoot / file
-        os.makedirs(target.parent, exist_ok=True)
-        os.rename(Path(tdir) / file, goRoot / file)
 
-    elif mode == 'check':
-      got = set(glob.glob('**/*.pb.go', recursive=True, root_dir=goRoot))
-      want = set(newFiles)
-
-      report = {}
-
-      report['missing in repo'] = want - got
-      report['extra in repo'] = got - want
-      _, report['with diff'], errs = filecmp.cmpfiles(
-          goRoot, tdir, want.intersection(got), shallow=False
-      )
-      if errs:
-        for err in errs:
-          print('error for file', err)
-        sys.exit(1)
-
-      if all(not value for value in report.values()):
-        return  # ok!
-
-      for category, files in sorted(report.items()):
-        if files:
-          print(f'{category}:')
-          for file in files:
-            print(f'  go/{file}')
-
-      sys.exit(1)
+    _install_stubs('go', check, tgo, '**/*.pb.go', _RepoRoot/'go')
+    _install_stubs('py', check, tpy, '**/*.*', _RepoRoot/'py')
 
 
 def task_store_descriptors(mode: None | str = None):
@@ -426,7 +441,7 @@ def task_all():
         check_all_fields_optional,
         task_lint,
         task_breaking,
-        task_compile_go,
+        task_compile_stubs,
         task_store_descriptors,
     )
 
