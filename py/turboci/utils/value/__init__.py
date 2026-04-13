@@ -5,4 +5,7 @@
 
 # Re-export all symbols from sub-modules.
 
+# go/keep-sorted start
+from .data_source import *
 from .digest import *
+# go/keep-sorted end
