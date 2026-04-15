@@ -7,6 +7,7 @@ from __future__ import annotations
 
 __all__ = [
     'DataSource',
+    'MutableDataSource',
     'SimpleDataSource',
     'pick_data',
 ]
@@ -19,9 +20,9 @@ from turboci.graph.orchestrator.v1 import value_data_pb2
 
 @typing.runtime_checkable
 class DataSource(typing.Protocol):
-  """DataSource is a type definition used by other helpers in value.
+  """Type definition used by reader/decoder functions in the value module.
 
-  In particular, this is a subset of `Mapping[Digest, ValueData]`.
+  In particular, this is a subset of `Mapping[str, ValueData]`.
   """
 
   def __getitem__(self, key: str, /) -> value_data_pb2.ValueData:
@@ -31,8 +32,16 @@ class DataSource(typing.Protocol):
     ...
 
 
+@typing.runtime_checkable
+class MutableDataSource(DataSource, typing.Protocol):
+  """Type definition which is DataSource plus a setter."""
+
+  def __setitem__(self, key: str, value: value_data_pb2.ValueData):
+    ...
+
+
 class SimpleDataSource(
-    collections.UserDict[str, value_data_pb2.ValueData], DataSource
+    collections.UserDict[str, value_data_pb2.ValueData], MutableDataSource
 ):
   """A implementation of DataSource which uses `pick_data` to apply updates.
 
