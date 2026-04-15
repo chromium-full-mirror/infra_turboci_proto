@@ -6,10 +6,8 @@
 from __future__ import annotations
 
 __all__ = [
-    'TYPE_URL_PREFIX',
     'ref',
     'ref_from_write',
-    'url',
     'write',
 ]
 
@@ -21,23 +19,6 @@ from google.protobuf import any_pb2
 from turboci.graph.orchestrator.v1 import value_ref_pb2
 from turboci.graph.orchestrator.v1 import value_write_pb2
 from turboci.graph.orchestrator.v1 import omit_reason_pb2
-
-# The standard type url prefix used by any_pb2.Any.
-TYPE_URL_PREFIX = 'type.googleapis.com/'
-
-
-def url(msg: message.Message | type[message.Message]) -> str:
-  """Helper to get the type_url from a proto message.
-
-  Useful for tests.
-
-  Args:
-    msg: The proto message type or instance.
-
-  Returns:
-    The type_url used by any_pb2.Any (e.g. type.googleapis.com/...)
-  """
-  return f'{TYPE_URL_PREFIX}{msg.DESCRIPTOR.full_name}'
 
 
 def write(

@@ -3,7 +3,28 @@
 # found in the LICENSE file.
 """Helpers for manipulating TurboCI Value{Write,Ref,Data} protos."""
 
+from google.protobuf import message as _message
+
 # Re-export all symbols from sub-modules.
+
+# The standard type url prefix used by any_pb2.Any.
+TYPE_URL_PREFIX = 'type.googleapis.com/'
+
+
+# We define `url` here because it's used by many of our contained modules.
+def url(msg: _message.Message | type[_message.Message]) -> str:
+  """Helper to get the type_url from a proto message.
+
+  Useful for tests.
+
+  Args:
+    msg: The proto message type or instance.
+
+  Returns:
+    The type_url used by any_pb2.Any (e.g. type.googleapis.com/...)
+  """
+  return f'{TYPE_URL_PREFIX}{msg.DESCRIPTOR.full_name}'
+
 
 # go/keep-sorted start
 from .data_source import *
