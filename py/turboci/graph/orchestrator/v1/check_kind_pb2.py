@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n.turboci/graph/orchestrator/v1/check_kind.proto\x12\x1dturboci.graph.orchestrator.v1*~\n\tCheckKind\x12\x16\n\x12\x43HECK_KIND_UNKNOWN\x10\x00\x12\x15\n\x11\x43HECK_KIND_SOURCE\x10\x01\x12\x14\n\x10\x43HECK_KIND_BUILD\x10\x02\x12\x13\n\x0f\x43HECK_KIND_TEST\x10\x03\x12\x17\n\x13\x43HECK_KIND_ANALYSIS\x10\x04\x42IP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n.turboci/graph/orchestrator/v1/check_kind.proto\x12\x1dturboci.graph.orchestrator.v1*\x96\x01\n\tCheckKind\x12\x16\n\x12\x43HECK_KIND_UNKNOWN\x10\x00\x12\x15\n\x11\x43HECK_KIND_SOURCE\x10\x01\x12\x14\n\x10\x43HECK_KIND_BUILD\x10\x02\x12\x13\n\x0f\x43HECK_KIND_TEST\x10\x03\x12\x17\n\x13\x43HECK_KIND_ANALYSIS\x10\x04\x12\x16\n\x12\x43HECK_KIND_KICKOFF\x10\x05\x42IP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,6 +32,6 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'turboci.graph.orchestrator.
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
-  _globals['_CHECKKIND']._serialized_start=81
-  _globals['_CHECKKIND']._serialized_end=207
+  _globals['_CHECKKIND']._serialized_start=82
+  _globals['_CHECKKIND']._serialized_end=232
 # @@protoc_insertion_point(module_scope)

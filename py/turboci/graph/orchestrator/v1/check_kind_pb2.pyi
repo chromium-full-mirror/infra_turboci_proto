@@ -11,8 +11,10 @@ class CheckKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     CHECK_KIND_BUILD: _ClassVar[CheckKind]
     CHECK_KIND_TEST: _ClassVar[CheckKind]
     CHECK_KIND_ANALYSIS: _ClassVar[CheckKind]
+    CHECK_KIND_KICKOFF: _ClassVar[CheckKind]
 CHECK_KIND_UNKNOWN: CheckKind
 CHECK_KIND_SOURCE: CheckKind
 CHECK_KIND_BUILD: CheckKind
 CHECK_KIND_TEST: CheckKind
 CHECK_KIND_ANALYSIS: CheckKind
+CHECK_KIND_KICKOFF: CheckKind

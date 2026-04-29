@@ -54,6 +54,11 @@ const (
 	// meta-determiniation. For example, an Analysis could consume sources, builds
 	// and tests and make a determiation like "this CL can land".
 	CheckKind_CHECK_KIND_ANALYSIS CheckKind = 4
+	// KICKOFF is a Check which is used to store information that will be used to
+	// kick off a set of additional stages. Typically used at the beginning of a
+	// workplan to represent the work that will be done by other, not-yet-created,
+	// stages during that workplan's run.
+	CheckKind_CHECK_KIND_KICKOFF CheckKind = 5
 )
 
 // Enum value maps for CheckKind.
@@ -64,6 +69,7 @@ var (
 		2: "CHECK_KIND_BUILD",
 		3: "CHECK_KIND_TEST",
 		4: "CHECK_KIND_ANALYSIS",
+		5: "CHECK_KIND_KICKOFF",
 	}
 	CheckKind_value = map[string]int32{
 		"CHECK_KIND_UNKNOWN":  0,
@@ -71,6 +77,7 @@ var (
 		"CHECK_KIND_BUILD":    2,
 		"CHECK_KIND_TEST":     3,
 		"CHECK_KIND_ANALYSIS": 4,
+		"CHECK_KIND_KICKOFF":  5,
 	}
 )
 
@@ -100,13 +107,14 @@ var File_turboci_graph_orchestrator_v1_check_kind_proto protoreflect.FileDescrip
 
 const file_turboci_graph_orchestrator_v1_check_kind_proto_rawDesc = "" +
 	"\n" +
-	".turboci/graph/orchestrator/v1/check_kind.proto\x12\x1dturboci.graph.orchestrator.v1*~\n" +
+	".turboci/graph/orchestrator/v1/check_kind.proto\x12\x1dturboci.graph.orchestrator.v1*\x96\x01\n" +
 	"\tCheckKind\x12\x16\n" +
 	"\x12CHECK_KIND_UNKNOWN\x10\x00\x12\x15\n" +
 	"\x11CHECK_KIND_SOURCE\x10\x01\x12\x14\n" +
 	"\x10CHECK_KIND_BUILD\x10\x02\x12\x13\n" +
 	"\x0fCHECK_KIND_TEST\x10\x03\x12\x17\n" +
-	"\x13CHECK_KIND_ANALYSIS\x10\x04BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x13CHECK_KIND_ANALYSIS\x10\x04\x12\x16\n" +
+	"\x12CHECK_KIND_KICKOFF\x10\x05BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_check_kind_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_check_kind_proto_goTypes = []any{
