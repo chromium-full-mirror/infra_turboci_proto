@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x12\x1dturboci.graph.orchestrator.v1*\x95\x02\n\x14StageConcludedReason\x12\"\n\x1eSTAGE_CONCLUDED_REASON_UNKNOWN\x10\x00\x12+\n\'STAGE_CONCLUDED_REASON_ATTEMPT_COMPLETE\x10\x01\x12*\n&STAGE_CONCLUDED_REASON_NO_RETRIES_LEFT\x10\x02\x12\x36\n2STAGE_CONCLUDED_REASON_FINAL_ATTEMPT_BLOCKED_RETRY\x10\x03\x12\"\n\x1eSTAGE_CONCLUDED_REASON_TIMEOUT\x10\x04\x12$\n STAGE_CONCLUDED_REASON_CANCELLED\x10\x05\x42IP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x12\x1dturboci.graph.orchestrator.v1*\xeb\x02\n\x14StageConcludedReason\x12\"\n\x1eSTAGE_CONCLUDED_REASON_UNKNOWN\x10\x00\x12+\n\'STAGE_CONCLUDED_REASON_ATTEMPT_COMPLETE\x10\x01\x12*\n&STAGE_CONCLUDED_REASON_NO_RETRIES_LEFT\x10\x02\x12\x36\n2STAGE_CONCLUDED_REASON_FINAL_ATTEMPT_BLOCKED_RETRY\x10\x03\x12\"\n\x1eSTAGE_CONCLUDED_REASON_TIMEOUT\x10\x04\x12$\n STAGE_CONCLUDED_REASON_CANCELLED\x10\x05\x12&\n\"STAGE_CONCLUDED_REASON_NO_EXECUTOR\x10\x06\x12,\n(STAGE_CONCLUDED_REASON_PERMISSION_DENIED\x10\x07\x42IP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,5 +33,5 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
   _globals['_STAGECONCLUDEDREASON']._serialized_start=94
-  _globals['_STAGECONCLUDEDREASON']._serialized_end=371
+  _globals['_STAGECONCLUDEDREASON']._serialized_end=457
 # @@protoc_insertion_point(module_scope)

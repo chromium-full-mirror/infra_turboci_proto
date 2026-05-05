@@ -32,14 +32,14 @@ type StageConcludedReason int32
 const (
 	// UNKNOWN means the stage is not concluded yet.
 	StageConcludedReason_STAGE_CONCLUDED_REASON_UNKNOWN StageConcludedReason = 0
-	// The last attempt to run the stage finished in STAGE_ATTEMPT_STATE_COMPLETE
-	// state.
+	// The last stage attempt finished in STAGE_ATTEMPT_STATE_COMPLETE state.
 	StageConcludedReason_STAGE_CONCLUDED_REASON_ATTEMPT_COMPLETE StageConcludedReason = 1
-	// The last attempt to run the stage finished in STAGE_ATTEMPT_STATE_INCOMPLETE
-	// state and the stage reached max allowed number of attempt retries.
+	// The last stage attempt finished in STAGE_ATTEMPT_STATE_INCOMPLETE state and
+	// the stage reached max allowed number of attempt retries.
 	StageConcludedReason_STAGE_CONCLUDED_REASON_NO_RETRIES_LEFT StageConcludedReason = 2
-	// The last attempt to run the stage finished in STAGE_ATTEMPT_STATE_INCOMPLETE
-	// state and the executor indicated that there should be no retry.
+	// The last stage attempt finished in STAGE_ATTEMPT_STATE_INCOMPLETE state,
+	// retries are allowed by the execution policy, but the executor explicitly
+	// indicated that there should be no retry.
 	StageConcludedReason_STAGE_CONCLUDED_REASON_FINAL_ATTEMPT_BLOCKED_RETRY StageConcludedReason = 3
 	// There's no time left to run an attempt per `stage_timeout` in
 	// StageExecutionPolicy.
@@ -51,6 +51,13 @@ const (
 	StageConcludedReason_STAGE_CONCLUDED_REASON_TIMEOUT StageConcludedReason = 4
 	// The Stage was explicitly cancelled via WriteNodes.
 	StageConcludedReason_STAGE_CONCLUDED_REASON_CANCELLED StageConcludedReason = 5
+	// The executor that was supposed to run this stage is no longer registered.
+	StageConcludedReason_STAGE_CONCLUDED_REASON_NO_EXECUTOR StageConcludedReason = 6
+	// The stage is no longer allowed to run due to ACLs.
+	//
+	// This can happen if ACLs change after the stage was already added to the
+	// work plan, but before it runs.
+	StageConcludedReason_STAGE_CONCLUDED_REASON_PERMISSION_DENIED StageConcludedReason = 7
 )
 
 // Enum value maps for StageConcludedReason.
@@ -62,6 +69,8 @@ var (
 		3: "STAGE_CONCLUDED_REASON_FINAL_ATTEMPT_BLOCKED_RETRY",
 		4: "STAGE_CONCLUDED_REASON_TIMEOUT",
 		5: "STAGE_CONCLUDED_REASON_CANCELLED",
+		6: "STAGE_CONCLUDED_REASON_NO_EXECUTOR",
+		7: "STAGE_CONCLUDED_REASON_PERMISSION_DENIED",
 	}
 	StageConcludedReason_value = map[string]int32{
 		"STAGE_CONCLUDED_REASON_UNKNOWN":                     0,
@@ -70,6 +79,8 @@ var (
 		"STAGE_CONCLUDED_REASON_FINAL_ATTEMPT_BLOCKED_RETRY": 3,
 		"STAGE_CONCLUDED_REASON_TIMEOUT":                     4,
 		"STAGE_CONCLUDED_REASON_CANCELLED":                   5,
+		"STAGE_CONCLUDED_REASON_NO_EXECUTOR":                 6,
+		"STAGE_CONCLUDED_REASON_PERMISSION_DENIED":           7,
 	}
 )
 
@@ -99,14 +110,16 @@ var File_turboci_graph_orchestrator_v1_stage_concluded_reason_proto protoreflect
 
 const file_turboci_graph_orchestrator_v1_stage_concluded_reason_proto_rawDesc = "" +
 	"\n" +
-	":turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x12\x1dturboci.graph.orchestrator.v1*\x95\x02\n" +
+	":turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x12\x1dturboci.graph.orchestrator.v1*\xeb\x02\n" +
 	"\x14StageConcludedReason\x12\"\n" +
 	"\x1eSTAGE_CONCLUDED_REASON_UNKNOWN\x10\x00\x12+\n" +
 	"'STAGE_CONCLUDED_REASON_ATTEMPT_COMPLETE\x10\x01\x12*\n" +
 	"&STAGE_CONCLUDED_REASON_NO_RETRIES_LEFT\x10\x02\x126\n" +
 	"2STAGE_CONCLUDED_REASON_FINAL_ATTEMPT_BLOCKED_RETRY\x10\x03\x12\"\n" +
 	"\x1eSTAGE_CONCLUDED_REASON_TIMEOUT\x10\x04\x12$\n" +
-	" STAGE_CONCLUDED_REASON_CANCELLED\x10\x05BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	" STAGE_CONCLUDED_REASON_CANCELLED\x10\x05\x12&\n" +
+	"\"STAGE_CONCLUDED_REASON_NO_EXECUTOR\x10\x06\x12,\n" +
+	"(STAGE_CONCLUDED_REASON_PERMISSION_DENIED\x10\aBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_stage_concluded_reason_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_stage_concluded_reason_proto_goTypes = []any{
