@@ -23,10 +23,9 @@ _sym_db = _symbol_database.Default()
 
 
 from google.protobuf import descriptor_pb2 as google_dot_protobuf_dot_descriptor__pb2
-from turboci.graph.ids.v1 import identifier_kind_pb2 as turboci_dot_graph_dot_ids_dot_v1_dot_identifier__kind__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n2turboci/graph/orchestrator/v1/method_options.proto\x12\x1dturboci.graph.orchestrator.v1\x1a google/protobuf/descriptor.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\"\xcb\x02\n\rMethodOptions\x12P\n\npermission\x18\x01 \x03(\x0b\x32\x37.turboci.graph.orchestrator.v1.MethodOptions.PermissionB\x03\x88\x01\x02\x1a\xe7\x01\n\nPermission\x12\x15\n\x08internal\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x15\n\x08\x65xternal\x18\x02 \x01(\tH\x01\x88\x01\x01\x12\x30\n\x02in\x18\x03 \x03(\x0e\x32$.turboci.graph.ids.v1.IdentifierKind\x12\x1b\n\x0ein_value_realm\x18\x04 \x01(\x08H\x02\x88\x01\x01\x12\"\n\x1apotentially_conditional_on\x18\x05 \x03(\t\x12\x0b\n\x03\x66or\x18\x06 \x03(\tB\x0b\n\t_internalB\x0b\n\t_externalB\x11\n\x0f_in_value_realm:h\n\x0bturboci_rpc\x12\x1e.google.protobuf.MethodOptions\x18\xda\xba\xab\xfa\x01 \x01(\x0b\x32,.turboci.graph.orchestrator.v1.MethodOptions\x88\x01\x01\x42IP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n2turboci/graph/orchestrator/v1/method_options.proto\x12\x1dturboci.graph.orchestrator.v1\x1a google/protobuf/descriptor.proto\"!\n\rMethodOptionsJ\x04\x08\x01\x10\x02R\npermission:h\n\x0bturboci_rpc\x12\x1e.google.protobuf.MethodOptions\x18\xda\xba\xab\xfa\x01 \x01(\x0b\x32,.turboci.graph.orchestrator.v1.MethodOptions\x88\x01\x01\x42IP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,10 +33,6 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'turboci.graph.orchestrator.
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
-  _globals['_METHODOPTIONS'].fields_by_name['permission']._loaded_options = None
-  _globals['_METHODOPTIONS'].fields_by_name['permission']._serialized_options = b'\210\001\002'
-  _globals['_METHODOPTIONS']._serialized_start=164
-  _globals['_METHODOPTIONS']._serialized_end=495
-  _globals['_METHODOPTIONS_PERMISSION']._serialized_start=264
-  _globals['_METHODOPTIONS_PERMISSION']._serialized_end=495
+  _globals['_METHODOPTIONS']._serialized_start=119
+  _globals['_METHODOPTIONS']._serialized_end=152
 # @@protoc_insertion_point(module_scope)

@@ -26,7 +26,6 @@ from turboci.graph.orchestrator.v1 import allocate_worknode_ids_request_pb2 as t
 from turboci.graph.orchestrator.v1 import allocate_worknode_ids_response_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_allocate__worknode__ids__response__pb2
 from turboci.graph.orchestrator.v1 import create_workplan_request_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_create__workplan__request__pb2
 from turboci.graph.orchestrator.v1 import create_workplan_response_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_create__workplan__response__pb2
-from turboci.graph.orchestrator.v1 import method_options_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_method__options__pb2
 from turboci.graph.orchestrator.v1 import query_nodes_request_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_query__nodes__request__pb2
 from turboci.graph.orchestrator.v1 import query_nodes_response_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_query__nodes__response__pb2
 from turboci.graph.orchestrator.v1 import read_workplan_request_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_read__workplan__request__pb2
@@ -35,7 +34,7 @@ from turboci.graph.orchestrator.v1 import write_nodes_request_pb2 as turboci_dot
 from turboci.graph.orchestrator.v1 import write_nodes_response_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_write__nodes__response__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\nAturboci/graph/orchestrator/v1/turbo_ci_orchestrator_service.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x41turboci/graph/orchestrator/v1/allocate_worknode_ids_request.proto\x1a\x42turboci/graph/orchestrator/v1/allocate_worknode_ids_response.proto\x1a;turboci/graph/orchestrator/v1/create_workplan_request.proto\x1a<turboci/graph/orchestrator/v1/create_workplan_response.proto\x1a\x32turboci/graph/orchestrator/v1/method_options.proto\x1a\x37turboci/graph/orchestrator/v1/query_nodes_request.proto\x1a\x38turboci/graph/orchestrator/v1/query_nodes_response.proto\x1a\x39turboci/graph/orchestrator/v1/read_workplan_request.proto\x1a:turboci/graph/orchestrator/v1/read_workplan_response.proto\x1a\x37turboci/graph/orchestrator/v1/write_nodes_request.proto\x1a\x38turboci/graph/orchestrator/v1/write_nodes_response.proto2\xab\x05\n\x13TurboCIOrchestrator\x12\x85\x01\n\x0e\x43reateWorkPlan\x12\x34.turboci.graph.orchestrator.v1.CreateWorkPlanRequest\x1a\x35.turboci.graph.orchestrator.v1.CreateWorkPlanResponse\"\x06\xd2\xd5\xdb\xd2\x0f\x00\x12y\n\nWriteNodes\x12\x30.turboci.graph.orchestrator.v1.WriteNodesRequest\x1a\x31.turboci.graph.orchestrator.v1.WriteNodesResponse\"\x06\xd2\xd5\xdb\xd2\x0f\x00\x12y\n\nQueryNodes\x12\x30.turboci.graph.orchestrator.v1.QueryNodesRequest\x1a\x31.turboci.graph.orchestrator.v1.QueryNodesResponse\"\x06\xd2\xd5\xdb\xd2\x0f\x00\x12\x7f\n\x0cReadWorkPlan\x12\x32.turboci.graph.orchestrator.v1.ReadWorkPlanRequest\x1a\x33.turboci.graph.orchestrator.v1.ReadWorkPlanResponse\"\x06\xd2\xd5\xdb\xd2\x0f\x00\x12\x94\x01\n\x13\x41llocateWorkNodeIDs\x12\x39.turboci.graph.orchestrator.v1.AllocateWorkNodeIDsRequest\x1a:.turboci.graph.orchestrator.v1.AllocateWorkNodeIDsResponse\"\x06\xd2\xd5\xdb\xd2\x0f\x00\x42TP\x01ZPgo.chromium.org/turboci/proto/go/graph/orchestrator/v1/grpcpb;orchestratorgrpcpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\nAturboci/graph/orchestrator/v1/turbo_ci_orchestrator_service.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x41turboci/graph/orchestrator/v1/allocate_worknode_ids_request.proto\x1a\x42turboci/graph/orchestrator/v1/allocate_worknode_ids_response.proto\x1a;turboci/graph/orchestrator/v1/create_workplan_request.proto\x1a<turboci/graph/orchestrator/v1/create_workplan_response.proto\x1a\x37turboci/graph/orchestrator/v1/query_nodes_request.proto\x1a\x38turboci/graph/orchestrator/v1/query_nodes_response.proto\x1a\x39turboci/graph/orchestrator/v1/read_workplan_request.proto\x1a:turboci/graph/orchestrator/v1/read_workplan_response.proto\x1a\x37turboci/graph/orchestrator/v1/write_nodes_request.proto\x1a\x38turboci/graph/orchestrator/v1/write_nodes_response.proto2\x8c\x05\n\x13TurboCIOrchestrator\x12\x7f\n\x0e\x43reateWorkPlan\x12\x34.turboci.graph.orchestrator.v1.CreateWorkPlanRequest\x1a\x35.turboci.graph.orchestrator.v1.CreateWorkPlanResponse\"\x00\x12s\n\nWriteNodes\x12\x30.turboci.graph.orchestrator.v1.WriteNodesRequest\x1a\x31.turboci.graph.orchestrator.v1.WriteNodesResponse\"\x00\x12s\n\nQueryNodes\x12\x30.turboci.graph.orchestrator.v1.QueryNodesRequest\x1a\x31.turboci.graph.orchestrator.v1.QueryNodesResponse\"\x00\x12y\n\x0cReadWorkPlan\x12\x32.turboci.graph.orchestrator.v1.ReadWorkPlanRequest\x1a\x33.turboci.graph.orchestrator.v1.ReadWorkPlanResponse\"\x00\x12\x8e\x01\n\x13\x41llocateWorkNodeIDs\x12\x39.turboci.graph.orchestrator.v1.AllocateWorkNodeIDsRequest\x1a:.turboci.graph.orchestrator.v1.AllocateWorkNodeIDsResponse\"\x00\x42TP\x01ZPgo.chromium.org/turboci/proto/go/graph/orchestrator/v1/grpcpb;orchestratorgrpcpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -43,16 +42,6 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'turboci.graph.orchestrator.
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZPgo.chromium.org/turboci/proto/go/graph/orchestrator/v1/grpcpb;orchestratorgrpcpb'
-  _globals['_TURBOCIORCHESTRATOR'].methods_by_name['CreateWorkPlan']._loaded_options = None
-  _globals['_TURBOCIORCHESTRATOR'].methods_by_name['CreateWorkPlan']._serialized_options = b'\322\325\333\322\017\000'
-  _globals['_TURBOCIORCHESTRATOR'].methods_by_name['WriteNodes']._loaded_options = None
-  _globals['_TURBOCIORCHESTRATOR'].methods_by_name['WriteNodes']._serialized_options = b'\322\325\333\322\017\000'
-  _globals['_TURBOCIORCHESTRATOR'].methods_by_name['QueryNodes']._loaded_options = None
-  _globals['_TURBOCIORCHESTRATOR'].methods_by_name['QueryNodes']._serialized_options = b'\322\325\333\322\017\000'
-  _globals['_TURBOCIORCHESTRATOR'].methods_by_name['ReadWorkPlan']._loaded_options = None
-  _globals['_TURBOCIORCHESTRATOR'].methods_by_name['ReadWorkPlan']._serialized_options = b'\322\325\333\322\017\000'
-  _globals['_TURBOCIORCHESTRATOR'].methods_by_name['AllocateWorkNodeIDs']._loaded_options = None
-  _globals['_TURBOCIORCHESTRATOR'].methods_by_name['AllocateWorkNodeIDs']._serialized_options = b'\322\325\333\322\017\000'
-  _globals['_TURBOCIORCHESTRATOR']._serialized_start=760
-  _globals['_TURBOCIORCHESTRATOR']._serialized_end=1443
+  _globals['_TURBOCIORCHESTRATOR']._serialized_start=708
+  _globals['_TURBOCIORCHESTRATOR']._serialized_end=1360
 # @@protoc_insertion_point(module_scope)

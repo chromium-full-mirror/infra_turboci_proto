@@ -54,6 +54,9 @@ const (
 // a different realm than their parent. Permission to read or write a nested
 // message also requires the corresponding permission for all parent nodes, and
 // for the containing Workplan.
+//
+// See http://go/turbo-ci-acls (Googlers only) for detailed description of
+// relevant permissions and roles.
 type TurboCIOrchestratorClient interface {
 	// CreateWorkPlan creates a new WorkPlan and returns a Workplan Creator
 	// token, which can be used to create checks and stages in this Workplan.
@@ -214,6 +217,9 @@ func (c *turboCIOrchestratorClient) AllocateWorkNodeIDs(ctx context.Context, in 
 // a different realm than their parent. Permission to read or write a nested
 // message also requires the corresponding permission for all parent nodes, and
 // for the containing Workplan.
+//
+// See http://go/turbo-ci-acls (Googlers only) for detailed description of
+// relevant permissions and roles.
 type TurboCIOrchestratorServer interface {
 	// CreateWorkPlan creates a new WorkPlan and returns a Workplan Creator
 	// token, which can be used to create checks and stages in this Workplan.

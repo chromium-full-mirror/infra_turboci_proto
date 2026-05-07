@@ -434,7 +434,7 @@ func (b0 Actor_WorkplanCreator_builder) Build() *Actor_WorkplanCreator {
 }
 
 // External indicates that the edit came from some Actor using an External
-// permission variant (no write token used).
+// permission variant (no stage attempt or work plan creator token used).
 type Actor_External struct {
 	state         protoimpl.MessageState `protogen:"opaque.v1"`
 	unknownFields protoimpl.UnknownFields

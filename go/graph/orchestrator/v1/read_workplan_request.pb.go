@@ -207,14 +207,6 @@ type ReadWorkPlanRequest_builder struct {
 	// of an empty Workplan.
 	//
 	// This is in addition to regular RPC authorization.
-	//
-	// If the token is populated:
-	//   - If its workplan ID matches the workplan ID in the request, this RPC will
-	//     check that the caller has the relevant 'read' permissions.
-	//   - If it doesn't match, this RPC will reject the request.
-	//
-	// If the token is not populated, the relevant 'readExternal' permissions will
-	// be checked.
 	Token *string
 	// The ID of the workplan from which to select nodes to return.
 	WorkplanId *v1.WorkPlan

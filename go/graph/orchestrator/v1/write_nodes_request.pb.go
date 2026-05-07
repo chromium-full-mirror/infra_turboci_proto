@@ -222,9 +222,9 @@ type WriteNodesRequest_builder struct {
 	//
 	// This is in addition to regular RPC authorization.
 	//
-	// If missing, this RPC will check that the caller additionally has the
-	// 'turboci.workplans.writeExternal' permission on Workplan(s) in the
-	// CheckWrites/StageWrites.
+	// If missing, this Orchestrator will check that the caller is permitted to
+	// act "externally" in the work plan, see http://go/turbo-ci-acls (Googlers
+	// only) for details.
 	Token *string
 	// Required reason for this write.
 	//
@@ -935,12 +935,9 @@ type WriteNodesRequest_CheckWrite_builder struct {
 
 	// The check to write to.
 	//
-	// If the WorkPlan is left blank, will be populated with the WorkPlan in
-	// `token`, if it's provided.
-	//
-	// Otherwise, the Check must belong to the token's WorkPlan, or the caller
-	// must have the additional "turboci.workplans.writeExternal" permission in
-	// the check's realm (or in the realm of the option/result data).
+	// The work plan in the ID can either be unset or be equal to the work plan
+	// the WriteNodesRequest's token is associated with. If there's no token,
+	// the work plan in the ID must be set.
 	Identifier *v1.Check
 	// Realm to assign to this Check.
 	//
@@ -1225,15 +1222,9 @@ type WriteNodesRequest_StageWrite_builder struct {
 
 	// The stage to write to.
 	//
-	// If the WorkPlan is left blank, will be populated with the WorkPlan in
-	// `token`, if it's provided.
-	//
-	// Otherwise, the Stage must belong to the token's WorkPlan, or the caller
-	// must have the additional "turboci.workplans.writeExternal" permission in
-	// the stage's realm.
-	//
-	// The `is_worknode` field should also be omitted - it will be filled in by
-	// the server according to the type of `args`.
+	// The work plan in the ID can either be unset or be equal to the work plan
+	// the WriteNodesRequest's token is associated with. If there's no token,
+	// the work plan in the ID must be set.
 	Identifier *v1.Stage
 	// The arguments of the Stage.
 	//
