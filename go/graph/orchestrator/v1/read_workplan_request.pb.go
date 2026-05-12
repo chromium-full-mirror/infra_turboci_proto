@@ -208,7 +208,9 @@ type ReadWorkPlanRequest_builder struct {
 	//
 	// This is in addition to regular RPC authorization.
 	Token *string
-	// The ID of the workplan from which to select nodes to return.
+	// The ID of the workplan from which to select nodes to return. If not
+	// provided and `token` is provided, the workplan ID from the token will be
+	// used. If not provided and not inferable, the request will be rejected.
 	WorkplanId *v1.WorkPlan
 	// The set of node types for which we should return nodes. If none are
 	// provided, the request will be rejected with INVALID_ARGUMENT.
