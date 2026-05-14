@@ -31,7 +31,8 @@ type ValueRef struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_TypeUrl     *string                `protobuf:"bytes,1,opt,name=type_url,json=typeUrl,proto3,oneof"`
 	xxx_hidden_Realm       *string                `protobuf:"bytes,2,opt,name=realm,proto3,oneof"`
-	xxx_hidden_Data        isValueRef_Data        `protobuf_oneof:"data"`
+	xxx_hidden_Digest      *string                `protobuf:"bytes,3,opt,name=digest,proto3,oneof"`
+	xxx_hidden_Inline      *anypb.Any             `protobuf:"bytes,4,opt,name=inline,proto3,oneof"`
 	xxx_hidden_OmitReason  OmitReason             `protobuf:"varint,5,opt,name=omit_reason,json=omitReason,proto3,enum=turboci.graph.orchestrator.v1.OmitReason,oneof"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
@@ -86,25 +87,24 @@ func (x *ValueRef) GetRealm() string {
 
 func (x *ValueRef) GetDigest() string {
 	if x != nil {
-		if x, ok := x.xxx_hidden_Data.(*valueRef_Digest); ok {
-			return x.Digest
+		if x.xxx_hidden_Digest != nil {
+			return *x.xxx_hidden_Digest
 		}
+		return ""
 	}
 	return ""
 }
 
 func (x *ValueRef) GetInline() *anypb.Any {
 	if x != nil {
-		if x, ok := x.xxx_hidden_Data.(*valueRef_Inline); ok {
-			return x.Inline
-		}
+		return x.xxx_hidden_Inline
 	}
 	return nil
 }
 
 func (x *ValueRef) GetOmitReason() OmitReason {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 3) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 4) {
 			return x.xxx_hidden_OmitReason
 		}
 	}
@@ -113,29 +113,26 @@ func (x *ValueRef) GetOmitReason() OmitReason {
 
 func (x *ValueRef) SetTypeUrl(v string) {
 	x.xxx_hidden_TypeUrl = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 5)
 }
 
 func (x *ValueRef) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 5)
 }
 
 func (x *ValueRef) SetDigest(v string) {
-	x.xxx_hidden_Data = &valueRef_Digest{v}
+	x.xxx_hidden_Digest = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 5)
 }
 
 func (x *ValueRef) SetInline(v *anypb.Any) {
-	if v == nil {
-		x.xxx_hidden_Data = nil
-		return
-	}
-	x.xxx_hidden_Data = &valueRef_Inline{v}
+	x.xxx_hidden_Inline = v
 }
 
 func (x *ValueRef) SetOmitReason(v OmitReason) {
 	x.xxx_hidden_OmitReason = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 5)
 }
 
 func (x *ValueRef) HasTypeUrl() bool {
@@ -152,34 +149,25 @@ func (x *ValueRef) HasRealm() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *ValueRef) HasData() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Data != nil
-}
-
 func (x *ValueRef) HasDigest() bool {
 	if x == nil {
 		return false
 	}
-	_, ok := x.xxx_hidden_Data.(*valueRef_Digest)
-	return ok
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
 func (x *ValueRef) HasInline() bool {
 	if x == nil {
 		return false
 	}
-	_, ok := x.xxx_hidden_Data.(*valueRef_Inline)
-	return ok
+	return x.xxx_hidden_Inline != nil
 }
 
 func (x *ValueRef) HasOmitReason() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
 }
 
 func (x *ValueRef) ClearTypeUrl() {
@@ -192,43 +180,18 @@ func (x *ValueRef) ClearRealm() {
 	x.xxx_hidden_Realm = nil
 }
 
-func (x *ValueRef) ClearData() {
-	x.xxx_hidden_Data = nil
-}
-
 func (x *ValueRef) ClearDigest() {
-	if _, ok := x.xxx_hidden_Data.(*valueRef_Digest); ok {
-		x.xxx_hidden_Data = nil
-	}
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Digest = nil
 }
 
 func (x *ValueRef) ClearInline() {
-	if _, ok := x.xxx_hidden_Data.(*valueRef_Inline); ok {
-		x.xxx_hidden_Data = nil
-	}
+	x.xxx_hidden_Inline = nil
 }
 
 func (x *ValueRef) ClearOmitReason() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
 	x.xxx_hidden_OmitReason = OmitReason_OMIT_REASON_UNKNOWN
-}
-
-const ValueRef_Data_not_set_case case_ValueRef_Data = 0
-const ValueRef_Digest_case case_ValueRef_Data = 3
-const ValueRef_Inline_case case_ValueRef_Data = 4
-
-func (x *ValueRef) WhichData() case_ValueRef_Data {
-	if x == nil {
-		return ValueRef_Data_not_set_case
-	}
-	switch x.xxx_hidden_Data.(type) {
-	case *valueRef_Digest:
-		return ValueRef_Digest_case
-	case *valueRef_Inline:
-		return ValueRef_Inline_case
-	default:
-		return ValueRef_Data_not_set_case
-	}
 }
 
 type ValueRef_builder struct {
@@ -245,14 +208,14 @@ type ValueRef_builder struct {
 	// Note that this will always be set, and will never be "$from_token" or
 	// "$from_container" as you may write via [ValueWrite.realm].
 	Realm *string
-	// The data for this ValueRef.
-
-	// Fields of oneof xxx_hidden_Data:
 	// Serialized [ValueDigest] for the data.
 	//
 	// This indicates that the data must be retrieved from the `value_data` map
 	// in the response (or from some other CAS system using `digest` as the
 	// effective key).
+	//
+	// NOTE: The current implementation of the TurboCI Orchestrator will always
+	// populate this field for non-omitted ValueRefs in its response.
 	Digest *string
 	// Inline contains the actual data, if the orchestrator decided that this
 	// data was too small/unique to store indirectly via `digest`.
@@ -263,8 +226,10 @@ type ValueRef_builder struct {
 	//
 	// See [ValueDigest] for how to compute `digest` from `inline`, should
 	// it be necessary.
+	//
+	// NOTE: The current implementation of the TurboCI Orchestrator will
+	// never populate this field for ValueRefs in its response.
 	Inline *anypb.Any
-	// -- end of xxx_hidden_Data
 	// If set, the reason this ValueRef's content was omitted from the response.
 	//
 	// If unset, it means that the caller has access to this data, and that the
@@ -281,81 +246,41 @@ func (b0 ValueRef_builder) Build() *ValueRef {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.TypeUrl != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 5)
 		x.xxx_hidden_TypeUrl = b.TypeUrl
 	}
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 5)
 		x.xxx_hidden_Realm = b.Realm
 	}
 	if b.Digest != nil {
-		x.xxx_hidden_Data = &valueRef_Digest{*b.Digest}
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 5)
+		x.xxx_hidden_Digest = b.Digest
 	}
-	if b.Inline != nil {
-		x.xxx_hidden_Data = &valueRef_Inline{b.Inline}
-	}
+	x.xxx_hidden_Inline = b.Inline
 	if b.OmitReason != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 5)
 		x.xxx_hidden_OmitReason = *b.OmitReason
 	}
 	return m0
 }
 
-type case_ValueRef_Data protoreflect.FieldNumber
-
-func (x case_ValueRef_Data) String() string {
-	md := file_turboci_graph_orchestrator_v1_value_ref_proto_msgTypes[0].Descriptor()
-	if x == 0 {
-		return "not set"
-	}
-	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
-}
-
-type isValueRef_Data interface {
-	isValueRef_Data()
-}
-
-type valueRef_Digest struct {
-	// Serialized [ValueDigest] for the data.
-	//
-	// This indicates that the data must be retrieved from the `value_data` map
-	// in the response (or from some other CAS system using `digest` as the
-	// effective key).
-	Digest string `protobuf:"bytes,3,opt,name=digest,proto3,oneof"`
-}
-
-type valueRef_Inline struct {
-	// Inline contains the actual data, if the orchestrator decided that this
-	// data was too small/unique to store indirectly via `digest`.
-	//
-	// It is expected that clients will always use a library function to handle
-	// inline vs. digest-referenced data. Server-provided JSON via ValueData
-	// will always be provided via digest, rather than stored inline.
-	//
-	// See [ValueDigest] for how to compute `digest` from `inline`, should
-	// it be necessary.
-	Inline *anypb.Any `protobuf:"bytes,4,opt,name=inline,proto3,oneof"`
-}
-
-func (*valueRef_Digest) isValueRef_Data() {}
-
-func (*valueRef_Inline) isValueRef_Data() {}
-
 var File_turboci_graph_orchestrator_v1_value_ref_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_value_ref_proto_rawDesc = "" +
 	"\n" +
-	"-turboci/graph/orchestrator/v1/value_ref.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\x1a/turboci/graph/orchestrator/v1/omit_reason.proto\"\x94\x02\n" +
+	"-turboci/graph/orchestrator/v1/value_ref.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\x1a/turboci/graph/orchestrator/v1/omit_reason.proto\"\xa8\x02\n" +
 	"\bValueRef\x12\x1e\n" +
-	"\btype_url\x18\x01 \x01(\tH\x01R\atypeUrl\x88\x01\x01\x12\x19\n" +
-	"\x05realm\x18\x02 \x01(\tH\x02R\x05realm\x88\x01\x01\x12\x18\n" +
-	"\x06digest\x18\x03 \x01(\tH\x00R\x06digest\x12.\n" +
-	"\x06inline\x18\x04 \x01(\v2\x14.google.protobuf.AnyH\x00R\x06inline\x12T\n" +
-	"\vomit_reason\x18\x05 \x01(\x0e2).turboci.graph.orchestrator.v1.OmitReasonB\x03\xe0A\x03H\x03R\n" +
-	"omitReason\x88\x01\x01B\x06\n" +
-	"\x04dataB\v\n" +
+	"\btype_url\x18\x01 \x01(\tH\x00R\atypeUrl\x88\x01\x01\x12\x19\n" +
+	"\x05realm\x18\x02 \x01(\tH\x01R\x05realm\x88\x01\x01\x12\x1b\n" +
+	"\x06digest\x18\x03 \x01(\tH\x02R\x06digest\x88\x01\x01\x121\n" +
+	"\x06inline\x18\x04 \x01(\v2\x14.google.protobuf.AnyH\x03R\x06inline\x88\x01\x01\x12T\n" +
+	"\vomit_reason\x18\x05 \x01(\x0e2).turboci.graph.orchestrator.v1.OmitReasonB\x03\xe0A\x03H\x04R\n" +
+	"omitReason\x88\x01\x01B\v\n" +
 	"\t_type_urlB\b\n" +
-	"\x06_realmB\x0e\n" +
+	"\x06_realmB\t\n" +
+	"\a_digestB\t\n" +
+	"\a_inlineB\x0e\n" +
 	"\f_omit_reasonBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_value_ref_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
@@ -380,10 +305,7 @@ func file_turboci_graph_orchestrator_v1_value_ref_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_omit_reason_proto_init()
-	file_turboci_graph_orchestrator_v1_value_ref_proto_msgTypes[0].OneofWrappers = []any{
-		(*valueRef_Digest)(nil),
-		(*valueRef_Inline)(nil),
-	}
+	file_turboci_graph_orchestrator_v1_value_ref_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

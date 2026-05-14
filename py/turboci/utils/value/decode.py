@@ -52,12 +52,13 @@ def decode(
   json_data: None | value_data_pb2.ValueData.JsonAny = None
   if ref.HasField('inline'):
     bin_data = ref.inline
-  else:
+
+  if ref.HasField('digest') and bin_data is None:
     try:
       got = ds[ref.digest]
       if got.HasField('binary'):
         bin_data = got.binary
-      else:
+      elif got.HasField('json'):
         json_data = got.json
     except KeyError:
       pass
@@ -67,13 +68,13 @@ def decode(
 
   if bin_data:
     ret = msg()
-    assert bin_data.Unpack(ret), 'failed to unpack {ref.type_url!r}'
+    assert bin_data.Unpack(ret), f'failed to unpack {ref.type_url!r}'
     return ret
 
   assert json_data
   assert (
       json_data.type_url == ref.type_url
-  ), r'BUG: mismatched refs {json.type_url!r} vs {ref.type_url!r}'
+  ), f'BUG: mismatched refs {json_data.type_url!r} vs {ref.type_url!r}'
 
   ret = msg()
   json_format.Parse(json_data.value, ret)

@@ -16,12 +16,15 @@ from turboci.utils.value import digest
 def absorb_inline(
     ds: data_source.MutableDataSource, ref: value_ref_pb2.ValueRef
 ):
-  """Consumes the inline data in `ref` into `src`.
+  """Consumes the inline data in `ref` into `ds`.
 
-  Mutates `ref` to set `digest` in place of `inline`.
+  Mutates `ref` to ensure the corresponding `digest` is populated.
 
-  No-op to absorb digest-based refs.
+  No-op to absorb refs which have no inline data.
   """
+  if not ref.HasField('inline'):
+    return
+
   if ref.HasField('digest'):
     return
 

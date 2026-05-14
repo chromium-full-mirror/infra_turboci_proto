@@ -7,6 +7,7 @@ import unittest
 
 from google.protobuf import timestamp_pb2
 from google.protobuf import wrappers_pb2
+from turboci.graph.orchestrator.v1 import value_ref_pb2
 from turboci.utils import value
 
 
@@ -86,6 +87,18 @@ class TestMatch(unittest.TestCase):
     # Content mismatch (inline vs digest)
     ref_e = value.ref(wrappers_pb2.StringValue(value='nop'), 'project:realm')
     self.assertFalse(value.ref_matches_ref(ref_a, ref_e))
+
+  def test_ref_matches_ref_invalid_ref_returns_false(self):
+    msg = wrappers_pb2.StringValue(value='hi')
+    valid_ref = value.ref(msg, 'project:realm')
+    invalid_ref = value_ref_pb2.ValueRef(
+        realm='project:realm',
+        type_url=valid_ref.type_url,
+    )
+
+    self.assertFalse(value.ref_matches_ref(valid_ref, invalid_ref))
+    self.assertFalse(value.ref_matches_ref(invalid_ref, valid_ref))
+    self.assertFalse(value.ref_matches_ref(invalid_ref, invalid_ref))
 
 
 if __name__ == '__main__':

@@ -43,8 +43,11 @@ class TestDecode(unittest.TestCase):
     self.assertEqual(decoded, want)
 
   def test_missing_data(self):
-    ref = value.ref(wrappers_pb2.StringValue(value='morp'), 'project:realm')
-    ref.digest = 'fake-digest'
+    ref = value_ref_pb2.ValueRef(
+        realm='project:realm',
+        digest='fake-digest',
+        type_url=value.url(wrappers_pb2.StringValue),
+    )
     with self.assertRaisesRegex(ValueError, 'could not find data'):
       value.decode({}, ref, wrappers_pb2.StringValue)
 
