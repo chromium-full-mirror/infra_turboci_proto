@@ -33,7 +33,7 @@ option java_multiple_files = true;
 // See also:
 //   * Identifier.Stage* (Identifiers for Stages, StageAttempts, etc.)
 //
-// Next ID: 17
+// Next ID: 18
 message Stage {
   // The Stage's identifier.
   optional ids.v1.Stage identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
@@ -84,9 +84,28 @@ message Stage {
   // The current state of the Stage.
   optional StageState state = 6;
 
-  // If this stage was cancelled, this indicates the Actor which cancelled
-  // it.
+  // If this stage was cancelled, this indicates the Actor which cancelled it.
+  //
+  // It is populated immediately after the cancellation was submitted and
+  // signals that the stage is pending cancellation. The stage may still be in
+  // non-final state for some time, since the cancellation process is generally
+  // asynchronous.
+  //
+  // Here's what cancellation does to stages in different states:
+  //  * PLANNED: the stage will remain PLANNED as long as it has unresolved
+  //    dependencies. When they are resolved, the stage will immediately
+  //    switch into FINAL state (instead of ATTEMPTING).
+  //  * ATTEMPTING: the current stage attempt will be moved to CANCELLING state
+  //    (followed by TEARING_DOWN, followed by COMPLETE or INCOMPLETE). No new
+  //    attempts will be allowed. Once the current attempt is COMPLETE or
+  //    INCOMPLETE, the stage will switch into AWAITING_GROUP or FINAL states,
+  //    just as if it finished normally.
+  //  * AWAITING_GROUP, FINAL: cancellation has no effect on stages in this
+  //    state (they have finished running already).
   optional Actor cancelled_by = 14;
+
+  // When the stage was cancelled (i.e. when `cancelled_by` was set).
+  optional Revision cancelled_at = 17;
 
   // Set for stages that represent legacy WorkNodes.
   message Legacy {
@@ -356,7 +375,7 @@ message Stage {
   // Stage. While the Stage is ATTEMPTING, the Stage's revision only changes
   // when:
   //   * A new Attempt is created
-  //   * The Stage is canceled
+  //   * The Stage is cancelled
   repeated Attempt attempts = 10;
 
   // Assignment describes the workflow's intent that this Stage will handle one

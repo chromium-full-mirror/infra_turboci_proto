@@ -149,7 +149,7 @@ func (x *CancelStageRequest) ClearStageAttemptToken() {
 type CancelStageRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Stage with the attempt being canceled.
+	// Stage with the attempt being cancelled.
 	Stage *v1.Stage
 	// A map containing [ValueData] for `stage`.
 	//
