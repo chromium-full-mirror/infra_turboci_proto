@@ -8,6 +8,8 @@ package turboci.graph.orchestrator.v1;
 
 import "turboci/graph/orchestrator/v1/allocate_worknode_ids_request.proto";
 import "turboci/graph/orchestrator/v1/allocate_worknode_ids_response.proto";
+import "turboci/graph/orchestrator/v1/cancel_workplan_request.proto";
+import "turboci/graph/orchestrator/v1/cancel_workplan_response.proto";
 import "turboci/graph/orchestrator/v1/create_workplan_request.proto";
 import "turboci/graph/orchestrator/v1/create_workplan_response.proto";
 import "turboci/graph/orchestrator/v1/query_nodes_request.proto";
@@ -123,6 +125,22 @@ service TurboCIOrchestrator {
   // guarantee their uniqueness (or non-uniqueness) based on what the stage
   // actually does.
   rpc AllocateWorkNodeIDs(AllocateWorkNodeIDsRequest) returns (AllocateWorkNodeIDsResponse) {}
+
+  // CancelWorkPlan initiates asynchronous cancellation of all stages in the
+  // work plan.
+  //
+  // All existing stages will eventually be cancelled. All new stages being
+  // added are added as immediately cancelled (that way stages that are
+  // oblivious of cancellation can still finish their WriteNodes calls with no
+  // errors). Such stages won't actually ever run.
+  //
+  // Eventually all activity in such a work plan will cease.
+  //
+  // CancelWorkPlan initiates this cancellation process and returns immediately.
+  // It doesn't wait for the cancellation to propagate through all of the plan.
+  //
+  // Cancelling an already canceled work plan succeeds and does nothing.
+  rpc CancelWorkPlan(CancelWorkPlanRequest) returns (CancelWorkPlanResponse) {}
 
   // TBD: An (idempotent) way to kick off a configured, named workplan.
   //

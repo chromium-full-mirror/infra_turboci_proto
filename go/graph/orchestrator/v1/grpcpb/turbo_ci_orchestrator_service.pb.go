@@ -29,7 +29,7 @@ var File_turboci_graph_orchestrator_v1_turbo_ci_orchestrator_service_proto proto
 
 const file_turboci_graph_orchestrator_v1_turbo_ci_orchestrator_service_proto_rawDesc = "" +
 	"\n" +
-	"Aturboci/graph/orchestrator/v1/turbo_ci_orchestrator_service.proto\x12\x1dturboci.graph.orchestrator.v1\x1aAturboci/graph/orchestrator/v1/allocate_worknode_ids_request.proto\x1aBturboci/graph/orchestrator/v1/allocate_worknode_ids_response.proto\x1a;turboci/graph/orchestrator/v1/create_workplan_request.proto\x1a<turboci/graph/orchestrator/v1/create_workplan_response.proto\x1a7turboci/graph/orchestrator/v1/query_nodes_request.proto\x1a8turboci/graph/orchestrator/v1/query_nodes_response.proto\x1a9turboci/graph/orchestrator/v1/read_workplan_request.proto\x1a:turboci/graph/orchestrator/v1/read_workplan_response.proto\x1a7turboci/graph/orchestrator/v1/write_nodes_request.proto\x1a8turboci/graph/orchestrator/v1/write_nodes_response.proto2\x8c\x05\n" +
+	"Aturboci/graph/orchestrator/v1/turbo_ci_orchestrator_service.proto\x12\x1dturboci.graph.orchestrator.v1\x1aAturboci/graph/orchestrator/v1/allocate_worknode_ids_request.proto\x1aBturboci/graph/orchestrator/v1/allocate_worknode_ids_response.proto\x1a;turboci/graph/orchestrator/v1/cancel_workplan_request.proto\x1a<turboci/graph/orchestrator/v1/cancel_workplan_response.proto\x1a;turboci/graph/orchestrator/v1/create_workplan_request.proto\x1a<turboci/graph/orchestrator/v1/create_workplan_response.proto\x1a7turboci/graph/orchestrator/v1/query_nodes_request.proto\x1a8turboci/graph/orchestrator/v1/query_nodes_response.proto\x1a9turboci/graph/orchestrator/v1/read_workplan_request.proto\x1a:turboci/graph/orchestrator/v1/read_workplan_response.proto\x1a7turboci/graph/orchestrator/v1/write_nodes_request.proto\x1a8turboci/graph/orchestrator/v1/write_nodes_response.proto2\x8d\x06\n" +
 	"\x13TurboCIOrchestrator\x12\x7f\n" +
 	"\x0eCreateWorkPlan\x124.turboci.graph.orchestrator.v1.CreateWorkPlanRequest\x1a5.turboci.graph.orchestrator.v1.CreateWorkPlanResponse\"\x00\x12s\n" +
 	"\n" +
@@ -37,7 +37,8 @@ const file_turboci_graph_orchestrator_v1_turbo_ci_orchestrator_service_proto_raw
 	"\n" +
 	"QueryNodes\x120.turboci.graph.orchestrator.v1.QueryNodesRequest\x1a1.turboci.graph.orchestrator.v1.QueryNodesResponse\"\x00\x12y\n" +
 	"\fReadWorkPlan\x122.turboci.graph.orchestrator.v1.ReadWorkPlanRequest\x1a3.turboci.graph.orchestrator.v1.ReadWorkPlanResponse\"\x00\x12\x8e\x01\n" +
-	"\x13AllocateWorkNodeIDs\x129.turboci.graph.orchestrator.v1.AllocateWorkNodeIDsRequest\x1a:.turboci.graph.orchestrator.v1.AllocateWorkNodeIDsResponse\"\x00BTP\x01ZPgo.chromium.org/turboci/proto/go/graph/orchestrator/v1/grpcpb;orchestratorgrpcpbb\x06proto3"
+	"\x13AllocateWorkNodeIDs\x129.turboci.graph.orchestrator.v1.AllocateWorkNodeIDsRequest\x1a:.turboci.graph.orchestrator.v1.AllocateWorkNodeIDsResponse\"\x00\x12\x7f\n" +
+	"\x0eCancelWorkPlan\x124.turboci.graph.orchestrator.v1.CancelWorkPlanRequest\x1a5.turboci.graph.orchestrator.v1.CancelWorkPlanResponse\"\x00BTP\x01ZPgo.chromium.org/turboci/proto/go/graph/orchestrator/v1/grpcpb;orchestratorgrpcpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_turbo_ci_orchestrator_service_proto_goTypes = []any{
 	(*v1.CreateWorkPlanRequest)(nil),       // 0: turboci.graph.orchestrator.v1.CreateWorkPlanRequest
@@ -45,28 +46,32 @@ var file_turboci_graph_orchestrator_v1_turbo_ci_orchestrator_service_proto_goTyp
 	(*v1.QueryNodesRequest)(nil),           // 2: turboci.graph.orchestrator.v1.QueryNodesRequest
 	(*v1.ReadWorkPlanRequest)(nil),         // 3: turboci.graph.orchestrator.v1.ReadWorkPlanRequest
 	(*v1.AllocateWorkNodeIDsRequest)(nil),  // 4: turboci.graph.orchestrator.v1.AllocateWorkNodeIDsRequest
-	(*v1.CreateWorkPlanResponse)(nil),      // 5: turboci.graph.orchestrator.v1.CreateWorkPlanResponse
-	(*v1.WriteNodesResponse)(nil),          // 6: turboci.graph.orchestrator.v1.WriteNodesResponse
-	(*v1.QueryNodesResponse)(nil),          // 7: turboci.graph.orchestrator.v1.QueryNodesResponse
-	(*v1.ReadWorkPlanResponse)(nil),        // 8: turboci.graph.orchestrator.v1.ReadWorkPlanResponse
-	(*v1.AllocateWorkNodeIDsResponse)(nil), // 9: turboci.graph.orchestrator.v1.AllocateWorkNodeIDsResponse
+	(*v1.CancelWorkPlanRequest)(nil),       // 5: turboci.graph.orchestrator.v1.CancelWorkPlanRequest
+	(*v1.CreateWorkPlanResponse)(nil),      // 6: turboci.graph.orchestrator.v1.CreateWorkPlanResponse
+	(*v1.WriteNodesResponse)(nil),          // 7: turboci.graph.orchestrator.v1.WriteNodesResponse
+	(*v1.QueryNodesResponse)(nil),          // 8: turboci.graph.orchestrator.v1.QueryNodesResponse
+	(*v1.ReadWorkPlanResponse)(nil),        // 9: turboci.graph.orchestrator.v1.ReadWorkPlanResponse
+	(*v1.AllocateWorkNodeIDsResponse)(nil), // 10: turboci.graph.orchestrator.v1.AllocateWorkNodeIDsResponse
+	(*v1.CancelWorkPlanResponse)(nil),      // 11: turboci.graph.orchestrator.v1.CancelWorkPlanResponse
 }
 var file_turboci_graph_orchestrator_v1_turbo_ci_orchestrator_service_proto_depIdxs = []int32{
-	0, // 0: turboci.graph.orchestrator.v1.TurboCIOrchestrator.CreateWorkPlan:input_type -> turboci.graph.orchestrator.v1.CreateWorkPlanRequest
-	1, // 1: turboci.graph.orchestrator.v1.TurboCIOrchestrator.WriteNodes:input_type -> turboci.graph.orchestrator.v1.WriteNodesRequest
-	2, // 2: turboci.graph.orchestrator.v1.TurboCIOrchestrator.QueryNodes:input_type -> turboci.graph.orchestrator.v1.QueryNodesRequest
-	3, // 3: turboci.graph.orchestrator.v1.TurboCIOrchestrator.ReadWorkPlan:input_type -> turboci.graph.orchestrator.v1.ReadWorkPlanRequest
-	4, // 4: turboci.graph.orchestrator.v1.TurboCIOrchestrator.AllocateWorkNodeIDs:input_type -> turboci.graph.orchestrator.v1.AllocateWorkNodeIDsRequest
-	5, // 5: turboci.graph.orchestrator.v1.TurboCIOrchestrator.CreateWorkPlan:output_type -> turboci.graph.orchestrator.v1.CreateWorkPlanResponse
-	6, // 6: turboci.graph.orchestrator.v1.TurboCIOrchestrator.WriteNodes:output_type -> turboci.graph.orchestrator.v1.WriteNodesResponse
-	7, // 7: turboci.graph.orchestrator.v1.TurboCIOrchestrator.QueryNodes:output_type -> turboci.graph.orchestrator.v1.QueryNodesResponse
-	8, // 8: turboci.graph.orchestrator.v1.TurboCIOrchestrator.ReadWorkPlan:output_type -> turboci.graph.orchestrator.v1.ReadWorkPlanResponse
-	9, // 9: turboci.graph.orchestrator.v1.TurboCIOrchestrator.AllocateWorkNodeIDs:output_type -> turboci.graph.orchestrator.v1.AllocateWorkNodeIDsResponse
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: turboci.graph.orchestrator.v1.TurboCIOrchestrator.CreateWorkPlan:input_type -> turboci.graph.orchestrator.v1.CreateWorkPlanRequest
+	1,  // 1: turboci.graph.orchestrator.v1.TurboCIOrchestrator.WriteNodes:input_type -> turboci.graph.orchestrator.v1.WriteNodesRequest
+	2,  // 2: turboci.graph.orchestrator.v1.TurboCIOrchestrator.QueryNodes:input_type -> turboci.graph.orchestrator.v1.QueryNodesRequest
+	3,  // 3: turboci.graph.orchestrator.v1.TurboCIOrchestrator.ReadWorkPlan:input_type -> turboci.graph.orchestrator.v1.ReadWorkPlanRequest
+	4,  // 4: turboci.graph.orchestrator.v1.TurboCIOrchestrator.AllocateWorkNodeIDs:input_type -> turboci.graph.orchestrator.v1.AllocateWorkNodeIDsRequest
+	5,  // 5: turboci.graph.orchestrator.v1.TurboCIOrchestrator.CancelWorkPlan:input_type -> turboci.graph.orchestrator.v1.CancelWorkPlanRequest
+	6,  // 6: turboci.graph.orchestrator.v1.TurboCIOrchestrator.CreateWorkPlan:output_type -> turboci.graph.orchestrator.v1.CreateWorkPlanResponse
+	7,  // 7: turboci.graph.orchestrator.v1.TurboCIOrchestrator.WriteNodes:output_type -> turboci.graph.orchestrator.v1.WriteNodesResponse
+	8,  // 8: turboci.graph.orchestrator.v1.TurboCIOrchestrator.QueryNodes:output_type -> turboci.graph.orchestrator.v1.QueryNodesResponse
+	9,  // 9: turboci.graph.orchestrator.v1.TurboCIOrchestrator.ReadWorkPlan:output_type -> turboci.graph.orchestrator.v1.ReadWorkPlanResponse
+	10, // 10: turboci.graph.orchestrator.v1.TurboCIOrchestrator.AllocateWorkNodeIDs:output_type -> turboci.graph.orchestrator.v1.AllocateWorkNodeIDsResponse
+	11, // 11: turboci.graph.orchestrator.v1.TurboCIOrchestrator.CancelWorkPlan:output_type -> turboci.graph.orchestrator.v1.CancelWorkPlanResponse
+	6,  // [6:12] is the sub-list for method output_type
+	0,  // [0:6] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_turbo_ci_orchestrator_service_proto_init() }

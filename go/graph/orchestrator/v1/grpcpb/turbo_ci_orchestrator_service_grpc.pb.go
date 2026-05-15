@@ -29,6 +29,7 @@ const (
 	TurboCIOrchestrator_QueryNodes_FullMethodName          = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/QueryNodes"
 	TurboCIOrchestrator_ReadWorkPlan_FullMethodName        = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/ReadWorkPlan"
 	TurboCIOrchestrator_AllocateWorkNodeIDs_FullMethodName = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/AllocateWorkNodeIDs"
+	TurboCIOrchestrator_CancelWorkPlan_FullMethodName      = "/turboci.graph.orchestrator.v1.TurboCIOrchestrator/CancelWorkPlan"
 )
 
 // TurboCIOrchestratorClient is the client API for TurboCIOrchestrator service.
@@ -134,6 +135,21 @@ type TurboCIOrchestratorClient interface {
 	// guarantee their uniqueness (or non-uniqueness) based on what the stage
 	// actually does.
 	AllocateWorkNodeIDs(ctx context.Context, in *v1.AllocateWorkNodeIDsRequest, opts ...grpc.CallOption) (*v1.AllocateWorkNodeIDsResponse, error)
+	// CancelWorkPlan initiates asynchronous cancellation of all stages in the
+	// work plan.
+	//
+	// All existing stages will eventually be cancelled. All new stages being
+	// added are added as immediately cancelled (that way stages that are
+	// oblivious of cancellation can still finish their WriteNodes calls with no
+	// errors). Such stages won't actually ever run.
+	//
+	// Eventually all activity in such a work plan will cease.
+	//
+	// CancelWorkPlan initiates this cancellation process and returns immediately.
+	// It doesn't wait for the cancellation to propagate through all of the plan.
+	//
+	// Cancelling an already canceled work plan succeeds and does nothing.
+	CancelWorkPlan(ctx context.Context, in *v1.CancelWorkPlanRequest, opts ...grpc.CallOption) (*v1.CancelWorkPlanResponse, error)
 }
 
 type turboCIOrchestratorClient struct {
@@ -188,6 +204,16 @@ func (c *turboCIOrchestratorClient) AllocateWorkNodeIDs(ctx context.Context, in 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(v1.AllocateWorkNodeIDsResponse)
 	err := c.cc.Invoke(ctx, TurboCIOrchestrator_AllocateWorkNodeIDs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *turboCIOrchestratorClient) CancelWorkPlan(ctx context.Context, in *v1.CancelWorkPlanRequest, opts ...grpc.CallOption) (*v1.CancelWorkPlanResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(v1.CancelWorkPlanResponse)
+	err := c.cc.Invoke(ctx, TurboCIOrchestrator_CancelWorkPlan_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -297,6 +323,21 @@ type TurboCIOrchestratorServer interface {
 	// guarantee their uniqueness (or non-uniqueness) based on what the stage
 	// actually does.
 	AllocateWorkNodeIDs(context.Context, *v1.AllocateWorkNodeIDsRequest) (*v1.AllocateWorkNodeIDsResponse, error)
+	// CancelWorkPlan initiates asynchronous cancellation of all stages in the
+	// work plan.
+	//
+	// All existing stages will eventually be cancelled. All new stages being
+	// added are added as immediately cancelled (that way stages that are
+	// oblivious of cancellation can still finish their WriteNodes calls with no
+	// errors). Such stages won't actually ever run.
+	//
+	// Eventually all activity in such a work plan will cease.
+	//
+	// CancelWorkPlan initiates this cancellation process and returns immediately.
+	// It doesn't wait for the cancellation to propagate through all of the plan.
+	//
+	// Cancelling an already canceled work plan succeeds and does nothing.
+	CancelWorkPlan(context.Context, *v1.CancelWorkPlanRequest) (*v1.CancelWorkPlanResponse, error)
 	mustEmbedUnimplementedTurboCIOrchestratorServer()
 }
 
@@ -321,6 +362,9 @@ func (UnimplementedTurboCIOrchestratorServer) ReadWorkPlan(context.Context, *v1.
 }
 func (UnimplementedTurboCIOrchestratorServer) AllocateWorkNodeIDs(context.Context, *v1.AllocateWorkNodeIDsRequest) (*v1.AllocateWorkNodeIDsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method AllocateWorkNodeIDs not implemented")
+}
+func (UnimplementedTurboCIOrchestratorServer) CancelWorkPlan(context.Context, *v1.CancelWorkPlanRequest) (*v1.CancelWorkPlanResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CancelWorkPlan not implemented")
 }
 func (UnimplementedTurboCIOrchestratorServer) mustEmbedUnimplementedTurboCIOrchestratorServer() {}
 func (UnimplementedTurboCIOrchestratorServer) testEmbeddedByValue()                             {}
@@ -433,6 +477,24 @@ func _TurboCIOrchestrator_AllocateWorkNodeIDs_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TurboCIOrchestrator_CancelWorkPlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.CancelWorkPlanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TurboCIOrchestratorServer).CancelWorkPlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TurboCIOrchestrator_CancelWorkPlan_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TurboCIOrchestratorServer).CancelWorkPlan(ctx, req.(*v1.CancelWorkPlanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TurboCIOrchestrator_ServiceDesc is the grpc.ServiceDesc for TurboCIOrchestrator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -459,6 +521,10 @@ var TurboCIOrchestrator_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AllocateWorkNodeIDs",
 			Handler:    _TurboCIOrchestrator_AllocateWorkNodeIDs_Handler,
+		},
+		{
+			MethodName: "CancelWorkPlan",
+			Handler:    _TurboCIOrchestrator_CancelWorkPlan_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

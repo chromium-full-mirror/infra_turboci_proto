@@ -1,5 +1,7 @@
 from turboci.graph.orchestrator.v1 import allocate_worknode_ids_request_pb2 as _allocate_worknode_ids_request_pb2
 from turboci.graph.orchestrator.v1 import allocate_worknode_ids_response_pb2 as _allocate_worknode_ids_response_pb2
+from turboci.graph.orchestrator.v1 import cancel_workplan_request_pb2 as _cancel_workplan_request_pb2
+from turboci.graph.orchestrator.v1 import cancel_workplan_response_pb2 as _cancel_workplan_response_pb2
 from turboci.graph.orchestrator.v1 import create_workplan_request_pb2 as _create_workplan_request_pb2
 from turboci.graph.orchestrator.v1 import create_workplan_response_pb2 as _create_workplan_response_pb2
 from turboci.graph.orchestrator.v1 import query_nodes_request_pb2 as _query_nodes_request_pb2
