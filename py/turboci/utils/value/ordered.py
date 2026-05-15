@@ -62,12 +62,21 @@ def find(
   return None
 
 
-def set_ref(refs: typing.MutableSequence, ref: value_ref_pb2.ValueRef):
+def set_ref(
+    refs: typing.MutableSequence[value_ref_pb2.ValueRef],
+    ref: value_ref_pb2.ValueRef
+):
   """Adds or overrides `ref` in `refs` by type_url.
 
+  Updates `refs` in place:
+    * Replaces the entry with the same `type_url` if it exists.
+    * Otherwise, inserts `ref`.
+
+  The update will keep the sequence sorted by `type_url`.
+
   Args:
-    refs: MutableSequence of ValueRefs, sorted and unique by `type_url`. This
-      will either have `ref` replace an entry, or have `ref` inserted into it.
+    refs: MutableSequence of ValueRefs, expected to be sorted and unique
+      by `type_url`.
     ref: The ref data to insert in this sequence.
 
   Raises:
