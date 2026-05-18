@@ -434,7 +434,7 @@ message Stage {
 
   // Describes why this stage is not PLANNED or ATTEMPTING anymore.
   //
-  // Set for stages that are in AWAITING_GROUP or FINAL states.
+  // Always set for stages that are in AWAITING_GROUP or FINAL states.
   optional StageConcludedReason concluded_reason = 13;
 
   // StageEdits for this Stage.

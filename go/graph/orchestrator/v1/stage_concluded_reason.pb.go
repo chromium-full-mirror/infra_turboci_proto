@@ -26,7 +26,7 @@ const (
 
 // Describes why a stage is not in PLANNED or ATTEMPTING state anymore.
 //
-// Set for stages that are in AWAITING_GROUP or FINAL states.
+// Always set for stages that are in AWAITING_GROUP or FINAL states.
 type StageConcludedReason int32
 
 const (
@@ -49,7 +49,14 @@ const (
 	//
 	// See StageExecutionPolicy for details.
 	StageConcludedReason_STAGE_CONCLUDED_REASON_TIMEOUT StageConcludedReason = 4
-	// The Stage was explicitly cancelled via WriteNodes.
+	// The stage was cancelled.
+	//
+	// This reason can be set even if the stage has no attempts (which means it
+	// was cancelled while it was still blocked on dependencies).
+	//
+	// Note that if the stage was cancelled while running an attempt, but this
+	// attempt actually completed successfully, the concluded reason would be
+	// STAGE_CONCLUDED_REASON_ATTEMPT_COMPLETE.
 	StageConcludedReason_STAGE_CONCLUDED_REASON_CANCELLED StageConcludedReason = 5
 	// The executor that was supposed to run this stage is no longer registered.
 	StageConcludedReason_STAGE_CONCLUDED_REASON_NO_EXECUTOR StageConcludedReason = 6
@@ -58,6 +65,8 @@ const (
 	// This can happen if ACLs change after the stage was already added to the
 	// work plan, but before it runs.
 	StageConcludedReason_STAGE_CONCLUDED_REASON_PERMISSION_DENIED StageConcludedReason = 7
+	// The stage didn't run because its dependencies resolved as unsatisfied.
+	StageConcludedReason_STAGE_CONCLUDED_REASON_DEPENDENCIES_UNSATISFIED StageConcludedReason = 8
 )
 
 // Enum value maps for StageConcludedReason.
@@ -71,6 +80,7 @@ var (
 		5: "STAGE_CONCLUDED_REASON_CANCELLED",
 		6: "STAGE_CONCLUDED_REASON_NO_EXECUTOR",
 		7: "STAGE_CONCLUDED_REASON_PERMISSION_DENIED",
+		8: "STAGE_CONCLUDED_REASON_DEPENDENCIES_UNSATISFIED",
 	}
 	StageConcludedReason_value = map[string]int32{
 		"STAGE_CONCLUDED_REASON_UNKNOWN":                     0,
@@ -81,6 +91,7 @@ var (
 		"STAGE_CONCLUDED_REASON_CANCELLED":                   5,
 		"STAGE_CONCLUDED_REASON_NO_EXECUTOR":                 6,
 		"STAGE_CONCLUDED_REASON_PERMISSION_DENIED":           7,
+		"STAGE_CONCLUDED_REASON_DEPENDENCIES_UNSATISFIED":    8,
 	}
 )
 
@@ -110,7 +121,7 @@ var File_turboci_graph_orchestrator_v1_stage_concluded_reason_proto protoreflect
 
 const file_turboci_graph_orchestrator_v1_stage_concluded_reason_proto_rawDesc = "" +
 	"\n" +
-	":turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x12\x1dturboci.graph.orchestrator.v1*\xeb\x02\n" +
+	":turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x12\x1dturboci.graph.orchestrator.v1*\xa0\x03\n" +
 	"\x14StageConcludedReason\x12\"\n" +
 	"\x1eSTAGE_CONCLUDED_REASON_UNKNOWN\x10\x00\x12+\n" +
 	"'STAGE_CONCLUDED_REASON_ATTEMPT_COMPLETE\x10\x01\x12*\n" +
@@ -119,7 +130,8 @@ const file_turboci_graph_orchestrator_v1_stage_concluded_reason_proto_rawDesc = 
 	"\x1eSTAGE_CONCLUDED_REASON_TIMEOUT\x10\x04\x12$\n" +
 	" STAGE_CONCLUDED_REASON_CANCELLED\x10\x05\x12&\n" +
 	"\"STAGE_CONCLUDED_REASON_NO_EXECUTOR\x10\x06\x12,\n" +
-	"(STAGE_CONCLUDED_REASON_PERMISSION_DENIED\x10\aBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"(STAGE_CONCLUDED_REASON_PERMISSION_DENIED\x10\a\x123\n" +
+	"/STAGE_CONCLUDED_REASON_DEPENDENCIES_UNSATISFIED\x10\bBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_stage_concluded_reason_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_stage_concluded_reason_proto_goTypes = []any{

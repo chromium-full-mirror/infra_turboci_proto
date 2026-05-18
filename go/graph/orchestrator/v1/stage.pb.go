@@ -559,7 +559,7 @@ type Stage_builder struct {
 	ContinuationGroup *Dependencies
 	// Describes why this stage is not PLANNED or ATTEMPTING anymore.
 	//
-	// Set for stages that are in AWAITING_GROUP or FINAL states.
+	// Always set for stages that are in AWAITING_GROUP or FINAL states.
 	ConcludedReason *StageConcludedReason
 	// StageEdits for this Stage.
 	//

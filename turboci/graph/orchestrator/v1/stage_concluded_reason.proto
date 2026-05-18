@@ -11,7 +11,7 @@ option java_multiple_files = true;
 
 // Describes why a stage is not in PLANNED or ATTEMPTING state anymore.
 //
-// Set for stages that are in AWAITING_GROUP or FINAL states.
+// Always set for stages that are in AWAITING_GROUP or FINAL states.
 enum StageConcludedReason {
   // UNKNOWN means the stage is not concluded yet.
   STAGE_CONCLUDED_REASON_UNKNOWN = 0;
@@ -37,7 +37,14 @@ enum StageConcludedReason {
   // See StageExecutionPolicy for details.
   STAGE_CONCLUDED_REASON_TIMEOUT = 4;
 
-  // The Stage was explicitly cancelled via WriteNodes.
+  // The stage was cancelled.
+  //
+  // This reason can be set even if the stage has no attempts (which means it
+  // was cancelled while it was still blocked on dependencies).
+  //
+  // Note that if the stage was cancelled while running an attempt, but this
+  // attempt actually completed successfully, the concluded reason would be
+  // STAGE_CONCLUDED_REASON_ATTEMPT_COMPLETE.
   STAGE_CONCLUDED_REASON_CANCELLED = 5;
 
   // The executor that was supposed to run this stage is no longer registered.
@@ -48,4 +55,7 @@ enum StageConcludedReason {
   // This can happen if ACLs change after the stage was already added to the
   // work plan, but before it runs.
   STAGE_CONCLUDED_REASON_PERMISSION_DENIED = 7;
+
+  // The stage didn't run because its dependencies resolved as unsatisfied.
+  STAGE_CONCLUDED_REASON_DEPENDENCIES_UNSATISFIED = 8;
 }
