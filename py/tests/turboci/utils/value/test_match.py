@@ -68,6 +68,33 @@ class TestMatch(unittest.TestCase):
     self.assertTrue(value.ref_matches_ref(ref_a, ref_b))
     self.assertTrue(value.ref_matches_ref(ref_b, ref_a))
 
+    # Pure Digest (has digest but no inline)
+    ref_pure_digest = value.ref(msg, 'project:realm')
+    value.absorb_inline(ds, ref_pure_digest)
+    ref_pure_digest.ClearField('inline')
+
+    # Inline vs Pure Digest
+    self.assertTrue(value.ref_matches_ref(ref_a, ref_pure_digest))
+    self.assertTrue(value.ref_matches_ref(ref_pure_digest, ref_a))
+
+    # Pure Digest vs Pure Digest
+    self.assertTrue(value.ref_matches_ref(ref_pure_digest, ref_pure_digest))
+
+    # Pure Digest mismatch
+    ref_pure_digest_diff = value.ref(
+        wrappers_pb2.StringValue(value='different'), 'project:realm'
+    )
+    value.absorb_inline(ds, ref_pure_digest_diff)
+    ref_pure_digest_diff.ClearField('inline')
+    self.assertFalse(
+        value.ref_matches_ref(ref_pure_digest, ref_pure_digest_diff)
+    )
+
+    # Inline vs Pure Digest mismatch
+    self.assertFalse(value.ref_matches_ref(ref_a, ref_pure_digest_diff))
+    # Pure Digest vs Inline mismatch
+    self.assertFalse(value.ref_matches_ref(ref_pure_digest_diff, ref_a))
+
     # Inline vs Inline
     self.assertTrue(value.ref_matches_ref(ref_a, ref_a))
 
@@ -99,6 +126,16 @@ class TestMatch(unittest.TestCase):
     self.assertFalse(value.ref_matches_ref(valid_ref, invalid_ref))
     self.assertFalse(value.ref_matches_ref(invalid_ref, valid_ref))
     self.assertFalse(value.ref_matches_ref(invalid_ref, invalid_ref))
+
+  def test_write_matches_ref_invalid_ref_returns_false(self):
+    msg = wrappers_pb2.StringValue(value='hi')
+    write = value.write(msg, realm='project:realm')
+
+    invalid_ref = value_ref_pb2.ValueRef(
+        realm='project:realm',
+        type_url=write.data.type_url,
+    )
+    self.assertFalse(value.write_matches_ref(write, invalid_ref))
 
 
 if __name__ == '__main__':
