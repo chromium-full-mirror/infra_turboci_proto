@@ -20,12 +20,14 @@ class Dependencies(_message.Message):
         threshold: int
         def __init__(self, edges: _Optional[_Iterable[int]] = ..., groups: _Optional[_Iterable[_Union[Dependencies.Group, _Mapping]]] = ..., threshold: _Optional[int] = ...) -> None: ...
     class ResolutionEvent(_message.Message):
-        __slots__ = ("version", "resolution")
+        __slots__ = ("version", "resolution", "condition_version")
         VERSION_FIELD_NUMBER: _ClassVar[int]
         RESOLUTION_FIELD_NUMBER: _ClassVar[int]
+        CONDITION_VERSION_FIELD_NUMBER: _ClassVar[int]
         version: _revision_pb2.Revision
         resolution: _edge_pb2.Resolution
-        def __init__(self, version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., resolution: _Optional[_Union[_edge_pb2.Resolution, str]] = ...) -> None: ...
+        condition_version: _revision_pb2.Revision
+        def __init__(self, version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., resolution: _Optional[_Union[_edge_pb2.Resolution, str]] = ..., condition_version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ...) -> None: ...
     class ResolutionEventsEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]

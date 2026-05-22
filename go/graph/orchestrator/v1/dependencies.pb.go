@@ -418,13 +418,14 @@ func (b0 Dependencies_Group_builder) Build() *Dependencies_Group {
 // This MAY include non-zero propagation time from the time that the target of
 // Edge entered a satisfying state for this Edge.
 type Dependencies_ResolutionEvent struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Version     *Revision              `protobuf:"bytes,1,opt,name=version,proto3,oneof"`
-	xxx_hidden_Resolution  Resolution             `protobuf:"varint,2,opt,name=resolution,proto3,enum=turboci.graph.orchestrator.v1.Resolution,oneof"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state                       protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Version          *Revision              `protobuf:"bytes,1,opt,name=version,proto3,oneof"`
+	xxx_hidden_Resolution       Resolution             `protobuf:"varint,2,opt,name=resolution,proto3,enum=turboci.graph.orchestrator.v1.Resolution,oneof"`
+	xxx_hidden_ConditionVersion *Revision              `protobuf:"bytes,3,opt,name=condition_version,json=conditionVersion,proto3,oneof"`
+	XXX_raceDetectHookData      protoimpl.RaceDetectHookData
+	XXX_presence                [1]uint32
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
 }
 
 func (x *Dependencies_ResolutionEvent) Reset() {
@@ -468,13 +469,24 @@ func (x *Dependencies_ResolutionEvent) GetResolution() Resolution {
 	return Resolution_RESOLUTION_UNKNOWN
 }
 
+func (x *Dependencies_ResolutionEvent) GetConditionVersion() *Revision {
+	if x != nil {
+		return x.xxx_hidden_ConditionVersion
+	}
+	return nil
+}
+
 func (x *Dependencies_ResolutionEvent) SetVersion(v *Revision) {
 	x.xxx_hidden_Version = v
 }
 
 func (x *Dependencies_ResolutionEvent) SetResolution(v Resolution) {
 	x.xxx_hidden_Resolution = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+}
+
+func (x *Dependencies_ResolutionEvent) SetConditionVersion(v *Revision) {
+	x.xxx_hidden_ConditionVersion = v
 }
 
 func (x *Dependencies_ResolutionEvent) HasVersion() bool {
@@ -491,6 +503,13 @@ func (x *Dependencies_ResolutionEvent) HasResolution() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
+func (x *Dependencies_ResolutionEvent) HasConditionVersion() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_ConditionVersion != nil
+}
+
 func (x *Dependencies_ResolutionEvent) ClearVersion() {
 	x.xxx_hidden_Version = nil
 }
@@ -500,19 +519,32 @@ func (x *Dependencies_ResolutionEvent) ClearResolution() {
 	x.xxx_hidden_Resolution = Resolution_RESOLUTION_UNKNOWN
 }
 
+func (x *Dependencies_ResolutionEvent) ClearConditionVersion() {
+	x.xxx_hidden_ConditionVersion = nil
+}
+
 type Dependencies_ResolutionEvent_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The version of the containing node which included this event.
+	// The version of the containing node (e.g. Stage or Check) which included
+	// this event.
 	//
-	// This MAY be substantially after the target of the edge is FINAL, e.g. if
+	// This MAY be substantially after the edge condition was resolved, e.g. if
 	// the containing node was created or became PLANNED far after the target
-	// was FINAL.
+	// condition was met.
+	//
+	// See `condition_version` below for the revision of the condition itself.
 	Version *Revision
 	// Was the criteria for this edge satisfied or not?
 	//
 	// Will never be `UNKNOWN`.
 	Resolution *Resolution
+	// The version of the Edge target when the edge's condition was originally
+	// resolved.
+	//
+	// This MAY be substantially before `version` (even before the
+	// containing node was created).
+	ConditionVersion *Revision
 }
 
 func (b0 Dependencies_ResolutionEvent_builder) Build() *Dependencies_ResolutionEvent {
@@ -521,9 +553,10 @@ func (b0 Dependencies_ResolutionEvent_builder) Build() *Dependencies_ResolutionE
 	_, _ = b, x
 	x.xxx_hidden_Version = b.Version
 	if b.Resolution != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
 		x.xxx_hidden_Resolution = *b.Resolution
 	}
+	x.xxx_hidden_ConditionVersion = b.ConditionVersion
 	return m0
 }
 
@@ -531,7 +564,7 @@ var File_turboci_graph_orchestrator_v1_dependencies_proto protoreflect.FileDescr
 
 const file_turboci_graph_orchestrator_v1_dependencies_proto_rawDesc = "" +
 	"\n" +
-	"0turboci/graph/orchestrator/v1/dependencies.proto\x12\x1dturboci.graph.orchestrator.v1\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xe2\x06\n" +
+	"0turboci/graph/orchestrator/v1/dependencies.proto\x12\x1dturboci.graph.orchestrator.v1\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xd3\a\n" +
 	"\fDependencies\x129\n" +
 	"\x05edges\x18\x01 \x03(\v2#.turboci.graph.orchestrator.v1.EdgeR\x05edges\x12T\n" +
 	"\tpredicate\x18\x02 \x01(\v21.turboci.graph.orchestrator.v1.Dependencies.GroupH\x00R\tpredicate\x88\x01\x01\x12n\n" +
@@ -544,15 +577,17 @@ const file_turboci_graph_orchestrator_v1_dependencies_proto_rawDesc = "" +
 	"\x06groups\x18\x02 \x03(\v21.turboci.graph.orchestrator.v1.Dependencies.GroupR\x06groups\x12!\n" +
 	"\tthreshold\x18\x03 \x01(\x05H\x00R\tthreshold\x88\x01\x01B\f\n" +
 	"\n" +
-	"_threshold\x1a\xc4\x01\n" +
+	"_threshold\x1a\xb5\x02\n" +
 	"\x0fResolutionEvent\x12F\n" +
 	"\aversion\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\aversion\x88\x01\x01\x12N\n" +
 	"\n" +
 	"resolution\x18\x02 \x01(\x0e2).turboci.graph.orchestrator.v1.ResolutionH\x01R\n" +
-	"resolution\x88\x01\x01B\n" +
+	"resolution\x88\x01\x01\x12Y\n" +
+	"\x11condition_version\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\x10conditionVersion\x88\x01\x01B\n" +
 	"\n" +
 	"\b_versionB\r\n" +
-	"\v_resolution\x1a\x80\x01\n" +
+	"\v_resolutionB\x14\n" +
+	"\x12_condition_version\x1a\x80\x01\n" +
 	"\x15ResolutionEventsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\x05R\x03key\x12Q\n" +
 	"\x05value\x18\x02 \x01(\v2;.turboci.graph.orchestrator.v1.Dependencies.ResolutionEventR\x05value:\x028\x01B\f\n" +
@@ -578,12 +613,13 @@ var file_turboci_graph_orchestrator_v1_dependencies_proto_depIdxs = []int32{
 	1, // 4: turboci.graph.orchestrator.v1.Dependencies.Group.groups:type_name -> turboci.graph.orchestrator.v1.Dependencies.Group
 	6, // 5: turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent.version:type_name -> turboci.graph.orchestrator.v1.Revision
 	5, // 6: turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent.resolution:type_name -> turboci.graph.orchestrator.v1.Resolution
-	2, // 7: turboci.graph.orchestrator.v1.Dependencies.ResolutionEventsEntry.value:type_name -> turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	6, // 7: turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent.condition_version:type_name -> turboci.graph.orchestrator.v1.Revision
+	2, // 8: turboci.graph.orchestrator.v1.Dependencies.ResolutionEventsEntry.value:type_name -> turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_dependencies_proto_init() }
