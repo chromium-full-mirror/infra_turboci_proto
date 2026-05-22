@@ -139,13 +139,15 @@ class StageAttemptClaimedFailure(_message.Message):
     def __init__(self, claimed_by_process_uid: _Optional[str] = ...) -> None: ...
 
 class StageAttemptCurrentState(_message.Message):
-    __slots__ = ("state", "version", "update_state_by", "heartbeat_by")
+    __slots__ = ("state", "version", "update_state_by", "heartbeat_by", "cancelled_at")
     STATE_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     UPDATE_STATE_BY_FIELD_NUMBER: _ClassVar[int]
     HEARTBEAT_BY_FIELD_NUMBER: _ClassVar[int]
+    CANCELLED_AT_FIELD_NUMBER: _ClassVar[int]
     state: _stage_attempt_state_pb2.StageAttemptState
     version: _revision_pb2.Revision
     update_state_by: _timestamp_pb2.Timestamp
     heartbeat_by: _timestamp_pb2.Timestamp
-    def __init__(self, state: _Optional[_Union[_stage_attempt_state_pb2.StageAttemptState, str]] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., update_state_by: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., heartbeat_by: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    cancelled_at: _revision_pb2.Revision
+    def __init__(self, state: _Optional[_Union[_stage_attempt_state_pb2.StageAttemptState, str]] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., update_state_by: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., heartbeat_by: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., cancelled_at: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ...) -> None: ...

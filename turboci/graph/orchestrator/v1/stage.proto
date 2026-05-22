@@ -470,22 +470,7 @@ message StageAttemptCurrentState {
   // NOTE: This is authoritative, and could be in a state which is later than
   // the one that the client which made the RPC expects.
   //
-  //   * CANCELLING - The Stage has been cancelled, but there has not yet been
-  //     a heartbeat from the the Stage Attempt. As soon as there is a
-  //     current_stage write from the Stage Attempt, this state will turn into
-  //     TEARING_DOWN.
-  //   * TEARING_DOWN - The Stage was cancelled while a Stage Attempt was
-  //     RUNNING. When a WriteNodes with current_stage set happens, the
-  //     orchestrator will transition to TEARING_DOWN in that same
-  //     transaction and report this state here. The still-running attempt
-  //     should do any graceful shutdown it can before
-  //     `current_state_deadline` and then do a WriteNodes to mark the
-  //     current attempt as either COMPLETE or INCOMPLETE.
-  //   * COMPLETE/INCOMPLETE - Something already marked this attempt as
-  //     finished. The still-running attempt should immediately shutdown
-  //     without attempting to do any further QueryNodes/WriteNodes calls.
-  //     Note that this could happen if a Stage is cancelled while PENDING or
-  //     SCHEDULED.
+  // See StageAttemptState for all details.
   optional StageAttemptState state = 1;
 
   // The version of the Stage Attempt that the orchestrator observed.
@@ -498,4 +483,7 @@ message StageAttemptCurrentState {
   // If set, the timestamp for when the orchestrator expects the next
   // heartbeat.
   optional google.protobuf.Timestamp heartbeat_by = 4;
+
+  // Set if the stage was cancelled.
+  optional Revision cancelled_at = 5;
 }

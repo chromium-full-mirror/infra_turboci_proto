@@ -268,18 +268,20 @@ type StageAttemptExecutionPolicy_Heartbeat_builder struct {
 	// The expected duration that a Stage Attempt can be in the SCHEDULED
 	// state without sending a heartbeat.
 	//
+	// Also applies to CANCELLING state if the attempt was cancelled while
+	// still being SCHEDULED.
+	//
 	// If unset, then there is no required heartbeat cadence, though the stage
 	// is still subject to timeouts for the phase.
 	Scheduled *durationpb.Duration
 	// The expected duration that a Stage Attempt can be in the RUNNING state
 	// without sending a heartbeat.
 	//
+	// Also applies to CANCELLING state if the attempt was cancelled while
+	// still being RUNNING.
+	//
 	// If unset, then there is no required heartbeat cadence, though the stage
 	// is still subject to timeouts for the phase.
-	//
-	// NOTE: This heartbeat still applies during the CANCELLING state - it's
-	// expected that CANCELLING only applies to Stage Attempts which are
-	// RUNNING, but before the Stage Attempt actually knows this.
 	Running *durationpb.Duration
 	// The expected duration that a Stage Attempt can be in the TEARING_DOWN
 	// state without sending a heartbeat.
@@ -322,6 +324,7 @@ type StageAttemptExecutionPolicy_Timeout struct {
 	xxx_hidden_PendingThrottled *durationpb.Duration   `protobuf:"bytes,1,opt,name=pending_throttled,json=pendingThrottled,proto3,oneof"`
 	xxx_hidden_Scheduled        *durationpb.Duration   `protobuf:"bytes,2,opt,name=scheduled,proto3,oneof"`
 	xxx_hidden_Running          *durationpb.Duration   `protobuf:"bytes,3,opt,name=running,proto3,oneof"`
+	xxx_hidden_Cancelling       *durationpb.Duration   `protobuf:"bytes,5,opt,name=cancelling,proto3,oneof"`
 	xxx_hidden_TearingDown      *durationpb.Duration   `protobuf:"bytes,4,opt,name=tearing_down,json=tearingDown,proto3,oneof"`
 	unknownFields               protoimpl.UnknownFields
 	sizeCache                   protoimpl.SizeCache
@@ -373,6 +376,13 @@ func (x *StageAttemptExecutionPolicy_Timeout) GetRunning() *durationpb.Duration 
 	return nil
 }
 
+func (x *StageAttemptExecutionPolicy_Timeout) GetCancelling() *durationpb.Duration {
+	if x != nil {
+		return x.xxx_hidden_Cancelling
+	}
+	return nil
+}
+
 func (x *StageAttemptExecutionPolicy_Timeout) GetTearingDown() *durationpb.Duration {
 	if x != nil {
 		return x.xxx_hidden_TearingDown
@@ -390,6 +400,10 @@ func (x *StageAttemptExecutionPolicy_Timeout) SetScheduled(v *durationpb.Duratio
 
 func (x *StageAttemptExecutionPolicy_Timeout) SetRunning(v *durationpb.Duration) {
 	x.xxx_hidden_Running = v
+}
+
+func (x *StageAttemptExecutionPolicy_Timeout) SetCancelling(v *durationpb.Duration) {
+	x.xxx_hidden_Cancelling = v
 }
 
 func (x *StageAttemptExecutionPolicy_Timeout) SetTearingDown(v *durationpb.Duration) {
@@ -417,6 +431,13 @@ func (x *StageAttemptExecutionPolicy_Timeout) HasRunning() bool {
 	return x.xxx_hidden_Running != nil
 }
 
+func (x *StageAttemptExecutionPolicy_Timeout) HasCancelling() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Cancelling != nil
+}
+
 func (x *StageAttemptExecutionPolicy_Timeout) HasTearingDown() bool {
 	if x == nil {
 		return false
@@ -434,6 +455,10 @@ func (x *StageAttemptExecutionPolicy_Timeout) ClearScheduled() {
 
 func (x *StageAttemptExecutionPolicy_Timeout) ClearRunning() {
 	x.xxx_hidden_Running = nil
+}
+
+func (x *StageAttemptExecutionPolicy_Timeout) ClearCancelling() {
+	x.xxx_hidden_Cancelling = nil
 }
 
 func (x *StageAttemptExecutionPolicy_Timeout) ClearTearingDown() {
@@ -457,20 +482,35 @@ type StageAttemptExecutionPolicy_Timeout_builder struct {
 	Scheduled *durationpb.Duration
 	// The maximum amount of time a Stage Attempt can be RUNNING.
 	//
-	// NOTE: This timeout still applies during the CANCELLING state - it's
-	// expected that CANCELLING only applies to Stage Attempts which are
-	// RUNNING, but before the Stage Attempt actually knows this.
-	//
 	// If unset or zero, it is assumed the executor is a synchronous one, i.e.
 	// it moves attempts immediately into COMPLETE or INCOMPLETE states,
 	// bypassing SCHEDULED/RUNNING.
 	Running *durationpb.Duration
+	// The maximum amount of time a Stage Attempt can be CANCELLING.
+	//
+	// This is also an upper bound on how long the orchestrator will keep
+	// retrying calling CancelStage RPC.
+	//
+	// If unset or zero, it is assumed the executor doesn't implement graceful
+	// cancellation. In that case cancelling a stage will make the attempt
+	// INCOMPLETE right away without any graceful tear down.
+	//
+	// For executors that implement graceful cancellation, the value here should
+	// generally be pretty small (minutes), since the executor is expected to
+	// acknowledge the cancellation ASAP e.g. by transitioning the attempt to
+	// TEARING_DOWN (which has its own timeout).
+	//
+	// To make sure cancelled stages terminate in a timely manner no matter
+	// what, the orchestrator puts a hard upper bound on a value of this timeout
+	// (currently 15 min).
+	Cancelling *durationpb.Duration
 	// The maximum amount of time a Stage Attempt can be TEARING_DOWN.
 	//
-	// Can be unset or zero if `running` is also unset or zero or if the
-	// executor doesn't implement stage cancellation at all. Otherwise it should
-	// be set to something to avoid premature termination of a cancelled
-	// attempt as timed out during the tear down.
+	// If unset or zero, the orchestrator will use some default value.
+	//
+	// To make sure cancelled stages terminate in a timely manner no matter
+	// what, the orchestrator puts a hard upper bound on a value of this timeout
+	// (currently 15 min).
 	TearingDown *durationpb.Duration
 }
 
@@ -481,6 +521,7 @@ func (b0 StageAttemptExecutionPolicy_Timeout_builder) Build() *StageAttemptExecu
 	x.xxx_hidden_PendingThrottled = b.PendingThrottled
 	x.xxx_hidden_Scheduled = b.Scheduled
 	x.xxx_hidden_Running = b.Running
+	x.xxx_hidden_Cancelling = b.Cancelling
 	x.xxx_hidden_TearingDown = b.TearingDown
 	return m0
 }
@@ -489,7 +530,7 @@ var File_turboci_graph_orchestrator_v1_stage_attempt_execution_policy_proto prot
 
 const file_turboci_graph_orchestrator_v1_stage_attempt_execution_policy_proto_rawDesc = "" +
 	"\n" +
-	"Bturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1egoogle/protobuf/duration.proto\"\xcc\x06\n" +
+	"Bturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1egoogle/protobuf/duration.proto\"\x9b\a\n" +
 	"\x1bStageAttemptExecutionPolicy\x12g\n" +
 	"\theartbeat\x18\x01 \x01(\v2D.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.HeartbeatH\x00R\theartbeat\x88\x01\x01\x12a\n" +
 	"\atimeout\x18\x02 \x01(\v2B.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.TimeoutH\x01R\atimeout\x88\x01\x01\x1a\xf1\x01\n" +
@@ -501,17 +542,21 @@ const file_turboci_graph_orchestrator_v1_stage_attempt_execution_policy_proto_ra
 	"_scheduledB\n" +
 	"\n" +
 	"\b_runningB\x0f\n" +
-	"\r_tearing_down\x1a\xd2\x02\n" +
+	"\r_tearing_down\x1a\xa1\x03\n" +
 	"\aTimeout\x12K\n" +
 	"\x11pending_throttled\x18\x01 \x01(\v2\x19.google.protobuf.DurationH\x00R\x10pendingThrottled\x88\x01\x01\x12<\n" +
 	"\tscheduled\x18\x02 \x01(\v2\x19.google.protobuf.DurationH\x01R\tscheduled\x88\x01\x01\x128\n" +
-	"\arunning\x18\x03 \x01(\v2\x19.google.protobuf.DurationH\x02R\arunning\x88\x01\x01\x12A\n" +
-	"\ftearing_down\x18\x04 \x01(\v2\x19.google.protobuf.DurationH\x03R\vtearingDown\x88\x01\x01B\x14\n" +
+	"\arunning\x18\x03 \x01(\v2\x19.google.protobuf.DurationH\x02R\arunning\x88\x01\x01\x12>\n" +
+	"\n" +
+	"cancelling\x18\x05 \x01(\v2\x19.google.protobuf.DurationH\x03R\n" +
+	"cancelling\x88\x01\x01\x12A\n" +
+	"\ftearing_down\x18\x04 \x01(\v2\x19.google.protobuf.DurationH\x04R\vtearingDown\x88\x01\x01B\x14\n" +
 	"\x12_pending_throttledB\f\n" +
 	"\n" +
 	"_scheduledB\n" +
 	"\n" +
-	"\b_runningB\x0f\n" +
+	"\b_runningB\r\n" +
+	"\v_cancellingB\x0f\n" +
 	"\r_tearing_downB\f\n" +
 	"\n" +
 	"_heartbeatB\n" +
@@ -526,20 +571,21 @@ var file_turboci_graph_orchestrator_v1_stage_attempt_execution_policy_proto_goTy
 	(*durationpb.Duration)(nil),                   // 3: google.protobuf.Duration
 }
 var file_turboci_graph_orchestrator_v1_stage_attempt_execution_policy_proto_depIdxs = []int32{
-	1, // 0: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.heartbeat:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Heartbeat
-	2, // 1: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.timeout:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Timeout
-	3, // 2: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Heartbeat.scheduled:type_name -> google.protobuf.Duration
-	3, // 3: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Heartbeat.running:type_name -> google.protobuf.Duration
-	3, // 4: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Heartbeat.tearing_down:type_name -> google.protobuf.Duration
-	3, // 5: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Timeout.pending_throttled:type_name -> google.protobuf.Duration
-	3, // 6: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Timeout.scheduled:type_name -> google.protobuf.Duration
-	3, // 7: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Timeout.running:type_name -> google.protobuf.Duration
-	3, // 8: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Timeout.tearing_down:type_name -> google.protobuf.Duration
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	1,  // 0: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.heartbeat:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Heartbeat
+	2,  // 1: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.timeout:type_name -> turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Timeout
+	3,  // 2: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Heartbeat.scheduled:type_name -> google.protobuf.Duration
+	3,  // 3: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Heartbeat.running:type_name -> google.protobuf.Duration
+	3,  // 4: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Heartbeat.tearing_down:type_name -> google.protobuf.Duration
+	3,  // 5: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Timeout.pending_throttled:type_name -> google.protobuf.Duration
+	3,  // 6: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Timeout.scheduled:type_name -> google.protobuf.Duration
+	3,  // 7: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Timeout.running:type_name -> google.protobuf.Duration
+	3,  // 8: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Timeout.cancelling:type_name -> google.protobuf.Duration
+	3,  // 9: turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.Timeout.tearing_down:type_name -> google.protobuf.Duration
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_stage_attempt_execution_policy_proto_init() }

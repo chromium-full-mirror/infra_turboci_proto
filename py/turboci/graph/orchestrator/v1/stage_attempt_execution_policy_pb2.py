@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import duration_pb2 as google_dot_protobuf_dot_duration__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\nBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1egoogle/protobuf/duration.proto\"\xe4\x05\n\x1bStageAttemptExecutionPolicy\x12\\\n\theartbeat\x18\x01 \x01(\x0b\x32\x44.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.HeartbeatH\x00\x88\x01\x01\x12X\n\x07timeout\x18\x02 \x01(\x0b\x32\x42.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.TimeoutH\x01\x88\x01\x01\x1a\xd0\x01\n\tHeartbeat\x12\x31\n\tscheduled\x18\x01 \x01(\x0b\x32\x19.google.protobuf.DurationH\x00\x88\x01\x01\x12/\n\x07running\x18\x02 \x01(\x0b\x32\x19.google.protobuf.DurationH\x01\x88\x01\x01\x12\x34\n\x0ctearing_down\x18\x03 \x01(\x0b\x32\x19.google.protobuf.DurationH\x02\x88\x01\x01\x42\x0c\n\n_scheduledB\n\n\x08_runningB\x0f\n\r_tearing_down\x1a\x9f\x02\n\x07Timeout\x12\x39\n\x11pending_throttled\x18\x01 \x01(\x0b\x32\x19.google.protobuf.DurationH\x00\x88\x01\x01\x12\x31\n\tscheduled\x18\x02 \x01(\x0b\x32\x19.google.protobuf.DurationH\x01\x88\x01\x01\x12/\n\x07running\x18\x03 \x01(\x0b\x32\x19.google.protobuf.DurationH\x02\x88\x01\x01\x12\x34\n\x0ctearing_down\x18\x04 \x01(\x0b\x32\x19.google.protobuf.DurationH\x03\x88\x01\x01\x42\x14\n\x12_pending_throttledB\x0c\n\n_scheduledB\n\n\x08_runningB\x0f\n\r_tearing_downB\x0c\n\n_heartbeatB\n\n\x08_timeoutBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\nBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1egoogle/protobuf/duration.proto\"\xa7\x06\n\x1bStageAttemptExecutionPolicy\x12\\\n\theartbeat\x18\x01 \x01(\x0b\x32\x44.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.HeartbeatH\x00\x88\x01\x01\x12X\n\x07timeout\x18\x02 \x01(\x0b\x32\x42.turboci.graph.orchestrator.v1.StageAttemptExecutionPolicy.TimeoutH\x01\x88\x01\x01\x1a\xd0\x01\n\tHeartbeat\x12\x31\n\tscheduled\x18\x01 \x01(\x0b\x32\x19.google.protobuf.DurationH\x00\x88\x01\x01\x12/\n\x07running\x18\x02 \x01(\x0b\x32\x19.google.protobuf.DurationH\x01\x88\x01\x01\x12\x34\n\x0ctearing_down\x18\x03 \x01(\x0b\x32\x19.google.protobuf.DurationH\x02\x88\x01\x01\x42\x0c\n\n_scheduledB\n\n\x08_runningB\x0f\n\r_tearing_down\x1a\xe2\x02\n\x07Timeout\x12\x39\n\x11pending_throttled\x18\x01 \x01(\x0b\x32\x19.google.protobuf.DurationH\x00\x88\x01\x01\x12\x31\n\tscheduled\x18\x02 \x01(\x0b\x32\x19.google.protobuf.DurationH\x01\x88\x01\x01\x12/\n\x07running\x18\x03 \x01(\x0b\x32\x19.google.protobuf.DurationH\x02\x88\x01\x01\x12\x32\n\ncancelling\x18\x05 \x01(\x0b\x32\x19.google.protobuf.DurationH\x03\x88\x01\x01\x12\x34\n\x0ctearing_down\x18\x04 \x01(\x0b\x32\x19.google.protobuf.DurationH\x04\x88\x01\x01\x42\x14\n\x12_pending_throttledB\x0c\n\n_scheduledB\n\n\x08_runningB\r\n\x0b_cancellingB\x0f\n\r_tearing_downB\x0c\n\n_heartbeatB\n\n\x08_timeoutBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,9 +34,9 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
   _globals['_STAGEATTEMPTEXECUTIONPOLICY']._serialized_start=134
-  _globals['_STAGEATTEMPTEXECUTIONPOLICY']._serialized_end=874
+  _globals['_STAGEATTEMPTEXECUTIONPOLICY']._serialized_end=941
   _globals['_STAGEATTEMPTEXECUTIONPOLICY_HEARTBEAT']._serialized_start=350
   _globals['_STAGEATTEMPTEXECUTIONPOLICY_HEARTBEAT']._serialized_end=558
   _globals['_STAGEATTEMPTEXECUTIONPOLICY_TIMEOUT']._serialized_start=561
-  _globals['_STAGEATTEMPTEXECUTIONPOLICY_TIMEOUT']._serialized_end=848
+  _globals['_STAGEATTEMPTEXECUTIONPOLICY_TIMEOUT']._serialized_end=915
 # @@protoc_insertion_point(module_scope)
