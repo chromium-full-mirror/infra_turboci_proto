@@ -988,7 +988,7 @@ type Stage_builder struct {
 	IsWorknode *bool
 	// An opaque identifier unique within this WorkPlan.
 	//
-	// For WorkNodes (`is_worknode` is true), this will a decimal integer.
+	// For WorkNodes (`is_worknode` is true), this will be a decimal integer.
 	//
 	// Otherwise this will be an arbitrary string supplied by the Stage which
 	// added this.
@@ -1019,7 +1019,7 @@ func (b0 Stage_builder) Build() *Stage {
 //
 // Serialized as "<stage>:A<attempts_idx>".
 //
-// E.g. "L<stage.work_plan.id>:<stage.id>:A<attempts_idx>"
+// E.g. "L<stage.work_plan.id>:S<stage.id>:A<idx>"
 type StageAttempt struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Stage       *Stage                 `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`
@@ -1129,7 +1129,7 @@ func (b0 StageAttempt_builder) Build() *StageAttempt {
 // Serialized as "<stage>:V<version>".
 //
 // E.g.
-// "L<stage.work_plan.id>:<stage.id>:V<version.seconds>/<version.nanos>"
+// "L<stage.work_plan.id>:S<stage.id>:V<version.seconds>/<version.nanos>"
 type StageEdit struct {
 	state              protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Stage   *Stage                 `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`

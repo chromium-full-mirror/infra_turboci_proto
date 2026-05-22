@@ -34,19 +34,19 @@ type IdentifierKind int32
 const (
 	// Default value.
 	IdentifierKind_IDENTIFIER_KIND_UNKNOWN IdentifierKind = 0
-	// An Identifier.WorkPlan.
+	// Identifies an entire TurboCI WorkPlan.
 	IdentifierKind_IDENTIFIER_KIND_WORK_PLAN IdentifierKind = 1
-	// An Identifier.Check.
+	// Identifies a Check within a WorkPlan.
 	IdentifierKind_IDENTIFIER_KIND_CHECK IdentifierKind = 2
-	// An Identifier.CheckResult.
+	// Identifies a Check Result within a WorkPlan.
 	IdentifierKind_IDENTIFIER_KIND_CHECK_RESULT IdentifierKind = 4
-	// An Identifier.CheckEdit.
+	// Identifies a Check Edit within a WorkPlan.
 	IdentifierKind_IDENTIFIER_KIND_CHECK_EDIT IdentifierKind = 6
-	// An Identifier.Stage.
+	// Identifies a Stage within a WorkPlan.
 	IdentifierKind_IDENTIFIER_KIND_STAGE IdentifierKind = 8
-	// An Identifier.StageAttempt.
+	// Identifies a Stage Attempt within a Stage.
 	IdentifierKind_IDENTIFIER_KIND_STAGE_ATTEMPT IdentifierKind = 9
-	// An Identifier.StageEdit.
+	// Identifies a Stage Edit within a WorkPlan.
 	IdentifierKind_IDENTIFIER_KIND_STAGE_EDIT IdentifierKind = 10
 )
 
