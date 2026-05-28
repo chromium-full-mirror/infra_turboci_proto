@@ -15,7 +15,7 @@ from turboci.utils.value import digest
 
 def absorb_inline(
     ds: data_source.MutableDataSource, ref: value_ref_pb2.ValueRef
-):
+) -> None:
   """Consumes the inline data in `ref` into `ds`.
 
   Mutates `ref` to ensure the corresponding `digest` is populated.
@@ -25,9 +25,7 @@ def absorb_inline(
   if not ref.HasField('inline'):
     return
 
-  if ref.HasField('digest'):
-    return
-
   dgst = digest.Digest.compute(ref.inline)
   ds[str(dgst)] = value_data_pb2.ValueData(binary=ref.inline)
   ref.digest = dgst
+  ref.ClearField('inline')

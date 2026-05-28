@@ -63,6 +63,7 @@ class TestWrite(unittest.TestCase):
         value_ref_pb2.ValueRef(
             type_url=value.url(wrappers_pb2.StringValue),
             inline=apb,
+            digest=str(value.Digest.compute(apb)),
             realm='some:realm',
         ),
     )

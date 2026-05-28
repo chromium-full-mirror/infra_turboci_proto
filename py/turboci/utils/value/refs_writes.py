@@ -19,6 +19,7 @@ from google.protobuf import any_pb2
 from turboci.graph.orchestrator.v1 import value_ref_pb2
 from turboci.graph.orchestrator.v1 import value_write_pb2
 from turboci.graph.orchestrator.v1 import omit_reason_pb2
+from turboci.utils.value import digest
 
 
 def write(
@@ -132,6 +133,7 @@ def ref_from_write(
   return value_ref_pb2.ValueRef(
       type_url=val_write.data.type_url,
       inline=val_write.data,
+      digest=str(digest.Digest.compute(val_write.data)),
       realm=val_write.realm,
       omit_reason=omit_reason,
   )
