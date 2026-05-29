@@ -1,5 +1,9 @@
 # About `py/turboci/utils/value`
 
+Last updated: 2026-05-28
+Document current as of revision: 80d0c5d561191f92889c5641174d1f0b48e2db5d
+Link: https://chromium.googlesource.com/infra/turboci/proto/+/80d0c5d561191f92889c5641174d1f0b48e2db5d
+
 Note: There are no subdirectories in this path.
 
 ## Purpose
@@ -23,15 +27,15 @@ URL string for a given protobuf message class or instance.
 Processes `ValueRef` objects that hold raw inline data. The `absorb_inline`
 function inspects a reference, calculates a SHA256 digest of its inline payload,
 transforms that payload into a `ValueData`, stores it in a provided
-`DataSource` using the digest as a key, and replaces the inline data in the
-reference with a pointer to that digest.
+`DataSource` using the digest as a key, updates the reference's `digest` field,
+and clears the `inline` field on the reference.
 
 ### `data_source.py`
 
 Defines interfaces (`DataSource`, `MutableDataSource`) and simple storage
 implementations (like `SimpleDataSource`) for mapping digests to payloads. It
 also contains `pick_data`, which helps a `DataSource` choose the most-complete
-`ValueRef` to store so JSON content can be accepted if it's computed after
+`ValueData` to store so JSON content can be accepted if it's computed after
 binary content has already been stored.
 
 ### `decode.py`
@@ -52,8 +56,8 @@ predictable serialization and custom varint encoding.
 
 Provides functions (`write_matches_ref` and `ref_matches_ref`) to check if two
 references point to the same underlying content. It ensures realms and message
-types align and dynamically handles comparisons between inline payloads and
-digest pointers.
+types align and performs direct comparisons of the `digest` field, enforcing
+the design guarantee that the `digest` field is always set on valid references.
 
 ### `ordered.py`
 
@@ -66,5 +70,6 @@ realm consistency.
 
 Contains factory functions for wrapping generic messages into persistent
 transport containers. It includes `write()` to generate `ValueWrite` messages
-and helpers to generate inline `ValueRef` objects while validating input
-conditions and access constraints.
+and helpers to generate `ValueRef` objects (populating both the `inline`
+payload and computed `digest` fields) while validating input conditions
+and access constraints.
