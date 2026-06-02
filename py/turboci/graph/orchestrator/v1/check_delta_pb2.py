@@ -29,7 +29,7 @@ from turboci.graph.orchestrator.v1 import field_options_pb2 as turboci_dot_graph
 from turboci.graph.orchestrator.v1 import value_ref_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_value__ref__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n/turboci/graph/orchestrator/v1/check_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a\x30turboci/graph/orchestrator/v1/dependencies.proto\x1a\x31turboci/graph/orchestrator/v1/field_options.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\x8d\x04\n\nCheckDelta\x12=\n\x05state\x18\x01 \x01(\x0e\x32).turboci.graph.orchestrator.v1.CheckStateH\x00\x88\x01\x01\x12S\n\x0c\x64\x65pendencies\x18\x02 \x01(\x0b\x32+.turboci.graph.orchestrator.v1.DependenciesB\x0b\x82\x86\xf6\xfb\x0f\x05\x12\x03\n\x01\x02H\x01\x88\x01\x01\x12\x38\n\x07options\x18\x03 \x03(\x0b\x32\'.turboci.graph.orchestrator.v1.ValueRef\x12\x41\n\x07results\x18\x04 \x03(\x0b\x32\x30.turboci.graph.orchestrator.v1.CheckDelta.Result\x1a\xd2\x01\n\x06Result\x12:\n\nidentifier\x18\x01 \x01(\x0b\x32!.turboci.graph.ids.v1.CheckResultH\x00\x88\x01\x01\x12\x14\n\x07\x63reated\x18\x02 \x01(\x08H\x01\x88\x01\x01\x12\x35\n\x04\x64\x61ta\x18\x03 \x03(\x0b\x32\'.turboci.graph.orchestrator.v1.ValueRef\x12\x16\n\tfinalized\x18\x04 \x01(\x08H\x02\x88\x01\x01\x42\r\n\x0b_identifierB\n\n\x08_createdB\x0c\n\n_finalizedB\x08\n\x06_stateB\x0f\n\r_dependenciesBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n/turboci/graph/orchestrator/v1/check_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a\x30turboci/graph/orchestrator/v1/dependencies.proto\x1a\x31turboci/graph/orchestrator/v1/field_options.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\xb9\x04\n\nCheckDelta\x12=\n\x05state\x18\x01 \x01(\x0e\x32).turboci.graph.orchestrator.v1.CheckStateH\x00\x88\x01\x01\x12\x19\n\x0c\x64isplay_name\x18\x05 \x01(\tH\x01\x88\x01\x01\x12S\n\x0c\x64\x65pendencies\x18\x02 \x01(\x0b\x32+.turboci.graph.orchestrator.v1.DependenciesB\x0b\x82\x86\xf6\xfb\x0f\x05\x12\x03\n\x01\x02H\x02\x88\x01\x01\x12\x38\n\x07options\x18\x03 \x03(\x0b\x32\'.turboci.graph.orchestrator.v1.ValueRef\x12\x41\n\x07results\x18\x04 \x03(\x0b\x32\x30.turboci.graph.orchestrator.v1.CheckDelta.Result\x1a\xd2\x01\n\x06Result\x12:\n\nidentifier\x18\x01 \x01(\x0b\x32!.turboci.graph.ids.v1.CheckResultH\x00\x88\x01\x01\x12\x14\n\x07\x63reated\x18\x02 \x01(\x08H\x01\x88\x01\x01\x12\x35\n\x04\x64\x61ta\x18\x03 \x03(\x0b\x32\'.turboci.graph.orchestrator.v1.ValueRef\x12\x16\n\tfinalized\x18\x04 \x01(\x08H\x02\x88\x01\x01\x42\r\n\x0b_identifierB\n\n\x08_createdB\x0c\n\n_finalizedB\x08\n\x06_stateB\x0f\n\r_display_nameB\x0f\n\r_dependenciesBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -40,7 +40,7 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_CHECKDELTA'].fields_by_name['dependencies']._loaded_options = None
   _globals['_CHECKDELTA'].fields_by_name['dependencies']._serialized_options = b'\202\206\366\373\017\005\022\003\n\001\002'
   _globals['_CHECKDELTA']._serialized_start=319
-  _globals['_CHECKDELTA']._serialized_end=844
-  _globals['_CHECKDELTA_RESULT']._serialized_start=607
-  _globals['_CHECKDELTA_RESULT']._serialized_end=817
+  _globals['_CHECKDELTA']._serialized_end=888
+  _globals['_CHECKDELTA_RESULT']._serialized_start=634
+  _globals['_CHECKDELTA_RESULT']._serialized_end=844
 # @@protoc_insertion_point(module_scope)

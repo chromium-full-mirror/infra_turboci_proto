@@ -145,6 +145,9 @@ type ValidateStageResponse struct {
 	state                           protoimpl.MessageState   `protogen:"opaque.v1"`
 	xxx_hidden_StageExecutionPolicy *v1.StageExecutionPolicy `protobuf:"bytes,1,opt,name=stage_execution_policy,json=stageExecutionPolicy,proto3,oneof"`
 	xxx_hidden_StageServiceAccounts []string                 `protobuf:"bytes,2,rep,name=stage_service_accounts,json=stageServiceAccounts,proto3"`
+	xxx_hidden_StageSubType         *string                  `protobuf:"bytes,3,opt,name=stage_sub_type,json=stageSubType,proto3,oneof"`
+	XXX_raceDetectHookData          protoimpl.RaceDetectHookData
+	XXX_presence                    [1]uint32
 	unknownFields                   protoimpl.UnknownFields
 	sizeCache                       protoimpl.SizeCache
 }
@@ -188,12 +191,27 @@ func (x *ValidateStageResponse) GetStageServiceAccounts() []string {
 	return nil
 }
 
+func (x *ValidateStageResponse) GetStageSubType() string {
+	if x != nil {
+		if x.xxx_hidden_StageSubType != nil {
+			return *x.xxx_hidden_StageSubType
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *ValidateStageResponse) SetStageExecutionPolicy(v *v1.StageExecutionPolicy) {
 	x.xxx_hidden_StageExecutionPolicy = v
 }
 
 func (x *ValidateStageResponse) SetStageServiceAccounts(v []string) {
 	x.xxx_hidden_StageServiceAccounts = v
+}
+
+func (x *ValidateStageResponse) SetStageSubType(v string) {
+	x.xxx_hidden_StageSubType = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
 }
 
 func (x *ValidateStageResponse) HasStageExecutionPolicy() bool {
@@ -203,8 +221,20 @@ func (x *ValidateStageResponse) HasStageExecutionPolicy() bool {
 	return x.xxx_hidden_StageExecutionPolicy != nil
 }
 
+func (x *ValidateStageResponse) HasStageSubType() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
 func (x *ValidateStageResponse) ClearStageExecutionPolicy() {
 	x.xxx_hidden_StageExecutionPolicy = nil
+}
+
+func (x *ValidateStageResponse) ClearStageSubType() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_StageSubType = nil
 }
 
 type ValidateStageResponse_builder struct {
@@ -232,6 +262,52 @@ type ValidateStageResponse_builder struct {
 	//
 	// If omitted, defaults to ["EUC"].
 	StageServiceAccounts []string
+	// A disambiguating sub-type for this Stage.
+	//
+	// Used to identify a specific, named, variant of this stage when many exist,
+	// to differentiate metrics between stage sub-types. This value should be
+	// computed by the executor from `args` with some pure function (for example,
+	// this could be the `config` field of a hypothetical args message, or
+	// combination of `os` and `flagset` fields).
+	//
+	// This must *not* contain high-cardinality data like:
+	//   - ChangeIds or Git Commits
+	//   - Build numbers
+	//   - etc.
+	//
+	// This should ideally have high predictive power for the performance
+	// characteristics of this particular instantiation of this stage - many
+	// different stages with the same stage args type_url and sub_type should
+	// perform similarly.
+	//
+	// This is *not* intended to be globally unique, but rather to be used to
+	// group together stages of similar purpose/intent which use the same stage
+	// args type_url.
+	//
+	// If the executor wants the workflow to control this value, it should
+	// provide a field via the stage args, which the executor can relay to here,
+	// but cardinality rules still apply, so this should be done with great
+	// caution. An example of this usage would be a Stage which takes an
+	// executable payload as part of its args (e.g. a wasm module or starlark
+	// script). In this case the workflow dictates the execution contents of what
+	// this Stage will do, and so it makes sense for the executor to allow the
+	// workflow to directly characterize the performance of this execution via
+	// sub_type.
+	//
+	// As an example, Buildbucket uses this to contain the
+	// `<bucketname>/<buildername>` (e.g. `try/linux-rel`). Without specifying
+	// this sub_type, all metrics for `buildbucket.v2.ScheduleBuild` stages would
+	// be indistinguishable (so the 30s markdown presubmit builder and the 12h+
+	// ASAN build+test builder would both just show as
+	// `buildbucket.v2.ScheduleBuild` stages).
+	//
+	// Where possible, it is preferable to have uinque Stage arg types instead of
+	// one big stage type with lots of configurations. This allows the arg types
+	// to be tailored more closely to the behavior of the actual stage, which
+	// makes documentation and debugging easier.
+	//
+	// Must adhere to the regex: /^[a-zA-Z0-9\(\)\-_./ ]{0,256}$/
+	StageSubType *string
 }
 
 func (b0 ValidateStageResponse_builder) Build() *ValidateStageResponse {
@@ -240,6 +316,10 @@ func (b0 ValidateStageResponse_builder) Build() *ValidateStageResponse {
 	_, _ = b, x
 	x.xxx_hidden_StageExecutionPolicy = b.StageExecutionPolicy
 	x.xxx_hidden_StageServiceAccounts = b.StageServiceAccounts
+	if b.StageSubType != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		x.xxx_hidden_StageSubType = b.StageSubType
+	}
 	return m0
 }
 
@@ -257,11 +337,13 @@ const file_turboci_graph_executor_v1_validate_stage_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12>\n" +
 	"\x05value\x18\x02 \x01(\v2(.turboci.graph.orchestrator.v1.ValueDataR\x05value:\x028\x01B\b\n" +
 	"\x06_stageB\v\n" +
-	"\t_workplan\"\xd8\x01\n" +
+	"\t_workplan\"\x96\x02\n" +
 	"\x15ValidateStageResponse\x12n\n" +
 	"\x16stage_execution_policy\x18\x01 \x01(\v23.turboci.graph.orchestrator.v1.StageExecutionPolicyH\x00R\x14stageExecutionPolicy\x88\x01\x01\x124\n" +
-	"\x16stage_service_accounts\x18\x02 \x03(\tR\x14stageServiceAccountsB\x19\n" +
-	"\x17_stage_execution_policyBAP\x01Z=go.chromium.org/turboci/proto/go/graph/executor/v1;executorpbb\x06proto3"
+	"\x16stage_service_accounts\x18\x02 \x03(\tR\x14stageServiceAccounts\x12)\n" +
+	"\x0estage_sub_type\x18\x03 \x01(\tH\x01R\fstageSubType\x88\x01\x01B\x19\n" +
+	"\x17_stage_execution_policyB\x11\n" +
+	"\x0f_stage_sub_typeBAP\x01Z=go.chromium.org/turboci/proto/go/graph/executor/v1;executorpbb\x06proto3"
 
 var file_turboci_graph_executor_v1_validate_stage_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_turboci_graph_executor_v1_validate_stage_proto_goTypes = []any{

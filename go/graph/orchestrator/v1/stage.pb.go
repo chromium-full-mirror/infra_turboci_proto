@@ -35,13 +35,15 @@ const (
 // See also:
 //   - Identifier.Stage* (Identifiers for Stages, StageAttempts, etc.)
 //
-// Next ID: 18
+// Next ID: 20
 type Stage struct {
 	state                        protoimpl.MessageState      `protogen:"opaque.v1"`
 	xxx_hidden_Identifier        *v1.Stage                   `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_DisplayName       *string                     `protobuf:"bytes,18,opt,name=display_name,json=displayName,proto3,oneof"`
 	xxx_hidden_CreatedBy         *Actor                      `protobuf:"bytes,2,opt,name=created_by,json=createdBy,proto3,oneof"`
 	xxx_hidden_Realm             *string                     `protobuf:"bytes,3,opt,name=realm,proto3,oneof"`
 	xxx_hidden_Args              *ValueRef                   `protobuf:"bytes,4,opt,name=args,proto3,oneof"`
+	xxx_hidden_SubType           *string                     `protobuf:"bytes,19,opt,name=sub_type,json=subType,proto3,oneof"`
 	xxx_hidden_Version           *Revision                   `protobuf:"bytes,5,opt,name=version,proto3,oneof"`
 	xxx_hidden_State             StageState                  `protobuf:"varint,6,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
 	xxx_hidden_CancelledBy       *Actor                      `protobuf:"bytes,14,opt,name=cancelled_by,json=cancelledBy,proto3,oneof"`
@@ -93,6 +95,16 @@ func (x *Stage) GetIdentifier() *v1.Stage {
 	return nil
 }
 
+func (x *Stage) GetDisplayName() string {
+	if x != nil {
+		if x.xxx_hidden_DisplayName != nil {
+			return *x.xxx_hidden_DisplayName
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *Stage) GetCreatedBy() *Actor {
 	if x != nil {
 		return x.xxx_hidden_CreatedBy
@@ -117,6 +129,16 @@ func (x *Stage) GetArgs() *ValueRef {
 	return nil
 }
 
+func (x *Stage) GetSubType() string {
+	if x != nil {
+		if x.xxx_hidden_SubType != nil {
+			return *x.xxx_hidden_SubType
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *Stage) GetVersion() *Revision {
 	if x != nil {
 		return x.xxx_hidden_Version
@@ -126,7 +148,7 @@ func (x *Stage) GetVersion() *Revision {
 
 func (x *Stage) GetState() StageState {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 5) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 7) {
 			return x.xxx_hidden_State
 		}
 	}
@@ -204,7 +226,7 @@ func (x *Stage) GetContinuationGroup() *Dependencies {
 
 func (x *Stage) GetConcludedReason() StageConcludedReason {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 15) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 17) {
 			return x.xxx_hidden_ConcludedReason
 		}
 	}
@@ -224,17 +246,27 @@ func (x *Stage) SetIdentifier(v *v1.Stage) {
 	x.xxx_hidden_Identifier = v
 }
 
+func (x *Stage) SetDisplayName(v string) {
+	x.xxx_hidden_DisplayName = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 19)
+}
+
 func (x *Stage) SetCreatedBy(v *Actor) {
 	x.xxx_hidden_CreatedBy = v
 }
 
 func (x *Stage) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 17)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 19)
 }
 
 func (x *Stage) SetArgs(v *ValueRef) {
 	x.xxx_hidden_Args = v
+}
+
+func (x *Stage) SetSubType(v string) {
+	x.xxx_hidden_SubType = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 19)
 }
 
 func (x *Stage) SetVersion(v *Revision) {
@@ -243,7 +275,7 @@ func (x *Stage) SetVersion(v *Revision) {
 
 func (x *Stage) SetState(v StageState) {
 	x.xxx_hidden_State = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 17)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 7, 19)
 }
 
 func (x *Stage) SetCancelledBy(v *Actor) {
@@ -284,7 +316,7 @@ func (x *Stage) SetContinuationGroup(v *Dependencies) {
 
 func (x *Stage) SetConcludedReason(v StageConcludedReason) {
 	x.xxx_hidden_ConcludedReason = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 15, 17)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 17, 19)
 }
 
 func (x *Stage) SetEdits(v []*Edit) {
@@ -298,6 +330,13 @@ func (x *Stage) HasIdentifier() bool {
 	return x.xxx_hidden_Identifier != nil
 }
 
+func (x *Stage) HasDisplayName() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
 func (x *Stage) HasCreatedBy() bool {
 	if x == nil {
 		return false
@@ -309,7 +348,7 @@ func (x *Stage) HasRealm() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
 func (x *Stage) HasArgs() bool {
@@ -317,6 +356,13 @@ func (x *Stage) HasArgs() bool {
 		return false
 	}
 	return x.xxx_hidden_Args != nil
+}
+
+func (x *Stage) HasSubType() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
 }
 
 func (x *Stage) HasVersion() bool {
@@ -330,7 +376,7 @@ func (x *Stage) HasState() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 7)
 }
 
 func (x *Stage) HasCancelledBy() bool {
@@ -379,11 +425,16 @@ func (x *Stage) HasConcludedReason() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 15)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 17)
 }
 
 func (x *Stage) ClearIdentifier() {
 	x.xxx_hidden_Identifier = nil
+}
+
+func (x *Stage) ClearDisplayName() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_DisplayName = nil
 }
 
 func (x *Stage) ClearCreatedBy() {
@@ -391,7 +442,7 @@ func (x *Stage) ClearCreatedBy() {
 }
 
 func (x *Stage) ClearRealm() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
 	x.xxx_hidden_Realm = nil
 }
 
@@ -399,12 +450,17 @@ func (x *Stage) ClearArgs() {
 	x.xxx_hidden_Args = nil
 }
 
+func (x *Stage) ClearSubType() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	x.xxx_hidden_SubType = nil
+}
+
 func (x *Stage) ClearVersion() {
 	x.xxx_hidden_Version = nil
 }
 
 func (x *Stage) ClearState() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 7)
 	x.xxx_hidden_State = StageState_STAGE_STATE_UNKNOWN
 }
 
@@ -433,7 +489,7 @@ func (x *Stage) ClearContinuationGroup() {
 }
 
 func (x *Stage) ClearConcludedReason() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 15)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 17)
 	x.xxx_hidden_ConcludedReason = StageConcludedReason_STAGE_CONCLUDED_REASON_UNKNOWN
 }
 
@@ -442,6 +498,11 @@ type Stage_builder struct {
 
 	// The Stage's identifier.
 	Identifier *v1.Stage
+	// Optional, non-unique, display name of this Stage.
+	//
+	// Should only be set if it provides meaningful context for what this Stage
+	// is above and beyond the Stage's identifier.id, args.type_url and sub_type.
+	DisplayName *string
 	// Actor which created the Stage.
 	CreatedBy *Actor
 	// The security realm for this Stage.
@@ -476,6 +537,17 @@ type Stage_builder struct {
 	// such a graph). There are also some executor types which serve as a way to
 	// separate ACLs, but we expect this to be handled by realms.
 	Args *ValueRef
+	// A disambiguating sub-type for this Stage returned by the stage executor
+	// from ValidateStage.
+	//
+	// Used to identify a specific, named, variant of this stage when many exist,
+	// to differentiate metrics between stage sub-types. This value should be
+	// computed by the executor from `args` with some pure function (for example,
+	// this could be the `config` field of a hypothetical args message, or
+	// combination of `os` and `flagset` fields).
+	//
+	// Must adhere to the regex: /^[a-zA-Z0-9\(\)\-_./ ]{0,256}$/
+	SubType *string
 	// The version of this Stage.
 	//
 	// Updated any time fields in this Stage change, which includes adding a new
@@ -572,15 +644,23 @@ func (b0 Stage_builder) Build() *Stage {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Identifier = b.Identifier
+	if b.DisplayName != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 19)
+		x.xxx_hidden_DisplayName = b.DisplayName
+	}
 	x.xxx_hidden_CreatedBy = b.CreatedBy
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 17)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 19)
 		x.xxx_hidden_Realm = b.Realm
 	}
 	x.xxx_hidden_Args = b.Args
+	if b.SubType != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 19)
+		x.xxx_hidden_SubType = b.SubType
+	}
 	x.xxx_hidden_Version = b.Version
 	if b.State != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 17)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 7, 19)
 		x.xxx_hidden_State = *b.State
 	}
 	x.xxx_hidden_CancelledBy = b.CancelledBy
@@ -593,7 +673,7 @@ func (b0 Stage_builder) Build() *Stage {
 	x.xxx_hidden_Assignments = &b.Assignments
 	x.xxx_hidden_ContinuationGroup = b.ContinuationGroup
 	if b.ConcludedReason != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 15, 17)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 17, 19)
 		x.xxx_hidden_ConcludedReason = *b.ConcludedReason
 	}
 	x.xxx_hidden_Edits = &b.Edits
@@ -1199,8 +1279,8 @@ type Stage_ExecutionPolicyState_builder struct {
 	// This will be validated by the Executor prior to the Stage being committed
 	// to the graph.
 	//
-	// If omitted, the Executor will provide a full StageExecutionPolicy according to
-	// its own logic/configuration.
+	// If omitted, the Executor will provide a full StageExecutionPolicy
+	// according to its own logic/configuration.
 	Requested *StageExecutionPolicy
 	// Actual execution policy is the policy validated and returned by the
 	// Executor when it accepts the Stage for insertion to the graph.
@@ -2039,31 +2119,33 @@ var File_turboci_graph_orchestrator_v1_stage_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/stage.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a(turboci/graph/orchestrator/v1/edit.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\xe4\x1d\n" +
+	")turboci/graph/orchestrator/v1/stage.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a(turboci/graph/orchestrator/v1/edit.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\xca\x1e\n" +
 	"\x05Stage\x12E\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.StageB\x03\xe0A\x05H\x00R\n" +
-	"identifier\x88\x01\x01\x12M\n" +
+	"identifier\x88\x01\x01\x12&\n" +
+	"\fdisplay_name\x18\x12 \x01(\tH\x01R\vdisplayName\x88\x01\x01\x12M\n" +
 	"\n" +
-	"created_by\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x05H\x01R\tcreatedBy\x88\x01\x01\x12\x1e\n" +
-	"\x05realm\x18\x03 \x01(\tB\x03\xe0A\x05H\x02R\x05realm\x88\x01\x01\x12E\n" +
-	"\x04args\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.ValueRefB\x03\xe0A\x05H\x03R\x04args\x88\x01\x01\x12F\n" +
-	"\aversion\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x04R\aversion\x88\x01\x01\x12D\n" +
-	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x05R\x05state\x88\x01\x01\x12L\n" +
-	"\fcancelled_by\x18\x0e \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\x06R\vcancelledBy\x88\x01\x01\x12O\n" +
-	"\fcancelled_at\x18\x11 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\aR\vcancelledAt\x88\x01\x01\x12H\n" +
-	"\x06legacy\x18\x10 \x01(\v2+.turboci.graph.orchestrator.v1.Stage.LegacyH\bR\x06legacy\x88\x01\x01\x12[\n" +
+	"created_by\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x05H\x02R\tcreatedBy\x88\x01\x01\x12\x1e\n" +
+	"\x05realm\x18\x03 \x01(\tB\x03\xe0A\x05H\x03R\x05realm\x88\x01\x01\x12E\n" +
+	"\x04args\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.ValueRefB\x03\xe0A\x05H\x04R\x04args\x88\x01\x01\x12\x1e\n" +
+	"\bsub_type\x18\x13 \x01(\tH\x05R\asubType\x88\x01\x01\x12F\n" +
+	"\aversion\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x06R\aversion\x88\x01\x01\x12D\n" +
+	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\aR\x05state\x88\x01\x01\x12L\n" +
+	"\fcancelled_by\x18\x0e \x01(\v2$.turboci.graph.orchestrator.v1.ActorH\bR\vcancelledBy\x88\x01\x01\x12O\n" +
+	"\fcancelled_at\x18\x11 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\tR\vcancelledAt\x88\x01\x01\x12H\n" +
+	"\x06legacy\x18\x10 \x01(\v2+.turboci.graph.orchestrator.v1.Stage.LegacyH\n" +
+	"R\x06legacy\x88\x01\x01\x12[\n" +
 	"\rstate_history\x18\a \x03(\v26.turboci.graph.orchestrator.v1.Stage.StateHistoryEntryR\fstateHistory\x12b\n" +
 	"\fdependencies\x18\b \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\f\x82\x86\xf6\xfb\x0f\x06\x12\x04\n" +
-	"\x02\x02\bH\tR\fdependencies\x88\x01\x01\x12i\n" +
-	"\x10execution_policy\x18\t \x01(\v29.turboci.graph.orchestrator.v1.Stage.ExecutionPolicyStateH\n" +
-	"R\x0fexecutionPolicy\x88\x01\x01\x12H\n" +
+	"\x02\x02\bH\vR\fdependencies\x88\x01\x01\x12i\n" +
+	"\x10execution_policy\x18\t \x01(\v29.turboci.graph.orchestrator.v1.Stage.ExecutionPolicyStateH\fR\x0fexecutionPolicy\x88\x01\x01\x12H\n" +
 	"\battempts\x18\n" +
 	" \x03(\v2,.turboci.graph.orchestrator.v1.Stage.AttemptR\battempts\x12V\n" +
 	"\vassignments\x18\v \x03(\v2/.turboci.graph.orchestrator.v1.Stage.AssignmentB\x03\xe0A\x05R\vassignments\x12l\n" +
 	"\x12continuation_group\x18\f \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\bH\vR\x11continuationGroup\x88\x01\x01\x12c\n" +
-	"\x10concluded_reason\x18\r \x01(\x0e23.turboci.graph.orchestrator.v1.StageConcludedReasonH\fR\x0fconcludedReason\x88\x01\x01\x129\n" +
+	"\x01\bH\rR\x11continuationGroup\x88\x01\x01\x12c\n" +
+	"\x10concluded_reason\x18\r \x01(\x0e23.turboci.graph.orchestrator.v1.StageConcludedReasonH\x0eR\x0fconcludedReason\x88\x01\x01\x129\n" +
 	"\x05edits\x18\x0f \x03(\v2#.turboci.graph.orchestrator.v1.EditR\x05edits\x1a\xa9\x01\n" +
 	"\x06Legacy\x12H\n" +
 	"\bworknode\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.ValueRefH\x00R\bworknode\x88\x01\x01\x121\n" +
@@ -2132,10 +2214,12 @@ const file_turboci_graph_orchestrator_v1_stage_proto_rawDesc = "" +
 	"goal_state\x18\x02 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x01R\tgoalState\x88\x01\x01B\t\n" +
 	"\a_targetB\r\n" +
 	"\v_goal_stateB\r\n" +
-	"\v_identifierB\r\n" +
+	"\v_identifierB\x0f\n" +
+	"\r_display_nameB\r\n" +
 	"\v_created_byB\b\n" +
 	"\x06_realmB\a\n" +
-	"\x05_argsB\n" +
+	"\x05_argsB\v\n" +
+	"\t_sub_typeB\n" +
 	"\n" +
 	"\b_versionB\b\n" +
 	"\x06_stateB\x0f\n" +

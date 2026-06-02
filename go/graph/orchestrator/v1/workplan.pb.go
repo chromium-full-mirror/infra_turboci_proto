@@ -47,17 +47,20 @@ const (
 // Within a node, all ValueRefs will be present, but they may reference the
 // digest of a ValueData that is not present in the WorkPlan based on the
 // parameters the caller provides in the request.
+//
+// Next ID: 7
 type WorkPlan struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Identifier  *v1.WorkPlan           `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
-	xxx_hidden_Version     *Revision              `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
-	xxx_hidden_Realm       *string                `protobuf:"bytes,3,opt,name=realm,proto3,oneof"`
-	xxx_hidden_Checks      *[]*Check              `protobuf:"bytes,4,rep,name=checks,proto3"`
-	xxx_hidden_Stages      *[]*Stage              `protobuf:"bytes,5,rep,name=stages,proto3"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state                   protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier   *v1.WorkPlan           `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Version      *Revision              `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
+	xxx_hidden_Realm        *string                `protobuf:"bytes,3,opt,name=realm,proto3,oneof"`
+	xxx_hidden_WorkflowName *string                `protobuf:"bytes,6,opt,name=workflow_name,json=workflowName,proto3,oneof"`
+	xxx_hidden_Checks       *[]*Check              `protobuf:"bytes,4,rep,name=checks,proto3"`
+	xxx_hidden_Stages       *[]*Stage              `protobuf:"bytes,5,rep,name=stages,proto3"`
+	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
+	XXX_presence            [1]uint32
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *WorkPlan) Reset() {
@@ -109,6 +112,16 @@ func (x *WorkPlan) GetRealm() string {
 	return ""
 }
 
+func (x *WorkPlan) GetWorkflowName() string {
+	if x != nil {
+		if x.xxx_hidden_WorkflowName != nil {
+			return *x.xxx_hidden_WorkflowName
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *WorkPlan) GetChecks() []*Check {
 	if x != nil {
 		if x.xxx_hidden_Checks != nil {
@@ -137,7 +150,12 @@ func (x *WorkPlan) SetVersion(v *Revision) {
 
 func (x *WorkPlan) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 5)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 6)
+}
+
+func (x *WorkPlan) SetWorkflowName(v string) {
+	x.xxx_hidden_WorkflowName = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 6)
 }
 
 func (x *WorkPlan) SetChecks(v []*Check) {
@@ -169,6 +187,13 @@ func (x *WorkPlan) HasRealm() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
+func (x *WorkPlan) HasWorkflowName() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+}
+
 func (x *WorkPlan) ClearIdentifier() {
 	x.xxx_hidden_Identifier = nil
 }
@@ -182,6 +207,11 @@ func (x *WorkPlan) ClearRealm() {
 	x.xxx_hidden_Realm = nil
 }
 
+func (x *WorkPlan) ClearWorkflowName() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_WorkflowName = nil
+}
+
 type WorkPlan_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
@@ -193,6 +223,18 @@ type WorkPlan_builder struct {
 	Version *Revision
 	// Maps this WorkPlan to a security realm.
 	Realm *string
+	// The optional name of the workflow that this WorkPlan is an instance of.
+	//
+	// This will describe the 'class' of the workplan within the given project -
+	// two workplans with the same 'workflow_name' do 'the same thing' (as defined
+	// by the owners of the workplan). An example of this may be "presubmit" or
+	// "postsubmit", etc.
+	//
+	// This will not include any high cardinality information (like commits,
+	// change IDs, build numbers, etc.).
+	//
+	// Must adhere to the regex: /^[a-zA-Z0-9\(\)\-_./ ]{0,256}$/
+	WorkflowName *string
 	// Checks in the graph.
 	Checks []*Check
 	// Stages in the graph.
@@ -206,8 +248,12 @@ func (b0 WorkPlan_builder) Build() *WorkPlan {
 	x.xxx_hidden_Identifier = b.Identifier
 	x.xxx_hidden_Version = b.Version
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 5)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 6)
 		x.xxx_hidden_Realm = b.Realm
+	}
+	if b.WorkflowName != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 6)
+		x.xxx_hidden_WorkflowName = b.WorkflowName
 	}
 	x.xxx_hidden_Checks = &b.Checks
 	x.xxx_hidden_Stages = &b.Stages
@@ -218,19 +264,21 @@ var File_turboci_graph_orchestrator_v1_workplan_proto protoreflect.FileDescripto
 
 const file_turboci_graph_orchestrator_v1_workplan_proto_rawDesc = "" +
 	"\n" +
-	",turboci/graph/orchestrator/v1/workplan.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/check.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\xd8\x02\n" +
+	",turboci/graph/orchestrator/v1/workplan.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/check.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\x94\x03\n" +
 	"\bWorkPlan\x12C\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x00R\n" +
 	"identifier\x88\x01\x01\x12F\n" +
 	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01\x12\x1e\n" +
-	"\x05realm\x18\x03 \x01(\tB\x03\xe0A\x05H\x02R\x05realm\x88\x01\x01\x12<\n" +
+	"\x05realm\x18\x03 \x01(\tB\x03\xe0A\x05H\x02R\x05realm\x88\x01\x01\x12(\n" +
+	"\rworkflow_name\x18\x06 \x01(\tH\x03R\fworkflowName\x88\x01\x01\x12<\n" +
 	"\x06checks\x18\x04 \x03(\v2$.turboci.graph.orchestrator.v1.CheckR\x06checks\x12<\n" +
 	"\x06stages\x18\x05 \x03(\v2$.turboci.graph.orchestrator.v1.StageR\x06stagesB\r\n" +
 	"\v_identifierB\n" +
 	"\n" +
 	"\b_versionB\b\n" +
-	"\x06_realmBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x06_realmB\x10\n" +
+	"\x0e_workflow_nameBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_workplan_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_workplan_proto_goTypes = []any{

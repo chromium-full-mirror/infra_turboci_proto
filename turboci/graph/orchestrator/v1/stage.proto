@@ -33,10 +33,16 @@ option java_multiple_files = true;
 // See also:
 //   * Identifier.Stage* (Identifiers for Stages, StageAttempts, etc.)
 //
-// Next ID: 18
+// Next ID: 20
 message Stage {
   // The Stage's identifier.
   optional ids.v1.Stage identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
+
+  // Optional, non-unique, display name of this Stage.
+  //
+  // Should only be set if it provides meaningful context for what this Stage
+  // is above and beyond the Stage's identifier.id, args.type_url and sub_type.
+  optional string display_name = 18;
 
   // Actor which created the Stage.
   optional Actor created_by = 2 [(google.api.field_behavior) = IMMUTABLE];
@@ -74,6 +80,18 @@ message Stage {
   // such a graph). There are also some executor types which serve as a way to
   // separate ACLs, but we expect this to be handled by realms.
   optional ValueRef args = 4 [(google.api.field_behavior) = IMMUTABLE];
+
+  // A disambiguating sub-type for this Stage returned by the stage executor
+  // from ValidateStage.
+  //
+  // Used to identify a specific, named, variant of this stage when many exist,
+  // to differentiate metrics between stage sub-types. This value should be
+  // computed by the executor from `args` with some pure function (for example,
+  // this could be the `config` field of a hypothetical args message, or
+  // combination of `os` and `flagset` fields).
+  //
+  // Must adhere to the regex: /^[a-zA-Z0-9\(\)\-_./ ]{0,256}$/
+  optional string sub_type = 19;
 
   // The version of this Stage.
   //
@@ -179,8 +197,8 @@ message Stage {
     // This will be validated by the Executor prior to the Stage being committed
     // to the graph.
     //
-    // If omitted, the Executor will provide a full StageExecutionPolicy according to
-    // its own logic/configuration.
+    // If omitted, the Executor will provide a full StageExecutionPolicy
+    // according to its own logic/configuration.
     optional StageExecutionPolicy requested = 1 [(google.api.field_behavior) = IMMUTABLE];
 
     // Actual execution policy is the policy validated and returned by the

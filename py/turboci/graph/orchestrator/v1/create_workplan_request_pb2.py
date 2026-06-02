@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n;turboci/graph/orchestrator/v1/create_workplan_request.proto\x12\x1dturboci.graph.orchestrator.v1\"g\n\x15\x43reateWorkPlanRequest\x12\x12\n\x05realm\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x1c\n\x0fidempotency_key\x18\x02 \x01(\tH\x01\x88\x01\x01\x42\x08\n\x06_realmB\x12\n\x10_idempotency_keyBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n;turboci/graph/orchestrator/v1/create_workplan_request.proto\x12\x1dturboci.graph.orchestrator.v1\"\x95\x01\n\x15\x43reateWorkPlanRequest\x12\x12\n\x05realm\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x1c\n\x0fidempotency_key\x18\x02 \x01(\tH\x01\x88\x01\x01\x12\x1a\n\rworkflow_name\x18\x03 \x01(\tH\x02\x88\x01\x01\x42\x08\n\x06_realmB\x12\n\x10_idempotency_keyB\x10\n\x0e_workflow_nameBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,6 +32,6 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'turboci.graph.orchestrator.
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
-  _globals['_CREATEWORKPLANREQUEST']._serialized_start=94
-  _globals['_CREATEWORKPLANREQUEST']._serialized_end=197
+  _globals['_CREATEWORKPLANREQUEST']._serialized_start=95
+  _globals['_CREATEWORKPLANREQUEST']._serialized_end=244
 # @@protoc_insertion_point(module_scope)

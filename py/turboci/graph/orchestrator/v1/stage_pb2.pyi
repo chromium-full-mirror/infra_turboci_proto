@@ -24,7 +24,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Stage(_message.Message):
-    __slots__ = ("identifier", "created_by", "realm", "args", "version", "state", "cancelled_by", "cancelled_at", "legacy", "state_history", "dependencies", "execution_policy", "attempts", "assignments", "continuation_group", "concluded_reason", "edits")
+    __slots__ = ("identifier", "display_name", "created_by", "realm", "args", "sub_type", "version", "state", "cancelled_by", "cancelled_at", "legacy", "state_history", "dependencies", "execution_policy", "attempts", "assignments", "continuation_group", "concluded_reason", "edits")
     class Legacy(_message.Message):
         __slots__ = ("worknode", "work_executor_type")
         WORKNODE_FIELD_NUMBER: _ClassVar[int]
@@ -97,9 +97,11 @@ class Stage(_message.Message):
         goal_state: _check_state_pb2.CheckState
         def __init__(self, target: _Optional[_Union[_identifier_pb2.Check, _Mapping]] = ..., goal_state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ...) -> None: ...
     IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
+    DISPLAY_NAME_FIELD_NUMBER: _ClassVar[int]
     CREATED_BY_FIELD_NUMBER: _ClassVar[int]
     REALM_FIELD_NUMBER: _ClassVar[int]
     ARGS_FIELD_NUMBER: _ClassVar[int]
+    SUB_TYPE_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
     CANCELLED_BY_FIELD_NUMBER: _ClassVar[int]
@@ -114,9 +116,11 @@ class Stage(_message.Message):
     CONCLUDED_REASON_FIELD_NUMBER: _ClassVar[int]
     EDITS_FIELD_NUMBER: _ClassVar[int]
     identifier: _identifier_pb2.Stage
+    display_name: str
     created_by: _actor_pb2.Actor
     realm: str
     args: _value_ref_pb2.ValueRef
+    sub_type: str
     version: _revision_pb2.Revision
     state: _stage_state_pb2.StageState
     cancelled_by: _actor_pb2.Actor
@@ -130,7 +134,7 @@ class Stage(_message.Message):
     continuation_group: _dependencies_pb2.Dependencies
     concluded_reason: _stage_concluded_reason_pb2.StageConcludedReason
     edits: _containers.RepeatedCompositeFieldContainer[_edit_pb2.Edit]
-    def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Stage, _Mapping]] = ..., created_by: _Optional[_Union[_actor_pb2.Actor, _Mapping]] = ..., realm: _Optional[str] = ..., args: _Optional[_Union[_value_ref_pb2.ValueRef, _Mapping]] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., state: _Optional[_Union[_stage_state_pb2.StageState, str]] = ..., cancelled_by: _Optional[_Union[_actor_pb2.Actor, _Mapping]] = ..., cancelled_at: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., legacy: _Optional[_Union[Stage.Legacy, _Mapping]] = ..., state_history: _Optional[_Iterable[_Union[Stage.StateHistoryEntry, _Mapping]]] = ..., dependencies: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., execution_policy: _Optional[_Union[Stage.ExecutionPolicyState, _Mapping]] = ..., attempts: _Optional[_Iterable[_Union[Stage.Attempt, _Mapping]]] = ..., assignments: _Optional[_Iterable[_Union[Stage.Assignment, _Mapping]]] = ..., continuation_group: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., concluded_reason: _Optional[_Union[_stage_concluded_reason_pb2.StageConcludedReason, str]] = ..., edits: _Optional[_Iterable[_Union[_edit_pb2.Edit, _Mapping]]] = ...) -> None: ...
+    def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Stage, _Mapping]] = ..., display_name: _Optional[str] = ..., created_by: _Optional[_Union[_actor_pb2.Actor, _Mapping]] = ..., realm: _Optional[str] = ..., args: _Optional[_Union[_value_ref_pb2.ValueRef, _Mapping]] = ..., sub_type: _Optional[str] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., state: _Optional[_Union[_stage_state_pb2.StageState, str]] = ..., cancelled_by: _Optional[_Union[_actor_pb2.Actor, _Mapping]] = ..., cancelled_at: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., legacy: _Optional[_Union[Stage.Legacy, _Mapping]] = ..., state_history: _Optional[_Iterable[_Union[Stage.StateHistoryEntry, _Mapping]]] = ..., dependencies: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., execution_policy: _Optional[_Union[Stage.ExecutionPolicyState, _Mapping]] = ..., attempts: _Optional[_Iterable[_Union[Stage.Attempt, _Mapping]]] = ..., assignments: _Optional[_Iterable[_Union[Stage.Assignment, _Mapping]]] = ..., continuation_group: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., concluded_reason: _Optional[_Union[_stage_concluded_reason_pb2.StageConcludedReason, str]] = ..., edits: _Optional[_Iterable[_Union[_edit_pb2.Edit, _Mapping]]] = ...) -> None: ...
 
 class StageAttemptClaimedFailure(_message.Message):
     __slots__ = ("claimed_by_process_uid",)

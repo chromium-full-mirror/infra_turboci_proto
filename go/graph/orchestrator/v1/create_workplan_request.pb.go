@@ -32,6 +32,7 @@ type CreateWorkPlanRequest struct {
 	state                     protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Realm          *string                `protobuf:"bytes,1,opt,name=realm,proto3,oneof"`
 	xxx_hidden_IdempotencyKey *string                `protobuf:"bytes,2,opt,name=idempotency_key,json=idempotencyKey,proto3,oneof"`
+	xxx_hidden_WorkflowName   *string                `protobuf:"bytes,3,opt,name=workflow_name,json=workflowName,proto3,oneof"`
 	XXX_raceDetectHookData    protoimpl.RaceDetectHookData
 	XXX_presence              [1]uint32
 	unknownFields             protoimpl.UnknownFields
@@ -83,14 +84,29 @@ func (x *CreateWorkPlanRequest) GetIdempotencyKey() string {
 	return ""
 }
 
+func (x *CreateWorkPlanRequest) GetWorkflowName() string {
+	if x != nil {
+		if x.xxx_hidden_WorkflowName != nil {
+			return *x.xxx_hidden_WorkflowName
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *CreateWorkPlanRequest) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
 }
 
 func (x *CreateWorkPlanRequest) SetIdempotencyKey(v string) {
 	x.xxx_hidden_IdempotencyKey = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+}
+
+func (x *CreateWorkPlanRequest) SetWorkflowName(v string) {
+	x.xxx_hidden_WorkflowName = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
 }
 
 func (x *CreateWorkPlanRequest) HasRealm() bool {
@@ -107,6 +123,13 @@ func (x *CreateWorkPlanRequest) HasIdempotencyKey() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
+func (x *CreateWorkPlanRequest) HasWorkflowName() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
 func (x *CreateWorkPlanRequest) ClearRealm() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Realm = nil
@@ -115,6 +138,11 @@ func (x *CreateWorkPlanRequest) ClearRealm() {
 func (x *CreateWorkPlanRequest) ClearIdempotencyKey() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
 	x.xxx_hidden_IdempotencyKey = nil
+}
+
+func (x *CreateWorkPlanRequest) ClearWorkflowName() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_WorkflowName = nil
 }
 
 type CreateWorkPlanRequest_builder struct {
@@ -134,6 +162,20 @@ type CreateWorkPlanRequest_builder struct {
 	// Required. Must be at least 8 bytes long. Can be a randomly generated
 	// string.
 	IdempotencyKey *string
+	// The optional name of the workflow that this WorkPlan is an instance of.
+	//
+	// This should describe the 'class' of the workplan within the given project,
+	// e.g. "presubmit", "postsubmit", etc. The classes used over time should
+	// be fairly static - this must *not* include high-cardinality data like:
+	//   - ChangeIds or Git Commits
+	//   - Build numbers
+	//   - etc.
+	//
+	// This is *not* intended to be globally unique, but rather to be used to
+	// group together workplans of similar purpose/intent.
+	//
+	// Must adhere to the regex: /^[a-zA-Z0-9\(\)\-_./ ]{0,256}$/
+	WorkflowName *string
 }
 
 func (b0 CreateWorkPlanRequest_builder) Build() *CreateWorkPlanRequest {
@@ -141,12 +183,16 @@ func (b0 CreateWorkPlanRequest_builder) Build() *CreateWorkPlanRequest {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
 		x.xxx_hidden_Realm = b.Realm
 	}
 	if b.IdempotencyKey != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
 		x.xxx_hidden_IdempotencyKey = b.IdempotencyKey
+	}
+	if b.WorkflowName != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		x.xxx_hidden_WorkflowName = b.WorkflowName
 	}
 	return m0
 }
@@ -155,12 +201,14 @@ var File_turboci_graph_orchestrator_v1_create_workplan_request_proto protoreflec
 
 const file_turboci_graph_orchestrator_v1_create_workplan_request_proto_rawDesc = "" +
 	"\n" +
-	";turboci/graph/orchestrator/v1/create_workplan_request.proto\x12\x1dturboci.graph.orchestrator.v1\"~\n" +
+	";turboci/graph/orchestrator/v1/create_workplan_request.proto\x12\x1dturboci.graph.orchestrator.v1\"\xba\x01\n" +
 	"\x15CreateWorkPlanRequest\x12\x19\n" +
 	"\x05realm\x18\x01 \x01(\tH\x00R\x05realm\x88\x01\x01\x12,\n" +
-	"\x0fidempotency_key\x18\x02 \x01(\tH\x01R\x0eidempotencyKey\x88\x01\x01B\b\n" +
+	"\x0fidempotency_key\x18\x02 \x01(\tH\x01R\x0eidempotencyKey\x88\x01\x01\x12(\n" +
+	"\rworkflow_name\x18\x03 \x01(\tH\x02R\fworkflowName\x88\x01\x01B\b\n" +
 	"\x06_realmB\x12\n" +
-	"\x10_idempotency_keyBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x10_idempotency_keyB\x10\n" +
+	"\x0e_workflow_nameBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_create_workplan_request_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_create_workplan_request_proto_goTypes = []any{

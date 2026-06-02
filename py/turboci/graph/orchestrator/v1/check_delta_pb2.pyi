@@ -12,7 +12,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CheckDelta(_message.Message):
-    __slots__ = ("state", "dependencies", "options", "results")
+    __slots__ = ("state", "display_name", "dependencies", "options", "results")
     class Result(_message.Message):
         __slots__ = ("identifier", "created", "data", "finalized")
         IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
@@ -25,11 +25,13 @@ class CheckDelta(_message.Message):
         finalized: bool
         def __init__(self, identifier: _Optional[_Union[_identifier_pb2.CheckResult, _Mapping]] = ..., created: _Optional[bool] = ..., data: _Optional[_Iterable[_Union[_value_ref_pb2.ValueRef, _Mapping]]] = ..., finalized: _Optional[bool] = ...) -> None: ...
     STATE_FIELD_NUMBER: _ClassVar[int]
+    DISPLAY_NAME_FIELD_NUMBER: _ClassVar[int]
     DEPENDENCIES_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
     RESULTS_FIELD_NUMBER: _ClassVar[int]
     state: _check_state_pb2.CheckState
+    display_name: str
     dependencies: _dependencies_pb2.Dependencies
     options: _containers.RepeatedCompositeFieldContainer[_value_ref_pb2.ValueRef]
     results: _containers.RepeatedCompositeFieldContainer[CheckDelta.Result]
-    def __init__(self, state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ..., dependencies: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., options: _Optional[_Iterable[_Union[_value_ref_pb2.ValueRef, _Mapping]]] = ..., results: _Optional[_Iterable[_Union[CheckDelta.Result, _Mapping]]] = ...) -> None: ...
+    def __init__(self, state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ..., display_name: _Optional[str] = ..., dependencies: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., options: _Optional[_Iterable[_Union[_value_ref_pb2.ValueRef, _Mapping]]] = ..., results: _Optional[_Iterable[_Union[CheckDelta.Result, _Mapping]]] = ...) -> None: ...

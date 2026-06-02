@@ -31,6 +31,7 @@ const (
 type CheckDelta struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_State        CheckState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
+	xxx_hidden_DisplayName  *string                `protobuf:"bytes,5,opt,name=display_name,json=displayName,proto3,oneof"`
 	xxx_hidden_Dependencies *Dependencies          `protobuf:"bytes,2,opt,name=dependencies,proto3,oneof"`
 	xxx_hidden_Options      *[]*ValueRef           `protobuf:"bytes,3,rep,name=options,proto3"`
 	xxx_hidden_Results      *[]*CheckDelta_Result  `protobuf:"bytes,4,rep,name=results,proto3"`
@@ -74,6 +75,16 @@ func (x *CheckDelta) GetState() CheckState {
 	return CheckState_CHECK_STATE_UNKNOWN
 }
 
+func (x *CheckDelta) GetDisplayName() string {
+	if x != nil {
+		if x.xxx_hidden_DisplayName != nil {
+			return *x.xxx_hidden_DisplayName
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *CheckDelta) GetDependencies() *Dependencies {
 	if x != nil {
 		return x.xxx_hidden_Dependencies
@@ -101,7 +112,12 @@ func (x *CheckDelta) GetResults() []*CheckDelta_Result {
 
 func (x *CheckDelta) SetState(v CheckState) {
 	x.xxx_hidden_State = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 5)
+}
+
+func (x *CheckDelta) SetDisplayName(v string) {
+	x.xxx_hidden_DisplayName = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 5)
 }
 
 func (x *CheckDelta) SetDependencies(v *Dependencies) {
@@ -123,6 +139,13 @@ func (x *CheckDelta) HasState() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
+func (x *CheckDelta) HasDisplayName() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
 func (x *CheckDelta) HasDependencies() bool {
 	if x == nil {
 		return false
@@ -135,6 +158,11 @@ func (x *CheckDelta) ClearState() {
 	x.xxx_hidden_State = CheckState_CHECK_STATE_UNKNOWN
 }
 
+func (x *CheckDelta) ClearDisplayName() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_DisplayName = nil
+}
+
 func (x *CheckDelta) ClearDependencies() {
 	x.xxx_hidden_Dependencies = nil
 }
@@ -144,6 +172,8 @@ type CheckDelta_builder struct {
 
 	// If set, the new state that was set as part of this edit.
 	State *CheckState
+	// The display_name of the check, if it was modified.
+	DisplayName *string
 	// Dependencies written as part of this edit.
 	//
 	// The fields within reflect what was changed in this edit:
@@ -172,8 +202,12 @@ func (b0 CheckDelta_builder) Build() *CheckDelta {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.State != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 5)
 		x.xxx_hidden_State = *b.State
+	}
+	if b.DisplayName != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 5)
+		x.xxx_hidden_DisplayName = b.DisplayName
 	}
 	x.xxx_hidden_Dependencies = b.Dependencies
 	x.xxx_hidden_Options = &b.Options
@@ -345,12 +379,13 @@ var File_turboci_graph_orchestrator_v1_check_delta_proto protoreflect.FileDescri
 
 const file_turboci_graph_orchestrator_v1_check_delta_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/check_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\xda\x04\n" +
+	"/turboci/graph/orchestrator/v1/check_delta.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\x93\x05\n" +
 	"\n" +
 	"CheckDelta\x12D\n" +
-	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\x05state\x88\x01\x01\x12a\n" +
+	"\x05state\x18\x01 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\x05state\x88\x01\x01\x12&\n" +
+	"\fdisplay_name\x18\x05 \x01(\tH\x01R\vdisplayName\x88\x01\x01\x12a\n" +
 	"\fdependencies\x18\x02 \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\x02H\x01R\fdependencies\x88\x01\x01\x12A\n" +
+	"\x01\x02H\x02R\fdependencies\x88\x01\x01\x12A\n" +
 	"\aoptions\x18\x03 \x03(\v2'.turboci.graph.orchestrator.v1.ValueRefR\aoptions\x12J\n" +
 	"\aresults\x18\x04 \x03(\v20.turboci.graph.orchestrator.v1.CheckDelta.ResultR\aresults\x1a\xf8\x01\n" +
 	"\x06Result\x12F\n" +
@@ -366,6 +401,7 @@ const file_turboci_graph_orchestrator_v1_check_delta_proto_rawDesc = "" +
 	"\n" +
 	"_finalizedB\b\n" +
 	"\x06_stateB\x0f\n" +
+	"\r_display_nameB\x0f\n" +
 	"\r_dependenciesBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_check_delta_proto_msgTypes = make([]protoimpl.MessageInfo, 2)

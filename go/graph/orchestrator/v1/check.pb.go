@@ -43,9 +43,12 @@ const (
 //
 // Checks are not, themselves, executable, but Stages are the executable nodes
 // which operate to plan and resolve Checks.
+//
+// Next ID: 13
 type Check struct {
 	state                   protoimpl.MessageState      `protogen:"opaque.v1"`
 	xxx_hidden_Identifier   *v1.Check                   `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_DisplayName  *string                     `protobuf:"bytes,12,opt,name=display_name,json=displayName,proto3,oneof"`
 	xxx_hidden_CreatedBy    *Actor                      `protobuf:"bytes,2,opt,name=created_by,json=createdBy,proto3,oneof"`
 	xxx_hidden_Kind         CheckKind                   `protobuf:"varint,3,opt,name=kind,proto3,enum=turboci.graph.orchestrator.v1.CheckKind,oneof"`
 	xxx_hidden_Realm        *string                     `protobuf:"bytes,4,opt,name=realm,proto3,oneof"`
@@ -94,6 +97,16 @@ func (x *Check) GetIdentifier() *v1.Check {
 	return nil
 }
 
+func (x *Check) GetDisplayName() string {
+	if x != nil {
+		if x.xxx_hidden_DisplayName != nil {
+			return *x.xxx_hidden_DisplayName
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *Check) GetCreatedBy() *Actor {
 	if x != nil {
 		return x.xxx_hidden_CreatedBy
@@ -103,7 +116,7 @@ func (x *Check) GetCreatedBy() *Actor {
 
 func (x *Check) GetKind() CheckKind {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 2) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 3) {
 			return x.xxx_hidden_Kind
 		}
 	}
@@ -129,7 +142,7 @@ func (x *Check) GetVersion() *Revision {
 
 func (x *Check) GetState() CheckState {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 5) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 6) {
 			return x.xxx_hidden_State
 		}
 	}
@@ -183,18 +196,23 @@ func (x *Check) SetIdentifier(v *v1.Check) {
 	x.xxx_hidden_Identifier = v
 }
 
+func (x *Check) SetDisplayName(v string) {
+	x.xxx_hidden_DisplayName = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 12)
+}
+
 func (x *Check) SetCreatedBy(v *Actor) {
 	x.xxx_hidden_CreatedBy = v
 }
 
 func (x *Check) SetKind(v CheckKind) {
 	x.xxx_hidden_Kind = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 12)
 }
 
 func (x *Check) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 12)
 }
 
 func (x *Check) SetVersion(v *Revision) {
@@ -203,7 +221,7 @@ func (x *Check) SetVersion(v *Revision) {
 
 func (x *Check) SetState(v CheckState) {
 	x.xxx_hidden_State = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 12)
 }
 
 func (x *Check) SetStateHistory(v []*Check_StateHistoryEntry) {
@@ -233,6 +251,13 @@ func (x *Check) HasIdentifier() bool {
 	return x.xxx_hidden_Identifier != nil
 }
 
+func (x *Check) HasDisplayName() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
 func (x *Check) HasCreatedBy() bool {
 	if x == nil {
 		return false
@@ -244,14 +269,14 @@ func (x *Check) HasKind() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
 func (x *Check) HasRealm() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
 }
 
 func (x *Check) HasVersion() bool {
@@ -265,7 +290,7 @@ func (x *Check) HasState() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
 }
 
 func (x *Check) HasDependencies() bool {
@@ -279,17 +304,22 @@ func (x *Check) ClearIdentifier() {
 	x.xxx_hidden_Identifier = nil
 }
 
+func (x *Check) ClearDisplayName() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_DisplayName = nil
+}
+
 func (x *Check) ClearCreatedBy() {
 	x.xxx_hidden_CreatedBy = nil
 }
 
 func (x *Check) ClearKind() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
 	x.xxx_hidden_Kind = CheckKind_CHECK_KIND_UNKNOWN
 }
 
 func (x *Check) ClearRealm() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
 	x.xxx_hidden_Realm = nil
 }
 
@@ -298,7 +328,7 @@ func (x *Check) ClearVersion() {
 }
 
 func (x *Check) ClearState() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
 	x.xxx_hidden_State = CheckState_CHECK_STATE_UNKNOWN
 }
 
@@ -313,6 +343,11 @@ type Check_builder struct {
 	//
 	// `identifier.id` is provided by the Stage which creates this Check.
 	Identifier *v1.Check
+	// Optional, non-unique, display name of this Check.
+	//
+	// Should only be set if it provides meaningful context for what this Check
+	// is for, above and beyond the Check's identifier.id and kind.
+	DisplayName *string
 	// Actor which created the Check.
 	CreatedBy *Actor
 	// The coarse-grained kind of this Check.
@@ -389,18 +424,22 @@ func (b0 Check_builder) Build() *Check {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Identifier = b.Identifier
+	if b.DisplayName != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 12)
+		x.xxx_hidden_DisplayName = b.DisplayName
+	}
 	x.xxx_hidden_CreatedBy = b.CreatedBy
 	if b.Kind != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 12)
 		x.xxx_hidden_Kind = *b.Kind
 	}
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 12)
 		x.xxx_hidden_Realm = b.Realm
 	}
 	x.xxx_hidden_Version = b.Version
 	if b.State != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 12)
 		x.xxx_hidden_State = *b.State
 	}
 	x.xxx_hidden_StateHistory = &b.StateHistory
@@ -749,20 +788,24 @@ var File_turboci_graph_orchestrator_v1_check_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a(turboci/graph/orchestrator/v1/edit.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\xf4\f\n" +
+	")turboci/graph/orchestrator/v1/check.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/actor.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a0turboci/graph/orchestrator/v1/dependencies.proto\x1a(turboci/graph/orchestrator/v1/edit.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a7turboci/graph/orchestrator/v1/stage_attempt_state.proto\x1a-turboci/graph/orchestrator/v1/value_ref.proto\"\xba\r\n" +
 	"\x05Check\x12E\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckB\x03\xe0A\x05H\x00R\n" +
-	"identifier\x88\x01\x01\x12M\n" +
+	"identifier\x88\x01\x01\x123\n" +
+	"\fdisplay_name\x18\f \x01(\tB\v\x82\x86\xf6\xfb\x0f\x05\n" +
+	"\x03\n" +
+	"\x01\n" +
+	"H\x01R\vdisplayName\x88\x01\x01\x12M\n" +
 	"\n" +
-	"created_by\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x05H\x01R\tcreatedBy\x88\x01\x01\x12F\n" +
-	"\x04kind\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\x03\xe0A\x05H\x02R\x04kind\x88\x01\x01\x12\x1e\n" +
-	"\x05realm\x18\x04 \x01(\tB\x03\xe0A\x05H\x03R\x05realm\x88\x01\x01\x12F\n" +
-	"\aversion\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x04R\aversion\x88\x01\x01\x12D\n" +
-	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x05R\x05state\x88\x01\x01\x12[\n" +
+	"created_by\x18\x02 \x01(\v2$.turboci.graph.orchestrator.v1.ActorB\x03\xe0A\x05H\x02R\tcreatedBy\x88\x01\x01\x12F\n" +
+	"\x04kind\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\x03\xe0A\x05H\x03R\x04kind\x88\x01\x01\x12\x1e\n" +
+	"\x05realm\x18\x04 \x01(\tB\x03\xe0A\x05H\x04R\x05realm\x88\x01\x01\x12F\n" +
+	"\aversion\x18\x05 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x05R\aversion\x88\x01\x01\x12D\n" +
+	"\x05state\x18\x06 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x06R\x05state\x88\x01\x01\x12[\n" +
 	"\rstate_history\x18\a \x03(\v26.turboci.graph.orchestrator.v1.Check.StateHistoryEntryR\fstateHistory\x12a\n" +
 	"\fdependencies\x18\b \x01(\v2+.turboci.graph.orchestrator.v1.DependenciesB\v\x82\x86\xf6\xfb\x0f\x05\x12\x03\n" +
-	"\x01\x02H\x06R\fdependencies\x88\x01\x01\x12N\n" +
+	"\x01\x02H\aR\fdependencies\x88\x01\x01\x12N\n" +
 	"\aoptions\x18\t \x03(\v2'.turboci.graph.orchestrator.v1.ValueRefB\v\x82\x86\xf6\xfb\x0f\x05\n" +
 	"\x03\n" +
 	"\x01\n" +
@@ -793,7 +836,8 @@ const file_turboci_graph_orchestrator_v1_check_proto_rawDesc = "" +
 	"\v_created_atB\x0f\n" +
 	"\r_finalized_atB\x10\n" +
 	"\x0e_attempt_stateB\r\n" +
-	"\v_identifierB\r\n" +
+	"\v_identifierB\x0f\n" +
+	"\r_display_nameB\r\n" +
 	"\v_created_byB\a\n" +
 	"\x05_kindB\b\n" +
 	"\x06_realmB\n" +

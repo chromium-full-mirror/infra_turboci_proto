@@ -28,9 +28,11 @@ class ValidateStageRequest(_message.Message):
     def __init__(self, stage: _Optional[_Union[_stage_pb2.Stage, _Mapping]] = ..., workplan: _Optional[_Union[_workplan_pb2.WorkPlan, _Mapping]] = ..., value_data: _Optional[_Mapping[str, _value_data_pb2.ValueData]] = ...) -> None: ...
 
 class ValidateStageResponse(_message.Message):
-    __slots__ = ("stage_execution_policy", "stage_service_accounts")
+    __slots__ = ("stage_execution_policy", "stage_service_accounts", "stage_sub_type")
     STAGE_EXECUTION_POLICY_FIELD_NUMBER: _ClassVar[int]
     STAGE_SERVICE_ACCOUNTS_FIELD_NUMBER: _ClassVar[int]
+    STAGE_SUB_TYPE_FIELD_NUMBER: _ClassVar[int]
     stage_execution_policy: _stage_execution_policy_pb2.StageExecutionPolicy
     stage_service_accounts: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, stage_execution_policy: _Optional[_Union[_stage_execution_policy_pb2.StageExecutionPolicy, _Mapping]] = ..., stage_service_accounts: _Optional[_Iterable[str]] = ...) -> None: ...
+    stage_sub_type: str
+    def __init__(self, stage_execution_policy: _Optional[_Union[_stage_execution_policy_pb2.StageExecutionPolicy, _Mapping]] = ..., stage_service_accounts: _Optional[_Iterable[str]] = ..., stage_sub_type: _Optional[str] = ...) -> None: ...

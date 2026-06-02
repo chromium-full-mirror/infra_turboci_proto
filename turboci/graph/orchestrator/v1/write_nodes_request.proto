@@ -200,6 +200,9 @@ message WriteNodesRequest {
     // existing Check kind.
     optional CheckKind kind = 3 [(turboci).creation_only = true];
 
+    // The display name of this Check.
+    optional string display_name = 9 [(turboci).check.editable = CHECK_STATE_PLANNING];
+
     // The list of Options to write/overwrite.
     //
     // Must be unique on `ValueWrite.data.type_url`.
@@ -287,6 +290,9 @@ message WriteNodesRequest {
     //
     // Defaults to "$from_token" if unset while creating a Stage.
     optional string realm = 3 [(turboci).creation_only = true];
+
+    // The display name of this Stage.
+    optional string display_name = 8 [(turboci).creation_only = true];
 
     // Dependency predicate for this Stage.
     //
