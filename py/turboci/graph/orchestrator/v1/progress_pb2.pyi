@@ -20,6 +20,16 @@ class ProgressEvolvePending(_message.Message):
     rpc: _status_pb2.Status
     def __init__(self, next_try: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., pre_rpc: _Optional[_Union[_status_pb2.Status, _Mapping]] = ..., rpc: _Optional[_Union[_status_pb2.Status, _Mapping]] = ...) -> None: ...
 
+class ProgressCancelling(_message.Message):
+    __slots__ = ("next_try", "pre_rpc", "rpc")
+    NEXT_TRY_FIELD_NUMBER: _ClassVar[int]
+    PRE_RPC_FIELD_NUMBER: _ClassVar[int]
+    RPC_FIELD_NUMBER: _ClassVar[int]
+    next_try: _timestamp_pb2.Timestamp
+    pre_rpc: _status_pb2.Status
+    rpc: _status_pb2.Status
+    def __init__(self, next_try: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., pre_rpc: _Optional[_Union[_status_pb2.Status, _Mapping]] = ..., rpc: _Optional[_Union[_status_pb2.Status, _Mapping]] = ...) -> None: ...
+
 class ProgressIgnoredDetail(_message.Message):
     __slots__ = ("type_url",)
     TYPE_URL_FIELD_NUMBER: _ClassVar[int]

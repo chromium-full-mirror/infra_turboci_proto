@@ -1592,6 +1592,10 @@ type Stage_Attempt_builder struct {
 	//   - AWAITING_RETRY - This Attempt was created as a retry of a previous
 	//     INCOMPLETE attempt, and the Orchestrator will not advance it to
 	//     PENDING until this time.
+	//   - CANCELLING - The Orchestrator called CancelStage, but the attempt
+	//     is still in CANCELLING state (i.e. it didn't progress to TEARING_DOWN
+	//     or concluded). The Orchestrator will try calling CancelStage again
+	//     after this time.
 	//
 	// In all other states, this field is unset.
 	WaitingUntil *timestamppb.Timestamp
@@ -2087,6 +2091,7 @@ type Stage_Attempt_Progress_builder struct {
 	// If created_by is Orchestrator, then `details` may contain the
 	// following:
 	//   - turboci.graph.orchestrator.v1.ProgressEvolvePending
+	//   - turboci.graph.orchestrator.v1.ProgressCancelling
 	//   - turboci.graph.orchestrator.v1.ProgressIgnoredDetail
 	CreatedBy *Actor
 	// Unique-to-this-Attempt key for this Progress message.

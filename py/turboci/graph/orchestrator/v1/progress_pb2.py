@@ -26,7 +26,7 @@ from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__
 from google.rpc import status_pb2 as google_dot_rpc_dot_status__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n,turboci/graph/orchestrator/v1/progress.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"\xaa\x01\n\x15ProgressEvolvePending\x12\x31\n\x08next_try\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x01\x88\x01\x01\x12%\n\x07pre_rpc\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusH\x00\x12!\n\x03rpc\x18\x03 \x01(\x0b\x32\x12.google.rpc.StatusH\x00\x42\x07\n\x05phaseB\x0b\n\t_next_try\")\n\x15ProgressIgnoredDetail\x12\x10\n\x08type_url\x18\x01 \x03(\tBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n,turboci/graph/orchestrator/v1/progress.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"\xaa\x01\n\x15ProgressEvolvePending\x12\x31\n\x08next_try\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x01\x88\x01\x01\x12%\n\x07pre_rpc\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusH\x00\x12!\n\x03rpc\x18\x03 \x01(\x0b\x32\x12.google.rpc.StatusH\x00\x42\x07\n\x05phaseB\x0b\n\t_next_try\"\xa7\x01\n\x12ProgressCancelling\x12\x31\n\x08next_try\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x01\x88\x01\x01\x12%\n\x07pre_rpc\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusH\x00\x12!\n\x03rpc\x18\x03 \x01(\x0b\x32\x12.google.rpc.StatusH\x00\x42\x07\n\x05phaseB\x0b\n\t_next_try\")\n\x15ProgressIgnoredDetail\x12\x10\n\x08type_url\x18\x01 \x03(\tBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -36,6 +36,8 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
   _globals['_PROGRESSEVOLVEPENDING']._serialized_start=138
   _globals['_PROGRESSEVOLVEPENDING']._serialized_end=308
-  _globals['_PROGRESSIGNOREDDETAIL']._serialized_start=310
-  _globals['_PROGRESSIGNOREDDETAIL']._serialized_end=351
+  _globals['_PROGRESSCANCELLING']._serialized_start=311
+  _globals['_PROGRESSCANCELLING']._serialized_end=478
+  _globals['_PROGRESSIGNOREDDETAIL']._serialized_start=480
+  _globals['_PROGRESSIGNOREDDETAIL']._serialized_end=521
 # @@protoc_insertion_point(module_scope)

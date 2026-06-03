@@ -26,12 +26,9 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// ProgressEvolvePending is a progress detail attached to Stage Attempts
+// ProgressEvolvePending is a Progress detail attached to Stage Attempts
 // by the Orchestrator itself while the StageAttempt is PENDING and something
-// goes wrong while talking to the Executor.
-//
-// This will be set in the transaction that validates that the Executor did
-// advance the Attempt to the next state after PENDING.
+// goes wrong while calling Executor's RunStage endpoint.
 type ProgressEvolvePending struct {
 	state              protoimpl.MessageState        `protogen:"opaque.v1"`
 	xxx_hidden_NextTry *timestamppb.Timestamp        `protobuf:"bytes,1,opt,name=next_try,json=nextTry,proto3,oneof"`
@@ -181,8 +178,7 @@ func (x *ProgressEvolvePending) WhichPhase() case_ProgressEvolvePending_Phase {
 type ProgressEvolvePending_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The target time when the Orchestrator will next try calling the
-	// Executor's RunStage endpoint.
+	// The target time when the Orchestrator will call RunStage RPC again.
 	NextTry *timestamppb.Timestamp
 	// The phase of the Orchestrator's handler where the failure occurred, and
 	// details about what went wrong.
@@ -193,7 +189,6 @@ type ProgressEvolvePending_builder struct {
 	PreRpc *status.Status
 	// Set if the Executor returned a status other than OK.
 	//
-	// This will be the most recent rpc.Status across all `retry_count` RPCs.
 	// If this is unset, then it means the Executor returned an OK status, but
 	// failed to advance the Attempt out of the PENDING state.
 	Rpc *status.Status
@@ -237,7 +232,6 @@ type progressEvolvePending_PreRpc struct {
 type progressEvolvePending_Rpc struct {
 	// Set if the Executor returned a status other than OK.
 	//
-	// This will be the most recent rpc.Status across all `retry_count` RPCs.
 	// If this is unset, then it means the Executor returned an OK status, but
 	// failed to advance the Attempt out of the PENDING state.
 	Rpc *status.Status `protobuf:"bytes,3,opt,name=rpc,proto3,oneof"`
@@ -246,6 +240,221 @@ type progressEvolvePending_Rpc struct {
 func (*progressEvolvePending_PreRpc) isProgressEvolvePending_Phase() {}
 
 func (*progressEvolvePending_Rpc) isProgressEvolvePending_Phase() {}
+
+// ProgressCancelling is a Progress detail attached to Stage Attempts by
+// the Orchestrator itself while the StageAttempt is CANCELLING and something
+// goes wrong while calling Executor's CancelStage endpoint.
+type ProgressCancelling struct {
+	state              protoimpl.MessageState     `protogen:"opaque.v1"`
+	xxx_hidden_NextTry *timestamppb.Timestamp     `protobuf:"bytes,1,opt,name=next_try,json=nextTry,proto3,oneof"`
+	xxx_hidden_Phase   isProgressCancelling_Phase `protobuf_oneof:"phase"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *ProgressCancelling) Reset() {
+	*x = ProgressCancelling{}
+	mi := &file_turboci_graph_orchestrator_v1_progress_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProgressCancelling) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProgressCancelling) ProtoMessage() {}
+
+func (x *ProgressCancelling) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_progress_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *ProgressCancelling) GetNextTry() *timestamppb.Timestamp {
+	if x != nil {
+		return x.xxx_hidden_NextTry
+	}
+	return nil
+}
+
+func (x *ProgressCancelling) GetPreRpc() *status.Status {
+	if x != nil {
+		if x, ok := x.xxx_hidden_Phase.(*progressCancelling_PreRpc); ok {
+			return x.PreRpc
+		}
+	}
+	return nil
+}
+
+func (x *ProgressCancelling) GetRpc() *status.Status {
+	if x != nil {
+		if x, ok := x.xxx_hidden_Phase.(*progressCancelling_Rpc); ok {
+			return x.Rpc
+		}
+	}
+	return nil
+}
+
+func (x *ProgressCancelling) SetNextTry(v *timestamppb.Timestamp) {
+	x.xxx_hidden_NextTry = v
+}
+
+func (x *ProgressCancelling) SetPreRpc(v *status.Status) {
+	if v == nil {
+		x.xxx_hidden_Phase = nil
+		return
+	}
+	x.xxx_hidden_Phase = &progressCancelling_PreRpc{v}
+}
+
+func (x *ProgressCancelling) SetRpc(v *status.Status) {
+	if v == nil {
+		x.xxx_hidden_Phase = nil
+		return
+	}
+	x.xxx_hidden_Phase = &progressCancelling_Rpc{v}
+}
+
+func (x *ProgressCancelling) HasNextTry() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_NextTry != nil
+}
+
+func (x *ProgressCancelling) HasPhase() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Phase != nil
+}
+
+func (x *ProgressCancelling) HasPreRpc() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Phase.(*progressCancelling_PreRpc)
+	return ok
+}
+
+func (x *ProgressCancelling) HasRpc() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Phase.(*progressCancelling_Rpc)
+	return ok
+}
+
+func (x *ProgressCancelling) ClearNextTry() {
+	x.xxx_hidden_NextTry = nil
+}
+
+func (x *ProgressCancelling) ClearPhase() {
+	x.xxx_hidden_Phase = nil
+}
+
+func (x *ProgressCancelling) ClearPreRpc() {
+	if _, ok := x.xxx_hidden_Phase.(*progressCancelling_PreRpc); ok {
+		x.xxx_hidden_Phase = nil
+	}
+}
+
+func (x *ProgressCancelling) ClearRpc() {
+	if _, ok := x.xxx_hidden_Phase.(*progressCancelling_Rpc); ok {
+		x.xxx_hidden_Phase = nil
+	}
+}
+
+const ProgressCancelling_Phase_not_set_case case_ProgressCancelling_Phase = 0
+const ProgressCancelling_PreRpc_case case_ProgressCancelling_Phase = 2
+const ProgressCancelling_Rpc_case case_ProgressCancelling_Phase = 3
+
+func (x *ProgressCancelling) WhichPhase() case_ProgressCancelling_Phase {
+	if x == nil {
+		return ProgressCancelling_Phase_not_set_case
+	}
+	switch x.xxx_hidden_Phase.(type) {
+	case *progressCancelling_PreRpc:
+		return ProgressCancelling_PreRpc_case
+	case *progressCancelling_Rpc:
+		return ProgressCancelling_Rpc_case
+	default:
+		return ProgressCancelling_Phase_not_set_case
+	}
+}
+
+type ProgressCancelling_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// The target time when the Orchestrator will call CancelStage RPC again.
+	NextTry *timestamppb.Timestamp
+	// The phase of the Orchestrator's handler where the failure occurred, and
+	// details about what went wrong.
+
+	// Fields of oneof xxx_hidden_Phase:
+	// Set if the Orchestrator encountered an error before reaching out to the
+	// Executor.
+	PreRpc *status.Status
+	// Set if the Executor returned a status other than OK.
+	//
+	// If this is unset, then it means the Executor returned an OK status, but
+	// failed to advance the Attempt out of the CANCELLING state.
+	Rpc *status.Status
+	// -- end of xxx_hidden_Phase
+}
+
+func (b0 ProgressCancelling_builder) Build() *ProgressCancelling {
+	m0 := &ProgressCancelling{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_NextTry = b.NextTry
+	if b.PreRpc != nil {
+		x.xxx_hidden_Phase = &progressCancelling_PreRpc{b.PreRpc}
+	}
+	if b.Rpc != nil {
+		x.xxx_hidden_Phase = &progressCancelling_Rpc{b.Rpc}
+	}
+	return m0
+}
+
+type case_ProgressCancelling_Phase protoreflect.FieldNumber
+
+func (x case_ProgressCancelling_Phase) String() string {
+	md := file_turboci_graph_orchestrator_v1_progress_proto_msgTypes[1].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
+type isProgressCancelling_Phase interface {
+	isProgressCancelling_Phase()
+}
+
+type progressCancelling_PreRpc struct {
+	// Set if the Orchestrator encountered an error before reaching out to the
+	// Executor.
+	PreRpc *status.Status `protobuf:"bytes,2,opt,name=pre_rpc,json=preRpc,proto3,oneof"`
+}
+
+type progressCancelling_Rpc struct {
+	// Set if the Executor returned a status other than OK.
+	//
+	// If this is unset, then it means the Executor returned an OK status, but
+	// failed to advance the Attempt out of the CANCELLING state.
+	Rpc *status.Status `protobuf:"bytes,3,opt,name=rpc,proto3,oneof"`
+}
+
+func (*progressCancelling_PreRpc) isProgressCancelling_Phase() {}
+
+func (*progressCancelling_Rpc) isProgressCancelling_Phase() {}
 
 // ProgressIgnoredDetail is a Progress detail message attached to Stage Attempts
 // when a CurrentAttemptWrite call writes a Stage Attempt detail whose type is
@@ -259,7 +468,7 @@ type ProgressIgnoredDetail struct {
 
 func (x *ProgressIgnoredDetail) Reset() {
 	*x = ProgressIgnoredDetail{}
-	mi := &file_turboci_graph_orchestrator_v1_progress_proto_msgTypes[1]
+	mi := &file_turboci_graph_orchestrator_v1_progress_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -271,7 +480,7 @@ func (x *ProgressIgnoredDetail) String() string {
 func (*ProgressIgnoredDetail) ProtoMessage() {}
 
 func (x *ProgressIgnoredDetail) ProtoReflect() protoreflect.Message {
-	mi := &file_turboci_graph_orchestrator_v1_progress_proto_msgTypes[1]
+	mi := &file_turboci_graph_orchestrator_v1_progress_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -318,26 +527,36 @@ const file_turboci_graph_orchestrator_v1_progress_proto_rawDesc = "" +
 	"\apre_rpc\x18\x02 \x01(\v2\x12.google.rpc.StatusH\x00R\x06preRpc\x12&\n" +
 	"\x03rpc\x18\x03 \x01(\v2\x12.google.rpc.StatusH\x00R\x03rpcB\a\n" +
 	"\x05phaseB\v\n" +
+	"\t_next_try\"\xbd\x01\n" +
+	"\x12ProgressCancelling\x12:\n" +
+	"\bnext_try\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\anextTry\x88\x01\x01\x12-\n" +
+	"\apre_rpc\x18\x02 \x01(\v2\x12.google.rpc.StatusH\x00R\x06preRpc\x12&\n" +
+	"\x03rpc\x18\x03 \x01(\v2\x12.google.rpc.StatusH\x00R\x03rpcB\a\n" +
+	"\x05phaseB\v\n" +
 	"\t_next_try\"2\n" +
 	"\x15ProgressIgnoredDetail\x12\x19\n" +
 	"\btype_url\x18\x01 \x03(\tR\atypeUrlBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_progress_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_turboci_graph_orchestrator_v1_progress_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_turboci_graph_orchestrator_v1_progress_proto_goTypes = []any{
 	(*ProgressEvolvePending)(nil), // 0: turboci.graph.orchestrator.v1.ProgressEvolvePending
-	(*ProgressIgnoredDetail)(nil), // 1: turboci.graph.orchestrator.v1.ProgressIgnoredDetail
-	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
-	(*status.Status)(nil),         // 3: google.rpc.Status
+	(*ProgressCancelling)(nil),    // 1: turboci.graph.orchestrator.v1.ProgressCancelling
+	(*ProgressIgnoredDetail)(nil), // 2: turboci.graph.orchestrator.v1.ProgressIgnoredDetail
+	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
+	(*status.Status)(nil),         // 4: google.rpc.Status
 }
 var file_turboci_graph_orchestrator_v1_progress_proto_depIdxs = []int32{
-	2, // 0: turboci.graph.orchestrator.v1.ProgressEvolvePending.next_try:type_name -> google.protobuf.Timestamp
-	3, // 1: turboci.graph.orchestrator.v1.ProgressEvolvePending.pre_rpc:type_name -> google.rpc.Status
-	3, // 2: turboci.graph.orchestrator.v1.ProgressEvolvePending.rpc:type_name -> google.rpc.Status
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	3, // 0: turboci.graph.orchestrator.v1.ProgressEvolvePending.next_try:type_name -> google.protobuf.Timestamp
+	4, // 1: turboci.graph.orchestrator.v1.ProgressEvolvePending.pre_rpc:type_name -> google.rpc.Status
+	4, // 2: turboci.graph.orchestrator.v1.ProgressEvolvePending.rpc:type_name -> google.rpc.Status
+	3, // 3: turboci.graph.orchestrator.v1.ProgressCancelling.next_try:type_name -> google.protobuf.Timestamp
+	4, // 4: turboci.graph.orchestrator.v1.ProgressCancelling.pre_rpc:type_name -> google.rpc.Status
+	4, // 5: turboci.graph.orchestrator.v1.ProgressCancelling.rpc:type_name -> google.rpc.Status
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_progress_proto_init() }
@@ -349,13 +568,17 @@ func file_turboci_graph_orchestrator_v1_progress_proto_init() {
 		(*progressEvolvePending_PreRpc)(nil),
 		(*progressEvolvePending_Rpc)(nil),
 	}
+	file_turboci_graph_orchestrator_v1_progress_proto_msgTypes[1].OneofWrappers = []any{
+		(*progressCancelling_PreRpc)(nil),
+		(*progressCancelling_Rpc)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_progress_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_progress_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
