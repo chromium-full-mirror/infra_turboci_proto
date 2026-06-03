@@ -186,3 +186,98 @@ annotations:
 
 Please file a go/turbo-ci-bug for any bugs or feature requests related to the
 protobuf definitions in this repository.
+
+## Turbo CI Data Model
+
+The Turbo CI data model utilizes a graph of nodes to describe the work done when
+a workflow is run.
+
+### Core Concepts
+
+*   **Workflow:** The high-level definition of the actions required to build,
+    test, and validate software changes. A workflow functions as a "template"
+    from which individual workplans can be instantiated. Workflows are specific
+    to both a product (Chrome/Chromium, Android, etc.) and a role (presubmit,
+    postsubmit, etc.), such as `Android presubmit`. Today Turbo CI does not
+    store workflows so there is no Workflow proto definition, but that will be
+    added later in 2026.
+*   **Workplan:** A graph holding all nodes related to a single run of a
+    workflow. See
+    [graph/orchestrator/v1/workplan.proto](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/orchestrator/v1/workplan.proto).
+*   **Checks:** Nodes representing work the workplan intends to accomplish,
+    and the results of that work. Checks contain options (definition of the work
+    to do) and results. Checks form the public API of the workplan, allowing
+    the stages to be implementation details that typically don't need
+    examination. See
+    [graph/orchestrator/v1/check.proto](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/orchestrator/v1/check.proto).
+*   **Stages:** Executable nodes managed by the Orchestrator, which will have
+    their stage executor run them once all dependencies are satisfied. Whereas
+    checks represent what to do, stages are a directive to actually do the work.
+*   **Stage Attempts:** An attempt to run a stage, where a single stage may have
+    more than one attempt due to retrying failures. See
+    [graph/orchestrator/v1/stage.proto](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/orchestrator/v1/stage.proto).
+*   **Stage Executors:** Services registered to execute specific stage types,
+    based on the `type_url` of the stage's `args` field. Stage executors must run
+    in Google's internal infrastructure, but it's possible to use GCP-hosted
+    services via a Google-hosted proxy that invokes the GCP-hosted service.
+    Such a proxy exists for LUCI Buildbucket, and can be added for other
+    GCP-hosted services. See
+    [graph/executor/v1/turbo_ci_stage_executor_service.proto](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/executor/v1/turbo_ci_stage_executor_service.proto).
+    Googlers looking to maintain a stage executor can find more information at
+    [go/turboci-stage-maintainers](http://go/turboci-stage-maintainers).
+
+### Values (`Any`) & Decoupled Architecture
+
+To cleanly separate the workplan's "skeleton" that the orchestrator needs to
+operate on from workplan-specific data, Turbo CI encapsulates workplan-specific
+payloads (Check Options, Check Results, Stage Args, and others) within protobuf
+`Any` "Value" messages. Checks and Stages contain both non-Value content
+(graph structure and other information the orchestrator directly uses) and Value
+content (which is meaningful to the workplan, its stages, and its readers, but
+can be opaque to the orchestrator).
+
+Values are represented via a set of related protos, where different protos are
+used when sending data to the orchestrator vs. when retrieving data from it:
+
+*   **ValueWrite**: A message used to hold a Value when sending data to the
+    orchestrator. See
+    [graph/orchestrator/v1/value_write.proto](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/orchestrator/v1/value_write.proto).
+*   **ValueRef**: Wraps/references a ValueData to embed it into a check, stage,
+    or other message in the data model. Used when retrieving data from the
+    orchestrator. ValueRefs retrieved from the orchestrator always store the
+    Value's digest to allow the ValueData be looked up from the `value_data`
+    map; the `inline` field is only used within the orchestrator. See
+    [graph/orchestrator/v1/value_ref.proto](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/orchestrator/v1/value_ref.proto).
+*   **ValueData**: A message used to hold a Value (or possibly a JSONPB-encoded
+    version of it) when retrieving data from the orchestrator. Returned in a
+    `value_data` map, keyed on the digest. Clients should typically use helper
+    functions such as `value.Lookup()`
+    ([Go](https://pkg.go.dev/go.chromium.org/luci/turboci/value#Lookup),
+    [Python](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/py/turboci/utils/value/decode.py#84))
+    to access the Value content rather than interacting directly with ValueData
+    messages. See
+    [graph/orchestrator/v1/value_data.proto](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/orchestrator/v1/value_data.proto).
+
+Encapsulating payloads in Value messages not only decouples the core
+Orchestrator messages from workplan-specific messages, but also allows clients
+to request only the specific Values they care about (avoiding unnecessary
+proto dependencies) and allows the orchestrator to cleanly omit Value data that
+a client doesn't have permission to access if they can see some but not all of
+the content in a given check.
+
+See [Repo layout](#repo-layout) for additional details.
+
+### Turbo CI Lifecycles
+
+The Turbo CI Orchestrator manages explicit, auditable state machines for Checks,
+Stages, and Stage Attempts. In most cases the state transition graphs are
+acyclic so there is no way to move from a later state to an earlier one, though
+Stage Attempts can cycle between PENDING and THROTTLED repeatedly if necessary.
+
+These are the three lifecycles in the Turbo CI data model:
+
+*   [CheckState](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/orchestrator/v1/check_state.proto)
+*   [StageState](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/orchestrator/v1/stage_state.proto)
+*   [StageAttemptState](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/orchestrator/v1/stage_attempt_state.proto)
+
+Lifecycle states for workplans will be added in the near future.
