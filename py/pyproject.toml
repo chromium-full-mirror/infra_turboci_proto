@@ -2,7 +2,7 @@
 name = "turboci"
 version = "0.0.1"
 authors = [
-  { name="Chromium Authors", },
+  { name="Chromium Authors" },
 ]
 description = "Helper library for manipulating TurboCI protos."
 readme = "README.md"
