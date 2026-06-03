@@ -32,12 +32,8 @@ class DataSource(typing.Protocol):
     ...
 
 
-@typing.runtime_checkable
-class MutableDataSource(DataSource, typing.Protocol):
-  """Type definition which is DataSource plus a setter."""
-
-  def __setitem__(self, key: str, value: value_data_pb2.ValueData):
-    ...
+# Type definition for a mutable DataSource.
+MutableDataSource = typing.MutableMapping[str, value_data_pb2.ValueData]
 
 
 class SimpleDataSource(
