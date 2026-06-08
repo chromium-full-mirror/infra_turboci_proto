@@ -20,13 +20,12 @@ import glob
 import gzip
 import inspect
 import os
+from pathlib import Path
 import re
 import subprocess
 import sys
 import tempfile
 import textwrap
-
-from pathlib import Path
 from typing import NoReturn
 
 from google.protobuf.descriptor_pb2 import (
@@ -63,7 +62,7 @@ def check_call(cmd: list[str | Path]):
   scmd: list[str] = [str(x) for x in cmd]
   if len(scmd) == 2 and scmd[0] == 'protoc' and scmd[1].startswith('@'):
     with open(scmd[1][1:], encoding='utf-8') as args:
-      print(f"running: protoc {args.read()}")
+      print(f'running: protoc {args.read()}')
   else:
     print(f"running: {' '.join(str(c) for c in scmd)}")
   ret = subprocess.call(scmd, cwd=_RepoRoot, env=_env)
@@ -243,8 +242,10 @@ def _check_message_fields(
       # In proto3, the presence of `proto3_optional` means the `optional`
       # keyword was used.
       if not field.proto3_optional:
-        errors.append(f'{file_name}: {message.name}.{field.name}: Non-repeated,'
-                      ' non-oneof field must use the `optional` keyword.')
+        errors.append(
+            f'{file_name}: {message.name}.{field.name}: Non-repeated,'
+            ' non-oneof field must use the `optional` keyword.'
+        )
 
   for nested_message in message.nested_type:
     if not nested_message.options.map_entry:
@@ -252,8 +253,7 @@ def _check_message_fields(
 
 
 def _task_check_all_fields_optional(desc: FileDescriptorSet):
-  """Checks that every non-repeated, non-oneof field uses the 'optional'
-    keyword."""
+  """Checks non-repeated, non-oneof fields uses the 'optional' keyword."""
   errors = []
   for file in desc.file:
     for message in file.message_type:
@@ -266,8 +266,7 @@ def _task_check_all_fields_optional(desc: FileDescriptorSet):
 
 
 def task_check_all_fields_optional():
-  """Checks that every non-repeated, non-oneof field uses the 'optional'
-    keyword."""
+  """Checks non-repeated, non-oneof fields uses the 'optional' keyword."""
   with _fds() as fds:
     _task_check_all_fields_optional(fds)
 
@@ -295,8 +294,8 @@ def task_compile_desc(
 ):
   """Runs `protoc` to ensure all protos can compile to a proto descriptor.
 
-    The descriptor is discarded, unless outfile is provided.
-    """
+  The descriptor is discarded, unless outfile is provided.
+  """
   if outfile is None:
     guardFn = tempfile.NamedTemporaryFile
   else:
@@ -327,8 +326,9 @@ def _fds():
     yield fds
 
 
-def _install_stubs(flavor: str, check: bool, src: Path, pattern: str,
-                   dst: Path):
+def _install_stubs(
+    flavor: str, check: bool, src: Path, pattern: str, dst: Path
+):
   newFiles: list[str] = glob.glob(pattern, recursive=True, root_dir=src)
 
   if not check:
@@ -346,10 +346,9 @@ def _install_stubs(flavor: str, check: bool, src: Path, pattern: str,
 
   report['missing in repo'] = want - got
   report['extra in repo'] = got - want
-  _, report['with diff'], errs = filecmp.cmpfiles(dst,
-                                                  src,
-                                                  want.intersection(got),
-                                                  shallow=False)
+  _, report['with diff'], errs = filecmp.cmpfiles(
+      dst, src, want.intersection(got), shallow=False
+  )
   if errs:
     for err in errs:
       print('error for file', err)
@@ -452,6 +451,13 @@ def task_test_python(verbose: None | str = None):
   check_call(args)
 
 
+def task_install_venv_link():
+  """Refreshes the `py/.venv` symlink."""
+  link = _RepoRoot / 'py' / '.venv'
+  link.unlink(missing_ok=True)
+  link.symlink_to(sys.prefix, target_is_directory=True)
+
+
 def task_all():
   """Shorthand to run all presubmit checks."""
   fail = False
@@ -477,6 +483,7 @@ def task_all():
         task_compile_stubs,
         task_store_descriptors,
         task_test_python,
+        task_install_venv_link,
     )
 
     for i, fn in enumerate(allTasks):

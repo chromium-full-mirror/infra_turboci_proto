@@ -15,3 +15,7 @@ classifiers = [
 ]
 license = "Apache-2.0"
 license-files = ["LICENSE"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
