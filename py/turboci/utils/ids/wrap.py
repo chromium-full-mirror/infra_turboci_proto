@@ -7,16 +7,24 @@ from __future__ import annotations
 
 __all__ = [
     'AnyIdentifier',
+    'SpecificIdentifier',
     'unwrap',
     'wrap',
 ]
 
 from turboci.graph.ids.v1 import identifier_pb2
 
-AnyIdentifier = (identifier_pb2.Identifier | identifier_pb2.WorkPlan |
-                 identifier_pb2.Check | identifier_pb2.CheckResult |
-                 identifier_pb2.CheckEdit | identifier_pb2.Stage |
-                 identifier_pb2.StageAttempt | identifier_pb2.StageEdit)
+SpecificIdentifier = (
+    identifier_pb2.WorkPlan
+    | identifier_pb2.Check
+    | identifier_pb2.CheckResult
+    | identifier_pb2.CheckEdit
+    | identifier_pb2.Stage
+    | identifier_pb2.StageAttempt
+    | identifier_pb2.StageEdit
+)
+
+AnyIdentifier = identifier_pb2.Identifier | SpecificIdentifier
 
 
 def wrap(ident: AnyIdentifier) -> identifier_pb2.Identifier:
@@ -49,7 +57,7 @@ def wrap(ident: AnyIdentifier) -> identifier_pb2.Identifier:
       raise NotImplementedError(f'wrap({type(ident)})')
 
 
-def unwrap(ident: AnyIdentifier) -> AnyIdentifier | None:
+def unwrap(ident: AnyIdentifier) -> SpecificIdentifier | None:
   """Unwraps any Identifier into it's *specific* identifier type.
 
   Args:
@@ -63,5 +71,5 @@ def unwrap(ident: AnyIdentifier) -> AnyIdentifier | None:
 
   active_field = ident.WhichOneof('type')
   if not active_field:
-    raise ValueError("unwrap: blank or unset Identifier wrapper")
+    raise ValueError('unwrap: blank or unset Identifier wrapper')
   return getattr(ident, active_field)

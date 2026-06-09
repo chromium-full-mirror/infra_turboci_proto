@@ -212,6 +212,44 @@ class TestSetWorkplan(unittest.TestCase):
         self.assertTrue(id_utils.same_workplan(updated, new_workplan))
 
 
+class TestClearWorkplan(unittest.TestCase):
+
+  def test_clear_workplan_unwrapped(self):
+    for tc in _test_cases:
+      with self.subTest(kind=tc.name):
+        if tc.kind == "work_plan":
+          with self.assertRaises(NotImplementedError):
+            id_utils.clear_workplan(copy.deepcopy(tc.ident))
+          continue
+
+        updated = id_utils.clear_workplan(copy.deepcopy(tc.ident))
+        self.assert_workplan_cleared(updated)
+
+  def test_clear_workplan_wrapped(self):
+    for tc in _test_cases:
+      with self.subTest(kind=tc.name):
+        if tc.kind == "work_plan":
+          wrapped = id_utils.wrap(tc.ident)
+          with self.assertRaises(NotImplementedError):
+            id_utils.clear_workplan(wrapped)
+          continue
+
+        wrapped = id_utils.wrap(copy.deepcopy(tc.ident))
+        updated = id_utils.clear_workplan(wrapped)
+        self.assert_workplan_cleared(updated)
+
+  def assert_workplan_cleared(self, ident):
+    unwrapped = id_utils.unwrap(ident)
+    if hasattr(unwrapped, 'work_plan'):
+      self.assertFalse(unwrapped.HasField('work_plan'))
+    elif hasattr(unwrapped, 'check'):
+      self.assertFalse(unwrapped.check.HasField('work_plan'))
+    elif hasattr(unwrapped, 'stage'):
+      self.assertFalse(unwrapped.stage.HasField('work_plan'))
+    else:
+      self.fail(f"Unknown identifier type: {type(unwrapped)}")
+
+
 class TestSameRoot(unittest.TestCase):
 
   def test_same_root_check(self):
