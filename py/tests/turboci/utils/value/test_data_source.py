@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 """Test for value.SimpleDataSource and value.pick_data."""
 
+import threading
 import unittest
 
 from google.protobuf import any_pb2
@@ -17,9 +18,8 @@ class TestSimpleDataSource(unittest.TestCase):
   def test_dict_compatible(self):
     # Make sure that a simple dict is compatible with DataSource.
     src: dict[str, value_data_pb2.ValueData] = {}
-    # Use `assertTrue` instead of `assertIsInstance` so typecheckers will
-    # squawk if it's incompatible.
-    self.assertTrue(isinstance(src, value.DataSource))
+    # Typecheckers will verify this assignment.
+    _dst: value.DataSource = src
 
   def test_simple_data_source(self):
     sds = value.SimpleDataSource()
@@ -75,13 +75,103 @@ class TestSimpleDataSource(unittest.TestCase):
         value_data={dgst: value_data_pb2.ValueData(binary=apb)},
     )
 
-    # Use `assertTrue` instead of `assertIsInstance` so typecheckers will
-    # squawk if it's incompatible.
-    self.assertTrue(isinstance(resp.value_data, value.DataSource))
+    # Typecheckers will verify this assignment.
+    _dst: value.DataSource = resp.value_data
 
     sds.update(resp.value_data)
 
     self.assertEqual(sds[dgst].binary.type_url, apb.type_url)
+
+
+class TestLockedDataSource(unittest.TestCase):
+
+  def test_locked_data_source(self):
+    lds = value.LockedDataSource()
+
+    apb = any_pb2.Any()
+    apb.Pack(empty_pb2.Empty())
+    dgst = "some_digest"
+
+    # Testing setting a new key (might fail with KeyError due to bug)
+    lds[dgst] = value_data_pb2.ValueData(binary=apb)
+
+    self.assertEqual(lds[dgst], value_data_pb2.ValueData(binary=apb))
+
+    jValueData = value_data_pb2.ValueData(
+        json=value_data_pb2.ValueData.JsonAny(type_url=apb.type_url)
+    )
+    lds[dgst] = jValueData
+
+    self.assertEqual(lds[dgst], jValueData)
+
+    # This is a merge, so it will still be JSON.
+    lds[dgst] = value_data_pb2.ValueData(binary=apb)
+
+    self.assertEqual(lds[dgst], jValueData)
+
+  def test_update(self):
+    lds = value.LockedDataSource()
+
+    apb = any_pb2.Any()
+    apb.Pack(empty_pb2.Empty())
+    dgst = "some_digest"
+
+    # Testing update with a new key (might fail with KeyError due to bug)
+    lds.update({
+        dgst: value_data_pb2.ValueData(
+            json=value_data_pb2.ValueData.JsonAny(
+                type_url=apb.type_url,
+            ),
+        ),
+    })
+
+    self.assertEqual(lds[dgst].json.type_url, apb.type_url)
+
+    # Updating with a binary value will not change the data.
+    lds.update({
+        dgst: value_data_pb2.ValueData(binary=apb),
+    })
+    self.assertEqual(lds[dgst].json.type_url, apb.type_url)
+
+  def test_update_deadlock_prevented(self):
+    lds1 = value.LockedDataSource()
+    lds2 = value.LockedDataSource()
+
+    apb = any_pb2.Any()
+    apb.Pack(empty_pb2.Empty())
+
+    lds1["key1"] = value_data_pb2.ValueData(binary=apb)
+    lds2["key2"] = value_data_pb2.ValueData(binary=apb)
+
+    errors = []
+
+    def target1():
+      try:
+        for _ in range(100):
+          lds1.update(lds2)
+      except Exception as e:
+        errors.append(e)
+
+    def target2():
+      try:
+        for _ in range(100):
+          lds2.update(lds1)
+      except Exception as e:
+        errors.append(e)
+
+    t1 = threading.Thread(target=target1)
+    t2 = threading.Thread(target=target2)
+
+    t1.start()
+    t2.start()
+
+    # Join with a timeout to avoid hanging the test suite if it deadlocks
+    t1.join(timeout=2.0)
+    t2.join(timeout=2.0)
+
+    self.assertFalse(t1.is_alive(), "Thread 1 deadlocked!")
+    self.assertFalse(t2.is_alive(), "Thread 2 deadlocked!")
+    self.assertEqual(errors, [])
 
 
 class TestPickData(unittest.TestCase):
