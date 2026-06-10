@@ -33,7 +33,7 @@ option java_multiple_files = true;
 // See also:
 //   * Identifier.Stage* (Identifiers for Stages, StageAttempts, etc.)
 //
-// Next ID: 20
+// Next ID: 20.
 message Stage {
   // The Stage's identifier.
   optional ids.v1.Stage identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
@@ -49,8 +49,12 @@ message Stage {
 
   // The security realm for this Stage.
   //
-  // When a Stage inserts another, the inserted Stage will inherit the realm of
-  // the inserting Stage, unless this is explicitly set.
+  // See WriteNodesRequest.StageWrite for how it is determined.
+  //
+  // Can be unset if this stage represents a legacy work node created via
+  // WorkPlan API. In that case access to this stage (and all realmless
+  // ValueRefs in it) is authorized using legacy WorkPlan API ACLs (which are
+  // based on Google groups, not realms).
   optional string realm = 3 [(google.api.field_behavior) = IMMUTABLE];
 
   // The arguments of the Stage.
@@ -59,26 +63,18 @@ message Stage {
   // and that registration will indicate which Executor should handle this
   // Stage.
   //
-  // NOTE: It's assumed that args.type_url will be a sufficient routing key to
-  // the various registered Executors, but it's POSSIBLE that we may need to
-  // have multiple Executors handle exactly the same Stage type, at which point
-  // we would need to either:
-  //   * Add a secondary type to distinguish them; this would have the
-  //     additional benefit of allowing us to clearly delineate the differences
-  //     via documentation, but if we have this situation a lot, it could be
-  //     confusing.
-  //   * Add another field to Stage to allow registration on (newfield,
-  //     type_url) instead of just type_url.
+  // Type type.googleapis.com/wireless.android.launchcontrol.WorkNodeStage is
+  // recognized by the Orchestrator natively. It can be used to insert legacy
+  // work nodes using Turbo CI API. Such nodes will be accessible both via
+  // WorkPlan API and Turbo CI API. WorkPlan API will always use legacy ACLs
+  // (based on Google groups). Turbo CI API will either use the legacy ACLs
+  // as well (if the stage was inserted with "$legacy_worknode" realm) or
+  // realm ACLs (if the stage with inserted with any other realm).
   //
-  // Looking at WorkNode, there are definitely multiple executor types which
-  // accept the same arguments in WorkParameters, but these could be
-  // represented by adding a new field to WorkParameters. There is also the
-  // PARTIAL_RERUN executor type which is used when duplicating WorkNodes, but
-  // this seems like it will be handled differently with Checks (i.e. Checks of
-  // the same options would be added, and new Results of the cached results
-  // would be added. There wouldn't be a need to add placeholder Stages into
-  // such a graph). There are also some executor types which serve as a way to
-  // separate ACLs, but we expect this to be handled by realms.
+  // Stages with WorkNodeStage type have `is_worknode` set to true in their
+  // `identifier` and they have numeric IDs. See AllocateWorkNodeIDs RPC.
+  //
+  // The realm always matches the realm of the stage.
   optional ValueRef args = 4 [(google.api.field_behavior) = IMMUTABLE];
 
   // A disambiguating sub-type for this Stage returned by the stage executor
@@ -142,14 +138,16 @@ message Stage {
     // The WorkExecutorType as extracted from `worknode`.
     //
     // Have it as a separate field is useful for skipping decoding large proto
-    // during ACL checks (that just need the executor type).
+    // during legacy ACL checks (that just need the executor type).
     optional int32 work_executor_type = 2;
   }
 
   // Set only for stages that represent legacy WorkNodes.
   //
-  // Such stages are submitted either via legacy WorkPlan API or as a special
-  // kind of a Stage (with `args` having type TBD).
+  // Such stages are submitted either via legacy WorkPlan API (in which case
+  // their realm will be unset) or via Turbo CI API using special `args` of
+  // type type.googleapis.com/wireless.android.launchcontrol.WorkNodeStage
+  // (in which case the realm may or may not be set, see `args`).
   optional Legacy legacy = 16;
 
   // StateHistoryEntry records the database revision (commit timestamp) when
@@ -187,9 +185,6 @@ message Stage {
   //
   // `requested` is set by the stage creator. This is validated and augmented by
   // the Executor to become the `validated` policy.
-  //
-  // In the future, this may also include a `dynamic` policy which could allow
-  // additional restrictions to be added after the Stage is created.
   message ExecutionPolicyState {
     // Requested execution policy is the policy which is set by the creator of
     // this Stage.
@@ -207,17 +202,6 @@ message Stage {
     // This is the policy that TurboCI will use to drive Attempts for this
     // Stage.
     optional StageExecutionPolicy validated = 2;
-
-    // TBD: Potentially allow a `dynamic` ExecutionPolicy which callers can use
-    // to decrease the effective limits on this Stage.
-    //
-    // If this is done:
-    //   * Stage type configuration should indicate that dynamic execution
-    //   policy is supported.
-    //   * TurboCI must ensure this dynamic policy only ever shrinks.
-    //   * If the changes are on `attempt_execution_policy_template`, TurboCI
-    //   will set the requested policy for the future attempts to this updated
-    //   policy. But the current attempt will not be affected.
   }
 
   // Execution policy for this Stage.
@@ -228,10 +212,7 @@ message Stage {
   // Stages in the AWAITING state ALWAYS have an active Attempt, even before
   // the Orchestrator sends the first RPC to the Executor for this Stage.
   //
-  // TBD: Pull this into its own top-level StageAttempt entity because it will
-  // need to have its own state and lifecycle/transactions.
-  //
-  // Next ID: 9, then 12
+  // Next ID: 12.
   message Attempt {
     // The Stage Attempt's identifier.
     optional ids.v1.StageAttempt identifier = 1 [(google.api.field_behavior) = IMMUTABLE];

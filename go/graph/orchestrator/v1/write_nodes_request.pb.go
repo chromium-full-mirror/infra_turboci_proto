@@ -716,6 +716,10 @@ func (b0 WriteNodesRequest_Reason_builder) Build() *WriteNodesRequest_Reason {
 }
 
 // A description of modifications to make to a single Check.
+//
+// All fields annotated as `(turboci).creation_only = true` can be set only
+// once in a sense that if a CheckWrite updates an existing check, values
+// of all these fields (if they are set) must match existing check values.
 type WriteNodesRequest_CheckWrite struct {
 	state                      protoimpl.MessageState             `protogen:"opaque.v1"`
 	xxx_hidden_Identifier      *v1.Check                          `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
@@ -966,26 +970,30 @@ type WriteNodesRequest_CheckWrite_builder struct {
 	// The work plan in the ID can either be unset or be equal to the work plan
 	// the WriteNodesRequest's token is associated with. If there's no token,
 	// the work plan in the ID must be set.
+	//
+	// Required.
 	Identifier *v1.Check
 	// Realm to assign to this Check.
 	//
-	// If provided, must be the absolute form "<project>:<name>", or a
-	// special form "$from_token" or "$from_container". "$from_token" works
-	// as documented in [ValueWrite]. "$from_container" means "the same realm
-	// as the WorkPlan".
+	// If provided, must be in the absolute form "<project>:<name>" or be one
+	// of special values:
+	//   - "$from_token" - see [ValueWrite] for how it works.
+	//   - "$from_container" means "the same realm as the WorkPlan".
 	//
-	// If omitted, it means that this check must already exist.
+	// Required when inserting a new check.
 	Realm *string
 	// Kind to assign to this check.
 	//
-	// If this is set, and the Check DOES already exist, this MUST match the
-	// existing Check kind.
+	// Required when inserting a new check.
 	Kind *CheckKind
 	// The display name of this Check.
+	//
+	// Optional. If set, overrides the existing value.
 	DisplayName *string
 	// The list of Options to write/overwrite.
 	//
-	// Must be unique on `ValueWrite.data.type_url`.
+	// Must be unique on `ValueWrite.data.type_url`. Changing realms of existing
+	// options is not allowed.
 	Options []*ValueWrite
 	// Dependency predicate for this Check.
 	//
@@ -1059,6 +1067,17 @@ func (b0 WriteNodesRequest_CheckWrite_builder) Build() *WriteNodesRequest_CheckW
 // Note that the `state` of a Stage is managed entirely by the Orchestrator
 // itself. If you are a Stage implementation and need to manage the state of
 // your own Stage Attempt, see CurrentStageWrite.
+//
+// There are only two sorts of writes currently allowed: inserting a new stage
+// or cancelling an existing stage.
+//
+// All fields annotated as `(turboci).creation_only = true` can be set only
+// once in a sense that if a StageWrite overwrites an existing stage, values
+// of all these fields (if they are set) must match existing stage values.
+//
+// All these fields are also optional when cancelling a stage. If they are
+// set, they'll act as a precondition for cancellation, i.e. the stage will be
+// cancelled only if its existing values match the provided ones.
 type WriteNodesRequest_StageWrite struct {
 	state                                    protoimpl.MessageState             `protogen:"opaque.v1"`
 	xxx_hidden_Identifier                    *v1.Stage                          `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
@@ -1287,37 +1306,42 @@ type WriteNodesRequest_StageWrite_builder struct {
 	// The work plan in the ID can either be unset or be equal to the work plan
 	// the WriteNodesRequest's token is associated with. If there's no token,
 	// the work plan in the ID must be set.
+	//
+	// When inserting a new stage, if `identifier.is_worknode` is true, `args`
+	// must be type.googleapis.com/wireless.android.launchcontrol.WorkNodeStage
+	// (only vice versa: if a WorkNodeStage is given as `args, the ID must be
+	// `is_worknode`). Such writes can be used to insert legacy work nodes using
+	// Turbo CI APIs. IDs for such stages must be preallocated via
+	// AllocateWorkNodeIDs RPC.
+	//
+	// Required.
 	Identifier *v1.Stage
-	// The arguments of the Stage.
+	// The arguments of the Stage when inserting a new stage.
 	//
-	// A Stage MUST have `args` - if this write would create the Stage and
-	// `args` is omitted, the write will be rejected. If the Stage already
-	// exists and `args` is specified, the supplied args must match the existing
-	// Stages's `args` exactly.
-	//
-	// TBD: Document executor registration/selection process.
+	// Required when inserting a new stage. The realm must match `realm` (or
+	// be "$from_container", which will make it match the stage realm).
 	Args *ValueWrite
-	// Realm to assign to this Stage.
+	// Realm to assign to this Stage when inserting it.
 	//
-	// If provided, must be the absolute form "<project>:<name>", or a
-	// special form "$from_token" or "$from_container". "$from_token" works
-	// as documented in [ValueWrite]. "$from_container" means "the same realm
-	// as the WorkPlan".
+	// If provided, must be in the absolute form "<project>:<name>" or be one
+	// of special values:
+	//   - "$from_token" - see [ValueWrite] for how it works.
+	//   - "$from_container" means "the same realm as the WorkPlan".
+	//   - "$legacy_worknode" means to use legacy WorkPlan API ACLs. Can only be
+	//     used if `identifier.is_worknode` is true.
 	//
-	// If the Stage already exists, this will only result in an error if it
-	// doesn't match the existing realm.
-	//
-	// Defaults to "$from_token" if unset while creating a Stage.
+	// When inserting a new stage defaults to:
+	//   - "$from_token" if `identifier.is_worknode` is false.
+	//   - "$legacy_worknode" if `identifier.is_worknode` is true.
 	Realm *string
 	// The display name of this Stage.
+	//
+	// Optional.
 	DisplayName *string
 	// Dependency predicate for this Stage.
 	//
 	// If set, used to populate the dependencies.edges and
 	// dependencies.predicate fields in the target Check.
-	//
-	// If the Stage already exists, this will only result in an error if it
-	// doesn't match the existing dependencies identically.
 	//
 	// NOTE: Currently Stages in this group must only point to Stages created by
 	// the Stage performing this write. In theory, this should help prevent
@@ -1334,27 +1358,17 @@ type WriteNodesRequest_StageWrite_builder struct {
 	Dependencies *WriteNodesRequest_DependencyGroup
 	// The requested execution policy of the Stage.
 	//
-	// If the Stage already exists, this will only result in an error if this
-	// requested policy doesn't match the existing requested policy.
-	//
-	// If this write creates the stage and the requested_stage_execution_policy
-	// is omitted, the stage will get the default StageExecutionPolicy from the
-	// Executor.
+	// Optional. If omitted when creating a stage, the executor will decide what
+	// policy to enforce in its ValidateStage RPC.
 	RequestedStageExecutionPolicy *StageExecutionPolicy
 	// The Check assignments of the Stage.
 	//
-	// If the Stage already exists, this will only result in an error if it
-	// doesn't match the existing assignments.
+	// Currently not implemented.
 	Assignments []*Stage_Assignment
 	// If true, ensures that this Stage is marked for cancellation.
 	//
-	// If the Stage is in the ATTEMPTING state, and the current Attempt is
-	// RUNNING, the Attempt will transition to CANCELLING - Otherwise the
-	// current Attempt will be marked INCOMPLETE.
-	//
-	// If the Stage is already marked for cancellation, setting this is a no-op.
-	//
-	// A value of `false` is the same as `unset` (no-op).
+	// See Stage.cancelled_by for how cancellation affects stages in different
+	// lifecycle states.
 	//
 	// Use the top-level `reason` field to provide the cancellation reason.
 	Cancelled *bool
@@ -1475,7 +1489,9 @@ type WriteNodesRequest_CurrentAttemptWrite_builder struct {
 
 	// Sets details in the Stage Attempt.details field.
 	//
-	// Overwrites any existing detail of the same type.
+	// Details are stored in an append-only map "type URL -> ValueRef".
+	// Overwrites of existing details are ignored (see ProgressIgnoredDetail
+	// message).
 	Details []*ValueWrite
 	// Progress messages to add to the current Stage Attempt.
 	//
