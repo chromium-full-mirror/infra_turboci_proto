@@ -6,6 +6,7 @@ modules:
       # Otherwise buf picks up standard google proto files under
       # ./tools/include.
       - tools
+      - py/.venv
 lint:
   use:
     - STANDARD
