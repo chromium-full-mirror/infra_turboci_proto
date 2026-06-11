@@ -31,6 +31,7 @@ from turboci.utils.value.absorb import *
 from turboci.utils.value.data_source import *
 from turboci.utils.value.decode import *
 from turboci.utils.value.digest import *
+from turboci.utils.value.iter import *
 from turboci.utils.value.match import *
 from turboci.utils.value.ordered import *
 from turboci.utils.value.refs_writes import *
