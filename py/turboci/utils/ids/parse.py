@@ -95,42 +95,42 @@ def from_string(ident_str: str) -> identifier_pb2.Identifier:
     to.seconds = int(secs)
     to.nanos = int(nanos)
 
-  match [t[0] for t in toks]:
-    case ['L']:
+  match [t[0] if t else '' for t in toks]:
+    case ['L' | '']:
       if trim[0]:
         ret.work_plan.id = trim[0]
 
-    case ['L', 'C']:
+    case ['L' | '', 'C']:
       if trim[0]:
         ret.check.work_plan.id = trim[0]
       ret.check.id = trim[1]
 
-    case ['L', 'C', 'R']:
+    case ['L' | '', 'C', 'R']:
       if trim[0]:
         ret.check_result.check.work_plan.id = trim[0]
       ret.check_result.check.id = trim[1]
       ret.check_result.idx = int(trim[2])
 
-    case ['L', 'C', 'V']:
+    case ['L' | '', 'C', 'V']:
       if trim[0]:
         ret.check_edit.check.work_plan.id = trim[0]
       ret.check_edit.check.id = trim[1]
       parse_vers(trim[2], ret.check_edit.version)
 
-    case ['L', _]:
+    case ['L' | '', _]:
       if trim[0]:
         ret.stage.work_plan.id = trim[0]
       parse_is_worknode(ret.stage)
       ret.stage.id = trim[1]
 
-    case ['L', _, 'A']:
+    case ['L' | '', _, 'A']:
       if trim[0]:
         ret.stage_attempt.stage.work_plan.id = trim[0]
       parse_is_worknode(ret.stage_attempt.stage)
       ret.stage_attempt.stage.id = trim[1]
       ret.stage_attempt.idx = int(trim[2])
 
-    case ['L', _, 'V']:
+    case ['L' | '', _, 'V']:
       if trim[0]:
         ret.stage_edit.stage.work_plan.id = trim[0]
       parse_is_worknode(ret.stage_edit.stage)
