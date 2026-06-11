@@ -7,7 +7,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class BuildCheckResult(_message.Message):
+class BuildCheckResults(_message.Message):
     __slots__ = ("success", "display_message", "android_build_artifacts", "cas_manifest", "gcs_artifacts", "view_url")
     class AndroidBuildArtifacts(_message.Message):
         __slots__ = ("build_id", "target", "build_attempt")
@@ -48,20 +48,20 @@ class BuildCheckResult(_message.Message):
             KEY_FIELD_NUMBER: _ClassVar[int]
             VALUE_FIELD_NUMBER: _ClassVar[int]
             key: str
-            value: BuildCheckResult.GcsArtifacts.Files
-            def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[BuildCheckResult.GcsArtifacts.Files, _Mapping]] = ...) -> None: ...
+            value: BuildCheckResults.GcsArtifacts.Files
+            def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[BuildCheckResults.GcsArtifacts.Files, _Mapping]] = ...) -> None: ...
         ROOT_DIRECTORY_URI_FIELD_NUMBER: _ClassVar[int]
         FILES_BY_CATEGORY_FIELD_NUMBER: _ClassVar[int]
         root_directory_uri: str
-        files_by_category: _containers.MessageMap[str, BuildCheckResult.GcsArtifacts.Files]
-        def __init__(self, root_directory_uri: _Optional[str] = ..., files_by_category: _Optional[_Mapping[str, BuildCheckResult.GcsArtifacts.Files]] = ...) -> None: ...
+        files_by_category: _containers.MessageMap[str, BuildCheckResults.GcsArtifacts.Files]
+        def __init__(self, root_directory_uri: _Optional[str] = ..., files_by_category: _Optional[_Mapping[str, BuildCheckResults.GcsArtifacts.Files]] = ...) -> None: ...
     class GcsArtifactsEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
-        value: BuildCheckResult.GcsArtifacts
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[BuildCheckResult.GcsArtifacts, _Mapping]] = ...) -> None: ...
+        value: BuildCheckResults.GcsArtifacts
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[BuildCheckResults.GcsArtifacts, _Mapping]] = ...) -> None: ...
     SUCCESS_FIELD_NUMBER: _ClassVar[int]
     DISPLAY_MESSAGE_FIELD_NUMBER: _ClassVar[int]
     ANDROID_BUILD_ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
@@ -70,8 +70,8 @@ class BuildCheckResult(_message.Message):
     VIEW_URL_FIELD_NUMBER: _ClassVar[int]
     success: bool
     display_message: _display_message_pb2.DisplayMessage
-    android_build_artifacts: BuildCheckResult.AndroidBuildArtifacts
-    cas_manifest: BuildCheckResult.CasManifest
-    gcs_artifacts: _containers.MessageMap[str, BuildCheckResult.GcsArtifacts]
+    android_build_artifacts: BuildCheckResults.AndroidBuildArtifacts
+    cas_manifest: BuildCheckResults.CasManifest
+    gcs_artifacts: _containers.MessageMap[str, BuildCheckResults.GcsArtifacts]
     view_url: str
-    def __init__(self, success: _Optional[bool] = ..., display_message: _Optional[_Union[_display_message_pb2.DisplayMessage, _Mapping]] = ..., android_build_artifacts: _Optional[_Union[BuildCheckResult.AndroidBuildArtifacts, _Mapping]] = ..., cas_manifest: _Optional[_Union[BuildCheckResult.CasManifest, _Mapping]] = ..., gcs_artifacts: _Optional[_Mapping[str, BuildCheckResult.GcsArtifacts]] = ..., view_url: _Optional[str] = ...) -> None: ...
+    def __init__(self, success: _Optional[bool] = ..., display_message: _Optional[_Union[_display_message_pb2.DisplayMessage, _Mapping]] = ..., android_build_artifacts: _Optional[_Union[BuildCheckResults.AndroidBuildArtifacts, _Mapping]] = ..., cas_manifest: _Optional[_Union[BuildCheckResults.CasManifest, _Mapping]] = ..., gcs_artifacts: _Optional[_Mapping[str, BuildCheckResults.GcsArtifacts]] = ..., view_url: _Optional[str] = ...) -> None: ...

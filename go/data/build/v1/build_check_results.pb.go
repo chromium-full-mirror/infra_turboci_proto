@@ -27,34 +27,34 @@ const (
 
 // BuildCheckResults represent the output of a build. This is mainly centered around the artifacts
 // generated from the build and their locations.
-type BuildCheckResult struct {
-	state                            protoimpl.MessageState                    `protogen:"opaque.v1"`
-	xxx_hidden_Success               bool                                      `protobuf:"varint,1,opt,name=success,proto3,oneof"`
-	xxx_hidden_DisplayMessage        *v1.DisplayMessage                        `protobuf:"bytes,2,opt,name=display_message,json=displayMessage,proto3,oneof"`
-	xxx_hidden_AndroidBuildArtifacts *BuildCheckResult_AndroidBuildArtifacts   `protobuf:"bytes,3,opt,name=android_build_artifacts,json=androidBuildArtifacts,proto3,oneof"`
-	xxx_hidden_CasManifest           *BuildCheckResult_CasManifest             `protobuf:"bytes,4,opt,name=cas_manifest,json=casManifest,proto3,oneof"`
-	xxx_hidden_GcsArtifacts          map[string]*BuildCheckResult_GcsArtifacts `protobuf:"bytes,5,rep,name=gcs_artifacts,json=gcsArtifacts,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	xxx_hidden_ViewUrl               *string                                   `protobuf:"bytes,6,opt,name=view_url,json=viewUrl,proto3,oneof"`
+type BuildCheckResults struct {
+	state                            protoimpl.MessageState                     `protogen:"opaque.v1"`
+	xxx_hidden_Success               bool                                       `protobuf:"varint,1,opt,name=success,proto3,oneof"`
+	xxx_hidden_DisplayMessage        *v1.DisplayMessage                         `protobuf:"bytes,2,opt,name=display_message,json=displayMessage,proto3,oneof"`
+	xxx_hidden_AndroidBuildArtifacts *BuildCheckResults_AndroidBuildArtifacts   `protobuf:"bytes,3,opt,name=android_build_artifacts,json=androidBuildArtifacts,proto3,oneof"`
+	xxx_hidden_CasManifest           *BuildCheckResults_CasManifest             `protobuf:"bytes,4,opt,name=cas_manifest,json=casManifest,proto3,oneof"`
+	xxx_hidden_GcsArtifacts          map[string]*BuildCheckResults_GcsArtifacts `protobuf:"bytes,5,rep,name=gcs_artifacts,json=gcsArtifacts,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	xxx_hidden_ViewUrl               *string                                    `protobuf:"bytes,6,opt,name=view_url,json=viewUrl,proto3,oneof"`
 	XXX_raceDetectHookData           protoimpl.RaceDetectHookData
 	XXX_presence                     [1]uint32
 	unknownFields                    protoimpl.UnknownFields
 	sizeCache                        protoimpl.SizeCache
 }
 
-func (x *BuildCheckResult) Reset() {
-	*x = BuildCheckResult{}
+func (x *BuildCheckResults) Reset() {
+	*x = BuildCheckResults{}
 	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *BuildCheckResult) String() string {
+func (x *BuildCheckResults) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BuildCheckResult) ProtoMessage() {}
+func (*BuildCheckResults) ProtoMessage() {}
 
-func (x *BuildCheckResult) ProtoReflect() protoreflect.Message {
+func (x *BuildCheckResults) ProtoReflect() protoreflect.Message {
 	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -66,42 +66,42 @@ func (x *BuildCheckResult) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *BuildCheckResult) GetSuccess() bool {
+func (x *BuildCheckResults) GetSuccess() bool {
 	if x != nil {
 		return x.xxx_hidden_Success
 	}
 	return false
 }
 
-func (x *BuildCheckResult) GetDisplayMessage() *v1.DisplayMessage {
+func (x *BuildCheckResults) GetDisplayMessage() *v1.DisplayMessage {
 	if x != nil {
 		return x.xxx_hidden_DisplayMessage
 	}
 	return nil
 }
 
-func (x *BuildCheckResult) GetAndroidBuildArtifacts() *BuildCheckResult_AndroidBuildArtifacts {
+func (x *BuildCheckResults) GetAndroidBuildArtifacts() *BuildCheckResults_AndroidBuildArtifacts {
 	if x != nil {
 		return x.xxx_hidden_AndroidBuildArtifacts
 	}
 	return nil
 }
 
-func (x *BuildCheckResult) GetCasManifest() *BuildCheckResult_CasManifest {
+func (x *BuildCheckResults) GetCasManifest() *BuildCheckResults_CasManifest {
 	if x != nil {
 		return x.xxx_hidden_CasManifest
 	}
 	return nil
 }
 
-func (x *BuildCheckResult) GetGcsArtifacts() map[string]*BuildCheckResult_GcsArtifacts {
+func (x *BuildCheckResults) GetGcsArtifacts() map[string]*BuildCheckResults_GcsArtifacts {
 	if x != nil {
 		return x.xxx_hidden_GcsArtifacts
 	}
 	return nil
 }
 
-func (x *BuildCheckResult) GetViewUrl() string {
+func (x *BuildCheckResults) GetViewUrl() string {
 	if x != nil {
 		if x.xxx_hidden_ViewUrl != nil {
 			return *x.xxx_hidden_ViewUrl
@@ -111,90 +111,90 @@ func (x *BuildCheckResult) GetViewUrl() string {
 	return ""
 }
 
-func (x *BuildCheckResult) SetSuccess(v bool) {
+func (x *BuildCheckResults) SetSuccess(v bool) {
 	x.xxx_hidden_Success = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 6)
 }
 
-func (x *BuildCheckResult) SetDisplayMessage(v *v1.DisplayMessage) {
+func (x *BuildCheckResults) SetDisplayMessage(v *v1.DisplayMessage) {
 	x.xxx_hidden_DisplayMessage = v
 }
 
-func (x *BuildCheckResult) SetAndroidBuildArtifacts(v *BuildCheckResult_AndroidBuildArtifacts) {
+func (x *BuildCheckResults) SetAndroidBuildArtifacts(v *BuildCheckResults_AndroidBuildArtifacts) {
 	x.xxx_hidden_AndroidBuildArtifacts = v
 }
 
-func (x *BuildCheckResult) SetCasManifest(v *BuildCheckResult_CasManifest) {
+func (x *BuildCheckResults) SetCasManifest(v *BuildCheckResults_CasManifest) {
 	x.xxx_hidden_CasManifest = v
 }
 
-func (x *BuildCheckResult) SetGcsArtifacts(v map[string]*BuildCheckResult_GcsArtifacts) {
+func (x *BuildCheckResults) SetGcsArtifacts(v map[string]*BuildCheckResults_GcsArtifacts) {
 	x.xxx_hidden_GcsArtifacts = v
 }
 
-func (x *BuildCheckResult) SetViewUrl(v string) {
+func (x *BuildCheckResults) SetViewUrl(v string) {
 	x.xxx_hidden_ViewUrl = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 6)
 }
 
-func (x *BuildCheckResult) HasSuccess() bool {
+func (x *BuildCheckResults) HasSuccess() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *BuildCheckResult) HasDisplayMessage() bool {
+func (x *BuildCheckResults) HasDisplayMessage() bool {
 	if x == nil {
 		return false
 	}
 	return x.xxx_hidden_DisplayMessage != nil
 }
 
-func (x *BuildCheckResult) HasAndroidBuildArtifacts() bool {
+func (x *BuildCheckResults) HasAndroidBuildArtifacts() bool {
 	if x == nil {
 		return false
 	}
 	return x.xxx_hidden_AndroidBuildArtifacts != nil
 }
 
-func (x *BuildCheckResult) HasCasManifest() bool {
+func (x *BuildCheckResults) HasCasManifest() bool {
 	if x == nil {
 		return false
 	}
 	return x.xxx_hidden_CasManifest != nil
 }
 
-func (x *BuildCheckResult) HasViewUrl() bool {
+func (x *BuildCheckResults) HasViewUrl() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
 }
 
-func (x *BuildCheckResult) ClearSuccess() {
+func (x *BuildCheckResults) ClearSuccess() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Success = false
 }
 
-func (x *BuildCheckResult) ClearDisplayMessage() {
+func (x *BuildCheckResults) ClearDisplayMessage() {
 	x.xxx_hidden_DisplayMessage = nil
 }
 
-func (x *BuildCheckResult) ClearAndroidBuildArtifacts() {
+func (x *BuildCheckResults) ClearAndroidBuildArtifacts() {
 	x.xxx_hidden_AndroidBuildArtifacts = nil
 }
 
-func (x *BuildCheckResult) ClearCasManifest() {
+func (x *BuildCheckResults) ClearCasManifest() {
 	x.xxx_hidden_CasManifest = nil
 }
 
-func (x *BuildCheckResult) ClearViewUrl() {
+func (x *BuildCheckResults) ClearViewUrl() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
 	x.xxx_hidden_ViewUrl = nil
 }
 
-type BuildCheckResult_builder struct {
+type BuildCheckResults_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// Whether the build succeeded or failed. "success = true" means that all required build actions
@@ -207,23 +207,23 @@ type BuildCheckResult_builder struct {
 	// Information needed to find artifacts in ab/.
 	// We acknowledge that this is Android-specific but are keeping it here in the "multiproduct"
 	// namespace.
-	AndroidBuildArtifacts *BuildCheckResult_AndroidBuildArtifacts
+	AndroidBuildArtifacts *BuildCheckResults_AndroidBuildArtifacts
 	// CAS manifest information fully represented in proto form.
-	CasManifest *BuildCheckResult_CasManifest
+	CasManifest *BuildCheckResults_CasManifest
 	// Mapping between a label string and a collection of artifacts in a GCS bucket.
 	// Used to support cases where different sets of artifacts are uploaded to different buckets.
 	// The string key identifies the purpose of the artifacts and allows easy access for consumers.
 	// For cases where only a single set of artifacts is uploaded, you can use "default" as the key.
 	// It is expected that use cases with multiple GCS buckets will likely want to represent
 	// the set of known keys for their use case, probably in a custom proto.
-	GcsArtifacts map[string]*BuildCheckResult_GcsArtifacts
+	GcsArtifacts map[string]*BuildCheckResults_GcsArtifacts
 	// A redirect URL to the build dashboard showing additional details about the build (eg. logs).
 	// Useful to show in tools like Chronicle.
 	ViewUrl *string
 }
 
-func (b0 BuildCheckResult_builder) Build() *BuildCheckResult {
-	m0 := &BuildCheckResult{}
+func (b0 BuildCheckResults_builder) Build() *BuildCheckResults {
+	m0 := &BuildCheckResults{}
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Success != nil {
@@ -242,7 +242,7 @@ func (b0 BuildCheckResult_builder) Build() *BuildCheckResult {
 }
 
 // Build ID, target and attempt which are necessary to query artifacts in ab/ or Android Build API
-type BuildCheckResult_AndroidBuildArtifacts struct {
+type BuildCheckResults_AndroidBuildArtifacts struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_BuildId      *string                `protobuf:"bytes,1,opt,name=build_id,json=buildId,proto3,oneof"`
 	xxx_hidden_Target       *string                `protobuf:"bytes,2,opt,name=target,proto3,oneof"`
@@ -253,20 +253,20 @@ type BuildCheckResult_AndroidBuildArtifacts struct {
 	sizeCache               protoimpl.SizeCache
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) Reset() {
-	*x = BuildCheckResult_AndroidBuildArtifacts{}
+func (x *BuildCheckResults_AndroidBuildArtifacts) Reset() {
+	*x = BuildCheckResults_AndroidBuildArtifacts{}
 	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) String() string {
+func (x *BuildCheckResults_AndroidBuildArtifacts) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BuildCheckResult_AndroidBuildArtifacts) ProtoMessage() {}
+func (*BuildCheckResults_AndroidBuildArtifacts) ProtoMessage() {}
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) ProtoReflect() protoreflect.Message {
+func (x *BuildCheckResults_AndroidBuildArtifacts) ProtoReflect() protoreflect.Message {
 	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -278,7 +278,7 @@ func (x *BuildCheckResult_AndroidBuildArtifacts) ProtoReflect() protoreflect.Mes
 	return mi.MessageOf(x)
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) GetBuildId() string {
+func (x *BuildCheckResults_AndroidBuildArtifacts) GetBuildId() string {
 	if x != nil {
 		if x.xxx_hidden_BuildId != nil {
 			return *x.xxx_hidden_BuildId
@@ -288,7 +288,7 @@ func (x *BuildCheckResult_AndroidBuildArtifacts) GetBuildId() string {
 	return ""
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) GetTarget() string {
+func (x *BuildCheckResults_AndroidBuildArtifacts) GetTarget() string {
 	if x != nil {
 		if x.xxx_hidden_Target != nil {
 			return *x.xxx_hidden_Target
@@ -298,7 +298,7 @@ func (x *BuildCheckResult_AndroidBuildArtifacts) GetTarget() string {
 	return ""
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) GetBuildAttempt() string {
+func (x *BuildCheckResults_AndroidBuildArtifacts) GetBuildAttempt() string {
 	if x != nil {
 		if x.xxx_hidden_BuildAttempt != nil {
 			return *x.xxx_hidden_BuildAttempt
@@ -308,58 +308,58 @@ func (x *BuildCheckResult_AndroidBuildArtifacts) GetBuildAttempt() string {
 	return ""
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) SetBuildId(v string) {
+func (x *BuildCheckResults_AndroidBuildArtifacts) SetBuildId(v string) {
 	x.xxx_hidden_BuildId = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) SetTarget(v string) {
+func (x *BuildCheckResults_AndroidBuildArtifacts) SetTarget(v string) {
 	x.xxx_hidden_Target = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) SetBuildAttempt(v string) {
+func (x *BuildCheckResults_AndroidBuildArtifacts) SetBuildAttempt(v string) {
 	x.xxx_hidden_BuildAttempt = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) HasBuildId() bool {
+func (x *BuildCheckResults_AndroidBuildArtifacts) HasBuildId() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) HasTarget() bool {
+func (x *BuildCheckResults_AndroidBuildArtifacts) HasTarget() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) HasBuildAttempt() bool {
+func (x *BuildCheckResults_AndroidBuildArtifacts) HasBuildAttempt() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) ClearBuildId() {
+func (x *BuildCheckResults_AndroidBuildArtifacts) ClearBuildId() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_BuildId = nil
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) ClearTarget() {
+func (x *BuildCheckResults_AndroidBuildArtifacts) ClearTarget() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
 	x.xxx_hidden_Target = nil
 }
 
-func (x *BuildCheckResult_AndroidBuildArtifacts) ClearBuildAttempt() {
+func (x *BuildCheckResults_AndroidBuildArtifacts) ClearBuildAttempt() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
 	x.xxx_hidden_BuildAttempt = nil
 }
 
-type BuildCheckResult_AndroidBuildArtifacts_builder struct {
+type BuildCheckResults_AndroidBuildArtifacts_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// Android build ID.
@@ -370,8 +370,8 @@ type BuildCheckResult_AndroidBuildArtifacts_builder struct {
 	BuildAttempt *string
 }
 
-func (b0 BuildCheckResult_AndroidBuildArtifacts_builder) Build() *BuildCheckResult_AndroidBuildArtifacts {
-	m0 := &BuildCheckResult_AndroidBuildArtifacts{}
+func (b0 BuildCheckResults_AndroidBuildArtifacts_builder) Build() *BuildCheckResults_AndroidBuildArtifacts {
+	m0 := &BuildCheckResults_AndroidBuildArtifacts{}
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.BuildId != nil {
@@ -392,7 +392,7 @@ func (b0 BuildCheckResult_AndroidBuildArtifacts_builder) Build() *BuildCheckResu
 // A manifest in proto form containing key (file name) to value (CAS digest) mappings of build
 // artifacts.
 // Eg. http://shortn/_zd9o9GVYT1
-type BuildCheckResult_CasManifest struct {
+type BuildCheckResults_CasManifest struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Manifest      map[string]string      `protobuf:"bytes,1,rep,name=manifest,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	xxx_hidden_CasInstance   *string                `protobuf:"bytes,2,opt,name=cas_instance,json=casInstance,proto3,oneof"`
@@ -404,20 +404,20 @@ type BuildCheckResult_CasManifest struct {
 	sizeCache                protoimpl.SizeCache
 }
 
-func (x *BuildCheckResult_CasManifest) Reset() {
-	*x = BuildCheckResult_CasManifest{}
+func (x *BuildCheckResults_CasManifest) Reset() {
+	*x = BuildCheckResults_CasManifest{}
 	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *BuildCheckResult_CasManifest) String() string {
+func (x *BuildCheckResults_CasManifest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BuildCheckResult_CasManifest) ProtoMessage() {}
+func (*BuildCheckResults_CasManifest) ProtoMessage() {}
 
-func (x *BuildCheckResult_CasManifest) ProtoReflect() protoreflect.Message {
+func (x *BuildCheckResults_CasManifest) ProtoReflect() protoreflect.Message {
 	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -429,14 +429,14 @@ func (x *BuildCheckResult_CasManifest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *BuildCheckResult_CasManifest) GetManifest() map[string]string {
+func (x *BuildCheckResults_CasManifest) GetManifest() map[string]string {
 	if x != nil {
 		return x.xxx_hidden_Manifest
 	}
 	return nil
 }
 
-func (x *BuildCheckResult_CasManifest) GetCasInstance() string {
+func (x *BuildCheckResults_CasManifest) GetCasInstance() string {
 	if x != nil {
 		if x.xxx_hidden_CasInstance != nil {
 			return *x.xxx_hidden_CasInstance
@@ -446,7 +446,7 @@ func (x *BuildCheckResult_CasManifest) GetCasInstance() string {
 	return ""
 }
 
-func (x *BuildCheckResult_CasManifest) GetCasService() string {
+func (x *BuildCheckResults_CasManifest) GetCasService() string {
 	if x != nil {
 		if x.xxx_hidden_CasService != nil {
 			return *x.xxx_hidden_CasService
@@ -456,7 +456,7 @@ func (x *BuildCheckResult_CasManifest) GetCasService() string {
 	return ""
 }
 
-func (x *BuildCheckResult_CasManifest) GetClientVersion() string {
+func (x *BuildCheckResults_CasManifest) GetClientVersion() string {
 	if x != nil {
 		if x.xxx_hidden_ClientVersion != nil {
 			return *x.xxx_hidden_ClientVersion
@@ -466,62 +466,62 @@ func (x *BuildCheckResult_CasManifest) GetClientVersion() string {
 	return ""
 }
 
-func (x *BuildCheckResult_CasManifest) SetManifest(v map[string]string) {
+func (x *BuildCheckResults_CasManifest) SetManifest(v map[string]string) {
 	x.xxx_hidden_Manifest = v
 }
 
-func (x *BuildCheckResult_CasManifest) SetCasInstance(v string) {
+func (x *BuildCheckResults_CasManifest) SetCasInstance(v string) {
 	x.xxx_hidden_CasInstance = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
 }
 
-func (x *BuildCheckResult_CasManifest) SetCasService(v string) {
+func (x *BuildCheckResults_CasManifest) SetCasService(v string) {
 	x.xxx_hidden_CasService = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
 }
 
-func (x *BuildCheckResult_CasManifest) SetClientVersion(v string) {
+func (x *BuildCheckResults_CasManifest) SetClientVersion(v string) {
 	x.xxx_hidden_ClientVersion = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
 }
 
-func (x *BuildCheckResult_CasManifest) HasCasInstance() bool {
+func (x *BuildCheckResults_CasManifest) HasCasInstance() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *BuildCheckResult_CasManifest) HasCasService() bool {
+func (x *BuildCheckResults_CasManifest) HasCasService() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
-func (x *BuildCheckResult_CasManifest) HasClientVersion() bool {
+func (x *BuildCheckResults_CasManifest) HasClientVersion() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
-func (x *BuildCheckResult_CasManifest) ClearCasInstance() {
+func (x *BuildCheckResults_CasManifest) ClearCasInstance() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
 	x.xxx_hidden_CasInstance = nil
 }
 
-func (x *BuildCheckResult_CasManifest) ClearCasService() {
+func (x *BuildCheckResults_CasManifest) ClearCasService() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
 	x.xxx_hidden_CasService = nil
 }
 
-func (x *BuildCheckResult_CasManifest) ClearClientVersion() {
+func (x *BuildCheckResults_CasManifest) ClearClientVersion() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
 	x.xxx_hidden_ClientVersion = nil
 }
 
-type BuildCheckResult_CasManifest_builder struct {
+type BuildCheckResults_CasManifest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// Key (filename), value (CAS digest)
@@ -540,8 +540,8 @@ type BuildCheckResult_CasManifest_builder struct {
 	ClientVersion *string
 }
 
-func (b0 BuildCheckResult_CasManifest_builder) Build() *BuildCheckResult_CasManifest {
-	m0 := &BuildCheckResult_CasManifest{}
+func (b0 BuildCheckResults_CasManifest_builder) Build() *BuildCheckResults_CasManifest {
+	m0 := &BuildCheckResults_CasManifest{}
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Manifest = b.Manifest
@@ -563,30 +563,30 @@ func (b0 BuildCheckResult_CasManifest_builder) Build() *BuildCheckResult_CasMani
 // GCS path to bucket/directory containing artifacts
 // This serves as an "implicit" manifest. Clients would be expected to have
 // "well-known" artifact names under this directory
-type BuildCheckResult_GcsArtifacts struct {
-	state                       protoimpl.MessageState                          `protogen:"opaque.v1"`
-	xxx_hidden_RootDirectoryUri *string                                         `protobuf:"bytes,1,opt,name=root_directory_uri,json=rootDirectoryUri,proto3,oneof"`
-	xxx_hidden_FilesByCategory  map[string]*BuildCheckResult_GcsArtifacts_Files `protobuf:"bytes,2,rep,name=files_by_category,json=filesByCategory,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+type BuildCheckResults_GcsArtifacts struct {
+	state                       protoimpl.MessageState                           `protogen:"opaque.v1"`
+	xxx_hidden_RootDirectoryUri *string                                          `protobuf:"bytes,1,opt,name=root_directory_uri,json=rootDirectoryUri,proto3,oneof"`
+	xxx_hidden_FilesByCategory  map[string]*BuildCheckResults_GcsArtifacts_Files `protobuf:"bytes,2,rep,name=files_by_category,json=filesByCategory,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	XXX_raceDetectHookData      protoimpl.RaceDetectHookData
 	XXX_presence                [1]uint32
 	unknownFields               protoimpl.UnknownFields
 	sizeCache                   protoimpl.SizeCache
 }
 
-func (x *BuildCheckResult_GcsArtifacts) Reset() {
-	*x = BuildCheckResult_GcsArtifacts{}
+func (x *BuildCheckResults_GcsArtifacts) Reset() {
+	*x = BuildCheckResults_GcsArtifacts{}
 	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *BuildCheckResult_GcsArtifacts) String() string {
+func (x *BuildCheckResults_GcsArtifacts) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BuildCheckResult_GcsArtifacts) ProtoMessage() {}
+func (*BuildCheckResults_GcsArtifacts) ProtoMessage() {}
 
-func (x *BuildCheckResult_GcsArtifacts) ProtoReflect() protoreflect.Message {
+func (x *BuildCheckResults_GcsArtifacts) ProtoReflect() protoreflect.Message {
 	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -598,7 +598,7 @@ func (x *BuildCheckResult_GcsArtifacts) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *BuildCheckResult_GcsArtifacts) GetRootDirectoryUri() string {
+func (x *BuildCheckResults_GcsArtifacts) GetRootDirectoryUri() string {
 	if x != nil {
 		if x.xxx_hidden_RootDirectoryUri != nil {
 			return *x.xxx_hidden_RootDirectoryUri
@@ -608,35 +608,35 @@ func (x *BuildCheckResult_GcsArtifacts) GetRootDirectoryUri() string {
 	return ""
 }
 
-func (x *BuildCheckResult_GcsArtifacts) GetFilesByCategory() map[string]*BuildCheckResult_GcsArtifacts_Files {
+func (x *BuildCheckResults_GcsArtifacts) GetFilesByCategory() map[string]*BuildCheckResults_GcsArtifacts_Files {
 	if x != nil {
 		return x.xxx_hidden_FilesByCategory
 	}
 	return nil
 }
 
-func (x *BuildCheckResult_GcsArtifacts) SetRootDirectoryUri(v string) {
+func (x *BuildCheckResults_GcsArtifacts) SetRootDirectoryUri(v string) {
 	x.xxx_hidden_RootDirectoryUri = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
 }
 
-func (x *BuildCheckResult_GcsArtifacts) SetFilesByCategory(v map[string]*BuildCheckResult_GcsArtifacts_Files) {
+func (x *BuildCheckResults_GcsArtifacts) SetFilesByCategory(v map[string]*BuildCheckResults_GcsArtifacts_Files) {
 	x.xxx_hidden_FilesByCategory = v
 }
 
-func (x *BuildCheckResult_GcsArtifacts) HasRootDirectoryUri() bool {
+func (x *BuildCheckResults_GcsArtifacts) HasRootDirectoryUri() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *BuildCheckResult_GcsArtifacts) ClearRootDirectoryUri() {
+func (x *BuildCheckResults_GcsArtifacts) ClearRootDirectoryUri() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_RootDirectoryUri = nil
 }
 
-type BuildCheckResult_GcsArtifacts_builder struct {
+type BuildCheckResults_GcsArtifacts_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// The path prefix in GS under which artifacts for this build will be stored.
@@ -644,11 +644,11 @@ type BuildCheckResult_GcsArtifacts_builder struct {
 	RootDirectoryUri *string
 	// Mapping of files in the GCS bucket into different artifact categories
 	// Eg. http://shortn/_8eibPJsb7v
-	FilesByCategory map[string]*BuildCheckResult_GcsArtifacts_Files
+	FilesByCategory map[string]*BuildCheckResults_GcsArtifacts_Files
 }
 
-func (b0 BuildCheckResult_GcsArtifacts_builder) Build() *BuildCheckResult_GcsArtifacts {
-	m0 := &BuildCheckResult_GcsArtifacts{}
+func (b0 BuildCheckResults_GcsArtifacts_builder) Build() *BuildCheckResults_GcsArtifacts {
+	m0 := &BuildCheckResults_GcsArtifacts{}
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.RootDirectoryUri != nil {
@@ -661,27 +661,27 @@ func (b0 BuildCheckResult_GcsArtifacts_builder) Build() *BuildCheckResult_GcsArt
 
 // Message wrapper to allow repeated files because repeated fields cannot directly
 // be used as a map value.
-type BuildCheckResult_GcsArtifacts_Files struct {
+type BuildCheckResults_GcsArtifacts_Files struct {
 	state            protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Files []string               `protobuf:"bytes,1,rep,name=files,proto3"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
 
-func (x *BuildCheckResult_GcsArtifacts_Files) Reset() {
-	*x = BuildCheckResult_GcsArtifacts_Files{}
+func (x *BuildCheckResults_GcsArtifacts_Files) Reset() {
+	*x = BuildCheckResults_GcsArtifacts_Files{}
 	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *BuildCheckResult_GcsArtifacts_Files) String() string {
+func (x *BuildCheckResults_GcsArtifacts_Files) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BuildCheckResult_GcsArtifacts_Files) ProtoMessage() {}
+func (*BuildCheckResults_GcsArtifacts_Files) ProtoMessage() {}
 
-func (x *BuildCheckResult_GcsArtifacts_Files) ProtoReflect() protoreflect.Message {
+func (x *BuildCheckResults_GcsArtifacts_Files) ProtoReflect() protoreflect.Message {
 	mi := &file_turboci_data_build_v1_build_check_results_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -693,26 +693,26 @@ func (x *BuildCheckResult_GcsArtifacts_Files) ProtoReflect() protoreflect.Messag
 	return mi.MessageOf(x)
 }
 
-func (x *BuildCheckResult_GcsArtifacts_Files) GetFiles() []string {
+func (x *BuildCheckResults_GcsArtifacts_Files) GetFiles() []string {
 	if x != nil {
 		return x.xxx_hidden_Files
 	}
 	return nil
 }
 
-func (x *BuildCheckResult_GcsArtifacts_Files) SetFiles(v []string) {
+func (x *BuildCheckResults_GcsArtifacts_Files) SetFiles(v []string) {
 	x.xxx_hidden_Files = v
 }
 
-type BuildCheckResult_GcsArtifacts_Files_builder struct {
+type BuildCheckResults_GcsArtifacts_Files_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// Paths to files in the GCS bucket, relative to the root_directory_uri.
 	Files []string
 }
 
-func (b0 BuildCheckResult_GcsArtifacts_Files_builder) Build() *BuildCheckResult_GcsArtifacts_Files {
-	m0 := &BuildCheckResult_GcsArtifacts_Files{}
+func (b0 BuildCheckResults_GcsArtifacts_Files_builder) Build() *BuildCheckResults_GcsArtifacts_Files {
+	m0 := &BuildCheckResults_GcsArtifacts_Files{}
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Files = b.Files
@@ -723,13 +723,13 @@ var File_turboci_data_build_v1_build_check_results_proto protoreflect.FileDescri
 
 const file_turboci_data_build_v1_build_check_results_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/data/build/v1/build_check_results.proto\x12\x15turboci.data.build.v1\x1a,turboci/data/common/v1/display_message.proto\"\xa7\f\n" +
-	"\x10BuildCheckResult\x12\x1d\n" +
+	"/turboci/data/build/v1/build_check_results.proto\x12\x15turboci.data.build.v1\x1a,turboci/data/common/v1/display_message.proto\"\xaf\f\n" +
+	"\x11BuildCheckResults\x12\x1d\n" +
 	"\asuccess\x18\x01 \x01(\bH\x00R\asuccess\x88\x01\x01\x12T\n" +
-	"\x0fdisplay_message\x18\x02 \x01(\v2&.turboci.data.common.v1.DisplayMessageH\x01R\x0edisplayMessage\x88\x01\x01\x12z\n" +
-	"\x17android_build_artifacts\x18\x03 \x01(\v2=.turboci.data.build.v1.BuildCheckResult.AndroidBuildArtifactsH\x02R\x15androidBuildArtifacts\x88\x01\x01\x12[\n" +
-	"\fcas_manifest\x18\x04 \x01(\v23.turboci.data.build.v1.BuildCheckResult.CasManifestH\x03R\vcasManifest\x88\x01\x01\x12^\n" +
-	"\rgcs_artifacts\x18\x05 \x03(\v29.turboci.data.build.v1.BuildCheckResult.GcsArtifactsEntryR\fgcsArtifacts\x12\x1e\n" +
+	"\x0fdisplay_message\x18\x02 \x01(\v2&.turboci.data.common.v1.DisplayMessageH\x01R\x0edisplayMessage\x88\x01\x01\x12{\n" +
+	"\x17android_build_artifacts\x18\x03 \x01(\v2>.turboci.data.build.v1.BuildCheckResults.AndroidBuildArtifactsH\x02R\x15androidBuildArtifacts\x88\x01\x01\x12\\\n" +
+	"\fcas_manifest\x18\x04 \x01(\v24.turboci.data.build.v1.BuildCheckResults.CasManifestH\x03R\vcasManifest\x88\x01\x01\x12_\n" +
+	"\rgcs_artifacts\x18\x05 \x03(\v2:.turboci.data.build.v1.BuildCheckResults.GcsArtifactsEntryR\fgcsArtifacts\x12\x1e\n" +
 	"\bview_url\x18\x06 \x01(\tH\x04R\aviewUrl\x88\x01\x01\x1a\xa8\x01\n" +
 	"\x15AndroidBuildArtifacts\x12\x1e\n" +
 	"\bbuild_id\x18\x01 \x01(\tH\x00R\abuildId\x88\x01\x01\x12\x1b\n" +
@@ -737,9 +737,9 @@ const file_turboci_data_build_v1_build_check_results_proto_rawDesc = "" +
 	"\rbuild_attempt\x18\x03 \x01(\tH\x02R\fbuildAttempt\x88\x01\x01B\v\n" +
 	"\t_build_idB\t\n" +
 	"\a_targetB\x10\n" +
-	"\x0e_build_attempt\x1a\xd7\x02\n" +
-	"\vCasManifest\x12]\n" +
-	"\bmanifest\x18\x01 \x03(\v2A.turboci.data.build.v1.BuildCheckResult.CasManifest.ManifestEntryR\bmanifest\x12&\n" +
+	"\x0e_build_attempt\x1a\xd8\x02\n" +
+	"\vCasManifest\x12^\n" +
+	"\bmanifest\x18\x01 \x03(\v2B.turboci.data.build.v1.BuildCheckResults.CasManifest.ManifestEntryR\bmanifest\x12&\n" +
 	"\fcas_instance\x18\x02 \x01(\tH\x00R\vcasInstance\x88\x01\x01\x12$\n" +
 	"\vcas_service\x18\x03 \x01(\tH\x01R\n" +
 	"casService\x88\x01\x01\x12*\n" +
@@ -749,19 +749,19 @@ const file_turboci_data_build_v1_build_check_results_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0f\n" +
 	"\r_cas_instanceB\x0e\n" +
 	"\f_cas_serviceB\x11\n" +
-	"\x0f_client_version\x1a\xee\x02\n" +
+	"\x0f_client_version\x1a\xf0\x02\n" +
 	"\fGcsArtifacts\x121\n" +
-	"\x12root_directory_uri\x18\x01 \x01(\tH\x00R\x10rootDirectoryUri\x88\x01\x01\x12u\n" +
-	"\x11files_by_category\x18\x02 \x03(\v2I.turboci.data.build.v1.BuildCheckResult.GcsArtifacts.FilesByCategoryEntryR\x0ffilesByCategory\x1a\x1d\n" +
+	"\x12root_directory_uri\x18\x01 \x01(\tH\x00R\x10rootDirectoryUri\x88\x01\x01\x12v\n" +
+	"\x11files_by_category\x18\x02 \x03(\v2J.turboci.data.build.v1.BuildCheckResults.GcsArtifacts.FilesByCategoryEntryR\x0ffilesByCategory\x1a\x1d\n" +
 	"\x05Files\x12\x14\n" +
-	"\x05files\x18\x01 \x03(\tR\x05files\x1a~\n" +
+	"\x05files\x18\x01 \x03(\tR\x05files\x1a\x7f\n" +
 	"\x14FilesByCategoryEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12P\n" +
-	"\x05value\x18\x02 \x01(\v2:.turboci.data.build.v1.BuildCheckResult.GcsArtifacts.FilesR\x05value:\x028\x01B\x15\n" +
-	"\x13_root_directory_uri\x1au\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12Q\n" +
+	"\x05value\x18\x02 \x01(\v2;.turboci.data.build.v1.BuildCheckResults.GcsArtifacts.FilesR\x05value:\x028\x01B\x15\n" +
+	"\x13_root_directory_uri\x1av\n" +
 	"\x11GcsArtifactsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12J\n" +
-	"\x05value\x18\x02 \x01(\v24.turboci.data.build.v1.BuildCheckResult.GcsArtifactsR\x05value:\x028\x01B\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12K\n" +
+	"\x05value\x18\x02 \x01(\v25.turboci.data.build.v1.BuildCheckResults.GcsArtifactsR\x05value:\x028\x01B\n" +
 	"\n" +
 	"\b_successB\x12\n" +
 	"\x10_display_messageB\x1a\n" +
@@ -771,25 +771,25 @@ const file_turboci_data_build_v1_build_check_results_proto_rawDesc = "" +
 
 var file_turboci_data_build_v1_build_check_results_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_turboci_data_build_v1_build_check_results_proto_goTypes = []any{
-	(*BuildCheckResult)(nil),                       // 0: turboci.data.build.v1.BuildCheckResult
-	(*BuildCheckResult_AndroidBuildArtifacts)(nil), // 1: turboci.data.build.v1.BuildCheckResult.AndroidBuildArtifacts
-	(*BuildCheckResult_CasManifest)(nil),           // 2: turboci.data.build.v1.BuildCheckResult.CasManifest
-	(*BuildCheckResult_GcsArtifacts)(nil),          // 3: turboci.data.build.v1.BuildCheckResult.GcsArtifacts
-	nil,                                            // 4: turboci.data.build.v1.BuildCheckResult.GcsArtifactsEntry
-	nil,                                            // 5: turboci.data.build.v1.BuildCheckResult.CasManifest.ManifestEntry
-	(*BuildCheckResult_GcsArtifacts_Files)(nil), // 6: turboci.data.build.v1.BuildCheckResult.GcsArtifacts.Files
-	nil,                       // 7: turboci.data.build.v1.BuildCheckResult.GcsArtifacts.FilesByCategoryEntry
+	(*BuildCheckResults)(nil),                       // 0: turboci.data.build.v1.BuildCheckResults
+	(*BuildCheckResults_AndroidBuildArtifacts)(nil), // 1: turboci.data.build.v1.BuildCheckResults.AndroidBuildArtifacts
+	(*BuildCheckResults_CasManifest)(nil),           // 2: turboci.data.build.v1.BuildCheckResults.CasManifest
+	(*BuildCheckResults_GcsArtifacts)(nil),          // 3: turboci.data.build.v1.BuildCheckResults.GcsArtifacts
+	nil,                                             // 4: turboci.data.build.v1.BuildCheckResults.GcsArtifactsEntry
+	nil,                                             // 5: turboci.data.build.v1.BuildCheckResults.CasManifest.ManifestEntry
+	(*BuildCheckResults_GcsArtifacts_Files)(nil), // 6: turboci.data.build.v1.BuildCheckResults.GcsArtifacts.Files
+	nil,                       // 7: turboci.data.build.v1.BuildCheckResults.GcsArtifacts.FilesByCategoryEntry
 	(*v1.DisplayMessage)(nil), // 8: turboci.data.common.v1.DisplayMessage
 }
 var file_turboci_data_build_v1_build_check_results_proto_depIdxs = []int32{
-	8, // 0: turboci.data.build.v1.BuildCheckResult.display_message:type_name -> turboci.data.common.v1.DisplayMessage
-	1, // 1: turboci.data.build.v1.BuildCheckResult.android_build_artifacts:type_name -> turboci.data.build.v1.BuildCheckResult.AndroidBuildArtifacts
-	2, // 2: turboci.data.build.v1.BuildCheckResult.cas_manifest:type_name -> turboci.data.build.v1.BuildCheckResult.CasManifest
-	4, // 3: turboci.data.build.v1.BuildCheckResult.gcs_artifacts:type_name -> turboci.data.build.v1.BuildCheckResult.GcsArtifactsEntry
-	5, // 4: turboci.data.build.v1.BuildCheckResult.CasManifest.manifest:type_name -> turboci.data.build.v1.BuildCheckResult.CasManifest.ManifestEntry
-	7, // 5: turboci.data.build.v1.BuildCheckResult.GcsArtifacts.files_by_category:type_name -> turboci.data.build.v1.BuildCheckResult.GcsArtifacts.FilesByCategoryEntry
-	3, // 6: turboci.data.build.v1.BuildCheckResult.GcsArtifactsEntry.value:type_name -> turboci.data.build.v1.BuildCheckResult.GcsArtifacts
-	6, // 7: turboci.data.build.v1.BuildCheckResult.GcsArtifacts.FilesByCategoryEntry.value:type_name -> turboci.data.build.v1.BuildCheckResult.GcsArtifacts.Files
+	8, // 0: turboci.data.build.v1.BuildCheckResults.display_message:type_name -> turboci.data.common.v1.DisplayMessage
+	1, // 1: turboci.data.build.v1.BuildCheckResults.android_build_artifacts:type_name -> turboci.data.build.v1.BuildCheckResults.AndroidBuildArtifacts
+	2, // 2: turboci.data.build.v1.BuildCheckResults.cas_manifest:type_name -> turboci.data.build.v1.BuildCheckResults.CasManifest
+	4, // 3: turboci.data.build.v1.BuildCheckResults.gcs_artifacts:type_name -> turboci.data.build.v1.BuildCheckResults.GcsArtifactsEntry
+	5, // 4: turboci.data.build.v1.BuildCheckResults.CasManifest.manifest:type_name -> turboci.data.build.v1.BuildCheckResults.CasManifest.ManifestEntry
+	7, // 5: turboci.data.build.v1.BuildCheckResults.GcsArtifacts.files_by_category:type_name -> turboci.data.build.v1.BuildCheckResults.GcsArtifacts.FilesByCategoryEntry
+	3, // 6: turboci.data.build.v1.BuildCheckResults.GcsArtifactsEntry.value:type_name -> turboci.data.build.v1.BuildCheckResults.GcsArtifacts
+	6, // 7: turboci.data.build.v1.BuildCheckResults.GcsArtifacts.FilesByCategoryEntry.value:type_name -> turboci.data.build.v1.BuildCheckResults.GcsArtifacts.Files
 	8, // [8:8] is the sub-list for method output_type
 	8, // [8:8] is the sub-list for method input_type
 	8, // [8:8] is the sub-list for extension type_name

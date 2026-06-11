@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 from turboci.data.common.v1 import display_message_pb2 as turboci_dot_data_dot_common_dot_v1_dot_display__message__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n/turboci/data/build/v1/build_check_results.proto\x12\x15turboci.data.build.v1\x1a,turboci/data/common/v1/display_message.proto\"\xb4\n\n\x10\x42uildCheckResult\x12\x14\n\x07success\x18\x01 \x01(\x08H\x00\x88\x01\x01\x12\x44\n\x0f\x64isplay_message\x18\x02 \x01(\x0b\x32&.turboci.data.common.v1.DisplayMessageH\x01\x88\x01\x01\x12\x63\n\x17\x61ndroid_build_artifacts\x18\x03 \x01(\x0b\x32=.turboci.data.build.v1.BuildCheckResult.AndroidBuildArtifactsH\x02\x88\x01\x01\x12N\n\x0c\x63\x61s_manifest\x18\x04 \x01(\x0b\x32\x33.turboci.data.build.v1.BuildCheckResult.CasManifestH\x03\x88\x01\x01\x12P\n\rgcs_artifacts\x18\x05 \x03(\x0b\x32\x39.turboci.data.build.v1.BuildCheckResult.GcsArtifactsEntry\x12\x15\n\x08view_url\x18\x06 \x01(\tH\x04\x88\x01\x01\x1a\x89\x01\n\x15\x41ndroidBuildArtifacts\x12\x15\n\x08\x62uild_id\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x13\n\x06target\x18\x02 \x01(\tH\x01\x88\x01\x01\x12\x1a\n\rbuild_attempt\x18\x03 \x01(\tH\x02\x88\x01\x01\x42\x0b\n\t_build_idB\t\n\x07_targetB\x10\n\x0e_build_attempt\x1a\x99\x02\n\x0b\x43\x61sManifest\x12S\n\x08manifest\x18\x01 \x03(\x0b\x32\x41.turboci.data.build.v1.BuildCheckResult.CasManifest.ManifestEntry\x12\x19\n\x0c\x63\x61s_instance\x18\x02 \x01(\tH\x00\x88\x01\x01\x12\x18\n\x0b\x63\x61s_service\x18\x03 \x01(\tH\x01\x88\x01\x01\x12\x1b\n\x0e\x63lient_version\x18\x04 \x01(\tH\x02\x88\x01\x01\x1a/\n\rManifestEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0f\n\r_cas_instanceB\x0e\n\x0c_cas_serviceB\x11\n\x0f_client_version\x1a\xb8\x02\n\x0cGcsArtifacts\x12\x1f\n\x12root_directory_uri\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x64\n\x11\x66iles_by_category\x18\x02 \x03(\x0b\x32I.turboci.data.build.v1.BuildCheckResult.GcsArtifacts.FilesByCategoryEntry\x1a\x16\n\x05\x46iles\x12\r\n\x05\x66iles\x18\x01 \x03(\t\x1ar\n\x14\x46ilesByCategoryEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12I\n\x05value\x18\x02 \x01(\x0b\x32:.turboci.data.build.v1.BuildCheckResult.GcsArtifacts.Files:\x02\x38\x01\x42\x15\n\x13_root_directory_uri\x1ai\n\x11GcsArtifactsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x43\n\x05value\x18\x02 \x01(\x0b\x32\x34.turboci.data.build.v1.BuildCheckResult.GcsArtifacts:\x02\x38\x01\x42\n\n\x08_successB\x12\n\x10_display_messageB\x1a\n\x18_android_build_artifactsB\x0f\n\r_cas_manifestB\x0b\n\t_view_urlB:P\x01Z6go.chromium.org/turboci/proto/go/data/build/v1;buildpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n/turboci/data/build/v1/build_check_results.proto\x12\x15turboci.data.build.v1\x1a,turboci/data/common/v1/display_message.proto\"\xbc\n\n\x11\x42uildCheckResults\x12\x14\n\x07success\x18\x01 \x01(\x08H\x00\x88\x01\x01\x12\x44\n\x0f\x64isplay_message\x18\x02 \x01(\x0b\x32&.turboci.data.common.v1.DisplayMessageH\x01\x88\x01\x01\x12\x64\n\x17\x61ndroid_build_artifacts\x18\x03 \x01(\x0b\x32>.turboci.data.build.v1.BuildCheckResults.AndroidBuildArtifactsH\x02\x88\x01\x01\x12O\n\x0c\x63\x61s_manifest\x18\x04 \x01(\x0b\x32\x34.turboci.data.build.v1.BuildCheckResults.CasManifestH\x03\x88\x01\x01\x12Q\n\rgcs_artifacts\x18\x05 \x03(\x0b\x32:.turboci.data.build.v1.BuildCheckResults.GcsArtifactsEntry\x12\x15\n\x08view_url\x18\x06 \x01(\tH\x04\x88\x01\x01\x1a\x89\x01\n\x15\x41ndroidBuildArtifacts\x12\x15\n\x08\x62uild_id\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x13\n\x06target\x18\x02 \x01(\tH\x01\x88\x01\x01\x12\x1a\n\rbuild_attempt\x18\x03 \x01(\tH\x02\x88\x01\x01\x42\x0b\n\t_build_idB\t\n\x07_targetB\x10\n\x0e_build_attempt\x1a\x9a\x02\n\x0b\x43\x61sManifest\x12T\n\x08manifest\x18\x01 \x03(\x0b\x32\x42.turboci.data.build.v1.BuildCheckResults.CasManifest.ManifestEntry\x12\x19\n\x0c\x63\x61s_instance\x18\x02 \x01(\tH\x00\x88\x01\x01\x12\x18\n\x0b\x63\x61s_service\x18\x03 \x01(\tH\x01\x88\x01\x01\x12\x1b\n\x0e\x63lient_version\x18\x04 \x01(\tH\x02\x88\x01\x01\x1a/\n\rManifestEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0f\n\r_cas_instanceB\x0e\n\x0c_cas_serviceB\x11\n\x0f_client_version\x1a\xba\x02\n\x0cGcsArtifacts\x12\x1f\n\x12root_directory_uri\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x65\n\x11\x66iles_by_category\x18\x02 \x03(\x0b\x32J.turboci.data.build.v1.BuildCheckResults.GcsArtifacts.FilesByCategoryEntry\x1a\x16\n\x05\x46iles\x12\r\n\x05\x66iles\x18\x01 \x03(\t\x1as\n\x14\x46ilesByCategoryEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12J\n\x05value\x18\x02 \x01(\x0b\x32;.turboci.data.build.v1.BuildCheckResults.GcsArtifacts.Files:\x02\x38\x01\x42\x15\n\x13_root_directory_uri\x1aj\n\x11GcsArtifactsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x44\n\x05value\x18\x02 \x01(\x0b\x32\x35.turboci.data.build.v1.BuildCheckResults.GcsArtifacts:\x02\x38\x01\x42\n\n\x08_successB\x12\n\x10_display_messageB\x1a\n\x18_android_build_artifactsB\x0f\n\r_cas_manifestB\x0b\n\t_view_urlB:P\x01Z6go.chromium.org/turboci/proto/go/data/build/v1;buildpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,26 +33,26 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'turboci.data.build.v1.build
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'P\001Z6go.chromium.org/turboci/proto/go/data/build/v1;buildpb'
-  _globals['_BUILDCHECKRESULT_CASMANIFEST_MANIFESTENTRY']._loaded_options = None
-  _globals['_BUILDCHECKRESULT_CASMANIFEST_MANIFESTENTRY']._serialized_options = b'8\001'
-  _globals['_BUILDCHECKRESULT_GCSARTIFACTS_FILESBYCATEGORYENTRY']._loaded_options = None
-  _globals['_BUILDCHECKRESULT_GCSARTIFACTS_FILESBYCATEGORYENTRY']._serialized_options = b'8\001'
-  _globals['_BUILDCHECKRESULT_GCSARTIFACTSENTRY']._loaded_options = None
-  _globals['_BUILDCHECKRESULT_GCSARTIFACTSENTRY']._serialized_options = b'8\001'
-  _globals['_BUILDCHECKRESULT']._serialized_start=121
-  _globals['_BUILDCHECKRESULT']._serialized_end=1453
-  _globals['_BUILDCHECKRESULT_ANDROIDBUILDARTIFACTS']._serialized_start=520
-  _globals['_BUILDCHECKRESULT_ANDROIDBUILDARTIFACTS']._serialized_end=657
-  _globals['_BUILDCHECKRESULT_CASMANIFEST']._serialized_start=660
-  _globals['_BUILDCHECKRESULT_CASMANIFEST']._serialized_end=941
-  _globals['_BUILDCHECKRESULT_CASMANIFEST_MANIFESTENTRY']._serialized_start=842
-  _globals['_BUILDCHECKRESULT_CASMANIFEST_MANIFESTENTRY']._serialized_end=889
-  _globals['_BUILDCHECKRESULT_GCSARTIFACTS']._serialized_start=944
-  _globals['_BUILDCHECKRESULT_GCSARTIFACTS']._serialized_end=1256
-  _globals['_BUILDCHECKRESULT_GCSARTIFACTS_FILES']._serialized_start=1095
-  _globals['_BUILDCHECKRESULT_GCSARTIFACTS_FILES']._serialized_end=1117
-  _globals['_BUILDCHECKRESULT_GCSARTIFACTS_FILESBYCATEGORYENTRY']._serialized_start=1119
-  _globals['_BUILDCHECKRESULT_GCSARTIFACTS_FILESBYCATEGORYENTRY']._serialized_end=1233
-  _globals['_BUILDCHECKRESULT_GCSARTIFACTSENTRY']._serialized_start=1258
-  _globals['_BUILDCHECKRESULT_GCSARTIFACTSENTRY']._serialized_end=1363
+  _globals['_BUILDCHECKRESULTS_CASMANIFEST_MANIFESTENTRY']._loaded_options = None
+  _globals['_BUILDCHECKRESULTS_CASMANIFEST_MANIFESTENTRY']._serialized_options = b'8\001'
+  _globals['_BUILDCHECKRESULTS_GCSARTIFACTS_FILESBYCATEGORYENTRY']._loaded_options = None
+  _globals['_BUILDCHECKRESULTS_GCSARTIFACTS_FILESBYCATEGORYENTRY']._serialized_options = b'8\001'
+  _globals['_BUILDCHECKRESULTS_GCSARTIFACTSENTRY']._loaded_options = None
+  _globals['_BUILDCHECKRESULTS_GCSARTIFACTSENTRY']._serialized_options = b'8\001'
+  _globals['_BUILDCHECKRESULTS']._serialized_start=121
+  _globals['_BUILDCHECKRESULTS']._serialized_end=1461
+  _globals['_BUILDCHECKRESULTS_ANDROIDBUILDARTIFACTS']._serialized_start=524
+  _globals['_BUILDCHECKRESULTS_ANDROIDBUILDARTIFACTS']._serialized_end=661
+  _globals['_BUILDCHECKRESULTS_CASMANIFEST']._serialized_start=664
+  _globals['_BUILDCHECKRESULTS_CASMANIFEST']._serialized_end=946
+  _globals['_BUILDCHECKRESULTS_CASMANIFEST_MANIFESTENTRY']._serialized_start=847
+  _globals['_BUILDCHECKRESULTS_CASMANIFEST_MANIFESTENTRY']._serialized_end=894
+  _globals['_BUILDCHECKRESULTS_GCSARTIFACTS']._serialized_start=949
+  _globals['_BUILDCHECKRESULTS_GCSARTIFACTS']._serialized_end=1263
+  _globals['_BUILDCHECKRESULTS_GCSARTIFACTS_FILES']._serialized_start=1101
+  _globals['_BUILDCHECKRESULTS_GCSARTIFACTS_FILES']._serialized_end=1123
+  _globals['_BUILDCHECKRESULTS_GCSARTIFACTS_FILESBYCATEGORYENTRY']._serialized_start=1125
+  _globals['_BUILDCHECKRESULTS_GCSARTIFACTS_FILESBYCATEGORYENTRY']._serialized_end=1240
+  _globals['_BUILDCHECKRESULTS_GCSARTIFACTSENTRY']._serialized_start=1265
+  _globals['_BUILDCHECKRESULTS_GCSARTIFACTSENTRY']._serialized_end=1371
 # @@protoc_insertion_point(module_scope)
