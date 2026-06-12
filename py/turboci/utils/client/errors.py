@@ -95,4 +95,4 @@ class RPCError(Exception):
 
 
 class RetryableRPCError(RPCError):
-  pass
+  """This is an RPCError which is known to be retriable."""
