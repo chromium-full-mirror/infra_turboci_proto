@@ -8,6 +8,7 @@ from __future__ import annotations
 # Re-export all symbols from sub-modules.
 
 # go/keep-sorted start
+from turboci.utils.client.clients import *
 from turboci.utils.client.errors import *
 from turboci.utils.client.grpc_transport import *
 from turboci.utils.client.state import *
