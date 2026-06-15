@@ -19,6 +19,7 @@ from turboci.graph.orchestrator.v1 import read_workplan_request_pb2
 from turboci.graph.orchestrator.v1 import read_workplan_response_pb2
 from turboci.graph.orchestrator.v1 import write_nodes_request_pb2
 from turboci.utils import value
+from turboci.utils.client import retry
 
 __all__ = [
     'Logger',
@@ -102,14 +103,8 @@ class State:
       default_factory=value.LockedDataSource
   )
 
-  # If set, will be called when retrying exceptions.
-  #
-  # Given the attempt #, the RPC method name ($TRANSACTION for transaction
-  # retries), the request proto (None for transactions), and the exception.
-  on_retry: (
-      None
-      | typing.Callable[[int, str, message.Message | None, Exception], None]
-  ) = None
+  # Retry policy.
+  retry: retry.Retry = dataclasses.field(default_factory=retry.Retry)
 
   def _adjust_request(self, req: message.Message) -> None:
     """Hook to adjust the req before sending (e.g., injecting tokens).

@@ -11,6 +11,7 @@ from __future__ import annotations
 from turboci.utils.client.clients import *
 from turboci.utils.client.errors import *
 from turboci.utils.client.grpc_transport import *
+from turboci.utils.client.retry import *
 from turboci.utils.client.state import *
 from turboci.utils.client.transports import *
 # go/keep-sorted end

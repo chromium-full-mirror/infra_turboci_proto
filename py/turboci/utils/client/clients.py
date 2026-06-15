@@ -5,7 +5,9 @@
 
 from __future__ import annotations
 
+import asyncio
 import dataclasses
+import time
 import typing
 
 from google.protobuf import message
@@ -49,13 +51,22 @@ class Sync(state.State):
       options: transports.CallOptions | None = None,
   ) -> message.Message:
     self._adjust_request(req)
-    try:
-      rsp = self.transport.call_unary(method_name, req, options)
-      self._process_response(req, rsp)
-      return rsp
-    except Exception as e:
-      if not isinstance(e, errors.RetryableRPCError):
-        raise
+    for attempt, next_sleep_time in enumerate(self.retry.attempts()):
+      try:
+        rsp = self.transport.call_unary(method_name, req, options)
+        self._process_response(req, rsp)
+        return rsp
+      except errors.RetryableRPCError as e:
+        if next_sleep_time is None:
+          raise
+        self.logger.warning(
+            'Transient error in RPC %s, retrying (attempt %d) in %.2fs: %s',
+            method_name,
+            attempt + 1,
+            next_sleep_time,
+            e,
+        )
+        time.sleep(next_sleep_time)
     raise Exception('impossible')
 
   def create_work_plan(
@@ -137,13 +148,22 @@ class Async(state.State):
       options: transports.CallOptions | None = None,
   ) -> message.Message:
     self._adjust_request(req)
-    try:
-      rsp = await self.transport.call_unary(method_name, req, options)
-      self._process_response(req, rsp)
-      return rsp
-    except Exception as e:
-      if not isinstance(e, errors.RetryableRPCError):
-        raise
+    for attempt, next_sleep_time in enumerate(self.retry.attempts()):
+      try:
+        rsp = await self.transport.call_unary(method_name, req, options)
+        self._process_response(req, rsp)
+        return rsp
+      except errors.RetryableRPCError as e:
+        if next_sleep_time is None:
+          raise
+        self.logger.warning(
+            'Transient error in RPC %s, retrying (attempt %d) in %.2fs: %s',
+            method_name,
+            attempt + 1,
+            next_sleep_time,
+            e,
+        )
+        await asyncio.sleep(next_sleep_time)
     raise Exception('impossible')
 
   async def create_work_plan(
