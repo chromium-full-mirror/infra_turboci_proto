@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import dataclasses
+import logging
 import typing
 
 from google.protobuf import message
@@ -20,6 +21,7 @@ from turboci.graph.orchestrator.v1 import write_nodes_request_pb2
 from turboci.utils import value
 
 __all__ = [
+    'Logger',
     'State',
 ]
 
@@ -42,10 +44,40 @@ _HAS_VALUE_DATA = (
 )
 
 
+class Logger(typing.Protocol):
+  """Protocol defining the logging interface by this package.
+
+  Some downstream users of this package will need to supply a not-quite
+  logging.Logger.
+  """
+
+  def debug(self, msg: str, *args: typing.Any, **kwargs: typing.Any) -> None:
+    ...
+
+  def info(self, msg: str, *args: typing.Any, **kwargs: typing.Any) -> None:
+    ...
+
+  def warning(self, msg: str, *args: typing.Any, **kwargs: typing.Any) -> None:
+    ...
+
+  def error(self, msg: str, *args: typing.Any, **kwargs: typing.Any) -> None:
+    ...
+
+  def exception(
+      self, msg: str, *args: typing.Any, **kwargs: typing.Any
+  ) -> None:
+    ...
+
+
 @dataclasses.dataclass(kw_only=True)
 class State:
   # (required) The workplan this client is bound to.
   wpid: identifier_pb2.WorkPlan
+
+  # Logger instance for client operations and debugging.
+  logger: Logger = dataclasses.field(
+      default_factory=lambda: logging.getLogger('turboci.client')
+  )
 
   # The token to inject into outgoing responses.
   #
