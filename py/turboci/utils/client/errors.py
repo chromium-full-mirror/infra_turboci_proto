@@ -13,6 +13,8 @@ from turboci.graph.orchestrator.v1 import stage_pb2
 __all__ = [
     'RPCError',
     'RetryableRPCError',
+    'TransactionMultipleWritesError',
+    'TransactionalPreconditionError',
 ]
 
 
@@ -96,3 +98,27 @@ class RPCError(Exception):
 
 class RetryableRPCError(RPCError):
   """This is an RPCError which is known to be retriable."""
+
+
+class TransactionalPreconditionError(Exception):
+  """This is raised when the current transaction attempt cannot be completed.
+
+  This will occur on reads when a second read re-observes a node at a newer
+  state, or on writes if some of the nodes in the precondition are actually
+  at a newer state than what we observed.
+
+  The transaction runner will catch this to start the transaction callback from
+  the beginning.
+  """
+
+
+class TransactionMultipleWritesError(Exception):
+  """Multiple WriteNodes invocations were used in the same transaction attempt.
+
+  This is not allowed - all writes must be done in a single WriteNodes call
+  with the aggregated precondition.
+
+  If you need to do multiple writes, split your transaction into multiple
+  pieces, each of them independently observing the necessary precondition for
+  that write.
+  """
