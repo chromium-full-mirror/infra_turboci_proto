@@ -8,18 +8,20 @@ See http://dev.chromium.org/developers/how-tos/depottools/presubmit-scripts for
 details on the presubmit API built into `git cl`.
 """
 
-PRESUBMIT_VERSION='2.0.0'
+PRESUBMIT_VERSION = '2.0.0'
 
 ALLOWED_PREFIXES = (
-  'google.golang.org/',
-  'golang.org/'
+    'github.com/google/',
+    'golang.org/',
+    'google.golang.org/',
 )
 
 
 def CheckGoSumOnlyRequiresFirstParty(input_api, output_api):
   files = input_api.AffectedFiles(
       include_deletes=False,
-      file_filter=lambda file: file.LocalPath() == 'go/go.mod')
+      file_filter=lambda file: file.LocalPath() == 'go/go.mod',
+  )
   if not files:
     return []
 
@@ -50,11 +52,15 @@ def CheckGoSumOnlyRequiresFirstParty(input_api, output_api):
 
     ret.append(
         output_api.PresubmitError(
-            f'go.mod:{linenum+1} - bad requirement {pkg!r}'))
+            f'go.mod:{linenum+1} - bad requirement {pkg!r}'
+        )
+    )
 
   if ret:
     ret.append(
         output_api.PresubmitError(
-            f'go.mod - only require packages in {ALLOWED_PREFIXES}.'))
+            f'go.mod - only require packages in {ALLOWED_PREFIXES}.'
+        )
+    )
 
   return ret
