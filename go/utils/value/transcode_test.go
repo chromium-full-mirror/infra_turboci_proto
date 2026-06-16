@@ -16,6 +16,8 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+
+	"go.chromium.org/turboci/proto/go/internal/test/assert"
 )
 
 func TestHasUnknownFields(t *testing.T) {
@@ -29,9 +31,9 @@ func TestHasUnknownFields(t *testing.T) {
 
 		e := &emptypb.Empty{}
 
-		assertNoErr(t, proto.Unmarshal(buf, e))
+		assert.NoErr(t, proto.Unmarshal(buf, e))
 
-		assertTrue(t, hasUnknownFields(e.ProtoReflect()))
+		assert.True(t, hasUnknownFields(e.ProtoReflect()))
 	})
 
 	t.Run(`list`, func(t *testing.T) {
@@ -48,13 +50,13 @@ func TestHasUnknownFields(t *testing.T) {
 		outer = protowire.AppendBytes(outer, inner)
 
 		l := &structpb.ListValue{}
-		assertNoErr(t, proto.Unmarshal(outer, l))
+		assert.NoErr(t, proto.Unmarshal(outer, l))
 
 		newList, err := structpb.NewList([]any{1.234})
-		assertNoErr(t, err)
-		assertMatch(t, newList, l, protocmp.IgnoreUnknown())
+		assert.NoErr(t, err)
+		assert.Match(t, newList, l, protocmp.IgnoreUnknown())
 
-		assertTrue(t, hasUnknownFields(l.ProtoReflect()))
+		assert.True(t, hasUnknownFields(l.ProtoReflect()))
 	})
 
 	t.Run(`map`, func(t *testing.T) {
@@ -77,13 +79,13 @@ func TestHasUnknownFields(t *testing.T) {
 		outer = protowire.AppendBytes(outer, mapVal)
 
 		s := &structpb.Struct{}
-		assertNoErr(t, proto.Unmarshal(outer, s))
+		assert.NoErr(t, proto.Unmarshal(outer, s))
 
 		newStruct, err := structpb.NewStruct(map[string]any{"key": 1.234})
-		assertNoErr(t, err)
-		assertMatch(t, newStruct, s, protocmp.IgnoreUnknown())
+		assert.NoErr(t, err)
+		assert.Match(t, newStruct, s, protocmp.IgnoreUnknown())
 
-		assertTrue(t, hasUnknownFields(s.ProtoReflect()))
+		assert.True(t, hasUnknownFields(s.ProtoReflect()))
 	})
 
 	t.Run(`nested`, func(t *testing.T) {
@@ -110,15 +112,15 @@ func TestHasUnknownFields(t *testing.T) {
 		outer = protowire.AppendBytes(outer, structVal)
 
 		v := &structpb.Value{}
-		assertNoErr(t, proto.Unmarshal(outer, v))
+		assert.NoErr(t, proto.Unmarshal(outer, v))
 
 		newStruct, err := structpb.NewStruct(map[string]any{"key": 1.234})
-		assertNoErr(t, err)
+		assert.NoErr(t, err)
 
 		val := structpb.NewStructValue(newStruct)
-		assertMatch(t, val, v, protocmp.IgnoreUnknown())
+		assert.Match(t, val, v, protocmp.IgnoreUnknown())
 
-		assertTrue(t, hasUnknownFields(v.ProtoReflect()))
+		assert.True(t, hasUnknownFields(v.ProtoReflect()))
 	})
 }
 
@@ -133,7 +135,7 @@ func TestEnsureJSONInSource(t *testing.T) {
 
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
 
-		assertMatch(t, orchestratorpb.ValueData_JsonAny_builder{
+		assert.Match(t, orchestratorpb.ValueData_JsonAny_builder{
 			TypeUrl: proto.String(URL[*structpb.Value]()),
 			Value:   proto.String(`"hi"`),
 		}.Build(), dSrc.Retrieve(Digest(v.GetDigest())).GetJson())
@@ -149,7 +151,7 @@ func TestEnsureJSONInSource(t *testing.T) {
 
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
 
-		assertMatch(t, orchestratorpb.ValueData_JsonAny_builder{
+		assert.Match(t, orchestratorpb.ValueData_JsonAny_builder{
 			TypeUrl: proto.String(URL[*structpb.Value]()),
 			Value:   proto.String(`"hi"`),
 		}.Build(), dSrc.Retrieve(Digest(v.GetDigest())).GetJson())
@@ -166,7 +168,7 @@ func TestEnsureJSONInSource(t *testing.T) {
 		// should be a no-op
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
 
-		assertMatch(t, orchestratorpb.ValueData_JsonAny_builder{
+		assert.Match(t, orchestratorpb.ValueData_JsonAny_builder{
 			TypeUrl: proto.String(URL[*structpb.Value]()),
 			Value:   proto.String(`"hi"`),
 		}.Build(), dSrc.Retrieve(Digest(v.GetDigest())).GetJson())
@@ -182,7 +184,7 @@ func TestEnsureJSONInSource(t *testing.T) {
 		}.Build()
 
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
-		assertEqual(t, 0, len(dSrc))
+		assert.Equal(t, 0, len(dSrc))
 	})
 
 	t.Run(`unknown_fields`, func(t *testing.T) {
@@ -192,12 +194,12 @@ func TestEnsureJSONInSource(t *testing.T) {
 		v := MustInline(&emptypb.Empty{}, "proj:realm")
 
 		raw, err := proto.Marshal(structpb.NewStringValue("hi"))
-		assertNoErr(t, err)
+		assert.NoErr(t, err)
 		v.GetInline().Value = raw
 
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
 
-		assertMatch(t, orchestratorpb.ValueData_JsonAny_builder{
+		assert.Match(t, orchestratorpb.ValueData_JsonAny_builder{
 			TypeUrl:          proto.String(URL[*emptypb.Empty]()),
 			Value:            proto.String("{}"),
 			HasUnknownFields: proto.Bool(true),
@@ -217,7 +219,7 @@ func TestEnsureJSONInSource(t *testing.T) {
 
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
 
-		assertMatch(t, orchestratorpb.ValueData_builder{
+		assert.Match(t, orchestratorpb.ValueData_builder{
 			Binary:            rawData,
 			ConversionFailure: orchestratorpb.DataConversionFailure_DATA_CONVERSION_FAILURE_NO_DESCRIPTOR.Enum(),
 		}.Build(), dSrc.Retrieve(dgst))
@@ -239,7 +241,7 @@ func TestEnsureJSONInSource(t *testing.T) {
 
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
 
-		assertMatch(t, orchestratorpb.ValueData_builder{
+		assert.Match(t, orchestratorpb.ValueData_builder{
 			Binary:            emptyInline,
 			ConversionFailure: orchestratorpb.DataConversionFailure_DATA_CONVERSION_FAILURE_NO_DESCRIPTOR.Enum(),
 		}.Build(), dSrc.Retrieve(dgst))
@@ -247,7 +249,7 @@ func TestEnsureJSONInSource(t *testing.T) {
 		// A second, unrelated, inline'd Empty.
 		AbsorbAsJSON(dSrc, MustInline(&emptypb.Empty{}, "other:realm"), protojson.MarshalOptions{})
 
-		assertMatch(t, orchestratorpb.ValueData_builder{
+		assert.Match(t, orchestratorpb.ValueData_builder{
 			Binary:            emptyInline,
 			ConversionFailure: orchestratorpb.DataConversionFailure_DATA_CONVERSION_FAILURE_NO_DESCRIPTOR.Enum(),
 		}.Build(), dSrc.Retrieve(dgst))

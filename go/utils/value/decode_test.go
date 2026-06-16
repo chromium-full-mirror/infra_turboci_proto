@@ -16,6 +16,8 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+
+	"go.chromium.org/turboci/proto/go/internal/test/assert"
 )
 
 func TestDecode(t *testing.T) {
@@ -27,9 +29,9 @@ func TestDecode(t *testing.T) {
 		vref := MustInline(structpb.NewStringValue("hi"), "proj:realm")
 
 		sval, err := Decode[*structpb.Value](nil, vref)
-		assertNoErr(t, err)
+		assert.NoErr(t, err)
 
-		assertMatch(t, structpb.NewStringValue("hi"), sval)
+		assert.Match(t, structpb.NewStringValue("hi"), sval)
 	})
 
 	t.Run(`ok_source`, func(t *testing.T) {
@@ -40,12 +42,12 @@ func TestDecode(t *testing.T) {
 		dSrc := SimpleDataSource{}
 		AbsorbInline(dSrc, vref)
 
-		assertTrue(t, vref.HasDigest())
+		assert.True(t, vref.HasDigest())
 
 		sval, err := Decode[*structpb.Value](dSrc, vref)
-		assertNoErr(t, err)
+		assert.NoErr(t, err)
 
-		assertMatch(t, structpb.NewStringValue("hi"), sval)
+		assert.Match(t, structpb.NewStringValue("hi"), sval)
 	})
 
 	t.Run(`ok_source_json`, func(t *testing.T) {
@@ -56,13 +58,13 @@ func TestDecode(t *testing.T) {
 		dSrc := SimpleDataSource{}
 		AbsorbAsJSON(dSrc, vref, protojson.MarshalOptions{})
 
-		assertTrue(t, vref.HasDigest())
-		assertTrue(t, dSrc.Retrieve(Digest(vref.GetDigest())).HasJson())
+		assert.True(t, vref.HasDigest())
+		assert.True(t, dSrc.Retrieve(Digest(vref.GetDigest())).HasJson())
 
 		sval, err := Decode[*structpb.Value](dSrc, vref)
-		assertNoErr(t, err)
+		assert.NoErr(t, err)
 
-		assertMatch(t, structpb.NewStringValue("hi"), sval)
+		assert.Match(t, structpb.NewStringValue("hi"), sval)
 	})
 
 	t.Run(`missing`, func(t *testing.T) {
@@ -76,8 +78,8 @@ func TestDecode(t *testing.T) {
 		dSrc := SimpleDataSource{}
 
 		sval, err := Decode[*structpb.Value](dSrc, vref)
-		assertNoErr(t, err)
-		assertNil(t, sval)
+		assert.NoErr(t, err)
+		assert.Nil(t, sval)
 	})
 
 	t.Run(`mismatch`, func(t *testing.T) {
@@ -91,7 +93,7 @@ func TestDecode(t *testing.T) {
 		dSrc := SimpleDataSource{}
 
 		_, err := Decode[*structpb.Value](dSrc, vref)
-		assertErrLike(t, err, "mismatched types")
+		assert.ErrLike(t, err, "mismatched types")
 	})
 }
 
@@ -109,16 +111,16 @@ func TestLookup(t *testing.T) {
 	AbsorbInline(dSrc, options[0]) // bool
 
 	valGot, err := Lookup[*structpb.Value](dSrc, options)
-	assertNoErr(t, err)
-	assertMatch(t, structpb.NewStringValue("hey"), valGot)
+	assert.NoErr(t, err)
+	assert.Match(t, structpb.NewStringValue("hey"), valGot)
 
 	boolGot, err := Lookup[*wrapperspb.BoolValue](dSrc, options)
-	assertNoErr(t, err)
-	assertMatch(t, wrapperspb.Bool(true), boolGot)
+	assert.NoErr(t, err)
+	assert.Match(t, wrapperspb.Bool(true), boolGot)
 
 	missing, err := Lookup[*wrapperspb.StringValue](dSrc, options)
-	assertNoErr(t, err)
-	assertNil(t, missing)
+	assert.NoErr(t, err)
+	assert.Nil(t, missing)
 }
 
 func TestFind(t *testing.T) {
@@ -148,16 +150,16 @@ func TestFind(t *testing.T) {
 	AbsorbInline(dSrc, options[0]) // bool
 
 	valGot := Find(options, URL[*structpb.Value]())
-	assertMatch(t, MustInline(structpb.NewStringValue("hey"), "proj:realm"), valGot)
+	assert.Match(t, MustInline(structpb.NewStringValue("hey"), "proj:realm"), valGot)
 
 	boolGot := Find(options, URL[*wrapperspb.BoolValue]())
-	assertMatch(t, options[0], boolGot)
+	assert.Match(t, options[0], boolGot)
 
 	missing := Find(options, URL[*wrapperspb.StringValue]())
-	assertNil(t, missing)
+	assert.Nil(t, missing)
 
 	emptyGot := Find(options, URL[*emptypb.Empty]())
-	assertMatch(t, MustInline(&emptypb.Empty{}, "proj:other_realm"), emptyGot)
+	assert.Match(t, MustInline(&emptypb.Empty{}, "proj:other_realm"), emptyGot)
 }
 
 func TestResults(t *testing.T) {
@@ -168,7 +170,7 @@ func TestResults(t *testing.T) {
 		for _, ref := range refs {
 			ok := false
 			ret, ok = AddByTypeIn(ret, ref)
-			assertTrue(t, ok)
+			assert.True(t, ok)
 		}
 		return ret
 	}
@@ -200,25 +202,25 @@ func TestResults(t *testing.T) {
 	}.Build()
 
 	emptyRslts, err := Results[*emptypb.Empty](nil, check)
-	assertNoErr(t, err)
-	assertLen(t, emptyRslts, 3)
+	assert.NoErr(t, err)
+	assert.Len(t, emptyRslts, 3)
 
 	boolRslts, err := Results[*wrapperspb.BoolValue](nil, check)
-	assertNoErr(t, err)
-	assertMatch(t, []*wrapperspb.BoolValue{
+	assert.NoErr(t, err)
+	assert.Match(t, []*wrapperspb.BoolValue{
 		wrapperspb.Bool(true),
 		wrapperspb.Bool(false),
 	}, boolRslts)
 
 	strResults, err := Results[*wrapperspb.StringValue](nil, check)
-	assertNoErr(t, err)
-	assertMatch(t, []*wrapperspb.StringValue{
+	assert.NoErr(t, err)
+	assert.Match(t, []*wrapperspb.StringValue{
 		wrapperspb.String("hey"),
 		wrapperspb.String("norp"),
 		wrapperspb.String("dorp"),
 	}, strResults)
 
 	intResults, err := Results[*wrapperspb.Int32Value](nil, check)
-	assertNoErr(t, err)
-	assertEmpty(t, intResults)
+	assert.NoErr(t, err)
+	assert.Empty(t, intResults)
 }

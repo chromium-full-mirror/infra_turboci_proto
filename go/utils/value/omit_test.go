@@ -11,6 +11,8 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+
+	"go.chromium.org/turboci/proto/go/internal/test/assert"
 )
 
 func TestOmit(t *testing.T) {
@@ -22,7 +24,7 @@ func TestOmit(t *testing.T) {
 		ref := MustInline(structpb.NewStringValue("hi"), "proj:realm")
 		Omit(ref, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED)
 
-		assertMatch(t, orchestratorpb.ValueRef_builder{
+		assert.Match(t, orchestratorpb.ValueRef_builder{
 			TypeUrl:    proto.String(URL[*structpb.Value]()),
 			Digest:     proto.String("E4Va4xxp3BGN61fY0u4azK_FAF7_dA4-X58V7IkJrsgxAQ"),
 			OmitReason: orchestratorpb.OmitReason_OMIT_REASON_UNWANTED.Enum(),
@@ -36,7 +38,7 @@ func TestOmit(t *testing.T) {
 		ref := MustInline(structpb.NewStringValue("hi"), "proj:realm")
 		Omit(ref, orchestratorpb.OmitReason_OMIT_REASON_NO_ACCESS)
 
-		assertMatch(t, orchestratorpb.ValueRef_builder{
+		assert.Match(t, orchestratorpb.ValueRef_builder{
 			TypeUrl:    proto.String(URL[*structpb.Value]()),
 			OmitReason: orchestratorpb.OmitReason_OMIT_REASON_NO_ACCESS.Enum(),
 			Realm:      proto.String("proj:realm"),
@@ -52,7 +54,7 @@ func TestOmit(t *testing.T) {
 
 		Omit(ref, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED)
 
-		assertMatch(t, orchestratorpb.ValueRef_builder{
+		assert.Match(t, orchestratorpb.ValueRef_builder{
 			TypeUrl:    proto.String(URL[*structpb.Value]()),
 			Digest:     proto.String("E4Va4xxp3BGN61fY0u4azK_FAF7_dA4-X58V7IkJrsgxAQ"),
 			OmitReason: orchestratorpb.OmitReason_OMIT_REASON_UNWANTED.Enum().Enum(),
@@ -69,7 +71,7 @@ func TestOmit(t *testing.T) {
 
 		Omit(ref, orchestratorpb.OmitReason_OMIT_REASON_NO_ACCESS)
 
-		assertMatch(t, orchestratorpb.ValueRef_builder{
+		assert.Match(t, orchestratorpb.ValueRef_builder{
 			TypeUrl:    proto.String(URL[*structpb.Value]()),
 			OmitReason: orchestratorpb.OmitReason_OMIT_REASON_NO_ACCESS.Enum(),
 			Realm:      proto.String("proj:realm"),

@@ -16,6 +16,8 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+
+	"go.chromium.org/turboci/proto/go/internal/test/assert"
 )
 
 func TestComputeDigest(t *testing.T) {
@@ -48,31 +50,31 @@ func TestComputeDigest(t *testing.T) {
 			t.Parallel()
 
 			apb, err := anypb.New(tc.msg)
-			assertNoErr(t, err)
+			assert.NoErr(t, err)
 
 			dgst := ComputeDigest(apb)
-			assertEqual(t, tc.want, dgst)
+			assert.Equal(t, tc.want, dgst)
 
 			dgstPb, err := dgst.ToProto()
-			assertNoErr(t, err)
+			assert.NoErr(t, err)
 
 			wantSize := proto.Size(apb)
 			enc, err := proto.Marshal(apb)
-			assertNoErr(t, err)
-			assertEqual(t, wantSize, len(enc))
+			assert.NoErr(t, err)
+			assert.Equal(t, wantSize, len(enc))
 
 			detEnc := DeterministicallySerializeAny(apb)
-			assertLen(t, detEnc, wantSize)
+			assert.Len(t, detEnc, wantSize)
 
 			dec := &anypb.Any{}
-			assertNoErr(t, proto.Unmarshal(detEnc, dec))
+			assert.NoErr(t, proto.Unmarshal(detEnc, dec))
 
-			assertTrue(t, proto.Equal(dec, apb))
+			assert.True(t, proto.Equal(dec, apb))
 
 			sha := sha256.Sum256(detEnc)
-			assertMatch(t, sha[:], dgstPb.GetHash())
+			assert.Match(t, sha[:], dgstPb.GetHash())
 
-			assertEqual(t, uint64(wantSize), dgstPb.GetSizeBytes())
+			assert.Equal(t, uint64(wantSize), dgstPb.GetSizeBytes())
 		})
 	}
 }
@@ -123,7 +125,7 @@ func TestDigestToProtoErrors(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			_, err := tc.digest.ToProto()
-			assertErrLike(t, err, tc.wantErr)
+			assert.ErrLike(t, err, tc.wantErr)
 		})
 	}
 }

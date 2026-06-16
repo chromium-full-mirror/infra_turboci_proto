@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package value
+package assert
 
 import (
 	"reflect"
@@ -13,17 +13,17 @@ import (
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
-// assertNoErr fails the test fatally if err is not nil.
-func assertNoErr(t *testing.T, err error) {
+// NoErr fails the test fatally if err is not nil.
+func NoErr(t *testing.T, err error) {
 	t.Helper()
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 }
 
-// assertErrLike fails the test fatally if err is nil or does not contain the
+// ErrLike fails the test fatally if err is nil or does not contain the
 // expected substring.
-func assertErrLike(t *testing.T, err error, substr string) {
+func ErrLike(t *testing.T, err error, substr string) {
 	t.Helper()
 	if err == nil {
 		t.Fatalf("Expected error containing %q, got nil", substr)
@@ -33,18 +33,18 @@ func assertErrLike(t *testing.T, err error, substr string) {
 	}
 }
 
-// assertEqual fails the test if got != want (using simple comparison).
-func assertEqual[T comparable](t *testing.T, want, got T) {
+// Equal fails the test if got != want (using simple comparison).
+func Equal[T comparable](t *testing.T, want, got T) {
 	t.Helper()
 	if got != want {
 		t.Errorf("Mismatch:\nwant: %v\ngot:  %v", want, got)
 	}
 }
 
-// assertMatch fails the test if got and want do not match.
+// Match fails the test if got and want do not match.
 // It uses go-cmp and automatically handles proto messages correctly.
 // Additional cmp.Options can be passed (e.g., protocmp.IgnoreUnknown()).
-func assertMatch(t *testing.T, want, got any, opts ...cmp.Option) {
+func Match(t *testing.T, want, got any, opts ...cmp.Option) {
 	t.Helper()
 	allOpts := append([]cmp.Option{protocmp.Transform()}, opts...)
 	if diff := cmp.Diff(want, got, allOpts...); diff != "" {
@@ -52,40 +52,40 @@ func assertMatch(t *testing.T, want, got any, opts ...cmp.Option) {
 	}
 }
 
-// assertTrue fails the test if val is false.
-func assertTrue(t *testing.T, val bool) {
+// True fails the test if val is false.
+func True(t *testing.T, val bool) {
 	t.Helper()
 	if !val {
 		t.Error("Expected true, got false")
 	}
 }
 
-// assertFalse fails the test if val is true.
-func assertFalse(t *testing.T, val bool) {
+// False fails the test if val is true.
+func False(t *testing.T, val bool) {
 	t.Helper()
 	if val {
 		t.Error("Expected false, got true")
 	}
 }
 
-// assertNil fails the test if val is not nil.
-func assertNil(t *testing.T, val any) {
+// Nil fails the test if val is not nil.
+func Nil(t *testing.T, val any) {
 	t.Helper()
 	if !isNil(val) {
 		t.Errorf("Expected nil, got: %v", val)
 	}
 }
 
-// assertLen fails the test if the length of got is not want.
-func assertLen[T any](t *testing.T, got []T, want int) {
+// Len fails the test if the length of got is not want.
+func Len[T any](t *testing.T, got []T, want int) {
 	t.Helper()
 	if len(got) != want {
 		t.Errorf("Expected length %d, got %d: %v", want, len(got), got)
 	}
 }
 
-// assertEmpty fails the test if got is not empty.
-func assertEmpty[T any](t *testing.T, got []T) {
+// Empty fails the test if got is not empty.
+func Empty[T any](t *testing.T, got []T) {
 	t.Helper()
 	if len(got) != 0 {
 		t.Errorf("Expected empty, got length %d: %v", len(got), got)

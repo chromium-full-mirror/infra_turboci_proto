@@ -12,13 +12,15 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+
+	"go.chromium.org/turboci/proto/go/internal/test/assert"
 )
 
 func TestSetAddIn(t *testing.T) {
 	t.Parallel()
 
 	s, err := structpb.NewStruct(map[string]any{"hello": "world"})
-	assertNoErr(t, err)
+	assert.NoErr(t, err)
 
 	toSet := []*orchestratorpb.ValueRef{
 		// NOTE: BoolValue and StringValue are the same proto message type.
@@ -35,31 +37,31 @@ func TestSetAddIn(t *testing.T) {
 	for _, ref := range toSet {
 		var realmConflict bool
 		set, realmConflict = SetByTypeIn(set, ref)
-		assertFalse(t, realmConflict)
+		assert.False(t, realmConflict)
 	}
 
-	assertMatch(t, []*orchestratorpb.ValueRef{
+	assert.Match(t, []*orchestratorpb.ValueRef{
 		MustInline(&emptypb.Empty{}, "proj:realm"),
 		MustInline(s, "proj:realm"),
 		MustInline(structpb.NewStringValue("goodbye"), "proj:realm"),
 	}, set)
 
 	set, realmConflict := SetByTypeIn(set, MustInline(structpb.NewBoolValue(false), "other:realm"))
-	assertTrue(t, realmConflict)
+	assert.True(t, realmConflict)
 
-	assertMatch(t, []*orchestratorpb.ValueRef{
+	assert.Match(t, []*orchestratorpb.ValueRef{
 		MustInline(&emptypb.Empty{}, "proj:realm"),
 		MustInline(s, "proj:realm"),
 		MustInline(structpb.NewStringValue("goodbye"), "proj:realm"),
 	}, set)
 
 	set, added := AddByTypeIn(set, MustInline(structpb.NewBoolValue(true), "proj:realm"))
-	assertFalse(t, added)
+	assert.False(t, added)
 
 	set, added = AddByTypeIn(set, MustInline(&wrapperspb.BoolValue{Value: true}, "proj:realm"))
-	assertTrue(t, added)
+	assert.True(t, added)
 
-	assertMatch(t, []*orchestratorpb.ValueRef{
+	assert.Match(t, []*orchestratorpb.ValueRef{
 		MustInline(&wrapperspb.BoolValue{Value: true}, "proj:realm"),
 		MustInline(&emptypb.Empty{}, "proj:realm"),
 		MustInline(s, "proj:realm"),

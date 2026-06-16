@@ -12,6 +12,8 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+
+	"go.chromium.org/turboci/proto/go/internal/test/assert"
 )
 
 func TestWrite(t *testing.T) {
@@ -21,8 +23,8 @@ func TestWrite(t *testing.T) {
 		t.Parallel()
 
 		vw, err := Write(&emptypb.Empty{})
-		assertNoErr(t, err)
-		assertMatch(t, orchestratorpb.ValueWrite_builder{
+		assert.NoErr(t, err)
+		assert.Match(t, orchestratorpb.ValueWrite_builder{
 			Data:  &anypb.Any{TypeUrl: URL[*emptypb.Empty]()},
 			Realm: proto.String(RealmFromContainer),
 		}.Build(), vw)
@@ -32,8 +34,8 @@ func TestWrite(t *testing.T) {
 		t.Parallel()
 
 		vw, err := Write(&emptypb.Empty{}, "project:realm")
-		assertNoErr(t, err)
-		assertMatch(t, orchestratorpb.ValueWrite_builder{
+		assert.NoErr(t, err)
+		assert.Match(t, orchestratorpb.ValueWrite_builder{
 			Data:  &anypb.Any{TypeUrl: URL[*emptypb.Empty]()},
 			Realm: proto.String("project:realm"),
 		}.Build(), vw)
@@ -43,13 +45,13 @@ func TestWrite(t *testing.T) {
 		t.Parallel()
 
 		_, err := Write(&emptypb.Empty{}, "project:realm", "what")
-		assertErrLike(t, err, "realm provided more than once")
+		assert.ErrLike(t, err, "realm provided more than once")
 	})
 
 	t.Run(`err_any`, func(t *testing.T) {
 		t.Parallel()
 
 		_, err := Write(&anypb.Any{})
-		assertErrLike(t, err, "cannot handle google.protobuf.Any")
+		assert.ErrLike(t, err, "cannot handle google.protobuf.Any")
 	})
 }

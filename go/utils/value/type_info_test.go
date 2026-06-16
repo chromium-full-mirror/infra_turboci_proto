@@ -13,6 +13,8 @@ import (
 
 	commonpb "go.chromium.org/turboci/proto/go/data/common/v1"
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+
+	"go.chromium.org/turboci/proto/go/internal/test/assert"
 )
 
 func TestMakeTypeMatcher(t *testing.T) {
@@ -151,19 +153,19 @@ func TestMakeTypeMatcher(t *testing.T) {
 				TypeUrls: tc.urls,
 			}.Build())
 			if tc.wantErr != "" {
-				assertErrLike(t, err, tc.wantErr)
+				assert.ErrLike(t, err, tc.wantErr)
 				return
 			}
 
-			assertLen(t, matcher.patterns, tc.wantN)
+			assert.Len(t, matcher.patterns, tc.wantN)
 
-			assertNoErr(t, err)
+			assert.NoErr(t, err)
 
 			for _, matchCandidate := range tc.matches {
-				assertTrue(t, matcher.Match(matchCandidate))
+				assert.True(t, matcher.Match(matchCandidate))
 			}
 			for _, rejectCandidate := range tc.rejects {
-				assertFalse(t, matcher.Match(rejectCandidate))
+				assert.False(t, matcher.Match(rejectCandidate))
 			}
 		})
 	}
@@ -176,16 +178,16 @@ func TestTypeSetBuilder(t *testing.T) {
 		t.Parallel()
 
 		tb, err := TypeSetBuilder{}.Build()
-		assertNoErr(t, err)
-		assertNil(t, tb)
+		assert.NoErr(t, err)
+		assert.Nil(t, tb)
 	})
 
 	t.Run(`fixed`, func(t *testing.T) {
 		t.Parallel()
 
 		tb, err := TypeSetBuilder{}.WithMessages(&emptypb.Empty{}, &structpb.Struct{}).Build()
-		assertNoErr(t, err)
-		assertLen(t, tb.GetTypeUrls(), 2)
+		assert.NoErr(t, err)
+		assert.Len(t, tb.GetTypeUrls(), 2)
 	})
 
 	t.Run(`normalized`, func(t *testing.T) {
@@ -195,8 +197,8 @@ func TestTypeSetBuilder(t *testing.T) {
 			WithMessages(&emptypb.Empty{}, &structpb.Struct{}).
 			WithPackagesOf(&structpb.ListValue{}).
 			Build())
-		assertNoErr(t, err)
-		assertLen(t, tb.GetTypeUrls(), 1)
-		assertEqual(t, TypePrefix+"google.protobuf.*", tb.GetTypeUrls()[0])
+		assert.NoErr(t, err)
+		assert.Len(t, tb.GetTypeUrls(), 1)
+		assert.Equal(t, TypePrefix+"google.protobuf.*", tb.GetTypeUrls()[0])
 	})
 }

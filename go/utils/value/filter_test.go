@@ -12,6 +12,8 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+
+	"go.chromium.org/turboci/proto/go/internal/test/assert"
 )
 
 // Tests [filterState.filterRef] by virtue of Stage.Args.
@@ -42,14 +44,14 @@ func TestFilterRef(t *testing.T) {
 	}.Build()
 
 	filter, err := ParseFilter(vf)
-	assertNoErr(t, err)
+	assert.NoErr(t, err)
 
 	t.Run(`want_binary_inline`, func(t *testing.T) {
 		ref := makeRef(t, nil, structpb.NewBoolValue(true))
 		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
-		assertNoErr(t, err)
-		assertEqual(t, orchestratorpb.OmitReason(0), ref.GetOmitReason())
-		assertFalse(t, wantJSON)
+		assert.NoErr(t, err)
+		assert.Equal(t, orchestratorpb.OmitReason(0), ref.GetOmitReason())
+		assert.False(t, wantJSON)
 	})
 
 	t.Run(`want_binary_remote`, func(t *testing.T) {
@@ -58,53 +60,53 @@ func TestFilterRef(t *testing.T) {
 		dgst := "nP03LSTuMLuLfYp94hWnwHOj2kT2Pg_DikrWVQk2tJ4vAQ"
 
 		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
-		assertNoErr(t, err)
-		assertEqual(t, dgst, ref.GetDigest())
-		assertFalse(t, wantJSON)
+		assert.NoErr(t, err)
+		assert.Equal(t, dgst, ref.GetDigest())
+		assert.False(t, wantJSON)
 	})
 
 	t.Run(`want_json_inline`, func(t *testing.T) {
 		lst, err := structpb.NewList([]any{true})
-		assertNoErr(t, err)
+		assert.NoErr(t, err)
 		ref := makeRef(t, nil, lst)
 
 		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
-		assertNoErr(t, err)
-		assertEqual(t, orchestratorpb.OmitReason(0), ref.GetOmitReason())
-		assertTrue(t, wantJSON)
+		assert.NoErr(t, err)
+		assert.Equal(t, orchestratorpb.OmitReason(0), ref.GetOmitReason())
+		assert.True(t, wantJSON)
 	})
 
 	t.Run(`want_json_remote`, func(t *testing.T) {
 		mSrc := SimpleDataSource{}
 		lst, err := structpb.NewList([]any{true})
-		assertNoErr(t, err)
+		assert.NoErr(t, err)
 
 		ref := makeRef(t, mSrc, lst)
 		dgst := "TiL2hG12z5bCnO-q4sXjaMqObIM7ZeZNAYcHd56bTRE1AQ"
 
 		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
-		assertNoErr(t, err)
-		assertEqual(t, orchestratorpb.OmitReason(0), ref.GetOmitReason())
-		assertTrue(t, wantJSON)
+		assert.NoErr(t, err)
+		assert.Equal(t, orchestratorpb.OmitReason(0), ref.GetOmitReason())
+		assert.True(t, wantJSON)
 
-		assertEqual(t, dgst, ref.GetDigest())
+		assert.Equal(t, dgst, ref.GetDigest())
 	})
 
 	t.Run(`want_no_access`, func(t *testing.T) {
 		ref := makeRef(t, nil, structpb.NewBoolValue(true))
 
 		filter, err := ParseFilter(vf)
-		assertNoErr(t, err)
+		assert.NoErr(t, err)
 
 		wantJSON, err := filter.Apply(StageArgsSlot, ref, func(realm string) (bool, error) {
 			return false, nil
 		})
-		assertNoErr(t, err)
-		assertEqual(t, orchestratorpb.OmitReason_OMIT_REASON_NO_ACCESS, ref.GetOmitReason())
-		assertFalse(t, wantJSON)
+		assert.NoErr(t, err)
+		assert.Equal(t, orchestratorpb.OmitReason_OMIT_REASON_NO_ACCESS, ref.GetOmitReason())
+		assert.False(t, wantJSON)
 
-		assertFalse(t, ref.HasDigest())
-		assertFalse(t, ref.HasInline())
+		assert.False(t, ref.HasDigest())
+		assert.False(t, ref.HasInline())
 	})
 
 	t.Run(`unwant_structural_inline`, func(t *testing.T) {
@@ -112,17 +114,17 @@ func TestFilterRef(t *testing.T) {
 		vf.ClearStageArgs()
 
 		filter, err := ParseFilter(vf)
-		assertNoErr(t, err)
+		assert.NoErr(t, err)
 
 		ref := makeRef(t, nil, structpb.NewBoolValue(true))
 
 		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
-		assertNoErr(t, err)
-		assertEqual(t, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED, ref.GetOmitReason())
-		assertFalse(t, wantJSON)
+		assert.NoErr(t, err)
+		assert.Equal(t, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED, ref.GetOmitReason())
+		assert.False(t, wantJSON)
 
-		assertEqual(t, "nP03LSTuMLuLfYp94hWnwHOj2kT2Pg_DikrWVQk2tJ4vAQ", ref.GetDigest())
-		assertFalse(t, ref.HasInline())
+		assert.Equal(t, "nP03LSTuMLuLfYp94hWnwHOj2kT2Pg_DikrWVQk2tJ4vAQ", ref.GetDigest())
+		assert.False(t, ref.HasInline())
 	})
 
 	t.Run(`unwant_structural_remote`, func(t *testing.T) {
@@ -130,19 +132,19 @@ func TestFilterRef(t *testing.T) {
 		vf.ClearStageArgs()
 
 		filter, err := ParseFilter(vf)
-		assertNoErr(t, err)
+		assert.NoErr(t, err)
 
 		mSrc := SimpleDataSource{}
 
 		ref := makeRef(t, mSrc, structpb.NewBoolValue(true))
 
 		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
-		assertNoErr(t, err)
-		assertEqual(t, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED, ref.GetOmitReason())
-		assertFalse(t, wantJSON)
+		assert.NoErr(t, err)
+		assert.Equal(t, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED, ref.GetOmitReason())
+		assert.False(t, wantJSON)
 
-		assertEqual(t, "nP03LSTuMLuLfYp94hWnwHOj2kT2Pg_DikrWVQk2tJ4vAQ", ref.GetDigest())
-		assertFalse(t, ref.HasInline())
+		assert.Equal(t, "nP03LSTuMLuLfYp94hWnwHOj2kT2Pg_DikrWVQk2tJ4vAQ", ref.GetDigest())
+		assert.False(t, ref.HasInline())
 	})
 
 	t.Run(`unwant_type_inline`, func(t *testing.T) {
@@ -151,23 +153,23 @@ func TestFilterRef(t *testing.T) {
 		ref.GetInline().TypeUrl = TypePrefix + "bogus.namespace.Message"
 
 		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
-		assertNoErr(t, err)
-		assertEqual(t, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED, ref.GetOmitReason())
-		assertFalse(t, wantJSON)
+		assert.NoErr(t, err)
+		assert.Equal(t, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED, ref.GetOmitReason())
+		assert.False(t, wantJSON)
 
-		assertEqual(t, "hvSVT6KdvPHO0-h55_J5by3wAe3u5ymMnl0ColX35QkxAQ", ref.GetDigest())
-		assertFalse(t, ref.HasInline())
+		assert.Equal(t, "hvSVT6KdvPHO0-h55_J5by3wAe3u5ymMnl0ColX35QkxAQ", ref.GetDigest())
+		assert.False(t, ref.HasInline())
 	})
 
 	t.Run(`auth_error`, func(t *testing.T) {
 		ref := makeRef(t, nil, structpb.NewBoolValue(true))
 
 		filter, err := ParseFilter(vf)
-		assertNoErr(t, err)
+		assert.NoErr(t, err)
 
 		_, err = filter.Apply(StageArgsSlot, ref, func(realm string) (bool, error) {
 			return false, errors.New("oh no auth exploded")
 		})
-		assertErrLike(t, err, "oh no auth exploded")
+		assert.ErrLike(t, err, "oh no auth exploded")
 	})
 }
