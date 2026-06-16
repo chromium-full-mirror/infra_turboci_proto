@@ -42,11 +42,13 @@ _env['PATH'] = os.path.pathsep.join(
 )
 
 
-def check_output(cmd: list[str | Path]) -> str | NoReturn:
+def check_output(
+    cmd: list[str | Path], *, cwd: Path = _RepoRoot
+) -> str | NoReturn:
   print(f"running: {' '.join(str(c) for c in cmd)}")
   with subprocess.Popen(
       cmd,
-      cwd=_RepoRoot,
+      cwd=cwd,
       env=_env,
       stdout=subprocess.PIPE,
       stderr=sys.stderr,
@@ -58,14 +60,14 @@ def check_output(cmd: list[str | Path]) -> str | NoReturn:
     return out
 
 
-def check_call(cmd: list[str | Path]):
+def check_call(cmd: list[str | Path], *, cwd: Path = _RepoRoot):
   scmd: list[str] = [str(x) for x in cmd]
   if len(scmd) == 2 and scmd[0] == 'protoc' and scmd[1].startswith('@'):
     with open(scmd[1][1:], encoding='utf-8') as args:
       print(f'running: protoc {args.read()}')
   else:
     print(f"running: {' '.join(str(c) for c in scmd)}")
-  ret = subprocess.call(scmd, cwd=_RepoRoot, env=_env)
+  ret = subprocess.call(scmd, cwd=cwd, env=_env)
   if ret != 0:
     sys.exit(ret)
 
@@ -458,6 +460,14 @@ def task_install_venv_link():
   link.symlink_to(sys.prefix, target_is_directory=True)
 
 
+def task_test_go(verbose: None | str = None):
+  """Runs python unittests."""
+  args = ['go', 'test', 'go.chromium.org/turboci/proto/go/...']
+  if verbose in ('-v', '--verbose'):
+    args.append('-v')
+  check_call(args, cwd=_RepoRoot / 'go')
+
+
 def task_all():
   """Shorthand to run all presubmit checks."""
   fail = False
@@ -484,6 +494,7 @@ def task_all():
         task_store_descriptors,
         task_test_python,
         task_install_venv_link,
+        task_test_go,
     )
 
     for i, fn in enumerate(allTasks):

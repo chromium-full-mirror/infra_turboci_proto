@@ -10,8 +10,7 @@ details on the presubmit API built into `git cl`.
 
 from itertools import chain
 
-
-PRESUBMIT_VERSION='2.0.0'
+PRESUBMIT_VERSION = '2.0.0'
 
 BACKWARDS_COMPAT_FOOTER = 'Breaking-Proto-Change-Ok'
 
@@ -39,16 +38,20 @@ def CheckProtoBackwardCompatibility(input_api, output_api):
     reason = '> ' + '\n> '.join(reasons)
     to_add.append(
         output_api.PresubmitPromptWarning(
-            "Ignored `build.py breaking` result due to "
-            f"{BACKWARDS_COMPAT_FOOTER} in CL description. Reason:"
-            f"\n{reason}"))
+            'Ignored `build.py breaking` result due to '
+            f'{BACKWARDS_COMPAT_FOOTER} in CL description. Reason:'
+            f'\n{reason}'
+        )
+    )
     msg = output_api.PresubmitPromptWarning
   else:
     to_add.append(
         output_api.PresubmitError(
-            "If this breaking change is expected, add the footer "
-            f"`{BACKWARDS_COMPAT_FOOTER}: <your reason>` to the CL"
-            " description."))
+            'If this breaking change is expected, add the footer '
+            f'`{BACKWARDS_COMPAT_FOOTER}: <your reason>` to the CL'
+            ' description.'
+        )
+    )
 
   rslt = input_api.RunTests([
       input_api.Command(
@@ -66,17 +69,19 @@ def CheckProtoBackwardCompatibility(input_api, output_api):
 def CheckAllTests(input_api, output_api):
   """This collects and runs all functions prefixed with test_.
 
-    This is done because presubmit does not currently run top-level CheckXXX
-    functions in parallel for some reason.
+  This is done because presubmit does not currently run top-level CheckXXX
+  functions in parallel for some reason.
 
-    Each `test_` function in this file is meant to return an iterable of
-    input_api.Command objects.
-    """
+  Each `test_` function in this file is meant to return an iterable of
+  input_api.Command objects.
+  """
   return input_api.RunTests(
       chain.from_iterable(
           testFn(input_api, output_api)
           for name, testFn in globals().items()
-          if name.startswith('test_')))
+          if name.startswith('test_')
+      )
+  )
 
 
 def test_Lint(input_api, output_api):
@@ -175,6 +180,7 @@ def test_PyFormat(input_api, output_api):
       output_api,
       version='3.2',
       pylintrc='.pylintrc',
+      files_to_skip=input_api.DEFAULT_FILES_TO_SKIP + ('tools/.*',),
   )
 
 
@@ -183,6 +189,17 @@ def test_PyTests(input_api, output_api):
       input_api.Command(
           name='build.py test_python',
           cmd=['build.py', 'test_python', '-v'],
+          kwargs={'cwd': input_api.PresubmitLocalPath()},
+          message=output_api.PresubmitError,
+      )
+  ]
+
+
+def test_GoTests(input_api, output_api):
+  return [
+      input_api.Command(
+          name='build.py test_go',
+          cmd=['build.py', 'test_go', '-v'],
           kwargs={'cwd': input_api.PresubmitLocalPath()},
           message=output_api.PresubmitError,
       )
