@@ -5,6 +5,7 @@
 package assert
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -90,6 +91,23 @@ func Empty[T any](t *testing.T, got []T) {
 	if len(got) != 0 {
 		t.Errorf("Expected empty, got length %d: %v", len(got), got)
 	}
+}
+
+// PanicLike fails the test if f does not panic or if the panic value
+// (formatted as a string) does not contain substr.
+func PanicLike(t *testing.T, f func(), substr string) {
+	t.Helper()
+	defer func() {
+		r := recover()
+		if r == nil {
+			t.Fatalf("Expected panic containing %q, got none", substr)
+		}
+		rStr := fmt.Sprint(r)
+		if !strings.Contains(rStr, substr) {
+			t.Fatalf("Expected panic containing %q, got: %v", substr, r)
+		}
+	}()
+	f()
 }
 
 func isNil(i any) bool {
