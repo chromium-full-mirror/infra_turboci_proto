@@ -242,6 +242,7 @@ type GerritChangeInfo struct {
 	xxx_hidden_Topic                *string                  `protobuf:"bytes,17,opt,name=topic,proto3,oneof"`
 	xxx_hidden_Local                bool                     `protobuf:"varint,18,opt,name=local,proto3,oneof"`
 	xxx_hidden_IsOwnerBot           bool                     `protobuf:"varint,19,opt,name=is_owner_bot,json=isOwnerBot,proto3,oneof"`
+	xxx_hidden_CherrypickedFrom     *string                  `protobuf:"bytes,21,opt,name=cherrypicked_from,json=cherrypickedFrom,proto3,oneof"`
 	XXX_raceDetectHookData          protoimpl.RaceDetectHookData
 	XXX_presence                    [1]uint32
 	unknownFields                   protoimpl.UnknownFields
@@ -438,39 +439,49 @@ func (x *GerritChangeInfo) GetIsOwnerBot() bool {
 	return false
 }
 
+func (x *GerritChangeInfo) GetCherrypickedFrom() string {
+	if x != nil {
+		if x.xxx_hidden_CherrypickedFrom != nil {
+			return *x.xxx_hidden_CherrypickedFrom
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *GerritChangeInfo) SetHost(v string) {
 	x.xxx_hidden_Host = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 20)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 21)
 }
 
 func (x *GerritChangeInfo) SetProject(v string) {
 	x.xxx_hidden_Project = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 20)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 21)
 }
 
 func (x *GerritChangeInfo) SetBranch(v string) {
 	x.xxx_hidden_Branch = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 20)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 21)
 }
 
 func (x *GerritChangeInfo) SetFullBranch(v string) {
 	x.xxx_hidden_FullBranch = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 20)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 21)
 }
 
 func (x *GerritChangeInfo) SetChangeNumber(v int64) {
 	x.xxx_hidden_ChangeNumber = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 20)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 21)
 }
 
 func (x *GerritChangeInfo) SetPatchset(v int32) {
 	x.xxx_hidden_Patchset = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 20)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 21)
 }
 
 func (x *GerritChangeInfo) SetStatus(v GerritChangeInfo_Status) {
 	x.xxx_hidden_Status = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 20)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 21)
 }
 
 func (x *GerritChangeInfo) SetCreationTime(v *timestamppb.Timestamp) {
@@ -487,7 +498,7 @@ func (x *GerritChangeInfo) SetSubmittedTime(v *timestamppb.Timestamp) {
 
 func (x *GerritChangeInfo) SetCurrentRevision(v string) {
 	x.xxx_hidden_CurrentRevision = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 10, 20)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 10, 21)
 }
 
 func (x *GerritChangeInfo) SetRevisions(v map[string]*RevisionInfo) {
@@ -512,22 +523,27 @@ func (x *GerritChangeInfo) SetMessages(v []*ChangeMessageInfo) {
 
 func (x *GerritChangeInfo) SetChangeId(v string) {
 	x.xxx_hidden_ChangeId = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 16, 20)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 16, 21)
 }
 
 func (x *GerritChangeInfo) SetTopic(v string) {
 	x.xxx_hidden_Topic = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 17, 20)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 17, 21)
 }
 
 func (x *GerritChangeInfo) SetLocal(v bool) {
 	x.xxx_hidden_Local = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 18, 20)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 18, 21)
 }
 
 func (x *GerritChangeInfo) SetIsOwnerBot(v bool) {
 	x.xxx_hidden_IsOwnerBot = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 19, 20)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 19, 21)
+}
+
+func (x *GerritChangeInfo) SetCherrypickedFrom(v string) {
+	x.xxx_hidden_CherrypickedFrom = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 20, 21)
 }
 
 func (x *GerritChangeInfo) HasHost() bool {
@@ -642,6 +658,13 @@ func (x *GerritChangeInfo) HasIsOwnerBot() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 19)
 }
 
+func (x *GerritChangeInfo) HasCherrypickedFrom() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 20)
+}
+
 func (x *GerritChangeInfo) ClearHost() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Host = nil
@@ -716,6 +739,11 @@ func (x *GerritChangeInfo) ClearLocal() {
 func (x *GerritChangeInfo) ClearIsOwnerBot() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 19)
 	x.xxx_hidden_IsOwnerBot = false
+}
+
+func (x *GerritChangeInfo) ClearCherrypickedFrom() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 20)
+	x.xxx_hidden_CherrypickedFrom = nil
 }
 
 type GerritChangeInfo_builder struct {
@@ -796,6 +824,8 @@ type GerritChangeInfo_builder struct {
 	Local *bool
 	// Whether the owner of the CL is a bot or not.
 	IsOwnerBot *bool
+	// Original commit SHA if this is a cherry-pick.
+	CherrypickedFrom *string
 }
 
 func (b0 GerritChangeInfo_builder) Build() *GerritChangeInfo {
@@ -803,38 +833,38 @@ func (b0 GerritChangeInfo_builder) Build() *GerritChangeInfo {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Host != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 20)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 21)
 		x.xxx_hidden_Host = b.Host
 	}
 	if b.Project != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 20)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 21)
 		x.xxx_hidden_Project = b.Project
 	}
 	if b.Branch != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 20)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 21)
 		x.xxx_hidden_Branch = b.Branch
 	}
 	if b.FullBranch != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 20)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 21)
 		x.xxx_hidden_FullBranch = b.FullBranch
 	}
 	if b.ChangeNumber != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 20)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 21)
 		x.xxx_hidden_ChangeNumber = *b.ChangeNumber
 	}
 	if b.Patchset != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 20)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 21)
 		x.xxx_hidden_Patchset = *b.Patchset
 	}
 	if b.Status != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 20)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 21)
 		x.xxx_hidden_Status = *b.Status
 	}
 	x.xxx_hidden_CreationTime = b.CreationTime
 	x.xxx_hidden_LastModificationTime = b.LastModificationTime
 	x.xxx_hidden_SubmittedTime = b.SubmittedTime
 	if b.CurrentRevision != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 10, 20)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 10, 21)
 		x.xxx_hidden_CurrentRevision = b.CurrentRevision
 	}
 	x.xxx_hidden_Revisions = b.Revisions
@@ -843,20 +873,24 @@ func (b0 GerritChangeInfo_builder) Build() *GerritChangeInfo {
 	x.xxx_hidden_Labels = b.Labels
 	x.xxx_hidden_Messages = &b.Messages
 	if b.ChangeId != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 16, 20)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 16, 21)
 		x.xxx_hidden_ChangeId = b.ChangeId
 	}
 	if b.Topic != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 17, 20)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 17, 21)
 		x.xxx_hidden_Topic = b.Topic
 	}
 	if b.Local != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 18, 20)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 18, 21)
 		x.xxx_hidden_Local = *b.Local
 	}
 	if b.IsOwnerBot != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 19, 20)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 19, 21)
 		x.xxx_hidden_IsOwnerBot = *b.IsOwnerBot
+	}
+	if b.CherrypickedFrom != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 20, 21)
+		x.xxx_hidden_CherrypickedFrom = b.CherrypickedFrom
 	}
 	return m0
 }
@@ -1736,17 +1770,21 @@ func (b0 ChangeMessageInfo_builder) Build() *ChangeMessageInfo {
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#commit-info
 type CommitInfo struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_CommitId    *string                `protobuf:"bytes,1,opt,name=commit_id,json=commitId,proto3,oneof"`
-	xxx_hidden_Parents     *[]*CommitInfo         `protobuf:"bytes,2,rep,name=parents,proto3"`
-	xxx_hidden_Author      *AccountInfo           `protobuf:"bytes,3,opt,name=author,proto3,oneof"`
-	xxx_hidden_Committer   *AccountInfo           `protobuf:"bytes,4,opt,name=committer,proto3,oneof"`
-	xxx_hidden_Subject     *string                `protobuf:"bytes,5,opt,name=subject,proto3,oneof"`
-	xxx_hidden_Message     *string                `protobuf:"bytes,6,opt,name=message,proto3,oneof"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state                    protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_CommitId      *string                `protobuf:"bytes,1,opt,name=commit_id,json=commitId,proto3,oneof"`
+	xxx_hidden_Parents       *[]*CommitInfo         `protobuf:"bytes,2,rep,name=parents,proto3"`
+	xxx_hidden_Author        *AccountInfo           `protobuf:"bytes,3,opt,name=author,proto3,oneof"`
+	xxx_hidden_Committer     *AccountInfo           `protobuf:"bytes,4,opt,name=committer,proto3,oneof"`
+	xxx_hidden_Subject       *string                `protobuf:"bytes,5,opt,name=subject,proto3,oneof"`
+	xxx_hidden_Message       *string                `protobuf:"bytes,6,opt,name=message,proto3,oneof"`
+	xxx_hidden_IsRobotCommit bool                   `protobuf:"varint,7,opt,name=is_robot_commit,json=isRobotCommit,proto3,oneof"`
+	xxx_hidden_BugId         []int64                `protobuf:"varint,8,rep,packed,name=bug_id,json=bugId,proto3"`
+	xxx_hidden_TreeId        *string                `protobuf:"bytes,9,opt,name=tree_id,json=treeId,proto3,oneof"`
+	xxx_hidden_Date          *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=date,proto3,oneof"`
+	XXX_raceDetectHookData   protoimpl.RaceDetectHookData
+	XXX_presence             [1]uint32
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *CommitInfo) Reset() {
@@ -1827,9 +1865,40 @@ func (x *CommitInfo) GetMessage() string {
 	return ""
 }
 
+func (x *CommitInfo) GetIsRobotCommit() bool {
+	if x != nil {
+		return x.xxx_hidden_IsRobotCommit
+	}
+	return false
+}
+
+func (x *CommitInfo) GetBugId() []int64 {
+	if x != nil {
+		return x.xxx_hidden_BugId
+	}
+	return nil
+}
+
+func (x *CommitInfo) GetTreeId() string {
+	if x != nil {
+		if x.xxx_hidden_TreeId != nil {
+			return *x.xxx_hidden_TreeId
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *CommitInfo) GetDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.xxx_hidden_Date
+	}
+	return nil
+}
+
 func (x *CommitInfo) SetCommitId(v string) {
 	x.xxx_hidden_CommitId = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 6)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 10)
 }
 
 func (x *CommitInfo) SetParents(v []*CommitInfo) {
@@ -1846,12 +1915,30 @@ func (x *CommitInfo) SetCommitter(v *AccountInfo) {
 
 func (x *CommitInfo) SetSubject(v string) {
 	x.xxx_hidden_Subject = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 6)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 10)
 }
 
 func (x *CommitInfo) SetMessage(v string) {
 	x.xxx_hidden_Message = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 6)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 10)
+}
+
+func (x *CommitInfo) SetIsRobotCommit(v bool) {
+	x.xxx_hidden_IsRobotCommit = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 10)
+}
+
+func (x *CommitInfo) SetBugId(v []int64) {
+	x.xxx_hidden_BugId = v
+}
+
+func (x *CommitInfo) SetTreeId(v string) {
+	x.xxx_hidden_TreeId = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 8, 10)
+}
+
+func (x *CommitInfo) SetDate(v *timestamppb.Timestamp) {
+	x.xxx_hidden_Date = v
 }
 
 func (x *CommitInfo) HasCommitId() bool {
@@ -1889,6 +1976,27 @@ func (x *CommitInfo) HasMessage() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
 }
 
+func (x *CommitInfo) HasIsRobotCommit() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
+}
+
+func (x *CommitInfo) HasTreeId() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 8)
+}
+
+func (x *CommitInfo) HasDate() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Date != nil
+}
+
 func (x *CommitInfo) ClearCommitId() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_CommitId = nil
@@ -1912,6 +2020,20 @@ func (x *CommitInfo) ClearMessage() {
 	x.xxx_hidden_Message = nil
 }
 
+func (x *CommitInfo) ClearIsRobotCommit() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
+	x.xxx_hidden_IsRobotCommit = false
+}
+
+func (x *CommitInfo) ClearTreeId() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 8)
+	x.xxx_hidden_TreeId = nil
+}
+
+func (x *CommitInfo) ClearDate() {
+	x.xxx_hidden_Date = nil
+}
+
 type CommitInfo_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
@@ -1920,13 +2042,38 @@ type CommitInfo_builder struct {
 	// The parent commits of this commit. In each parent only the commit and subject fields are populated.
 	Parents []*CommitInfo
 	// The author of this commit.
+	//
+	// Note that Gerrit REST API actually uses
+	// https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#git-person-info
+	// for author, we chose to use AccountInfo instead.
 	Author *AccountInfo
 	// The committer of this commit.
+	//
+	// Note that Gerrit REST API actually uses
+	// https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#git-person-info
+	// for committer, we chose to use AccountInfo instead, and use
+	// CommitInfo.date for the commit date.
 	Committer *AccountInfo
 	// The subject of the commit (header line of the commit message).
 	Subject *string
 	// The commit message.
 	Message *string
+	// Whether the commit is a robot commit or not.
+	IsRobotCommit *bool
+	// A list of bugs associated with the commit (likely via its commit message).
+	BugId []int64
+	// Hash of the tree object that represents the snapshot of the project's root
+	// directory at the moment that commit was made, can be used to identify blank
+	// commits.
+	TreeId *string
+	// The timestamp of the commit.
+	//
+	// Sourced from the `date` field of
+	// https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#git-person-info.
+	//
+	// We choose to use AccountInfo instead of GerritPersonInfo for `committer`
+	// and `author`, while need the commit date, so adding it to CommitInfo.
+	Date *timestamppb.Timestamp
 }
 
 func (b0 CommitInfo_builder) Build() *CommitInfo {
@@ -1934,20 +2081,30 @@ func (b0 CommitInfo_builder) Build() *CommitInfo {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.CommitId != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 6)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 10)
 		x.xxx_hidden_CommitId = b.CommitId
 	}
 	x.xxx_hidden_Parents = &b.Parents
 	x.xxx_hidden_Author = b.Author
 	x.xxx_hidden_Committer = b.Committer
 	if b.Subject != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 6)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 10)
 		x.xxx_hidden_Subject = b.Subject
 	}
 	if b.Message != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 6)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 10)
 		x.xxx_hidden_Message = b.Message
 	}
+	if b.IsRobotCommit != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 10)
+		x.xxx_hidden_IsRobotCommit = *b.IsRobotCommit
+	}
+	x.xxx_hidden_BugId = b.BugId
+	if b.TreeId != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 8, 10)
+		x.xxx_hidden_TreeId = b.TreeId
+	}
+	x.xxx_hidden_Date = b.Date
 	return m0
 }
 
@@ -2544,7 +2701,7 @@ var File_turboci_data_gerrit_v1_gerrit_change_info_proto protoreflect.FileDescri
 
 const file_turboci_data_gerrit_v1_gerrit_change_info_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/data/gerrit/v1/gerrit_change_info.proto\x12\x16turboci.data.gerrit.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc1\r\n" +
+	"/turboci/data/gerrit/v1/gerrit_change_info.proto\x12\x16turboci.data.gerrit.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x89\x0e\n" +
 	"\x10GerritChangeInfo\x12\x17\n" +
 	"\x04host\x18\x01 \x01(\tH\x00R\x04host\x88\x01\x01\x12\x1d\n" +
 	"\aproject\x18\x02 \x01(\tH\x01R\aproject\x88\x01\x01\x12\x1b\n" +
@@ -2569,7 +2726,8 @@ const file_turboci_data_gerrit_v1_gerrit_change_info_proto_rawDesc = "" +
 	"\x05topic\x18\x11 \x01(\tH\rR\x05topic\x88\x01\x01\x12\x19\n" +
 	"\x05local\x18\x12 \x01(\bH\x0eR\x05local\x88\x01\x01\x12%\n" +
 	"\fis_owner_bot\x18\x13 \x01(\bH\x0fR\n" +
-	"isOwnerBot\x88\x01\x01\x1ab\n" +
+	"isOwnerBot\x88\x01\x01\x120\n" +
+	"\x11cherrypicked_from\x18\x15 \x01(\tH\x10R\x10cherrypickedFrom\x88\x01\x01\x1ab\n" +
 	"\x0eRevisionsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12:\n" +
 	"\x05value\x18\x02 \x01(\v2$.turboci.data.gerrit.v1.RevisionInfoR\x05value:\x028\x01\x1ab\n" +
@@ -2603,7 +2761,8 @@ const file_turboci_data_gerrit_v1_gerrit_change_info_proto_rawDesc = "" +
 	"_change_idB\b\n" +
 	"\x06_topicB\b\n" +
 	"\x06_localB\x0f\n" +
-	"\r_is_owner_bot\"\xae\x03\n" +
+	"\r_is_owner_botB\x14\n" +
+	"\x12_cherrypicked_from\"\xae\x03\n" +
 	"\vAccountInfo\x12\"\n" +
 	"\n" +
 	"account_id\x18\x01 \x01(\x03H\x00R\taccountId\x88\x01\x01\x12\x17\n" +
@@ -2657,7 +2816,7 @@ const file_turboci_data_gerrit_v1_gerrit_change_info_proto_rawDesc = "" +
 	"\n" +
 	"\b_messageB\x06\n" +
 	"\x04_tagB\v\n" +
-	"\t_patchset\"\xf3\x02\n" +
+	"\t_patchset\"\xb3\x04\n" +
 	"\n" +
 	"CommitInfo\x12 \n" +
 	"\tcommit_id\x18\x01 \x01(\tH\x00R\bcommitId\x88\x01\x01\x12<\n" +
@@ -2665,7 +2824,12 @@ const file_turboci_data_gerrit_v1_gerrit_change_info_proto_rawDesc = "" +
 	"\x06author\x18\x03 \x01(\v2#.turboci.data.gerrit.v1.AccountInfoH\x01R\x06author\x88\x01\x01\x12F\n" +
 	"\tcommitter\x18\x04 \x01(\v2#.turboci.data.gerrit.v1.AccountInfoH\x02R\tcommitter\x88\x01\x01\x12\x1d\n" +
 	"\asubject\x18\x05 \x01(\tH\x03R\asubject\x88\x01\x01\x12\x1d\n" +
-	"\amessage\x18\x06 \x01(\tH\x04R\amessage\x88\x01\x01B\f\n" +
+	"\amessage\x18\x06 \x01(\tH\x04R\amessage\x88\x01\x01\x12+\n" +
+	"\x0fis_robot_commit\x18\a \x01(\bH\x05R\risRobotCommit\x88\x01\x01\x12\x15\n" +
+	"\x06bug_id\x18\b \x03(\x03R\x05bugId\x12\x1c\n" +
+	"\atree_id\x18\t \x01(\tH\x06R\x06treeId\x88\x01\x01\x123\n" +
+	"\x04date\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampH\aR\x04date\x88\x01\x01B\f\n" +
 	"\n" +
 	"_commit_idB\t\n" +
 	"\a_authorB\f\n" +
@@ -2674,7 +2838,11 @@ const file_turboci_data_gerrit_v1_gerrit_change_info_proto_rawDesc = "" +
 	"\n" +
 	"\b_subjectB\n" +
 	"\n" +
-	"\b_message\"\x9a\x03\n" +
+	"\b_messageB\x12\n" +
+	"\x10_is_robot_commitB\n" +
+	"\n" +
+	"\b_tree_idB\a\n" +
+	"\x05_date\"\x9a\x03\n" +
 	"\bFileInfo\x12\x1e\n" +
 	"\bold_path\x18\x01 \x01(\tH\x00R\aoldPath\x88\x01\x01\x12D\n" +
 	"\x06status\x18\x02 \x01(\x0e2'.turboci.data.gerrit.v1.FileInfo.StatusH\x01R\x06status\x88\x01\x01\x12*\n" +
@@ -2774,23 +2942,24 @@ var file_turboci_data_gerrit_v1_gerrit_change_info_proto_depIdxs = []int32{
 	8,  // 16: turboci.data.gerrit.v1.CommitInfo.parents:type_name -> turboci.data.gerrit.v1.CommitInfo
 	4,  // 17: turboci.data.gerrit.v1.CommitInfo.author:type_name -> turboci.data.gerrit.v1.AccountInfo
 	4,  // 18: turboci.data.gerrit.v1.CommitInfo.committer:type_name -> turboci.data.gerrit.v1.AccountInfo
-	1,  // 19: turboci.data.gerrit.v1.FileInfo.status:type_name -> turboci.data.gerrit.v1.FileInfo.Status
-	6,  // 20: turboci.data.gerrit.v1.LabelInfo.all:type_name -> turboci.data.gerrit.v1.ApprovalInfo
-	15, // 21: turboci.data.gerrit.v1.LabelInfo.values:type_name -> turboci.data.gerrit.v1.LabelInfo.ValuesEntry
-	2,  // 22: turboci.data.gerrit.v1.RevisionInfo.kind:type_name -> turboci.data.gerrit.v1.RevisionInfo.Kind
-	17, // 23: turboci.data.gerrit.v1.RevisionInfo.created:type_name -> google.protobuf.Timestamp
-	4,  // 24: turboci.data.gerrit.v1.RevisionInfo.uploader:type_name -> turboci.data.gerrit.v1.AccountInfo
-	8,  // 25: turboci.data.gerrit.v1.RevisionInfo.commit:type_name -> turboci.data.gerrit.v1.CommitInfo
-	16, // 26: turboci.data.gerrit.v1.RevisionInfo.files:type_name -> turboci.data.gerrit.v1.RevisionInfo.FilesEntry
-	11, // 27: turboci.data.gerrit.v1.GerritChangeInfo.RevisionsEntry.value:type_name -> turboci.data.gerrit.v1.RevisionInfo
-	5,  // 28: turboci.data.gerrit.v1.GerritChangeInfo.ReviewersEntry.value:type_name -> turboci.data.gerrit.v1.AccountInfos
-	10, // 29: turboci.data.gerrit.v1.GerritChangeInfo.LabelsEntry.value:type_name -> turboci.data.gerrit.v1.LabelInfo
-	9,  // 30: turboci.data.gerrit.v1.RevisionInfo.FilesEntry.value:type_name -> turboci.data.gerrit.v1.FileInfo
-	31, // [31:31] is the sub-list for method output_type
-	31, // [31:31] is the sub-list for method input_type
-	31, // [31:31] is the sub-list for extension type_name
-	31, // [31:31] is the sub-list for extension extendee
-	0,  // [0:31] is the sub-list for field type_name
+	17, // 19: turboci.data.gerrit.v1.CommitInfo.date:type_name -> google.protobuf.Timestamp
+	1,  // 20: turboci.data.gerrit.v1.FileInfo.status:type_name -> turboci.data.gerrit.v1.FileInfo.Status
+	6,  // 21: turboci.data.gerrit.v1.LabelInfo.all:type_name -> turboci.data.gerrit.v1.ApprovalInfo
+	15, // 22: turboci.data.gerrit.v1.LabelInfo.values:type_name -> turboci.data.gerrit.v1.LabelInfo.ValuesEntry
+	2,  // 23: turboci.data.gerrit.v1.RevisionInfo.kind:type_name -> turboci.data.gerrit.v1.RevisionInfo.Kind
+	17, // 24: turboci.data.gerrit.v1.RevisionInfo.created:type_name -> google.protobuf.Timestamp
+	4,  // 25: turboci.data.gerrit.v1.RevisionInfo.uploader:type_name -> turboci.data.gerrit.v1.AccountInfo
+	8,  // 26: turboci.data.gerrit.v1.RevisionInfo.commit:type_name -> turboci.data.gerrit.v1.CommitInfo
+	16, // 27: turboci.data.gerrit.v1.RevisionInfo.files:type_name -> turboci.data.gerrit.v1.RevisionInfo.FilesEntry
+	11, // 28: turboci.data.gerrit.v1.GerritChangeInfo.RevisionsEntry.value:type_name -> turboci.data.gerrit.v1.RevisionInfo
+	5,  // 29: turboci.data.gerrit.v1.GerritChangeInfo.ReviewersEntry.value:type_name -> turboci.data.gerrit.v1.AccountInfos
+	10, // 30: turboci.data.gerrit.v1.GerritChangeInfo.LabelsEntry.value:type_name -> turboci.data.gerrit.v1.LabelInfo
+	9,  // 31: turboci.data.gerrit.v1.RevisionInfo.FilesEntry.value:type_name -> turboci.data.gerrit.v1.FileInfo
+	32, // [32:32] is the sub-list for method output_type
+	32, // [32:32] is the sub-list for method input_type
+	32, // [32:32] is the sub-list for extension type_name
+	32, // [32:32] is the sub-list for extension extendee
+	0,  // [0:32] is the sub-list for field type_name
 }
 
 func init() { file_turboci_data_gerrit_v1_gerrit_change_info_proto_init() }

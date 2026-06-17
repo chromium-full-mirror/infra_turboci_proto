@@ -11,7 +11,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class GerritChangeInfo(_message.Message):
-    __slots__ = ("host", "project", "branch", "full_branch", "change_number", "patchset", "status", "creation_time", "last_modification_time", "submitted_time", "current_revision", "revisions", "owner", "reviewers", "labels", "messages", "change_id", "topic", "local", "is_owner_bot")
+    __slots__ = ("host", "project", "branch", "full_branch", "change_number", "patchset", "status", "creation_time", "last_modification_time", "submitted_time", "current_revision", "revisions", "owner", "reviewers", "labels", "messages", "change_id", "topic", "local", "is_owner_bot", "cherrypicked_from")
     class Status(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         STATUS_UNKNOWN: _ClassVar[GerritChangeInfo.Status]
@@ -65,6 +65,7 @@ class GerritChangeInfo(_message.Message):
     TOPIC_FIELD_NUMBER: _ClassVar[int]
     LOCAL_FIELD_NUMBER: _ClassVar[int]
     IS_OWNER_BOT_FIELD_NUMBER: _ClassVar[int]
+    CHERRYPICKED_FROM_FIELD_NUMBER: _ClassVar[int]
     host: str
     project: str
     branch: str
@@ -85,7 +86,8 @@ class GerritChangeInfo(_message.Message):
     topic: str
     local: bool
     is_owner_bot: bool
-    def __init__(self, host: _Optional[str] = ..., project: _Optional[str] = ..., branch: _Optional[str] = ..., full_branch: _Optional[str] = ..., change_number: _Optional[int] = ..., patchset: _Optional[int] = ..., status: _Optional[_Union[GerritChangeInfo.Status, str]] = ..., creation_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., last_modification_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., submitted_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., current_revision: _Optional[str] = ..., revisions: _Optional[_Mapping[str, RevisionInfo]] = ..., owner: _Optional[_Union[AccountInfo, _Mapping]] = ..., reviewers: _Optional[_Mapping[str, AccountInfos]] = ..., labels: _Optional[_Mapping[str, LabelInfo]] = ..., messages: _Optional[_Iterable[_Union[ChangeMessageInfo, _Mapping]]] = ..., change_id: _Optional[str] = ..., topic: _Optional[str] = ..., local: _Optional[bool] = ..., is_owner_bot: _Optional[bool] = ...) -> None: ...
+    cherrypicked_from: str
+    def __init__(self, host: _Optional[str] = ..., project: _Optional[str] = ..., branch: _Optional[str] = ..., full_branch: _Optional[str] = ..., change_number: _Optional[int] = ..., patchset: _Optional[int] = ..., status: _Optional[_Union[GerritChangeInfo.Status, str]] = ..., creation_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., last_modification_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., submitted_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., current_revision: _Optional[str] = ..., revisions: _Optional[_Mapping[str, RevisionInfo]] = ..., owner: _Optional[_Union[AccountInfo, _Mapping]] = ..., reviewers: _Optional[_Mapping[str, AccountInfos]] = ..., labels: _Optional[_Mapping[str, LabelInfo]] = ..., messages: _Optional[_Iterable[_Union[ChangeMessageInfo, _Mapping]]] = ..., change_id: _Optional[str] = ..., topic: _Optional[str] = ..., local: _Optional[bool] = ..., is_owner_bot: _Optional[bool] = ..., cherrypicked_from: _Optional[str] = ...) -> None: ...
 
 class AccountInfo(_message.Message):
     __slots__ = ("account_id", "name", "display_name", "email", "secondary_emails", "username", "status", "inactive", "deleted", "tags")
@@ -152,20 +154,28 @@ class ChangeMessageInfo(_message.Message):
     def __init__(self, id: _Optional[str] = ..., author: _Optional[_Union[AccountInfo, _Mapping]] = ..., real_author: _Optional[_Union[AccountInfo, _Mapping]] = ..., date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., message: _Optional[str] = ..., accounts_in_message: _Optional[_Iterable[_Union[AccountInfo, _Mapping]]] = ..., tag: _Optional[str] = ..., patchset: _Optional[int] = ...) -> None: ...
 
 class CommitInfo(_message.Message):
-    __slots__ = ("commit_id", "parents", "author", "committer", "subject", "message")
+    __slots__ = ("commit_id", "parents", "author", "committer", "subject", "message", "is_robot_commit", "bug_id", "tree_id", "date")
     COMMIT_ID_FIELD_NUMBER: _ClassVar[int]
     PARENTS_FIELD_NUMBER: _ClassVar[int]
     AUTHOR_FIELD_NUMBER: _ClassVar[int]
     COMMITTER_FIELD_NUMBER: _ClassVar[int]
     SUBJECT_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    IS_ROBOT_COMMIT_FIELD_NUMBER: _ClassVar[int]
+    BUG_ID_FIELD_NUMBER: _ClassVar[int]
+    TREE_ID_FIELD_NUMBER: _ClassVar[int]
+    DATE_FIELD_NUMBER: _ClassVar[int]
     commit_id: str
     parents: _containers.RepeatedCompositeFieldContainer[CommitInfo]
     author: AccountInfo
     committer: AccountInfo
     subject: str
     message: str
-    def __init__(self, commit_id: _Optional[str] = ..., parents: _Optional[_Iterable[_Union[CommitInfo, _Mapping]]] = ..., author: _Optional[_Union[AccountInfo, _Mapping]] = ..., committer: _Optional[_Union[AccountInfo, _Mapping]] = ..., subject: _Optional[str] = ..., message: _Optional[str] = ...) -> None: ...
+    is_robot_commit: bool
+    bug_id: _containers.RepeatedScalarFieldContainer[int]
+    tree_id: str
+    date: _timestamp_pb2.Timestamp
+    def __init__(self, commit_id: _Optional[str] = ..., parents: _Optional[_Iterable[_Union[CommitInfo, _Mapping]]] = ..., author: _Optional[_Union[AccountInfo, _Mapping]] = ..., committer: _Optional[_Union[AccountInfo, _Mapping]] = ..., subject: _Optional[str] = ..., message: _Optional[str] = ..., is_robot_commit: _Optional[bool] = ..., bug_id: _Optional[_Iterable[int]] = ..., tree_id: _Optional[str] = ..., date: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class FileInfo(_message.Message):
     __slots__ = ("old_path", "status", "lines_inserted", "lines_deleted")
