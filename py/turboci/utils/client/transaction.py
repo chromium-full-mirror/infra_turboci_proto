@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import copy
 import dataclasses
+import typing
 
 from google.protobuf import timestamp_pb2
 from turboci.graph.ids.v1 import identifier_pb2
@@ -18,6 +19,7 @@ from turboci.graph.orchestrator.v1 import revision_pb2
 from turboci.graph.orchestrator.v1 import stage_pb2
 from turboci.graph.orchestrator.v1 import workplan_pb2
 from turboci.utils import ids
+from turboci.utils import value
 from turboci.utils.client import errors
 
 __all__ = [
@@ -175,3 +177,47 @@ class ObservedNodeSet:
   @staticmethod
   def _ts_to_str(ts: timestamp_pb2.Timestamp) -> str:
     return f'{ts.seconds}/{ts.nanos}'
+
+
+# LocalNodePredicate is the type signature for a filter function used with
+# `apply_node_predicate`.
+#
+# This should be a pure function over its arguments.
+LocalNodePredicate = typing.Callable[
+    [value.DataSource, check_pb2.Check | stage_pb2.Stage], bool
+]
+
+
+def apply_node_predicate(
+    pred: LocalNodePredicate,
+    plans: workplan_pb2.WorkPlan | typing.Sequence[workplan_pb2.WorkPlan],
+    data: value.MutableDataSource,
+):
+  """Modifies `data` and `plans` to remove items where `pred` returns False.
+
+  Also discards value_data which ar unreferenced after the removal of all nodes
+  which reference it.
+
+  The intent is to be able to filter one or more API-returned workplans before
+  passing them for observation to a ObservedNodeSet (e.g. to remove nodes from a
+  ReadWorkPlanResponse which are not relevant to the transaction).
+  """
+  if isinstance(plans, workplan_pb2.WorkPlan):
+    plans = (plans,)
+
+  data_to_remove: set[str] = set(data)
+  for wp in plans:
+    for i, check in reversed(list(enumerate(wp.checks))):
+      if pred(data, check):
+        for _, ref in value.refs_in_check(check):
+          data_to_remove.discard(ref.digest)
+        continue
+      wp.checks.pop(i)
+    for i, stage in reversed(list(enumerate(wp.stages))):
+      if pred(data, stage):
+        for _, ref in value.refs_in_stage(stage):
+          data_to_remove.discard(ref.digest)
+        continue
+      wp.stages.pop(i)
+  for digest in data_to_remove:
+    del data[digest]

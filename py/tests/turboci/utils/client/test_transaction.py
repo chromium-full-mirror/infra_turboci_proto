@@ -15,9 +15,11 @@ from turboci.graph.orchestrator.v1 import query_nodes_response_pb2
 from turboci.graph.orchestrator.v1 import read_workplan_response_pb2
 from turboci.graph.orchestrator.v1 import revision_pb2
 from turboci.graph.orchestrator.v1 import stage_pb2
+from turboci.graph.orchestrator.v1 import value_data_pb2
 from turboci.graph.orchestrator.v1 import workplan_pb2
 from turboci.utils import client
 from turboci.utils import ids
+from turboci.utils import value
 from turboci.utils.client import transaction
 
 # pylint: disable=protected-access
@@ -199,6 +201,95 @@ class TestObservedNodeSet(unittest.TestCase):
     self.assertEqual(self.ns._rev, wp.version)
     self.assertIn(ids.to_string(ids.check('check1')), self.ns.nodes)
     self.assertIn(ids.to_string(ids.stage('stage1')), self.ns.nodes)
+
+
+class TestApplyNodePredicate(unittest.TestCase):
+
+  def test_apply_node_predicate(self):
+    wpid = ids.workplan(12345)
+    wp = make_wp(wpid, 100)
+
+    # Check 1: kept, references digest1
+    c1 = make_check(wpid, 'check1', 50)
+    c1.options.add(digest='digest1')
+    wp.checks.append(c1)
+
+    # Check 2: removed, references digest2
+    c2 = make_check(wpid, 'check2', 50)
+    c2.options.add(digest='digest2')
+    wp.checks.append(c2)
+
+    # Stage 1: kept, references digest3
+    s1 = make_stage(wpid, 'stage1', 80)
+    s1.args.digest = 'digest3'
+    wp.stages.append(s1)
+
+    # Stage 2: removed, references digest4
+    s2 = make_stage(wpid, 'stage2', 80)
+    s2.args.digest = 'digest4'
+    wp.stages.append(s2)
+
+    # Populate data source
+    data = value.LockedDataSource()
+    vdata = value_data_pb2.ValueData()
+    data['digest1'] = vdata
+    data['digest2'] = vdata
+    data['digest3'] = vdata
+    data['digest4'] = vdata
+
+    # Predicate: keep 'check1' and 'stage1'
+    transaction.apply_node_predicate(
+        lambda _, node: node.identifier.id in ('check1', 'stage1'),
+        wp,
+        data,
+    )
+
+    # Verify workplan modifications
+    self.assertEqual(len(wp.checks), 1)
+    self.assertEqual(wp.checks[0].identifier.id, 'check1')
+    self.assertEqual(len(wp.stages), 1)
+    self.assertEqual(wp.stages[0].identifier.id, 'stage1')
+
+    # Verify data source modifications
+    self.assertIn('digest1', data)
+    self.assertIn('digest3', data)
+    self.assertNotIn('digest2', data)
+    self.assertNotIn('digest4', data)
+
+  def test_apply_node_predicate_sequence(self):
+    wpid1 = ids.workplan(12345)
+    wpid2 = ids.workplan(67890)
+
+    wp1 = make_wp(wpid1, 100)
+    c1 = make_check(wpid1, 'check1', 50)
+    c1.options.add(digest='digest1')
+    c1.options.add(digest='digest_shared')
+    wp1.checks.append(c1)
+
+    wp2 = make_wp(wpid2, 100)
+    c2 = make_check(wpid2, 'check2', 50)
+    c2.options.add(digest='digest2')
+    c2.options.add(digest='digest_shared')
+    wp2.checks.append(c2)
+
+    data = value.LockedDataSource()
+    vdata = value_data_pb2.ValueData()
+    data['digest1'] = vdata
+    data['digest2'] = vdata
+    data['digest_shared'] = vdata
+
+    # Keep only check1 (remove check2)
+    transaction.apply_node_predicate(
+        lambda _, node: node.identifier.id == 'check1',
+        [wp1, wp2],
+        data,
+    )
+
+    self.assertEqual(len(wp1.checks), 1)
+    self.assertEqual(len(wp2.checks), 0)
+    self.assertIn('digest1', data)
+    self.assertIn('digest_shared', data)
+    self.assertNotIn('digest2', data)
 
 
 if __name__ == '__main__':
