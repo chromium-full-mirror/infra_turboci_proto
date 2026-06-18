@@ -9,6 +9,7 @@ import copy
 import dataclasses
 import typing
 
+from google.protobuf import message
 from google.protobuf import timestamp_pb2
 from turboci.graph.ids.v1 import identifier_pb2
 from turboci.graph.orchestrator.v1 import check_pb2
@@ -19,12 +20,18 @@ from turboci.graph.orchestrator.v1 import revision_pb2
 from turboci.graph.orchestrator.v1 import stage_pb2
 from turboci.graph.orchestrator.v1 import transaction_details_pb2
 from turboci.graph.orchestrator.v1 import workplan_pb2
+from turboci.graph.orchestrator.v1 import write_nodes_request_pb2
+from turboci.graph.orchestrator.v1 import write_nodes_response_pb2
 from turboci.utils import ids
 from turboci.utils import value
+from turboci.utils.client import clients
 from turboci.utils.client import errors
+from turboci.utils.client import state
 
 __all__ = [
     'ObservedNodeSet',
+    'Transactional',
+    'TransactionalAsync',
 ]
 
 ObservableNode = stage_pb2.Stage | check_pb2.Check | stage_pb2.Stage.Attempt
@@ -231,3 +238,92 @@ def apply_node_predicate(
       wp.stages.pop(i)
   for digest in data_to_remove:
     del data[digest]
+
+
+@dataclasses.dataclass(kw_only=True)
+class _TransactionalBase(state.State):
+  """Base class for transactional clients, holding shared state and hooks."""
+
+  _observed: ObservedNodeSet = dataclasses.field(init=False)
+  _write_called: list[bool] = dataclasses.field(
+      default_factory=lambda: [False], init=False
+  )
+  _node_filter: LocalNodePredicate | None = dataclasses.field(
+      default=None, init=False
+  )
+
+  def __post_init__(self):
+    # Safe call to parent __post_init__ if it exists in MRO.
+    # Needed for cooperative multiple inheritance, as clients.Sync/Async
+    # do not currently define __post_init__.
+    if hasattr(super(), '__post_init__'):
+      super().__post_init__()  # type: ignore
+    self._observed = ObservedNodeSet(wpid=self.wpid)
+
+  def with_node_filter(self, pred: LocalNodePredicate) -> typing.Self:
+    """Returns a shallow copy of the client with the given node filter applied.
+
+    The predicate is used to determine which nodes to keep. Any nodes discard
+    will be removed from the response (and any now-unreferenced data as well)
+    before they are observed by the transaction.
+
+    This is useful for excluding irrelevant nodes that shouldn't trigger
+    transaction conflicts if they happen to change between read and write.
+
+    Args:
+      pred: A predicate function that returns True for nodes to *keep*.
+    """
+    new_client = copy.copy(self)
+    new_client._node_filter = pred  # pylint: disable=protected-access
+    return new_client
+
+  def assert_missing_nodes(self, *nodes: ObservableNodeID):
+    """Asserts that the given nodes do not exist in the WorkPlan yet.
+
+    This may only be called before any read or query operations are performed
+    on this transactional client, and prevents all future reads.
+
+    If you want to query, then instead include these nodes as part of the
+    query's nodes_by_id, and they will be marked as missing (if they actually
+    are missing in the response).
+
+    Args:
+      *nodes: The node identifiers to assert as missing.
+    """
+    self._observed.assert_missing_nodes(*nodes)
+
+  def _adjust_request_precondition(self, req: message.Message) -> None:
+    if isinstance(req, write_nodes_request_pb2.WriteNodesRequest):
+      if self._write_called[0]:
+        raise errors.TransactionMultipleWritesError(
+            'transactional client used for more than one write'
+        )
+      req.txn.CopyFrom(self._observed.generate_precondition())
+
+  def _process_response_observed_nodes(
+      self, req: message.Message, rsp: message.Message
+  ) -> None:
+    match rsp:
+      case read_workplan_response_pb2.ReadWorkPlanResponse():
+        if self._node_filter:
+          apply_node_predicate(self._node_filter, rsp.workplan, self.data)
+        self._observed.observe_read_work_plan(rsp)
+
+      case query_nodes_response_pb2.QueryNodesResponse():
+        assert isinstance(req, query_nodes_request_pb2.QueryNodesRequest)
+        if self._node_filter:
+          apply_node_predicate(self._node_filter, rsp.workplans, self.data)
+        self._observed.observe_query_nodes(req, rsp)
+
+      case write_nodes_response_pb2.WriteNodesResponse():
+        self._write_called[0] = True
+
+
+@dataclasses.dataclass(kw_only=True)
+class Transactional(_TransactionalBase, clients.Sync):
+  """Transactional synchronous client for TurboCI Orchestrator."""
+
+
+@dataclasses.dataclass(kw_only=True)
+class TransactionalAsync(_TransactionalBase, clients.Async):
+  """Transactional asynchronous client for TurboCI Orchestrator."""

@@ -6,17 +6,21 @@
 from __future__ import annotations
 
 import unittest
+from unittest import mock
 
 from google.protobuf import timestamp_pb2
 from turboci.graph.ids.v1 import identifier_pb2
 from turboci.graph.orchestrator.v1 import check_pb2
 from turboci.graph.orchestrator.v1 import query_nodes_request_pb2
 from turboci.graph.orchestrator.v1 import query_nodes_response_pb2
+from turboci.graph.orchestrator.v1 import read_workplan_request_pb2
 from turboci.graph.orchestrator.v1 import read_workplan_response_pb2
 from turboci.graph.orchestrator.v1 import revision_pb2
 from turboci.graph.orchestrator.v1 import stage_pb2
 from turboci.graph.orchestrator.v1 import value_data_pb2
 from turboci.graph.orchestrator.v1 import workplan_pb2
+from turboci.graph.orchestrator.v1 import write_nodes_request_pb2
+from turboci.graph.orchestrator.v1 import write_nodes_response_pb2
 from turboci.utils import client
 from turboci.utils import ids
 from turboci.utils import value
@@ -308,6 +312,214 @@ class TestApplyNodePredicate(unittest.TestCase):
     self.assertIn('digest1', data)
     self.assertIn('digest_shared', data)
     self.assertNotIn('digest2', data)
+
+
+class TestTransactionalClient(unittest.TestCase):
+
+  def setUp(self):
+    self.wpid = ids.workplan(12345)
+    self.mock_transport = mock.Mock(spec=client.TurboCITransport)
+    self.client = transaction.Transactional(
+        wpid=self.wpid, transport=self.mock_transport
+    )
+
+  def test_assert_missing_nodes(self):
+    self.client.assert_missing_nodes(
+        ids.check('check1', self.wpid),
+        ids.stage('stage1', self.wpid),
+    )
+    self.assertIn(
+        ids.to_string(ids.check('check1')), self.client._observed.nodes
+    )
+    self.assertIn(
+        ids.to_string(ids.stage('stage1')), self.client._observed.nodes
+    )
+
+  def test_observe_on_read(self):
+    self.mock_transport.call_unary.return_value = (
+        read_workplan_response_pb2.ReadWorkPlanResponse(
+            workplan=make_wp(self.wpid, 100)
+        )
+    )
+    self.mock_transport.call_unary.return_value.workplan.checks.append(
+        make_check(self.wpid, 'check1', 50)
+    )
+
+    self.client.read_work_plan(read_workplan_request_pb2.ReadWorkPlanRequest())
+
+    self.assertEqual(self.client._observed._rev, make_rev(100))
+    self.assertIn(
+        ids.to_string(ids.check('check1')), self.client._observed.nodes
+    )
+
+  def test_write_nodes_injects_precondition_and_blocks_subsequent(self):
+    self.client._observed.observe_read_work_plan(
+        read_workplan_response_pb2.ReadWorkPlanResponse(
+            workplan=make_wp(self.wpid, 100)
+        )
+    )
+    self.client._observed._observe(ids.check('check1', self.wpid))
+
+    self.mock_transport.call_unary.return_value = (
+        write_nodes_response_pb2.WriteNodesResponse()
+    )
+
+    req = write_nodes_request_pb2.WriteNodesRequest()
+    self.client.write_nodes(req)
+
+    self.assertTrue(req.HasField('txn'))
+    self.assertEqual(req.txn.snapshot_version, make_rev(100))
+    self.assertEqual(len(req.txn.nodes_observed), 1)
+    self.assertEqual(req.txn.nodes_observed[0].check.id, 'check1')
+
+    with self.assertRaisesRegex(
+        client.TransactionMultipleWritesError,
+        'transactional client used for more than one write',
+    ):
+      self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+
+  def test_write_nodes_failure_allows_retry(self):
+    self.mock_transport.call_unary.side_effect = Exception('network error')
+
+    with self.assertRaises(Exception):
+      self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+
+    self.mock_transport.call_unary.side_effect = Exception(
+        'another network error'
+    )
+    with self.assertRaisesRegex(Exception, 'another network error'):
+      self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+
+    self.mock_transport.call_unary.side_effect = None
+    self.mock_transport.call_unary.return_value = (
+        write_nodes_response_pb2.WriteNodesResponse()
+    )
+    self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+
+    with self.assertRaisesRegex(
+        client.TransactionMultipleWritesError,
+        'transactional client used for more than one write',
+    ):
+      self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+
+  def test_with_node_filter(self):
+    filtered_client = self.client.with_node_filter(
+        lambda _, node: node.identifier.id == 'check1'
+    )
+
+    self.assertNotEqual(self.client, filtered_client)
+    self.assertIs(self.client._write_called, filtered_client._write_called)
+
+    self.mock_transport.call_unary.return_value = (
+        read_workplan_response_pb2.ReadWorkPlanResponse(
+            workplan=make_wp(self.wpid, 100)
+        )
+    )
+    self.mock_transport.call_unary.return_value.workplan.checks.append(
+        make_check(self.wpid, 'check1', 50)
+    )
+    self.mock_transport.call_unary.return_value.workplan.checks.append(
+        make_check(self.wpid, 'check2', 50)
+    )
+
+    self.mock_transport.call_unary.return_value.workplan.checks[0].options.add(
+        digest='digest1'
+    )
+    self.mock_transport.call_unary.return_value.workplan.checks[1].options.add(
+        digest='digest2'
+    )
+
+    filtered_client.data['digest1'] = value_data_pb2.ValueData()
+    filtered_client.data['digest2'] = value_data_pb2.ValueData()
+
+    filtered_client.read_work_plan(
+        read_workplan_request_pb2.ReadWorkPlanRequest()
+    )
+
+    self.assertIn(
+        ids.to_string(ids.check('check1')), filtered_client._observed.nodes
+    )
+    self.assertNotIn(
+        ids.to_string(ids.check('check2')), filtered_client._observed.nodes
+    )
+
+    self.assertIn('digest1', filtered_client.data)
+    self.assertNotIn('digest2', filtered_client.data)
+
+    self.mock_transport.call_unary.return_value = (
+        write_nodes_response_pb2.WriteNodesResponse()
+    )
+    filtered_client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+
+    with self.assertRaisesRegex(
+        client.TransactionMultipleWritesError,
+        'transactional client used for more than one write',
+    ):
+      self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+
+
+class TestTransactionalClientAsync(unittest.IsolatedAsyncioTestCase):
+
+  def setUp(self):
+    self.wpid = ids.workplan(12345)
+    self.mock_transport = mock.Mock(spec=client.TurboCIAsyncTransport)
+    self.client = transaction.TransactionalAsync(
+        wpid=self.wpid, transport=self.mock_transport
+    )
+
+  async def test_assert_missing_nodes(self):
+    self.client.assert_missing_nodes(
+        ids.check('check1', self.wpid),
+        ids.stage('stage1', self.wpid),
+    )
+    self.assertIn(
+        ids.to_string(ids.check('check1')), self.client._observed.nodes
+    )
+    self.assertIn(
+        ids.to_string(ids.stage('stage1')), self.client._observed.nodes
+    )
+
+  async def test_observe_on_read(self):
+    mock_response = read_workplan_response_pb2.ReadWorkPlanResponse(
+        workplan=make_wp(self.wpid, 100)
+    )
+    mock_response.workplan.checks.append(make_check(self.wpid, 'check1', 50))
+    self.mock_transport.call_unary = mock.AsyncMock(return_value=mock_response)
+
+    await self.client.read_work_plan(
+        read_workplan_request_pb2.ReadWorkPlanRequest()
+    )
+
+    self.assertEqual(self.client._observed._rev, make_rev(100))
+    self.assertIn(
+        ids.to_string(ids.check('check1')), self.client._observed.nodes
+    )
+
+  async def test_write_nodes_injects_precondition_and_blocks_subsequent(self):
+    self.client._observed.observe_read_work_plan(
+        read_workplan_response_pb2.ReadWorkPlanResponse(
+            workplan=make_wp(self.wpid, 100)
+        )
+    )
+    self.client._observed._observe(ids.check('check1', self.wpid))
+
+    self.mock_transport.call_unary = mock.AsyncMock(
+        return_value=write_nodes_response_pb2.WriteNodesResponse()
+    )
+
+    req = write_nodes_request_pb2.WriteNodesRequest()
+    await self.client.write_nodes(req)
+
+    self.assertTrue(req.HasField('txn'))
+    self.assertEqual(req.txn.snapshot_version, make_rev(100))
+    self.assertEqual(len(req.txn.nodes_observed), 1)
+    self.assertEqual(req.txn.nodes_observed[0].check.id, 'check1')
+
+    with self.assertRaisesRegex(
+        client.TransactionMultipleWritesError,
+        'transactional client used for more than one write',
+    ):
+      await self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
 
 
 if __name__ == '__main__':
