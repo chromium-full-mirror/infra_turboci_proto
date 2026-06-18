@@ -522,5 +522,181 @@ class TestTransactionalClientAsync(unittest.IsolatedAsyncioTestCase):
       await self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
 
 
+class TestRunTransaction(unittest.TestCase):
+
+  def setUp(self):
+    self.wpid = ids.workplan(12345)
+    self.mock_transport = mock.Mock(spec=client.TurboCITransport)
+    self.client = client.Sync(wpid=self.wpid, transport=self.mock_transport)
+
+  def test_success(self):
+    def cb(_):
+      return 'success'
+
+    res = transaction.run_transaction(self.client, cb)
+    self.assertEqual(res, 'success')
+
+  def test_retry_success(self):
+    mock_logger = mock.Mock()
+    self.client.logger = mock_logger
+
+    attempts = 0
+
+    def cb(_):
+      nonlocal attempts
+      attempts += 1
+      if attempts == 1:
+        raise client.TransactionalPreconditionError('conflict')
+      return 'success'
+
+    res = transaction.run_transaction(self.client, cb, max_retries=3)
+    self.assertEqual(res, 'success')
+    self.assertEqual(attempts, 2)
+    mock_logger.warning.assert_called_once_with(
+        'Retrying transaction (attempt %d/%d) due to precondition conflict: %s',
+        1,
+        3,
+        mock.ANY,
+    )
+
+  def test_max_retries_exceeded(self):
+    mock_logger = mock.Mock()
+    self.client.logger = mock_logger
+
+    attempts = 0
+
+    def cb(_):
+      nonlocal attempts
+      attempts += 1
+      raise client.TransactionalPreconditionError(f'conflict {attempts}')
+
+    with self.assertRaisesRegex(
+        client.TransactionalPreconditionError, 'conflict 4'
+    ):
+      transaction.run_transaction(self.client, cb, max_retries=3)
+    self.assertEqual(attempts, 4)  # 1 initial + 3 retries
+    mock_logger.warning.assert_has_calls([
+        mock.call(
+            'Retrying transaction (attempt %d/%d) due to precondition'
+            ' conflict: %s',
+            1,
+            3,
+            mock.ANY,
+        ),
+        mock.call(
+            'Retrying transaction (attempt %d/%d) due to precondition'
+            ' conflict: %s',
+            2,
+            3,
+            mock.ANY,
+        ),
+        mock.call(
+            'Retrying transaction (attempt %d/%d) due to precondition'
+            ' conflict: %s',
+            3,
+            3,
+            mock.ANY,
+        ),
+    ])
+    self.assertEqual(mock_logger.warning.call_count, 3)
+
+  def test_other_exception_no_retry(self):
+    mock_logger = mock.Mock()
+    self.client.logger = mock_logger
+
+    attempts = 0
+
+    def cb(_):
+      nonlocal attempts
+      attempts += 1
+      raise ValueError('some other error')
+
+    with self.assertRaises(ValueError):
+      transaction.run_transaction(self.client, cb, max_retries=3)
+    self.assertEqual(attempts, 1)
+    mock_logger.warning.assert_not_called()
+
+
+class TestRunTransactionAsync(unittest.IsolatedAsyncioTestCase):
+
+  def setUp(self):
+    self.wpid = ids.workplan(12345)
+    self.mock_transport = mock.Mock(spec=client.TurboCIAsyncTransport)
+    self.client = client.Async(wpid=self.wpid, transport=self.mock_transport)
+
+  async def test_success(self):
+    async def cb(_):
+      return 'success'
+
+    res = await transaction.run_transaction_async(self.client, cb)
+    self.assertEqual(res, 'success')
+
+  async def test_retry_success(self):
+    mock_logger = mock.Mock()
+    self.client.logger = mock_logger
+
+    attempts = 0
+
+    async def cb(_):
+      nonlocal attempts
+      attempts += 1
+      if attempts == 1:
+        raise client.TransactionalPreconditionError('conflict')
+      return 'success'
+
+    res = await transaction.run_transaction_async(
+        self.client, cb, max_retries=3
+    )
+    self.assertEqual(res, 'success')
+    self.assertEqual(attempts, 2)
+    mock_logger.warning.assert_called_once_with(
+        'Retrying transaction (attempt %d/%d) due to precondition conflict: %s',
+        1,
+        3,
+        mock.ANY,
+    )
+
+  async def test_max_retries_exceeded(self):
+    mock_logger = mock.Mock()
+    self.client.logger = mock_logger
+
+    attempts = 0
+
+    async def cb(_):
+      nonlocal attempts
+      attempts += 1
+      raise client.TransactionalPreconditionError(f'conflict {attempts}')
+
+    with self.assertRaisesRegex(
+        client.TransactionalPreconditionError, 'conflict 4'
+    ):
+      await transaction.run_transaction_async(self.client, cb, max_retries=3)
+    self.assertEqual(attempts, 4)
+    mock_logger.warning.assert_has_calls([
+        mock.call(
+            'Retrying transaction (attempt %d/%d) due to precondition'
+            ' conflict: %s',
+            1,
+            3,
+            mock.ANY,
+        ),
+        mock.call(
+            'Retrying transaction (attempt %d/%d) due to precondition'
+            ' conflict: %s',
+            2,
+            3,
+            mock.ANY,
+        ),
+        mock.call(
+            'Retrying transaction (attempt %d/%d) due to precondition'
+            ' conflict: %s',
+            3,
+            3,
+            mock.ANY,
+        ),
+    ])
+    self.assertEqual(mock_logger.warning.call_count, 3)
+
+
 if __name__ == '__main__':
   unittest.main()

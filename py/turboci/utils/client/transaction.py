@@ -32,6 +32,8 @@ __all__ = [
     'ObservedNodeSet',
     'Transactional',
     'TransactionalAsync',
+    'run_transaction',
+    'run_transaction_async',
 ]
 
 ObservableNode = stage_pb2.Stage | check_pb2.Check | stage_pb2.Stage.Attempt
@@ -327,3 +329,88 @@ class Transactional(_TransactionalBase, clients.Sync):
 @dataclasses.dataclass(kw_only=True)
 class TransactionalAsync(_TransactionalBase, clients.Async):
   """Transactional asynchronous client for TurboCI Orchestrator."""
+
+
+T = typing.TypeVar('T')
+
+
+def run_transaction(
+    client: clients.Sync,
+    callback: typing.Callable[[Transactional], T],
+    *,
+    max_retries: int = 5,
+) -> T:
+  """Runs a transaction using the given sync client.
+
+  Derives a Transactional client from the base client and passes it to
+  the callback. If the callback raises TransactionalPreconditionError,
+  it will be retried up to max_retries times.
+
+  Args:
+    client: The base sync client.
+    callback: The transaction body, accepting the transactional client.
+    max_retries: Maximum number of retries.
+  """
+  max_retries = max(0, max_retries)
+  for attempt in range(max_retries + 1):
+    # pylint: disable=unexpected-keyword-arg
+    tx_client = Transactional(
+        wpid=client.wpid,
+        transport=client.transport,
+        data=client.data,
+    )
+    try:
+      return callback(tx_client)
+    except errors.TransactionalPreconditionError as exc:
+      if attempt < max_retries:
+        client.logger.warning(
+            'Retrying transaction (attempt %d/%d) due to precondition'
+            ' conflict: %s',
+            attempt + 1,
+            max_retries,
+            exc,
+        )
+        continue
+      raise
+  raise Exception('impossible')
+
+
+async def run_transaction_async(
+    client: clients.Async,
+    callback: typing.Callable[[TransactionalAsync], typing.Awaitable[T]],
+    *,
+    max_retries: int = 5,
+) -> T:
+  """Runs a transaction using the given async client.
+
+  Derives a TransactionalAsync client from the base client and passes it to
+  the callback. If the callback raises TransactionalPreconditionError,
+  it will be retried up to max_retries times.
+
+  Args:
+    client: The base async client.
+    callback: The transaction body, accepting the transactional client.
+    max_retries: Maximum number of retries.
+  """
+  max_retries = max(0, max_retries)
+  for attempt in range(max_retries + 1):
+    # pylint: disable=unexpected-keyword-arg
+    tx_client = TransactionalAsync(
+        wpid=client.wpid,
+        transport=client.transport,
+        data=client.data,
+    )
+    try:
+      return await callback(tx_client)
+    except errors.TransactionalPreconditionError as exc:
+      if attempt < max_retries:
+        client.logger.warning(
+            'Retrying transaction (attempt %d/%d) due to precondition'
+            ' conflict: %s',
+            attempt + 1,
+            max_retries,
+            exc,
+        )
+        continue
+      raise
+  raise Exception('impossible')
