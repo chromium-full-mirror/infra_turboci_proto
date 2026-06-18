@@ -202,6 +202,24 @@ class TestObservedNodeSet(unittest.TestCase):
     self.assertIn(ids.to_string(ids.check('check1')), self.ns.nodes)
     self.assertIn(ids.to_string(ids.stage('stage1')), self.ns.nodes)
 
+  def test_generate_precondition(self):
+    self.ns.observe_read_work_plan(
+        read_workplan_response_pb2.ReadWorkPlanResponse(
+            workplan=make_wp(self.wpid, 100)
+        )
+    )
+    self.ns._observe(ids.check('check1', self.wpid))
+    self.ns._observe(ids.stage('stage1', self.wpid))
+
+    txn = self.ns.generate_precondition()
+
+    self.assertEqual(txn.snapshot_version, make_rev(100))
+    self.assertEqual(len(txn.nodes_observed), 2)
+    self.assertEqual(txn.nodes_observed[0].check.work_plan.id, '')
+    self.assertEqual(txn.nodes_observed[0].check.id, 'check1')
+    self.assertEqual(txn.nodes_observed[1].stage.work_plan.id, '')
+    self.assertEqual(txn.nodes_observed[1].stage.id, 'stage1')
+
 
 class TestApplyNodePredicate(unittest.TestCase):
 

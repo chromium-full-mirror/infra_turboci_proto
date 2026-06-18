@@ -13,16 +13,16 @@ __all__ = [
 from google.protobuf import timestamp_pb2
 
 from turboci.graph.ids.v1 import identifier_pb2
-from turboci.utils.ids.wrap import AnyIdentifier, unwrap
+from turboci.utils.ids import wrap
 
 
-def to_string(ident: AnyIdentifier) -> str:
+def to_string(ident: wrap.AnyIdentifier) -> str:
   """Converts from a proto identifier to a canonical string."""
 
   def fmt_rev(ts: timestamp_pb2.Timestamp) -> str:
     return f'{ts.seconds}/{ts.nanos}'
 
-  any_id = unwrap(ident)
+  any_id = wrap.unwrap(ident)
   parts = []
   stop = False
 
@@ -77,7 +77,7 @@ def from_string(ident_str: str) -> identifier_pb2.Identifier:
   ret = identifier_pb2.Identifier()
 
   def parse_is_worknode(stg: identifier_pb2.Stage):
-    '''Parses toks[1][0] for S, N, ?'''
+    """Parses toks[1][0] for S, N, ?"""
     match toks[1][0]:
       case 'N':
         stg.is_worknode = True
@@ -87,8 +87,9 @@ def from_string(ident_str: str) -> identifier_pb2.Identifier:
         stg.ClearField('is_worknode')
       case _:
         raise NotImplementedError(
-            "from_string: expected token to start with S, N or ?, "
-            f"got {toks[1][0]!r}")
+            'from_string: expected token to start with S, N or ?, '
+            f'got {toks[1][0]!r}'
+        )
 
   def parse_vers(v: str, to: timestamp_pb2.Timestamp):
     secs, nanos = v.split('/')

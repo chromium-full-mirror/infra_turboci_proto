@@ -17,6 +17,7 @@ from turboci.graph.orchestrator.v1 import query_nodes_response_pb2
 from turboci.graph.orchestrator.v1 import read_workplan_response_pb2
 from turboci.graph.orchestrator.v1 import revision_pb2
 from turboci.graph.orchestrator.v1 import stage_pb2
+from turboci.graph.orchestrator.v1 import transaction_details_pb2
 from turboci.graph.orchestrator.v1 import workplan_pb2
 from turboci.utils import ids
 from turboci.utils import value
@@ -169,6 +170,15 @@ class ObservedNodeSet:
     elif curwp:
       ident = ids.clear_workplan(copy.deepcopy(ident))
     self._nodes.add(ids.to_string(ident))
+
+  def generate_precondition(self) -> transaction_details_pb2.TransactionDetails:
+    """Generates a TransactionDetails proto from the observed nodes."""
+    txn = transaction_details_pb2.TransactionDetails(
+        snapshot_version=self._rev,
+    )
+    for node_str in sorted(self._nodes):
+      txn.nodes_observed.append(ids.from_string(node_str))
+    return txn
 
   @staticmethod
   def _is_after(a: revision_pb2.Revision, b: revision_pb2.Revision) -> bool:
