@@ -82,6 +82,10 @@ class HeartbeatOptions:
   # and shutting down.
   max_consecutive_unexpected_errors: int = 3
 
+  # Whether to automatically transition the attempt to COMPLETE on clean exit
+  # or INCOMPLETE on exception exit (if not already COMPLETE/INCOMPLETE).
+  transition_on_exit: bool = True
+
   # History of recent write latencies (in seconds) for moving average
   # calculation.
   _latencies: list[float] = dataclasses.field(default_factory=list, init=False)
@@ -201,8 +205,14 @@ def execute_stage(
 ) -> AttemptLifecycleManager:
   """Transitions the current stage attempt to SCHEDULED or RUNNING.
 
-  Returns a lifecycle manager which can be used as a context manager to
-  surround the stage attempt implementation.
+  Returns an attempt lifecycle manager which can be used as a context manager
+  to surround the stage attempt implementation.
+
+  If `opts.transition_on_exit` is True (the default), when exiting the `with`:
+  - If exiting with an exception, it will attempt to transition the current
+    Attempt to INCOMPLETE (unless already COMPLETE or INCOMPLETE).
+  - If exiting cleanly with no exception, it will attempt to transition the
+    current Attempt to COMPLETE (unless already COMPLETE or INCOMPLETE).
 
   Example:
     def RunStage(
@@ -219,8 +229,9 @@ def execute_stage(
             lcm.start_tearing_down()
             # Perform cleanup and transition attempt to final state...
 
-      threading.Thread(target=background_worker, args=(lcm,),
-      daemon=True).start()
+      threading.Thread(
+        target=background_worker, args=(lcm,), daemon=True
+      ).start()
       return run_stage_pb2.RunStageResponse()
   """
   if not opts:
@@ -251,8 +262,15 @@ async def async_execute_stage(
 ) -> AttemptLifecycleManagerAsync:
   """Transitions the current stage attempt to SCHEDULED or RUNNING.
 
-  Returns a lifecycle manager which can be used as a context manager to
-  surround the stage attempt implementation.
+  Returns an attempt lifecycle manager which can be used as a context manager
+  to surround the stage attempt implementation.
+
+  If `opts.transition_on_exit` is True (the default), when exiting the `async
+  with`:
+  - If exiting with an exception, it will attempt to transition the current
+    Attempt to INCOMPLETE (unless already COMPLETE or INCOMPLETE).
+  - If exiting cleanly with no exception, it will attempt to transition the
+    current Attempt to COMPLETE (unless already COMPLETE or INCOMPLETE).
 
   Example:
     async def RunStage(
@@ -270,6 +288,8 @@ async def async_execute_stage(
             await lcm.start_tearing_down()
             # Perform cleanup and transition attempt to final state...
 
+      # NOTE: You will have to ensure this task gets associated with some
+      # appropriate asyncio reactor loop.
       asyncio.create_task(background_worker(lcm))
       return run_stage_pb2.RunStageResponse()
   """
@@ -355,6 +375,57 @@ class LifecycleManagerCore(typing.Generic[_EventT, _ClientT]):
         self.client.logger.info(f"Observed cancellation with delay: {delay}s")
       raise errors.StageAttemptNotRunning()
 
+  def _make_incomplete_request(
+      self,
+      reason: str | None = None,
+  ) -> write_nodes_request_pb2.WriteNodesRequest:
+    req = write_nodes_request_pb2.WriteNodesRequest()
+    if reason is not None:
+      req.reason.message = reason
+    else:
+      req.reason.message = "execution_failed"
+
+    req.current_attempt.state_transition.incomplete.SetInParent()
+    return req
+
+  def _make_complete_request(
+      self,
+      reason: str | None = None,
+  ) -> write_nodes_request_pb2.WriteNodesRequest:
+    req = write_nodes_request_pb2.WriteNodesRequest()
+    if reason is not None:
+      req.reason.message = reason
+    else:
+      req.reason.message = "execution_completed"
+
+    req.current_attempt.state_transition.complete.SetInParent()
+    return req
+
+  def _get_exit_transition_request(
+      self,
+      exc_type: type[BaseException] | None,
+      exc_val: BaseException | None,
+  ) -> write_nodes_request_pb2.WriteNodesRequest | None:
+    """Computes the WriteNodesRequest for context exit, if any."""
+    if not self.opts.transition_on_exit:
+      return None
+    if self.client.latest_attempt_state.state in (
+        stage_attempt_state_pb2.STAGE_ATTEMPT_STATE_COMPLETE,
+        stage_attempt_state_pb2.STAGE_ATTEMPT_STATE_INCOMPLETE,
+    ):
+      return None
+
+    if exc_type is not None:
+      self.client.logger.warning(
+          "%s caught exception, transitioning attempt to INCOMPLETE: %s",
+          type(self).__name__.lstrip("_"),
+          exc_val,
+      )
+      reason = f"execution_failed: {exc_type.__name__}: {exc_val}"
+      return self._make_incomplete_request(reason=reason[:1024])
+
+    return self._make_complete_request()
+
   def _register(self):
     if self._used:
       raise RuntimeError(f"{type(self)} cannot be re-entered")
@@ -437,8 +508,13 @@ class AttemptLifecycleManager(
   Orchestrator. It supports adaptive safety margins, randomized jitter, and
   graceful cancellation detection.
 
-  The caller is responsible for transitioning the Attempt to its final state
-  (COMPLETE or INCOMPLETE) upon exit. See `execute_stage` for usage examples.
+  On exit, if `opts.transition_on_exit` is True (the default):
+  - If an exception was raised, it automatically attempts to transition the
+    Attempt to INCOMPLETE (unless already COMPLETE or INCOMPLETE).
+  - Otherwise, it automatically attempts to transition the Attempt to COMPLETE
+    (unless already COMPLETE or INCOMPLETE).
+
+  See `execute_stage` for usage examples.
   """
 
   # The process_uid picked by execute_stage, for naming the thread.
@@ -462,7 +538,7 @@ class AttemptLifecycleManager(
     return self
 
   def __exit__(self, exc_type, exc_val, exc_tb):
-    _, _, _ = exc_type, exc_val, exc_tb
+    _ = exc_tb
     self._unregister()
     if self._thread:
       self._thread.join(timeout=self.opts.exit_timeout_sec)
@@ -472,6 +548,15 @@ class AttemptLifecycleManager(
             self.opts.exit_timeout_sec,
         )
       self._thread = None
+
+    if req := self._get_exit_transition_request(exc_type, exc_val):
+      try:
+        self._ping(req)
+      except Exception as e:
+        target = "INCOMPLETE" if exc_type is not None else "COMPLETE"
+        self.client.logger.error(
+            "Failed to transition attempt to %s on exit: %s", target, e
+        )
 
   def start_tearing_down(
       self,
@@ -542,9 +627,13 @@ class AttemptLifecycleManagerAsync(
   Orchestrator. It supports adaptive safety margins, randomized jitter, and
   graceful cancellation detection.
 
-  The caller is responsible for transitioning the Attempt to its final state
-  (COMPLETE or INCOMPLETE) upon exit. See `async_execute_stage` for usage
-  examples.
+  On exit, if `opts.transition_on_exit` is True (the default):
+  - If an exception was raised, it automatically attempts to transition the
+    Attempt to INCOMPLETE (unless already COMPLETE or INCOMPLETE).
+  - Otherwise, it automatically attempts to transition the Attempt to COMPLETE
+    (unless already COMPLETE or INCOMPLETE).
+
+  See `async_execute_stage` for usage examples.
   """
 
   # The process_uid picked by async_execute_stage, for naming the task.
@@ -566,7 +655,7 @@ class AttemptLifecycleManagerAsync(
     return self
 
   async def __aexit__(self, exc_type, exc_val, exc_tb):
-    _, _, _ = exc_type, exc_val, exc_tb
+    _ = exc_tb
     self._unregister()
     if self._task:
       self._task.cancel()
@@ -582,6 +671,15 @@ class AttemptLifecycleManagerAsync(
         pass
       finally:
         self._task = None
+
+    if req := self._get_exit_transition_request(exc_type, exc_val):
+      try:
+        await self._ping(req)
+      except Exception as e:
+        target = "INCOMPLETE" if exc_type is not None else "COMPLETE"
+        self.client.logger.error(
+            "Failed to transition attempt to %s on exit: %s", target, e
+        )
 
   async def start_tearing_down(
       self,

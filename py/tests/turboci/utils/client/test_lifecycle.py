@@ -25,6 +25,7 @@ from turboci.utils.client import lifecycle
 from turboci.utils.client import transports
 
 # pylint: disable=protected-access
+# pylint: disable=line-too-long
 
 
 def make_ts(seconds: int, nanos: int = 0) -> timestamp_pb2.Timestamp:
@@ -93,8 +94,8 @@ class TestLifecycle(unittest.TestCase):
       self.assertFalse(hb.is_cancelled)
 
     # Verify transition to RUNNING was sent
-    self.assertEqual(self.mock_transport.call_unary.call_count, 1)
-    req = self.mock_transport.call_unary.call_args[0][1]
+    self.assertEqual(self.mock_transport.call_unary.call_count, 2)
+    req = self.mock_transport.call_unary.call_args_list[0][0][1]
     self.assertTrue(req.current_attempt.state_transition.HasField("running"))
 
   def test_happy_path_periodic_heartbeats(self):
@@ -127,7 +128,7 @@ class TestLifecycle(unittest.TestCase):
     )
 
     # Verify subsequent calls were heartbeats (empty current_attempt)
-    for call in self.mock_transport.call_unary.call_args_list[1:]:
+    for call in self.mock_transport.call_unary.call_args_list[1:-1]:
       req = call[0][1]
       self.assertTrue(req.HasField("current_attempt"))
       self.assertFalse(req.current_attempt.HasField("state_transition"))
@@ -378,8 +379,8 @@ class TestLifecycle(unittest.TestCase):
       pass
 
     # Verify that CallOptions was passed to call_unary with correct deadline
-    self.assertEqual(self.mock_transport.call_unary.call_count, 1)
-    call_args = self.mock_transport.call_unary.call_args
+    self.assertEqual(self.mock_transport.call_unary.call_count, 2)
+    call_args = self.mock_transport.call_unary.call_args_list[0]
     options = call_args[0][2]
     self.assertIsNotNone(options)
     self.assertEqual(options.deadline.total_seconds(), 4.2)
@@ -453,6 +454,7 @@ class TestLifecycle(unittest.TestCase):
         client=self.client,
         stage=make_stage(),
         transition_to=stage_attempt_state_pb2.STAGE_ATTEMPT_STATE_SCHEDULED,
+        opts=lifecycle.HeartbeatOptions(transition_on_exit=False),
     )
     with hb:
       pass
@@ -470,8 +472,134 @@ class TestLifecycle(unittest.TestCase):
           transition_to=stage_attempt_state_pb2.STAGE_ATTEMPT_STATE_COMPLETE,
       )
 
+  def test_exit_with_exception_transitions_to_incomplete(self):
+    self.mock_transport.call_unary.return_value = (
+        write_nodes_response_pb2.WriteNodesResponse(
+            current_attempt_state=make_state(int(time.time()) + 10)
+        )
+    )
+    hb = lifecycle.execute_stage(
+        client=self.client,
+        stage=make_stage(),
+    )
 
-class TestHeartbeaterAsync(unittest.IsolatedAsyncioTestCase):
+    with self.assertRaises(ValueError) as ctx:
+      with hb:
+        raise ValueError("test error")
+
+    self.assertEqual(str(ctx.exception), "test error")
+
+    # 2 calls: RUNNING (execute_stage) and INCOMPLETE (exit)
+    self.assertEqual(self.mock_transport.call_unary.call_count, 2)
+
+    second_req = self.mock_transport.call_unary.call_args_list[1][0][1]
+    self.assertTrue(
+        second_req.current_attempt.state_transition.HasField("incomplete")
+    )
+    self.assertIn("ValueError: test error", second_req.reason.message)
+
+  def test_exit_with_exception_transition_failure_does_not_mask(self):
+    # RUNNING succeeds, but INCOMPLETE fails
+    self.mock_transport.call_unary.side_effect = [
+        write_nodes_response_pb2.WriteNodesResponse(
+            current_attempt_state=make_state(int(time.time()) + 10)
+        ),
+        errors.RPCError("network down", None),
+    ]
+    hb = lifecycle.execute_stage(
+        client=self.client,
+        stage=make_stage(),
+    )
+
+    # The original ValueError should still propagate, NOT the RPCError
+    with self.assertRaises(ValueError) as ctx:
+      with hb:
+        raise ValueError("original error")
+
+    self.assertEqual(str(ctx.exception), "original error")
+    self.assertEqual(self.mock_transport.call_unary.call_count, 2)
+
+  def test_exit_clean_transitions_to_complete(self):
+    self.mock_transport.call_unary.return_value = (
+        write_nodes_response_pb2.WriteNodesResponse(
+            current_attempt_state=make_state(int(time.time()) + 10)
+        )
+    )
+    hb = lifecycle.execute_stage(
+        client=self.client,
+        stage=make_stage(),
+    )
+    with hb:
+      pass
+
+    self.assertEqual(self.mock_transport.call_unary.call_count, 2)
+    second_req = self.mock_transport.call_unary.call_args_list[1][0][1]
+    self.assertTrue(
+        second_req.current_attempt.state_transition.HasField("complete")
+    )
+    self.assertEqual(second_req.reason.message, "execution_completed")
+
+  def test_exit_clean_already_complete_or_incomplete_does_not_transition(self):
+    self.mock_transport.call_unary.return_value = (
+        write_nodes_response_pb2.WriteNodesResponse(
+            current_attempt_state=make_state(
+                int(time.time()) + 10,
+                state_enum=stage_attempt_state_pb2.STAGE_ATTEMPT_STATE_COMPLETE,
+            )
+        )
+    )
+    hb = lifecycle.execute_stage(
+        client=self.client,
+        stage=make_stage(),
+    )
+    with hb:
+      pass
+
+    self.assertEqual(self.mock_transport.call_unary.call_count, 1)
+
+  def test_exit_with_exception_already_complete_or_incomplete_does_not_transition(
+      self,
+  ):
+    self.mock_transport.call_unary.return_value = write_nodes_response_pb2.WriteNodesResponse(
+        current_attempt_state=make_state(
+            int(time.time()) + 10,
+            state_enum=stage_attempt_state_pb2.STAGE_ATTEMPT_STATE_INCOMPLETE,
+        )
+    )
+    hb = lifecycle.execute_stage(
+        client=self.client,
+        stage=make_stage(),
+    )
+    with self.assertRaises(ValueError):
+      with hb:
+        raise ValueError("test error")
+
+    self.assertEqual(self.mock_transport.call_unary.call_count, 1)
+
+  def test_transition_on_exit_disabled(self):
+    self.mock_transport.call_unary.return_value = (
+        write_nodes_response_pb2.WriteNodesResponse(
+            current_attempt_state=make_state(int(time.time()) + 10)
+        )
+    )
+    opts = lifecycle.HeartbeatOptions(transition_on_exit=False)
+    hb = lifecycle.execute_stage(
+        client=self.client, stage=make_stage(), opts=opts
+    )
+    with hb:
+      pass
+    self.assertEqual(self.mock_transport.call_unary.call_count, 1)
+
+    hb2 = lifecycle.execute_stage(
+        client=self.client, stage=make_stage(), opts=opts
+    )
+    with self.assertRaises(ValueError):
+      with hb2:
+        raise ValueError("test error")
+    self.assertEqual(self.mock_transport.call_unary.call_count, 2)
+
+
+class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
 
   def setUp(self):
     self.wpid = ids.workplan(12345)
@@ -766,8 +894,8 @@ class TestHeartbeaterAsync(unittest.IsolatedAsyncioTestCase):
       pass
 
     # Verify that CallOptions was passed to call_unary with correct deadline
-    self.assertEqual(self.mock_transport.call_unary.call_count, 1)
-    call_args = self.mock_transport.call_unary.call_args
+    self.assertEqual(self.mock_transport.call_unary.call_count, 2)
+    call_args = self.mock_transport.call_unary.call_args_list[0]
     options = call_args[0][2]
     self.assertIsNotNone(options)
     self.assertEqual(options.deadline.total_seconds(), 4.2)
@@ -842,6 +970,7 @@ class TestHeartbeaterAsync(unittest.IsolatedAsyncioTestCase):
         client=self.client,
         stage=make_stage(),
         transition_to=stage_attempt_state_pb2.STAGE_ATTEMPT_STATE_SCHEDULED,
+        opts=lifecycle.HeartbeatOptions(transition_on_exit=False),
     )
     async with hb:
       pass
@@ -858,6 +987,138 @@ class TestHeartbeaterAsync(unittest.IsolatedAsyncioTestCase):
           stage=make_stage(),
           transition_to=stage_attempt_state_pb2.STAGE_ATTEMPT_STATE_COMPLETE,
       )
+
+  async def test_aexit_with_exception_transitions_to_incomplete(self):
+    self.mock_transport.call_unary = mock.AsyncMock(
+        return_value=write_nodes_response_pb2.WriteNodesResponse(
+            current_attempt_state=make_state(int(time.time()) + 10)
+        )
+    )
+    hb = await lifecycle.async_execute_stage(
+        client=self.client,
+        stage=make_stage(),
+    )
+
+    with self.assertRaises(ValueError) as ctx:
+      async with hb:
+        raise ValueError("test error")
+
+    self.assertEqual(str(ctx.exception), "test error")
+
+    # 2 calls: RUNNING (async_execute_stage) and INCOMPLETE (exit)
+    self.assertEqual(self.mock_transport.call_unary.call_count, 2)
+
+    second_req = self.mock_transport.call_unary.call_args_list[1][0][1]
+    self.assertTrue(
+        second_req.current_attempt.state_transition.HasField("incomplete")
+    )
+    self.assertIn("ValueError: test error", second_req.reason.message)
+
+  async def test_aexit_with_exception_transition_failure_does_not_mask(self):
+    # RUNNING succeeds, but INCOMPLETE fails
+    self.mock_transport.call_unary = mock.AsyncMock(
+        side_effect=[
+            write_nodes_response_pb2.WriteNodesResponse(
+                current_attempt_state=make_state(int(time.time()) + 10)
+            ),
+            errors.RPCError("network down", None),
+        ]
+    )
+    hb = await lifecycle.async_execute_stage(
+        client=self.client,
+        stage=make_stage(),
+    )
+
+    # The original ValueError should still propagate, NOT the RPCError
+    with self.assertRaises(ValueError) as ctx:
+      async with hb:
+        raise ValueError("original error")
+
+    self.assertEqual(str(ctx.exception), "original error")
+    self.assertEqual(self.mock_transport.call_unary.call_count, 2)
+
+  async def test_aexit_clean_transitions_to_complete(self):
+    self.mock_transport.call_unary = mock.AsyncMock(
+        return_value=write_nodes_response_pb2.WriteNodesResponse(
+            current_attempt_state=make_state(int(time.time()) + 10)
+        )
+    )
+    hb = await lifecycle.async_execute_stage(
+        client=self.client,
+        stage=make_stage(),
+    )
+    async with hb:
+      pass
+
+    self.assertEqual(self.mock_transport.call_unary.call_count, 2)
+    second_req = self.mock_transport.call_unary.call_args_list[1][0][1]
+    self.assertTrue(
+        second_req.current_attempt.state_transition.HasField("complete")
+    )
+    self.assertEqual(second_req.reason.message, "execution_completed")
+
+  async def test_aexit_clean_already_complete_or_incomplete_does_not_transition(
+      self,
+  ):
+    self.mock_transport.call_unary = mock.AsyncMock(
+        return_value=write_nodes_response_pb2.WriteNodesResponse(
+            current_attempt_state=make_state(
+                int(time.time()) + 10,
+                state_enum=stage_attempt_state_pb2.STAGE_ATTEMPT_STATE_COMPLETE,
+            )
+        )
+    )
+    hb = await lifecycle.async_execute_stage(
+        client=self.client,
+        stage=make_stage(),
+    )
+    async with hb:
+      pass
+
+    self.assertEqual(self.mock_transport.call_unary.call_count, 1)
+
+  async def test_aexit_with_exception_already_complete_or_incomplete_does_not_transition(
+      self,
+  ):
+    self.mock_transport.call_unary = mock.AsyncMock(
+        return_value=write_nodes_response_pb2.WriteNodesResponse(
+            current_attempt_state=make_state(
+                int(time.time()) + 10,
+                state_enum=stage_attempt_state_pb2.STAGE_ATTEMPT_STATE_INCOMPLETE,
+            )
+        )
+    )
+    hb = await lifecycle.async_execute_stage(
+        client=self.client,
+        stage=make_stage(),
+    )
+    with self.assertRaises(ValueError):
+      async with hb:
+        raise ValueError("test error")
+
+    self.assertEqual(self.mock_transport.call_unary.call_count, 1)
+
+  async def test_atransition_on_exit_disabled(self):
+    self.mock_transport.call_unary = mock.AsyncMock(
+        return_value=write_nodes_response_pb2.WriteNodesResponse(
+            current_attempt_state=make_state(int(time.time()) + 10)
+        )
+    )
+    opts = lifecycle.HeartbeatOptions(transition_on_exit=False)
+    hb = await lifecycle.async_execute_stage(
+        client=self.client, stage=make_stage(), opts=opts
+    )
+    async with hb:
+      pass
+    self.assertEqual(self.mock_transport.call_unary.call_count, 1)
+
+    hb2 = await lifecycle.async_execute_stage(
+        client=self.client, stage=make_stage(), opts=opts
+    )
+    with self.assertRaises(ValueError):
+      async with hb2:
+        raise ValueError("test error")
+    self.assertEqual(self.mock_transport.call_unary.call_count, 2)
 
 
 if __name__ == "__main__":
