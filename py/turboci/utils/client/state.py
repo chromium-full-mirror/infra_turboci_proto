@@ -5,11 +5,12 @@
 
 from __future__ import annotations
 
+import copy
 import dataclasses
 import logging
 import typing
 
-from google.protobuf import message
+from google.protobuf import message, timestamp_pb2
 from turboci.graph.ids.v1 import identifier_pb2
 from turboci.graph.orchestrator.v1 import allocate_worknode_ids_request_pb2
 from turboci.graph.orchestrator.v1 import cancel_workplan_request_pb2
@@ -17,7 +18,9 @@ from turboci.graph.orchestrator.v1 import query_nodes_request_pb2
 from turboci.graph.orchestrator.v1 import query_nodes_response_pb2
 from turboci.graph.orchestrator.v1 import read_workplan_request_pb2
 from turboci.graph.orchestrator.v1 import read_workplan_response_pb2
+from turboci.graph.orchestrator.v1 import stage_pb2
 from turboci.graph.orchestrator.v1 import write_nodes_request_pb2
+from turboci.graph.orchestrator.v1 import write_nodes_response_pb2
 from turboci.utils import value
 from turboci.utils.client import retry
 
@@ -70,8 +73,21 @@ class Logger(typing.Protocol):
     ...
 
 
+class NullLock:
+  """A no-op context manager for async uses of State."""
+
+  def __enter__(self) -> None:
+    pass
+
+  def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    _ = (exc_type, exc_val, exc_tb)
+
+
+_LockT = typing.TypeVar('_LockT', bound=typing.ContextManager[typing.Any])
+
+
 @dataclasses.dataclass(kw_only=True)
-class State:
+class State(typing.Generic[_LockT]):
   # (required) The workplan this client is bound to.
   wpid: identifier_pb2.WorkPlan
 
@@ -105,6 +121,84 @@ class State:
 
   # Retry policy.
   retry: retry.Retry = dataclasses.field(default_factory=retry.Retry)
+
+  # WARNING: Callbacks are executed while holding the state lock (_state_mu).
+  # Callbacks MUST NOT interact with the client or State directly (e.g.
+  # accessing properties or registering callbacks) and MUST be quick and
+  # non-blocking to avoid deadlocks.
+  _on_state_change: set[
+      typing.Callable[[stage_pb2.StageAttemptCurrentState], None]
+  ] = dataclasses.field(default_factory=set, init=False)
+
+  # The latest observed stage attempt state.
+  # Protected by _state_mu. Read via the latest_attempt_state property.
+  _latest_attempt_state: stage_pb2.StageAttemptCurrentState = dataclasses.field(
+      default_factory=stage_pb2.StageAttemptCurrentState, init=False
+  )
+
+  # Mutex protecting latest_attempt_state and on_state_change.
+  #
+  # Subclasses will populate this from __post_init__.
+  _state_mu: _LockT = dataclasses.field(
+      default_factory=NullLock, init=False  # type: ignore[assignment]
+  )
+
+  @property
+  def latest_attempt_state(self) -> stage_pb2.StageAttemptCurrentState:
+    """Returns the latest observed stage attempt state (thread-safe)."""
+    with self._state_mu:
+      return self._latest_attempt_state
+
+  @staticmethod
+  def ts_as_float(ts: None | timestamp_pb2.Timestamp) -> float:
+    """Renders a Timestamp to a python float timestamp.
+
+    Previously this used AsDatetime, however this doesn't set a default timezone
+    in the returned datetime, leading to bugs :(.
+
+    As a convenience, if this is given None, it returns negative infinity (which
+    will sort before all other values, except for negative infinity).
+    """
+    if not ts:
+      return float('-inf')
+    return ts.seconds + (ts.nanos / 1e9)
+
+  def register_on_state_change(
+      self, fn: typing.Callable[[stage_pb2.StageAttemptCurrentState], None]
+  ):
+    """Call `fn` when we observe a newer version of the current attempt state.
+
+    This can happen after any WriteNodes call.
+
+    The function will be called while holding the state lock (_state_mu).
+    It MUST NOT interact with the client or State directly (e.g., accessing
+    properties like latest_attempt_state or registering/unregistering
+    callbacks) and must be quick and non-blocking to avoid deadlocks.
+
+    Only works for States bound to a Stage Attempt (e.g. for a Stage Executor
+    within the context of running some Stage).
+
+    If this State has already observed some StageAttemptCurrentState, `fn` will
+    be called immediately with this value before this function returns.
+    """
+    with self._state_mu:
+      self._on_state_change.add(fn)
+      if self._latest_attempt_state.HasField('version'):
+        try:
+          fn(self._latest_attempt_state)
+        except Exception:
+          self.logger.exception('While processing current state change.')
+
+  def unregister_on_state_change(
+      self, fn: typing.Callable[[stage_pb2.StageAttemptCurrentState], None]
+  ):
+    """Unregisters a function previously used with `register_on_state_change`.
+
+    No-op if the function was not registered, or if called multiple times for
+    the same function.
+    """
+    with self._state_mu:
+      self._on_state_change.discard(fn)
 
   def _adjust_request(self, req: message.Message) -> None:
     """Hook to adjust the req before sending (e.g., injecting tokens).
@@ -151,3 +245,26 @@ class State:
     _ = req
     if isinstance(rsp, _HAS_VALUE_DATA):
       self.data.update(rsp.value_data)
+
+  def _process_response_current_attempt_state(
+      self, req: message.Message, rsp: message.Message
+  ) -> None:
+    _ = req
+    if isinstance(rsp, write_nodes_response_pb2.WriteNodesResponse):
+      if rsp.HasField('current_attempt_state'):
+        new_state = copy.deepcopy(rsp.current_attempt_state)
+        with self._state_mu:
+          new_ver = self.ts_as_float(new_state.version.ts)
+          old_ver = self.ts_as_float(
+              self._latest_attempt_state.version.ts
+              if self._latest_attempt_state
+              else None
+          )
+
+          if new_ver > old_ver:
+            self._latest_attempt_state = new_state
+            for cb in list(self._on_state_change):
+              try:
+                cb(new_state)
+              except Exception:
+                self.logger.exception('While processing current state change.')

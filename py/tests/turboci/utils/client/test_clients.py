@@ -8,9 +8,14 @@ from __future__ import annotations
 import unittest
 from unittest import mock
 
+from google.protobuf import timestamp_pb2
 from turboci.graph.orchestrator.v1 import read_workplan_request_pb2
 from turboci.graph.orchestrator.v1 import read_workplan_response_pb2
+from turboci.graph.orchestrator.v1 import revision_pb2
+from turboci.graph.orchestrator.v1 import stage_pb2
 from turboci.graph.orchestrator.v1 import value_data_pb2
+from turboci.graph.orchestrator.v1 import write_nodes_request_pb2
+from turboci.graph.orchestrator.v1 import write_nodes_response_pb2
 from turboci.utils import client
 from turboci.utils import ids
 
@@ -169,6 +174,35 @@ class TestClients(unittest.TestCase):
     self.assertEqual(mock_transport.call_unary.call_count, 1)
     mock_sleep.assert_not_called()
     mock_logger.warning.assert_not_called()
+
+  def test_sync_client_write_nodes_updates_state(self):
+    mock_transport = mock.Mock(spec=client.TurboCITransport)
+    mock_transport.call_unary.return_value = (
+        write_nodes_response_pb2.WriteNodesResponse(
+            current_attempt_state=stage_pb2.StageAttemptCurrentState(
+                version=revision_pb2.Revision(
+                    ts=timestamp_pb2.Timestamp(seconds=123)
+                )
+            )
+        )
+    )
+
+    client_inst = client.Sync(
+        wpid=self.wpid,
+        transport=mock_transport,
+        token='my-token',
+    )
+    cb = mock.Mock()
+    client_inst.register_on_state_change(cb)
+
+    self.assertIsInstance(
+        client_inst.write_nodes(
+            write_nodes_request_pb2.WriteNodesRequest()
+        ),
+        write_nodes_response_pb2.WriteNodesResponse,
+    )
+    self.assertEqual(client_inst.latest_attempt_state.version.ts.seconds, 123)
+    cb.assert_called_once_with(client_inst.latest_attempt_state)
 
 
 class TestClientsAsync(unittest.IsolatedAsyncioTestCase):
@@ -329,6 +363,35 @@ class TestClientsAsync(unittest.IsolatedAsyncioTestCase):
     self.assertEqual(mock_transport.call_unary.call_count, 1)
     mock_sleep.assert_not_called()
     mock_logger.warning.assert_not_called()
+
+  async def test_async_client_write_nodes_updates_state(self):
+    mock_transport = mock.Mock(spec=client.TurboCIAsyncTransport)
+    mock_transport.call_unary = mock.AsyncMock(
+        return_value=write_nodes_response_pb2.WriteNodesResponse(
+            current_attempt_state=stage_pb2.StageAttemptCurrentState(
+                version=revision_pb2.Revision(
+                    ts=timestamp_pb2.Timestamp(seconds=456)
+                )
+            )
+        )
+    )
+
+    client_inst = client.Async(
+        wpid=self.wpid,
+        transport=mock_transport,
+        token='my-token',
+    )
+    cb = mock.Mock()
+    client_inst.register_on_state_change(cb)
+
+    self.assertIsInstance(
+        await client_inst.write_nodes(
+            write_nodes_request_pb2.WriteNodesRequest()
+        ),
+        write_nodes_response_pb2.WriteNodesResponse,
+    )
+    self.assertEqual(client_inst.latest_attempt_state.version.ts.seconds, 456)
+    cb.assert_called_once_with(client_inst.latest_attempt_state)
 
 
 if __name__ == '__main__':

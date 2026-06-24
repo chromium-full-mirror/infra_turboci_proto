@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 import dataclasses
+import threading
 import time
 import typing
 
@@ -34,7 +35,7 @@ __all__ = [
 
 
 @dataclasses.dataclass(kw_only=True)
-class Sync(state.State):
+class Sync(state.State[threading.Lock]):
   """Stateful, non-transactional synchronous client for TurboCI Orchestrator.
 
   This client internally handles retries for RetryableRPCError
@@ -43,6 +44,10 @@ class Sync(state.State):
 
   # (required) The transport to the actual service.
   transport: transports.TurboCITransport
+
+  def __post_init__(self):
+    # pylint: disable=attribute-defined-outside-init
+    self._state_mu = threading.Lock()
 
   def _execute(
       self,
@@ -131,7 +136,7 @@ class Sync(state.State):
 
 
 @dataclasses.dataclass(kw_only=True)
-class Async(state.State):
+class Async(state.State[state.NullLock]):
   """Stateful, non-transactional asynchronous client for TurboCI Orchestrator.
 
   This client internally handles retries for RetryableRPCError

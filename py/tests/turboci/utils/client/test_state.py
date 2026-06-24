@@ -7,9 +7,11 @@ from __future__ import annotations
 
 import copy
 import unittest
+from unittest import mock
 
 from google.protobuf import any_pb2
 from google.protobuf import empty_pb2
+from google.protobuf import timestamp_pb2
 from turboci.graph.ids.v1 import identifier_pb2
 from turboci.graph.orchestrator.v1 import allocate_worknode_ids_request_pb2
 from turboci.graph.orchestrator.v1 import cancel_workplan_request_pb2
@@ -19,9 +21,13 @@ from turboci.graph.orchestrator.v1 import query_nodes_request_pb2
 from turboci.graph.orchestrator.v1 import query_nodes_response_pb2
 from turboci.graph.orchestrator.v1 import read_workplan_request_pb2
 from turboci.graph.orchestrator.v1 import read_workplan_response_pb2
+from turboci.graph.orchestrator.v1 import revision_pb2
+from turboci.graph.orchestrator.v1 import stage_pb2
 from turboci.graph.orchestrator.v1 import value_data_pb2
 from turboci.graph.orchestrator.v1 import write_nodes_request_pb2
+from turboci.graph.orchestrator.v1 import write_nodes_response_pb2
 from turboci.utils import value
+from turboci.utils.client.state import NullLock
 from turboci.utils.client.state import State
 
 # pylint: disable=protected-access
@@ -139,6 +145,163 @@ class TestState(unittest.TestCase):
         cancel_workplan_response_pb2.CancelWorkPlanResponse(),
     )
     self.assertEqual(len(state.data), 0)
+
+  def test_null_lock(self):
+    lock = NullLock()
+    with lock:
+      pass
+
+  def test_ts_as_float(self):
+    self.assertEqual(State.ts_as_float(None), float('-inf'))
+    ts = timestamp_pb2.Timestamp(seconds=123, nanos=450000000)
+    self.assertAlmostEqual(State.ts_as_float(ts), 123.45)
+
+  def test_latest_attempt_state_default(self):
+    state = State(wpid=self.wpid)
+    self.assertEqual(
+        state.latest_attempt_state, stage_pb2.StageAttemptCurrentState()
+    )
+
+  def test_register_unregister_on_state_change(self):
+    state = State(wpid=self.wpid)
+    cb = mock.Mock()
+    state.register_on_state_change(cb)
+    cb.assert_not_called()
+
+    state.unregister_on_state_change(cb)
+    rsp = write_nodes_response_pb2.WriteNodesResponse(
+        current_attempt_state=stage_pb2.StageAttemptCurrentState(
+            version=revision_pb2.Revision(
+                ts=timestamp_pb2.Timestamp(seconds=10)
+            )
+        )
+    )
+    state._process_response_current_attempt_state(
+        write_nodes_request_pb2.WriteNodesRequest(), rsp
+    )
+    cb.assert_not_called()
+
+  def test_register_on_state_change_invokes_immediately_if_version_set(self):
+    state = State(wpid=self.wpid)
+    rsp = write_nodes_response_pb2.WriteNodesResponse(
+        current_attempt_state=stage_pb2.StageAttemptCurrentState(
+            version=revision_pb2.Revision(
+                ts=timestamp_pb2.Timestamp(seconds=10)
+            )
+        )
+    )
+    state._process_response_current_attempt_state(
+        write_nodes_request_pb2.WriteNodesRequest(), rsp
+    )
+    cb = mock.Mock()
+    state.register_on_state_change(cb)
+    cb.assert_called_once_with(state.latest_attempt_state)
+
+  def test_register_on_state_change_callback_exception(self):
+    state = State(wpid=self.wpid)
+    rsp = write_nodes_response_pb2.WriteNodesResponse(
+        current_attempt_state=stage_pb2.StageAttemptCurrentState(
+            version=revision_pb2.Revision(
+                ts=timestamp_pb2.Timestamp(seconds=10)
+            )
+        )
+    )
+    state._process_response_current_attempt_state(
+        write_nodes_request_pb2.WriteNodesRequest(), rsp
+    )
+    cb = mock.Mock(side_effect=RuntimeError('cb error'))
+    with self.assertLogs(state.logger, level='ERROR'):
+      state.register_on_state_change(cb)
+    cb.assert_called_once_with(state.latest_attempt_state)
+
+  def test_process_response_current_attempt_state_updates_and_notifies(self):
+    state = State(wpid=self.wpid)
+    cb1 = mock.Mock()
+    cb2 = mock.Mock()
+    state.register_on_state_change(cb1)
+    state.register_on_state_change(cb2)
+
+    # 1. First update (t=100s)
+    rsp1 = write_nodes_response_pb2.WriteNodesResponse(
+        current_attempt_state=stage_pb2.StageAttemptCurrentState(
+            version=revision_pb2.Revision(
+                ts=timestamp_pb2.Timestamp(seconds=100)
+            )
+        )
+    )
+    state._process_response_current_attempt_state(
+        write_nodes_request_pb2.WriteNodesRequest(), rsp1
+    )
+    self.assertEqual(state.latest_attempt_state.version.ts.seconds, 100)
+    cb1.assert_called_once_with(state.latest_attempt_state)
+    cb2.assert_called_once_with(state.latest_attempt_state)
+
+    cb1.reset_mock()
+    cb2.reset_mock()
+
+    # 2. Older update (t=50s) -> should be ignored
+    rsp2 = write_nodes_response_pb2.WriteNodesResponse(
+        current_attempt_state=stage_pb2.StageAttemptCurrentState(
+            version=revision_pb2.Revision(
+                ts=timestamp_pb2.Timestamp(seconds=50)
+            )
+        )
+    )
+    state._process_response_current_attempt_state(
+        write_nodes_request_pb2.WriteNodesRequest(), rsp2
+    )
+    self.assertEqual(state.latest_attempt_state.version.ts.seconds, 100)
+    cb1.assert_not_called()
+    cb2.assert_not_called()
+
+    # 3. Newer update (t=200s)
+    rsp3 = write_nodes_response_pb2.WriteNodesResponse(
+        current_attempt_state=stage_pb2.StageAttemptCurrentState(
+            version=revision_pb2.Revision(
+                ts=timestamp_pb2.Timestamp(seconds=200)
+            )
+        )
+    )
+    state._process_response_current_attempt_state(
+        write_nodes_request_pb2.WriteNodesRequest(), rsp3
+    )
+    self.assertEqual(state.latest_attempt_state.version.ts.seconds, 200)
+    cb1.assert_called_once_with(state.latest_attempt_state)
+    cb2.assert_called_once_with(state.latest_attempt_state)
+
+  def test_process_response_current_attempt_state_ignores_other_responses(self):
+    state = State(wpid=self.wpid)
+    with self.subTest('non-WriteNodesResponse'):
+      state._process_response_current_attempt_state(
+          read_workplan_request_pb2.ReadWorkPlanRequest(),
+          read_workplan_response_pb2.ReadWorkPlanResponse(),
+      )
+      self.assertFalse(state.latest_attempt_state.HasField('version'))
+
+    with self.subTest('WriteNodesResponse missing current_attempt_state'):
+      state._process_response_current_attempt_state(
+          write_nodes_request_pb2.WriteNodesRequest(),
+          write_nodes_response_pb2.WriteNodesResponse(),
+      )
+      self.assertFalse(state.latest_attempt_state.HasField('version'))
+
+  def test_process_response_current_attempt_state_callback_exception(self):
+    state = State(wpid=self.wpid)
+    cb = mock.Mock(side_effect=ValueError('cb fail'))
+    state.register_on_state_change(cb)
+    rsp = write_nodes_response_pb2.WriteNodesResponse(
+        current_attempt_state=stage_pb2.StageAttemptCurrentState(
+            version=revision_pb2.Revision(
+                ts=timestamp_pb2.Timestamp(seconds=10)
+            )
+        )
+    )
+    with self.assertLogs(state.logger, level='ERROR'):
+      state._process_response_current_attempt_state(
+          write_nodes_request_pb2.WriteNodesRequest(), rsp
+      )
+    self.assertEqual(state.latest_attempt_state.version.ts.seconds, 10)
+    cb.assert_called_once()
 
 
 if __name__ == '__main__':

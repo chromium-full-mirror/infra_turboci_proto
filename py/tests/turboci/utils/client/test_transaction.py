@@ -319,6 +319,7 @@ class TestTransactionalClient(unittest.TestCase):
   def setUp(self):
     self.wpid = ids.workplan(12345)
     self.mock_transport = mock.Mock(spec=client.TurboCITransport)
+    # pylint: disable=unexpected-keyword-arg
     self.client = transaction.Transactional(
         wpid=self.wpid, transport=self.mock_transport
     )
@@ -463,6 +464,7 @@ class TestTransactionalClientAsync(unittest.IsolatedAsyncioTestCase):
   def setUp(self):
     self.wpid = ids.workplan(12345)
     self.mock_transport = mock.Mock(spec=client.TurboCIAsyncTransport)
+    # pylint: disable=unexpected-keyword-arg
     self.client = transaction.TransactionalAsync(
         wpid=self.wpid, transport=self.mock_transport
     )
