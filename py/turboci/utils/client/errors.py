@@ -13,6 +13,7 @@ from turboci.graph.orchestrator.v1 import stage_pb2
 __all__ = [
     'RPCError',
     'RetryableRPCError',
+    'StageAttemptNotRunning',
     'TransactionMultipleWritesError',
     'TransactionalPreconditionError',
 ]
@@ -122,3 +123,7 @@ class TransactionMultipleWritesError(Exception):
   pieces, each of them independently observing the necessary precondition for
   that write.
   """
+
+
+class StageAttemptNotRunning(Exception):
+  """Raised from Heartbeater{,Async}.assert_running()."""
