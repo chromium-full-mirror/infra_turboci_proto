@@ -10,7 +10,8 @@ import dataclasses
 import logging
 import typing
 
-from google.protobuf import message, timestamp_pb2
+from google.protobuf import message
+from google.protobuf import timestamp_pb2
 from turboci.graph.ids.v1 import identifier_pb2
 from turboci.graph.orchestrator.v1 import allocate_worknode_ids_request_pb2
 from turboci.graph.orchestrator.v1 import cancel_workplan_request_pb2

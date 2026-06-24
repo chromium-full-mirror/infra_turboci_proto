@@ -105,11 +105,11 @@ class LockedDataSource(MutableDataSource):
     with self._mu:
       return self._mapping[key]
 
-  def __setitem__(self, key: str, value: value_data_pb2.ValueData, /) -> None:
+  def __setitem__(self, key: str, value: value_data_pb2.ValueData) -> None:
     with self._mu:
       self._mapping[key] = pick_data(self._mapping.get(key), value)
 
-  def __delitem__(self, key: str, /) -> None:
+  def __delitem__(self, key: str) -> None:
     with self._mu:
       del self._mapping[key]
 
@@ -131,16 +131,22 @@ class LockedDataSource(MutableDataSource):
     # LockedDataSource
     updates: list[tuple[str, value_data_pb2.ValueData]] = []
     if o:
-      if isinstance(o[0], typing.Mapping):
+      o0 = o[0]
+      if isinstance(o0, typing.Mapping):
         # This might call o[0].items() which acquires o[0]._mu, but we don't
         # hold self._mu yet.
-        updates.extend(typing.cast(DataSource, o[0]).items())
-      elif isinstance(o[0], _weakDataSource):
-        m = o[0]
-        for key in m.keys():
-          updates.append((key, m[key]))
+        updates.extend(typing.cast(DataSource, o0).items())
+      elif isinstance(o0, _weakDataSource):
+        for key in o0.keys():
+          updates.append((key, o0[key]))
+      elif isinstance(o0, typing.Iterable):
+        updates.extend(
+            typing.cast(
+                typing.Iterable[tuple[str, value_data_pb2.ValueData]], o0
+            )
+        )
       else:
-        updates.extend(o[0])
+        raise ValueError(f'Unsupported type for update: {type(o0)}')
     for key, value in kwargs.items():
       updates.append((key, value))
 
