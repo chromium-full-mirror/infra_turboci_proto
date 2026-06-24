@@ -210,7 +210,7 @@ class TestState(unittest.TestCase):
         write_nodes_request_pb2.WriteNodesRequest(), rsp
     )
     cb = mock.Mock(side_effect=RuntimeError('cb error'))
-    with self.assertLogs(state.logger, level='ERROR'):
+    with self.assertLogs('turboci.client', level='ERROR'):
       state.register_on_state_change(cb)
     cb.assert_called_once_with(state.latest_attempt_state)
 
@@ -296,7 +296,7 @@ class TestState(unittest.TestCase):
             )
         )
     )
-    with self.assertLogs(state.logger, level='ERROR'):
+    with self.assertLogs('turboci.client', level='ERROR'):
       state._process_response_current_attempt_state(
           write_nodes_request_pb2.WriteNodesRequest(), rsp
       )
