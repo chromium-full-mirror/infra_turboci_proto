@@ -37,7 +37,7 @@ option java_multiple_files = true;
 // digest of a ValueData that is not present in the WorkPlan based on the
 // parameters the caller provides in the request.
 //
-// Next ID: 7
+// Next ID: 8
 message WorkPlan {
   // The WorkPlan to which all nodes in this WorkPlan belong.
   optional ids.v1.WorkPlan identifier = 1;
