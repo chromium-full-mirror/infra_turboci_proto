@@ -56,7 +56,7 @@ class Sync(state.State[threading.Lock]):
       options: transports.CallOptions | None = None,
   ) -> message.Message:
     self._adjust_request(req)
-    for attempt, next_sleep_time in enumerate(self.retry.attempts()):
+    for attempt, next_sleep_time in enumerate(self.retry_policy.attempts()):
       try:
         rsp = self.transport.call_unary(method_name, req, options)
         self._process_response(req, rsp)
@@ -153,7 +153,7 @@ class Async(state.State[state.NullLock]):
       options: transports.CallOptions | None = None,
   ) -> message.Message:
     self._adjust_request(req)
-    for attempt, next_sleep_time in enumerate(self.retry.attempts()):
+    for attempt, next_sleep_time in enumerate(self.retry_policy.attempts()):
       try:
         rsp = await self.transport.call_unary(method_name, req, options)
         self._process_response(req, rsp)

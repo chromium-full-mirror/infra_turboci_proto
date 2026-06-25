@@ -65,7 +65,7 @@ class TestClients(unittest.TestCase):
         transport=mock_transport,
         token='my-token',
         logger=mock_logger,
-        retry=client.Retry(
+        retry_policy=client.Retry(
             max_retries=3,
             base_delay_sec=1.0,
             backoff_factor=2.0,
@@ -115,7 +115,7 @@ class TestClients(unittest.TestCase):
         transport=mock_transport,
         token='my-token',
         logger=mock_logger,
-        retry=client.Retry(
+        retry_policy=client.Retry(
             max_retries=2,
             base_delay_sec=1.0,
             backoff_factor=2.0,
@@ -196,9 +196,7 @@ class TestClients(unittest.TestCase):
     client_inst.register_on_state_change(cb)
 
     self.assertIsInstance(
-        client_inst.write_nodes(
-            write_nodes_request_pb2.WriteNodesRequest()
-        ),
+        client_inst.write_nodes(write_nodes_request_pb2.WriteNodesRequest()),
         write_nodes_response_pb2.WriteNodesResponse,
     )
     self.assertEqual(client_inst.latest_attempt_state.version.ts.seconds, 123)
@@ -252,7 +250,7 @@ class TestClientsAsync(unittest.IsolatedAsyncioTestCase):
         transport=mock_transport,
         token='my-token',
         logger=mock_logger,
-        retry=client.Retry(
+        retry_policy=client.Retry(
             max_retries=3,
             base_delay_sec=1.0,
             backoff_factor=2.0,
@@ -302,7 +300,7 @@ class TestClientsAsync(unittest.IsolatedAsyncioTestCase):
         transport=mock_transport,
         token='my-token',
         logger=mock_logger,
-        retry=client.Retry(
+        retry_policy=client.Retry(
             max_retries=2,
             base_delay_sec=1.0,
             backoff_factor=2.0,

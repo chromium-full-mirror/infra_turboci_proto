@@ -121,7 +121,7 @@ class State(typing.Generic[_LockT]):
   )
 
   # Retry policy.
-  retry: retry.Retry = dataclasses.field(default_factory=retry.Retry)
+  retry_policy: retry.Retry = dataclasses.field(default_factory=retry.Retry)
 
   # WARNING: Callbacks are executed while holding the state lock (_state_mu).
   # Callbacks MUST NOT interact with the client or State directly (e.g.
