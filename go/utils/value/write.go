@@ -34,6 +34,19 @@ const (
 	//     respective Edit, which always has the same realm as the Check or
 	//     Stage to which the Edit belongs.
 	RealmFromContainer string = "$from_container"
+
+	// RealmForLegacyWorkNode can be used in place of a realm to instruct the
+	// orchestrator to use legacy work node ACLs instead of realm-based ACLs.
+	//
+	// Can only be used when writing work node stages. When a stage (or a
+	// ValueRef inside of it) is written using this placeholder, the final realm
+	// stored in the Stage proto (and ValueRefs) will be empty string.
+	//
+	// Note that it is allowed to write legacy work nodes with some concrete
+	// realm. This will switch their ACLs to be based on realms, but only when
+	// accessed via Turbo CI Orchestrator APIs. Access through Workplan API is
+	// always governed by legacy ACLs.
+	RealmForLegacyWorkNode string = "$legacy_worknode"
 )
 
 // Write returns a [ValueWrite] for use with TurboCI write APIs (e.g.
