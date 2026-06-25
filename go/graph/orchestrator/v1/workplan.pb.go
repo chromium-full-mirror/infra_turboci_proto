@@ -50,17 +50,17 @@ const (
 //
 // Next ID: 7
 type WorkPlan struct {
-	state                   protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Identifier   *v1.WorkPlan           `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
-	xxx_hidden_Version      *Revision              `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
-	xxx_hidden_Realm        *string                `protobuf:"bytes,3,opt,name=realm,proto3,oneof"`
-	xxx_hidden_WorkflowName *string                `protobuf:"bytes,6,opt,name=workflow_name,json=workflowName,proto3,oneof"`
-	xxx_hidden_Checks       *[]*Check              `protobuf:"bytes,4,rep,name=checks,proto3"`
-	xxx_hidden_Stages       *[]*Stage              `protobuf:"bytes,5,rep,name=stages,proto3"`
-	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
-	XXX_presence            [1]uint32
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Identifier  *v1.WorkPlan           `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
+	xxx_hidden_Version     *Revision              `protobuf:"bytes,2,opt,name=version,proto3,oneof"`
+	xxx_hidden_Realm       *string                `protobuf:"bytes,3,opt,name=realm,proto3,oneof"`
+	xxx_hidden_Name        isWorkPlan_Name        `protobuf_oneof:"name"`
+	xxx_hidden_Checks      *[]*Check              `protobuf:"bytes,4,rep,name=checks,proto3"`
+	xxx_hidden_Stages      *[]*Stage              `protobuf:"bytes,5,rep,name=stages,proto3"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *WorkPlan) Reset() {
@@ -114,10 +114,18 @@ func (x *WorkPlan) GetRealm() string {
 
 func (x *WorkPlan) GetWorkflowName() string {
 	if x != nil {
-		if x.xxx_hidden_WorkflowName != nil {
-			return *x.xxx_hidden_WorkflowName
+		if x, ok := x.xxx_hidden_Name.(*workPlan_WorkflowName); ok {
+			return x.WorkflowName
 		}
-		return ""
+	}
+	return ""
+}
+
+func (x *WorkPlan) GetDynamicWorkflowName() string {
+	if x != nil {
+		if x, ok := x.xxx_hidden_Name.(*workPlan_DynamicWorkflowName); ok {
+			return x.DynamicWorkflowName
+		}
 	}
 	return ""
 }
@@ -154,8 +162,11 @@ func (x *WorkPlan) SetRealm(v string) {
 }
 
 func (x *WorkPlan) SetWorkflowName(v string) {
-	x.xxx_hidden_WorkflowName = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 6)
+	x.xxx_hidden_Name = &workPlan_WorkflowName{v}
+}
+
+func (x *WorkPlan) SetDynamicWorkflowName(v string) {
+	x.xxx_hidden_Name = &workPlan_DynamicWorkflowName{v}
 }
 
 func (x *WorkPlan) SetChecks(v []*Check) {
@@ -187,11 +198,27 @@ func (x *WorkPlan) HasRealm() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
+func (x *WorkPlan) HasName() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Name != nil
+}
+
 func (x *WorkPlan) HasWorkflowName() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+	_, ok := x.xxx_hidden_Name.(*workPlan_WorkflowName)
+	return ok
+}
+
+func (x *WorkPlan) HasDynamicWorkflowName() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Name.(*workPlan_DynamicWorkflowName)
+	return ok
 }
 
 func (x *WorkPlan) ClearIdentifier() {
@@ -207,9 +234,38 @@ func (x *WorkPlan) ClearRealm() {
 	x.xxx_hidden_Realm = nil
 }
 
+func (x *WorkPlan) ClearName() {
+	x.xxx_hidden_Name = nil
+}
+
 func (x *WorkPlan) ClearWorkflowName() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
-	x.xxx_hidden_WorkflowName = nil
+	if _, ok := x.xxx_hidden_Name.(*workPlan_WorkflowName); ok {
+		x.xxx_hidden_Name = nil
+	}
+}
+
+func (x *WorkPlan) ClearDynamicWorkflowName() {
+	if _, ok := x.xxx_hidden_Name.(*workPlan_DynamicWorkflowName); ok {
+		x.xxx_hidden_Name = nil
+	}
+}
+
+const WorkPlan_Name_not_set_case case_WorkPlan_Name = 0
+const WorkPlan_WorkflowName_case case_WorkPlan_Name = 6
+const WorkPlan_DynamicWorkflowName_case case_WorkPlan_Name = 7
+
+func (x *WorkPlan) WhichName() case_WorkPlan_Name {
+	if x == nil {
+		return WorkPlan_Name_not_set_case
+	}
+	switch x.xxx_hidden_Name.(type) {
+	case *workPlan_WorkflowName:
+		return WorkPlan_WorkflowName_case
+	case *workPlan_DynamicWorkflowName:
+		return WorkPlan_DynamicWorkflowName_case
+	default:
+		return WorkPlan_Name_not_set_case
+	}
 }
 
 type WorkPlan_builder struct {
@@ -223,7 +279,7 @@ type WorkPlan_builder struct {
 	Version *Revision
 	// Maps this WorkPlan to a security realm.
 	Realm *string
-	// The optional name of the workflow that this WorkPlan is an instance of.
+	// The name of the workflow of which this this WorkPlan is an instance.
 	//
 	// This will describe the 'class' of the workplan within the given project -
 	// two workplans with the same 'workflow_name' do 'the same thing' (as defined
@@ -234,7 +290,18 @@ type WorkPlan_builder struct {
 	// change IDs, build numbers, etc.).
 	//
 	// Must adhere to the regex: /^[a-zA-Z0-9\(\)\-_./ ]{0,256}$/
+
+	// Fields of oneof xxx_hidden_Name:
+	// A workflow name from pre-registered service configuration.
 	WorkflowName *string
+	// A workflow name provided manually by the caller of CreateWorkPlan.
+	//
+	// This may look like a `workflow_name`, but only has syntactic validation.
+	// Do not assume that workplans with a dynamic_workflow_name have any
+	// correlation whatsoever with other workplans with the same
+	// dynamic_workflow_name, or workplans with the same workflow_name.
+	DynamicWorkflowName *string
+	// -- end of xxx_hidden_Name
 	// Checks in the graph.
 	Checks []*Check
 	// Stages in the graph.
@@ -252,33 +319,69 @@ func (b0 WorkPlan_builder) Build() *WorkPlan {
 		x.xxx_hidden_Realm = b.Realm
 	}
 	if b.WorkflowName != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 6)
-		x.xxx_hidden_WorkflowName = b.WorkflowName
+		x.xxx_hidden_Name = &workPlan_WorkflowName{*b.WorkflowName}
+	}
+	if b.DynamicWorkflowName != nil {
+		x.xxx_hidden_Name = &workPlan_DynamicWorkflowName{*b.DynamicWorkflowName}
 	}
 	x.xxx_hidden_Checks = &b.Checks
 	x.xxx_hidden_Stages = &b.Stages
 	return m0
 }
 
+type case_WorkPlan_Name protoreflect.FieldNumber
+
+func (x case_WorkPlan_Name) String() string {
+	md := file_turboci_graph_orchestrator_v1_workplan_proto_msgTypes[0].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
+type isWorkPlan_Name interface {
+	isWorkPlan_Name()
+}
+
+type workPlan_WorkflowName struct {
+	// A workflow name from pre-registered service configuration.
+	WorkflowName string `protobuf:"bytes,6,opt,name=workflow_name,json=workflowName,proto3,oneof"`
+}
+
+type workPlan_DynamicWorkflowName struct {
+	// A workflow name provided manually by the caller of CreateWorkPlan.
+	//
+	// This may look like a `workflow_name`, but only has syntactic validation.
+	// Do not assume that workplans with a dynamic_workflow_name have any
+	// correlation whatsoever with other workplans with the same
+	// dynamic_workflow_name, or workplans with the same workflow_name.
+	DynamicWorkflowName string `protobuf:"bytes,7,opt,name=dynamic_workflow_name,json=dynamicWorkflowName,proto3,oneof"`
+}
+
+func (*workPlan_WorkflowName) isWorkPlan_Name() {}
+
+func (*workPlan_DynamicWorkflowName) isWorkPlan_Name() {}
+
 var File_turboci_graph_orchestrator_v1_workplan_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_workplan_proto_rawDesc = "" +
 	"\n" +
-	",turboci/graph/orchestrator/v1/workplan.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/check.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\x94\x03\n" +
+	",turboci/graph/orchestrator/v1/workplan.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/check.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\xbd\x03\n" +
 	"\bWorkPlan\x12C\n" +
 	"\n" +
-	"identifier\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x00R\n" +
+	"identifier\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x01R\n" +
 	"identifier\x88\x01\x01\x12F\n" +
-	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01\x12\x1e\n" +
-	"\x05realm\x18\x03 \x01(\tB\x03\xe0A\x05H\x02R\x05realm\x88\x01\x01\x12(\n" +
-	"\rworkflow_name\x18\x06 \x01(\tH\x03R\fworkflowName\x88\x01\x01\x12<\n" +
+	"\aversion\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\aversion\x88\x01\x01\x12\x1e\n" +
+	"\x05realm\x18\x03 \x01(\tB\x03\xe0A\x05H\x03R\x05realm\x88\x01\x01\x12%\n" +
+	"\rworkflow_name\x18\x06 \x01(\tH\x00R\fworkflowName\x124\n" +
+	"\x15dynamic_workflow_name\x18\a \x01(\tH\x00R\x13dynamicWorkflowName\x12<\n" +
 	"\x06checks\x18\x04 \x03(\v2$.turboci.graph.orchestrator.v1.CheckR\x06checks\x12<\n" +
-	"\x06stages\x18\x05 \x03(\v2$.turboci.graph.orchestrator.v1.StageR\x06stagesB\r\n" +
+	"\x06stages\x18\x05 \x03(\v2$.turboci.graph.orchestrator.v1.StageR\x06stagesB\x06\n" +
+	"\x04nameB\r\n" +
 	"\v_identifierB\n" +
 	"\n" +
 	"\b_versionB\b\n" +
-	"\x06_realmB\x10\n" +
-	"\x0e_workflow_nameBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x06_realmBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_workplan_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_workplan_proto_goTypes = []any{
@@ -308,7 +411,10 @@ func file_turboci_graph_orchestrator_v1_workplan_proto_init() {
 	file_turboci_graph_orchestrator_v1_check_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_proto_init()
-	file_turboci_graph_orchestrator_v1_workplan_proto_msgTypes[0].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_workplan_proto_msgTypes[0].OneofWrappers = []any{
+		(*workPlan_WorkflowName)(nil),
+		(*workPlan_DynamicWorkflowName)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

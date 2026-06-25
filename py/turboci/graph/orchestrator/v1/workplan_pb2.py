@@ -29,7 +29,7 @@ from turboci.graph.orchestrator.v1 import revision_pb2 as turboci_dot_graph_dot_
 from turboci.graph.orchestrator.v1 import stage_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_stage__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n,turboci/graph/orchestrator/v1/workplan.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/check.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\xda\x02\n\x08WorkPlan\x12\x37\n\nidentifier\x18\x01 \x01(\x0b\x32\x1e.turboci.graph.ids.v1.WorkPlanH\x00\x88\x01\x01\x12=\n\x07version\x18\x02 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x01\x88\x01\x01\x12\x17\n\x05realm\x18\x03 \x01(\tB\x03\xe0\x41\x05H\x02\x88\x01\x01\x12\x1a\n\rworkflow_name\x18\x06 \x01(\tH\x03\x88\x01\x01\x12\x34\n\x06\x63hecks\x18\x04 \x03(\x0b\x32$.turboci.graph.orchestrator.v1.Check\x12\x34\n\x06stages\x18\x05 \x03(\x0b\x32$.turboci.graph.orchestrator.v1.StageB\r\n\x0b_identifierB\n\n\x08_versionB\x08\n\x06_realmB\x10\n\x0e_workflow_nameBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n,turboci/graph/orchestrator/v1/workplan.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a)turboci/graph/orchestrator/v1/check.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\"\xee\x02\n\x08WorkPlan\x12\x37\n\nidentifier\x18\x01 \x01(\x0b\x32\x1e.turboci.graph.ids.v1.WorkPlanH\x01\x88\x01\x01\x12=\n\x07version\x18\x02 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x02\x88\x01\x01\x12\x17\n\x05realm\x18\x03 \x01(\tB\x03\xe0\x41\x05H\x03\x88\x01\x01\x12\x17\n\rworkflow_name\x18\x06 \x01(\tH\x00\x12\x1f\n\x15\x64ynamic_workflow_name\x18\x07 \x01(\tH\x00\x12\x34\n\x06\x63hecks\x18\x04 \x03(\x0b\x32$.turboci.graph.orchestrator.v1.Check\x12\x34\n\x06stages\x18\x05 \x03(\x0b\x32$.turboci.graph.orchestrator.v1.StageB\x06\n\x04nameB\r\n\x0b_identifierB\n\n\x08_versionB\x08\n\x06_realmBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -40,5 +40,5 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_WORKPLAN'].fields_by_name['realm']._loaded_options = None
   _globals['_WORKPLAN'].fields_by_name['realm']._serialized_options = b'\340A\005'
   _globals['_WORKPLAN']._serialized_start=284
-  _globals['_WORKPLAN']._serialized_end=630
+  _globals['_WORKPLAN']._serialized_end=650
 # @@protoc_insertion_point(module_scope)
