@@ -35,7 +35,7 @@ const (
 // See also:
 //   - Identifier.Stage* (Identifiers for Stages, StageAttempts, etc.)
 //
-// Next ID: 20.
+// Next ID: 20
 type Stage struct {
 	state                        protoimpl.MessageState      `protogen:"opaque.v1"`
 	xxx_hidden_Identifier        *v1.Stage                   `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
@@ -1299,7 +1299,7 @@ func (b0 Stage_ExecutionPolicyState_builder) Build() *Stage_ExecutionPolicyState
 // Stages in the AWAITING state ALWAYS have an active Attempt, even before
 // the Orchestrator sends the first RPC to the Executor for this Stage.
 //
-// Next ID: 12.
+// Next ID: 12
 type Stage_Attempt struct {
 	state                      protoimpl.MessageState              `protogen:"opaque.v1"`
 	xxx_hidden_Identifier      *v1.StageAttempt                    `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`

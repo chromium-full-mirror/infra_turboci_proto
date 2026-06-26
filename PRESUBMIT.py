@@ -139,6 +139,17 @@ def test_AllFieldsOptional(input_api, output_api):
   ]
 
 
+def test_NextId(input_api, output_api):
+  return [
+      input_api.Command(
+          name='build.py check_next_id',
+          cmd=['build.py', 'check_next_id'],
+          kwargs={'cwd': input_api.PresubmitLocalPath()},
+          message=output_api.PresubmitError,
+      )
+  ]
+
+
 def test_Stubs(input_api, output_api):
   return [
       input_api.Command(

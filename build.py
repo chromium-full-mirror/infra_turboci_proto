@@ -273,6 +273,85 @@ def task_check_all_fields_optional():
     _task_check_all_fields_optional(fds)
 
 
+def _check_message_next_id(
+    file_name: str,
+    message: DescriptorProto,
+    message_name: str,
+    path: tuple[int, ...],
+    cmap: dict[tuple[int, ...], str],
+    errors: list[str],
+):
+  """Recursively checks 'Next ID' comments in a message and its children."""
+  if path in cmap:
+    comment = cmap[path]
+    lines = [line.strip() for line in comment.splitlines() if line.strip()]
+    if lines:
+      last_line = lines[-1]
+      if re.search(r'\bnext[_\s-]*id\b', last_line, re.IGNORECASE):
+        numbers = [field.number for field in message.field] + [
+            r.end - 1 for r in message.reserved_range
+        ]
+        expected_next_id = (max(numbers) + 1) if numbers else 1
+        canonical_match = re.match(r'^Next ID:\s+(\d+)$', last_line)
+        if canonical_match:
+          comment_next_id = int(canonical_match.group(1))
+          if comment_next_id != expected_next_id:
+            errors.append(
+                f'{file_name}: {message_name}: Next ID comment says'
+                f' {comment_next_id}, but expected {expected_next_id}.'
+            )
+        else:
+          errors.append(
+              f'{file_name}: {message_name}: Non-canonical Next ID comment'
+              f' {last_line!r}. Please use the canonical form "Next ID: XXX"'
+              f' (e.g. "Next ID: {expected_next_id}").'
+          )
+
+  for i, nested_message in enumerate(message.nested_type):
+    if not nested_message.options.map_entry:
+      _check_message_next_id(
+          file_name,
+          nested_message,
+          f'{message_name}.{nested_message.name}',
+          path + (3, i),
+          cmap,
+          errors,
+      )
+
+
+def _task_check_next_id(desc: FileDescriptorSet):
+  """Checks that 'Next ID' comment on messages matches expected next ID."""
+  errors = []
+  for file in desc.file:
+    cmap = {}
+    for loc in file.source_code_info.location:
+      comments = []
+      if loc.leading_comments:
+        comments.append(loc.leading_comments)
+      if loc.trailing_comments:
+        comments.append(loc.trailing_comments)
+      if loc.leading_detached_comments:
+        comments.extend(loc.leading_detached_comments)
+      if comments:
+        cmap[tuple(loc.path)] = '\n'.join(comments)
+
+    for i, message in enumerate(file.message_type):
+      _check_message_next_id(
+          file.name, message, message.name, (4, i), cmap, errors
+      )
+
+  if errors:
+    for error in errors:
+      print(error)
+    sys.exit(1)
+
+
+def task_check_next_id():
+  """Checks that 'Next ID' comment on messages matches expected next ID."""
+  with _fds() as fds:
+    _task_check_next_id(fds)
+
+
 def protoc(*args: str):
   with tempfile.NamedTemporaryFile() as argfile:
     argfile.writelines((arg + '\n').encode() for arg in args)
@@ -483,11 +562,15 @@ def task_all():
     def check_all_fields_optional():
       _task_check_all_fields_optional(fds)
 
+    def check_next_id():
+      _task_check_next_id(fds)
+
     allTasks = (
         task_format,
         check_service_definitions,
         check_go_package,
         check_all_fields_optional,
+        check_next_id,
         task_lint,
         task_breaking,
         task_compile_stubs,
