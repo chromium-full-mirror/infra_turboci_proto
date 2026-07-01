@@ -6,9 +6,11 @@
 import enum
 import typing
 
-from turboci.graph.orchestrator.v1 import check_pb2, edit_pb2, workplan_pb2
+from turboci.graph.orchestrator.v1 import check_pb2
+from turboci.graph.orchestrator.v1 import edit_pb2
 from turboci.graph.orchestrator.v1 import stage_pb2
 from turboci.graph.orchestrator.v1 import value_ref_pb2
+from turboci.graph.orchestrator.v1 import workplan_pb2
 
 __all__ = [
     'RefSlot',

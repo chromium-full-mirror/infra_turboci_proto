@@ -195,6 +195,17 @@ def test_PyFormat(input_api, output_api):
   )
 
 
+def test_PyImports(input_api, output_api):
+  return [
+      input_api.Command(
+          name='build.py check_python_imports',
+          cmd=['build.py', 'check_python_imports'],
+          kwargs={'cwd': input_api.PresubmitLocalPath()},
+          message=output_api.PresubmitError,
+      )
+  ]
+
+
 def test_PyTests(input_api, output_api):
   return [
       input_api.Command(

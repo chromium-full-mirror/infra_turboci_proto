@@ -8,5 +8,5 @@ from turboci.utils.ids.create import *
 from turboci.utils.ids.mutate import *
 from turboci.utils.ids.parse import *
 from turboci.utils.ids.root import *
-from turboci.utils.ids.wrap import *
+from turboci.utils.ids.wrapping import *
 # go/keep-sorted end

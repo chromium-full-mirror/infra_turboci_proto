@@ -13,16 +13,16 @@ __all__ = [
 from google.protobuf import timestamp_pb2
 
 from turboci.graph.ids.v1 import identifier_pb2
-from turboci.utils.ids import wrap
+from turboci.utils.ids import wrapping
 
 
-def to_string(ident: wrap.AnyIdentifier) -> str:
+def to_string(ident: wrapping.AnyIdentifier) -> str:
   """Converts from a proto identifier to a canonical string."""
 
   def fmt_rev(ts: timestamp_pb2.Timestamp) -> str:
     return f'{ts.seconds}/{ts.nanos}'
 
-  any_id = wrap.unwrap(ident)
+  any_id = wrapping.unwrap(ident)
   parts = []
   stop = False
 

@@ -22,8 +22,14 @@ from google.protobuf import timestamp_pb2
 from turboci.graph.ids.v1 import identifier_pb2
 
 
-def _normalize_workplan(
-    in_workplan: str | int | identifier_pb2.WorkPlan) -> str:
+def normalize_workplan(in_workplan: str | int | identifier_pb2.WorkPlan) -> str:
+  """Converts 'L1345', '1345' and 1345 to '1345'.
+
+  Rejects non-numeric workplan IDs with ValueError.
+
+  Used by other modules, so doesn't have a leading underscore, but we don't
+  need to export it via __all__.
+  """
   if isinstance(in_workplan, int):
     return str(in_workplan)
   if isinstance(in_workplan, identifier_pb2.WorkPlan):
@@ -41,7 +47,7 @@ def _normalize_workplan(
 
 def _check_index(idx: int):
   if idx <= 0 or idx >= 2**31 - 1:
-    raise ValueError(f"index must be in [1, 2**31 - 1): {idx!r}")
+    raise ValueError(f'index must be in [1, 2**31 - 1): {idx!r}')
 
 
 def workplan(ident: str | int) -> identifier_pb2.WorkPlan:
@@ -50,13 +56,13 @@ def workplan(ident: str | int) -> identifier_pb2.WorkPlan:
   Args:
     ident: The workplan ID string (with or without 'L' prefix) or integer.
   """
-  cleaned = _normalize_workplan(ident)
+  cleaned = normalize_workplan(ident)
   return identifier_pb2.WorkPlan(id=cleaned)
 
 
 def check(
-    ident: str,
-    in_workplan: identifier_pb2.WorkPlan | None = None) -> identifier_pb2.Check:
+    ident: str, in_workplan: identifier_pb2.WorkPlan | None = None
+) -> identifier_pb2.Check:
   """Helper to generate a Check identifier.
 
   Args:
@@ -69,8 +75,9 @@ def check(
   return identifier_pb2.Check(work_plan=in_workplan, id=ident)
 
 
-def check_result(idx: int,
-                 check_id: identifier_pb2.Check) -> identifier_pb2.CheckResult:
+def check_result(
+    idx: int, check_id: identifier_pb2.Check
+) -> identifier_pb2.CheckResult:
   """Helper to generate a CheckResult identifier.
 
   Args:
@@ -81,8 +88,10 @@ def check_result(idx: int,
   return identifier_pb2.CheckResult(check=check_id, idx=idx)
 
 
-def check_edit(ts: datetime.datetime | timestamp_pb2.Timestamp,
-               check_id: identifier_pb2.Check) -> identifier_pb2.CheckEdit:
+def check_edit(
+    ts: datetime.datetime | timestamp_pb2.Timestamp,
+    check_id: identifier_pb2.Check,
+) -> identifier_pb2.CheckEdit:
   """Helper to generate a CheckEdit identifier_pb2.
 
   Args:
@@ -96,10 +105,12 @@ def check_edit(ts: datetime.datetime | timestamp_pb2.Timestamp,
   return identifier_pb2.CheckEdit(check=check_id, version=ts)
 
 
-def stage(ident: str,
-          in_workplan: identifier_pb2.WorkPlan | None = None,
-          *,
-          is_worknode: bool = False) -> identifier_pb2.Stage:
+def stage(
+    ident: str,
+    in_workplan: identifier_pb2.WorkPlan | None = None,
+    *,
+    is_worknode: bool = False,
+) -> identifier_pb2.Stage:
   """Helper to generate a Stage identifier_pb2.
 
   Args:
@@ -110,13 +121,14 @@ def stage(ident: str,
   if ':' in ident:
     raise ValueError(f"stage: value must not contain ':': {ident!r}")
 
-  return identifier_pb2.Stage(work_plan=in_workplan,
-                              id=ident,
-                              is_worknode=is_worknode)
+  return identifier_pb2.Stage(
+      work_plan=in_workplan, id=ident, is_worknode=is_worknode
+  )
 
 
 def stage_attempt(
-    idx: int, stage_id: identifier_pb2.Stage) -> identifier_pb2.StageAttempt:
+    idx: int, stage_id: identifier_pb2.Stage
+) -> identifier_pb2.StageAttempt:
   """Helper to generate a StageAttempt identifier.
 
   Args:
@@ -127,8 +139,10 @@ def stage_attempt(
   return identifier_pb2.StageAttempt(stage=stage_id, idx=idx)
 
 
-def stage_edit(ts: datetime.datetime | timestamp_pb2.Timestamp,
-               stage_id: identifier_pb2.Stage) -> identifier_pb2.StageEdit:
+def stage_edit(
+    ts: datetime.datetime | timestamp_pb2.Timestamp,
+    stage_id: identifier_pb2.Stage,
+) -> identifier_pb2.StageEdit:
   """Helper to generate a StageEdit identifier.
 
   Args:

@@ -5,20 +5,23 @@
 
 from __future__ import annotations
 
+from turboci.graph.ids.v1 import identifier_pb2
+from turboci.utils.ids import wrapping
+
 __all__ = [
     'root',
     'same_root',
     'same_workplan',
 ]
 
-from turboci.graph.ids.v1 import identifier_pb2
-from turboci.utils.ids.wrap import AnyIdentifier, unwrap
-
 
 def root(
-    ident: AnyIdentifier
-) -> tuple[identifier_pb2.WorkPlan | None, identifier_pb2.Check | None,
-           identifier_pb2.Stage | None]:
+    ident: wrapping.AnyIdentifier,
+) -> tuple[
+    identifier_pb2.WorkPlan | None,
+    identifier_pb2.Check | None,
+    identifier_pb2.Stage | None,
+]:
   """Returns the underlying root components representing the identifier.
 
   Useful to inspect the baseline components (WorkPlan, Check, or Stage)
@@ -28,7 +31,7 @@ def root(
     A 3-tuple of (WorkPlan, Check, Stage) where precisely one of Check or Stage
    is populated.
   """
-  match (unwrapped := unwrap(ident)):
+  match (unwrapped := wrapping.unwrap(ident)):
     case identifier_pb2.WorkPlan():
       return unwrapped, None, None
     case identifier_pb2.Check():
@@ -47,7 +50,7 @@ def root(
       raise NotImplementedError(f'root({type(ident)})')
 
 
-def same_root(a: AnyIdentifier, b: AnyIdentifier) -> bool:
+def same_root(a: wrapping.AnyIdentifier, b: wrapping.AnyIdentifier) -> bool:
   """Checks if two identifiers share the exact same Check or Stage root."""
   if a is None or b is None:
     return False
@@ -62,7 +65,7 @@ def same_root(a: AnyIdentifier, b: AnyIdentifier) -> bool:
   return False
 
 
-def same_workplan(a: AnyIdentifier, b: AnyIdentifier) -> bool:
+def same_workplan(a: wrapping.AnyIdentifier, b: wrapping.AnyIdentifier) -> bool:
   """Checks if two identifiers operate within the same WorkPlan context."""
   if a is None or b is None:
     return False

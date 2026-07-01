@@ -13,6 +13,7 @@ Typically this is run as `build.py all` to do all the things.
 
 from __future__ import annotations
 
+import ast
 import collections
 import contextlib
 import filecmp
@@ -515,6 +516,58 @@ def task_store_descriptors(mode: None | str = None):
     f.write(gzipped)
 
 
+def task_check_python_imports():
+  """Checks that Python files have only one import per import statement."""
+  violations = False
+  for rel_path in quick_glob('py/**/*.py'):
+    if (
+        rel_path.endswith('__init__.py')
+        or rel_path.endswith('_pb2.py')
+        or '/.' in rel_path
+    ):
+      continue
+    abs_path = _RepoRoot / rel_path
+    with open(abs_path, encoding='utf-8') as f:
+      content = f.read()
+    lines = content.splitlines()
+    tree = ast.parse(content, rel_path)
+    for node in ast.walk(tree):
+      if isinstance(node, (ast.Import, ast.ImportFrom)):
+        if getattr(node, 'module', None) == '__future__':
+          continue
+        if len(node.names) > 1:
+          violations = True
+          end_lineno = getattr(node, 'end_lineno', node.lineno)
+          found = '\n'.join(lines[node.lineno - 1 : end_lineno])
+          recommended = []
+          if isinstance(node, ast.Import):
+            for alias in node.names:
+              if alias.asname:
+                recommended.append(f'import {alias.name} as {alias.asname}')
+              else:
+                recommended.append(f'import {alias.name}')
+          else:
+            prefix = '.' * node.level + (node.module or '')
+            for alias in node.names:
+              if alias.asname:
+                recommended.append(
+                    f'from {prefix} import {alias.name} as {alias.asname}'
+                )
+              else:
+                recommended.append(f'from {prefix} import {alias.name}')
+          rec_str = '\n'.join(f'    {r}' for r in recommended)
+          found_str = '\n'.join(f'    {line}' for line in found.splitlines())
+          print(f'{rel_path}:{node.lineno}: multiple imports per statement')
+          print('  Found:')
+          print(found_str)
+          print('  Recommended:')
+          print(rec_str)
+          print()
+
+  if violations:
+    sys.exit(1)
+
+
 def task_test_python(verbose: None | str = None):
   """Runs python unittests."""
   args = [
@@ -575,6 +628,7 @@ def task_all():
         task_breaking,
         task_compile_stubs,
         task_store_descriptors,
+        task_check_python_imports,
         task_test_python,
         task_install_venv_link,
         task_test_go,

@@ -3,12 +3,13 @@
 # found in the LICENSE file.
 """Test for value.Digest."""
 
-import unittest
 import hashlib
+import unittest
 
-from google.protobuf import empty_pb2, struct_pb2, any_pb2
-
-from turboci.utils.value import Digest, deterministially_serialize_any
+from google.protobuf import any_pb2
+from google.protobuf import empty_pb2
+from google.protobuf import struct_pb2
+from turboci.utils import value
 
 
 class TestDigest(unittest.TestCase):
@@ -38,16 +39,18 @@ class TestDigest(unittest.TestCase):
       with self.subTest(name):
         apb = any_pb2.Any()
         apb.Pack(msg)
-        dgst = Digest.compute(apb)
+        dgst = value.Digest.compute(apb)
         self.assertEqual(str(dgst), want)
 
         anySerialized = apb.SerializeToString(deterministic=True)
-        self.assertEqual(deterministially_serialize_any(apb), anySerialized)
+        self.assertEqual(
+            value.deterministially_serialize_any(apb), anySerialized
+        )
 
         vd = dgst.to_proto()
         self.assertEqual(vd.size_bytes, apb.ByteSize())
         self.assertEqual(hashlib.sha256(anySerialized).digest(), vd.hash)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   unittest.main()

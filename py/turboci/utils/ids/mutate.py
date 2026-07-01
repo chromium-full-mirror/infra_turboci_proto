@@ -8,8 +8,8 @@ from __future__ import annotations
 import typing
 
 from turboci.graph.ids.v1 import identifier_pb2
-from turboci.utils.ids.create import _normalize_workplan
-from turboci.utils.ids.wrap import AnyIdentifier, unwrap
+from turboci.utils.ids import create
+from turboci.utils.ids import wrapping
 
 __all__ = [
     'set_workplan',
@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-SpecificIdent = typing.TypeVar('SpecificIdent', bound=AnyIdentifier)
+SpecificIdent = typing.TypeVar('SpecificIdent', bound=wrapping.AnyIdentifier)
 
 
 def set_workplan(
@@ -33,9 +33,9 @@ def set_workplan(
   Returns:
     The modified identifier with the bound workplan.
   """
-  wp_cleaned = _normalize_workplan(workplan_id)
+  wp_cleaned = create.normalize_workplan(workplan_id)
 
-  match (unwrapped := unwrap(ident)):
+  match (unwrapped := wrapping.unwrap(ident)):
     case identifier_pb2.WorkPlan():
       unwrapped.id = wp_cleaned
     case identifier_pb2.Check():
@@ -64,7 +64,7 @@ def clear_workplan(ident: SpecificIdent) -> SpecificIdent:
   Returns:
     The modified identifier with the workplan removed.
   """
-  match (unwrapped := unwrap(ident)):
+  match (unwrapped := wrapping.unwrap(ident)):
     case identifier_pb2.Check():
       unwrapped.ClearField('work_plan')
     case identifier_pb2.CheckResult():
