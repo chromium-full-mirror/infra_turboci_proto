@@ -33,7 +33,7 @@ def _translate_grpc_error(err: grpc.RpcError) -> Exception:
     code = code_val[0] if isinstance(code_val, tuple) else code_val
     status = status_pb2.Status(code=code, message=err.details())
 
-  return errors.RPCError.make(
+  return errors.MakeRPCError(
       message=status.message,
       status=status,
   )

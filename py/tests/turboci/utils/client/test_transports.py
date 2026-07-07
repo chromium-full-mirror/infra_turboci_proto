@@ -106,8 +106,8 @@ class TestTransports(unittest.TestCase):
     with self.assertRaises(client.RPCError) as ctx:
       transport.call_unary('CreateWorkPlan', request)
 
-    self.assertEqual(ctx.exception.code, code_pb2.NOT_FOUND)
-    self.assertEqual(str(ctx.exception), 'not found')
+    self.assertEqual(ctx.exception.status.code, code_pb2.NOT_FOUND)
+    self.assertEqual(str(ctx.exception), 'NOT_FOUND: not found')
 
 
 class TestTransportsAsync(unittest.IsolatedAsyncioTestCase):
@@ -148,8 +148,8 @@ class TestTransportsAsync(unittest.IsolatedAsyncioTestCase):
     with self.assertRaises(client.RPCError) as ctx:
       await transport.call_unary('CreateWorkPlan', request)
 
-    self.assertEqual(ctx.exception.code, code_pb2.NOT_FOUND)
-    self.assertEqual(str(ctx.exception), 'not found')
+    self.assertEqual(ctx.exception.status.code, code_pb2.NOT_FOUND)
+    self.assertEqual(str(ctx.exception), 'NOT_FOUND: not found')
 
 
 if __name__ == '__main__':

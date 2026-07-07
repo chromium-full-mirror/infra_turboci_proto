@@ -12,7 +12,7 @@ from unittest import mock
 from google.protobuf import any_pb2
 from google.protobuf import timestamp_pb2
 from google.protobuf import wrappers_pb2
-from google.rpc import status_pb2
+from google.rpc import code_pb2
 from turboci.graph.orchestrator.v1 import revision_pb2
 from turboci.graph.orchestrator.v1 import stage_attempt_state_pb2
 from turboci.graph.orchestrator.v1 import stage_pb2
@@ -265,9 +265,7 @@ class TestLifecycle(unittest.TestCase):
     self.client.logger = mock_logger
     opts = lifecycle.HeartbeatOptions(min_delay_sec=0.01)
 
-    transient_error = errors.RPCError.make(
-        "transient", status_pb2.Status(code=14)  # UNAVAILABLE
-    )
+    transient_error = errors.RetryableRPCError.make("transient")
     default_rsp = write_nodes_response_pb2.WriteNodesResponse(
         current_attempt_state=make_state(int(time.time()) + 10)
     )
@@ -308,7 +306,7 @@ class TestLifecycle(unittest.TestCase):
     opts = lifecycle.HeartbeatOptions(min_delay_sec=0.01)
 
     permanent_error = errors.RPCError.make(
-        "permanent", status_pb2.Status(code=7)  # PERMISSION_DENIED
+        "permanent", code=code_pb2.PERMISSION_DENIED
     )
     self.client.write_nodes = mock.Mock(
         side_effect=[
@@ -504,7 +502,7 @@ class TestLifecycle(unittest.TestCase):
         write_nodes_response_pb2.WriteNodesResponse(
             current_attempt_state=make_state(int(time.time()) + 10)
         ),
-        errors.RPCError("network down", None),
+        errors.RPCError.make("network down"),
     ]
     hb = lifecycle.execute_stage(
         client=self.client,
@@ -743,9 +741,7 @@ class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
     self.client.logger = mock_logger
     opts = lifecycle.HeartbeatOptions(min_delay_sec=0.01)
 
-    transient_error = errors.RPCError.make(
-        "transient", status_pb2.Status(code=14)  # UNAVAILABLE
-    )
+    transient_error = errors.RetryableRPCError.make("transient")
     default_rsp = write_nodes_response_pb2.WriteNodesResponse(
         current_attempt_state=make_state(int(time.time()) + 10)
     )
@@ -786,7 +782,7 @@ class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
     opts = lifecycle.HeartbeatOptions(min_delay_sec=0.01)
 
     permanent_error = errors.RPCError.make(
-        "permanent", status_pb2.Status(code=7)  # PERMISSION_DENIED
+        "permanent", code=code_pb2.PERMISSION_DENIED
     )
     self.client.write_nodes = mock.AsyncMock(
         side_effect=[
@@ -1021,7 +1017,7 @@ class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
             write_nodes_response_pb2.WriteNodesResponse(
                 current_attempt_state=make_state(int(time.time()) + 10)
             ),
-            errors.RPCError("network down", None),
+            errors.RPCError.make("network down"),
         ]
     )
     hb = await lifecycle.async_execute_stage(

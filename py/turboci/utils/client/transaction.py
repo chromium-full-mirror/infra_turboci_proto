@@ -158,7 +158,7 @@ class ObservedNodeSet:
       cvers = self._ts_to_str(node.version.ts)
       wpvers = self._ts_to_str(self._rev.ts)
       ident = ids.to_string(node.identifier)
-      raise errors.TransactionalPreconditionError(
+      raise errors.TransactionalPreconditionError.make(
           f'node[{ident!r}]: newer than snapshot: {cvers} > {wpvers}'
       )
 
@@ -365,7 +365,9 @@ def run_transaction(
     )
     try:
       return callback(tx_client)
-    except errors.TransactionalPreconditionError as exc:
+    except errors.RPCError as exc:
+      if not exc.status.conflict:
+        raise
       if attempt < max_retries:
         client.logger.warning(
             'Retrying transaction (attempt %d/%d) due to precondition'

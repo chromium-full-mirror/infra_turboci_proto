@@ -132,7 +132,7 @@ class TestObservedNodeSet(unittest.TestCase):
     wp2 = make_wp(self.wpid, 101)
     wp2.checks.append(make_check(self.wpid, 'check1', 101))
 
-    with self.assertRaises(client.TransactionalPreconditionError):
+    with self.assertRaises(client.RPCError):
       self.ns._observe_workplan(wp2)
 
   def test_observe_workplan_with_stage_attempts(self):
@@ -169,7 +169,7 @@ class TestObservedNodeSet(unittest.TestCase):
     attempt.version.CopyFrom(make_rev(101))
     wp2.stages.append(stage)
 
-    with self.assertRaises(client.TransactionalPreconditionError):
+    with self.assertRaises(client.RPCError):
       self.ns._observe_workplan(wp2)
 
   def test_observe_different_workplan_raises(self):
@@ -548,7 +548,7 @@ class TestRunTransaction(unittest.TestCase):
       nonlocal attempts
       attempts += 1
       if attempts == 1:
-        raise client.TransactionalPreconditionError('conflict')
+        raise client.TransactionalPreconditionError.make('conflict')
       return 'success'
 
     res = transaction.run_transaction(self.client, cb, max_retries=3)
@@ -570,11 +570,9 @@ class TestRunTransaction(unittest.TestCase):
     def cb(_):
       nonlocal attempts
       attempts += 1
-      raise client.TransactionalPreconditionError(f'conflict {attempts}')
+      raise client.TransactionalPreconditionError.make(f'conflict {attempts}')
 
-    with self.assertRaisesRegex(
-        client.TransactionalPreconditionError, 'conflict 4'
-    ):
+    with self.assertRaisesRegex(client.RPCError, 'conflict 4'):
       transaction.run_transaction(self.client, cb, max_retries=3)
     self.assertEqual(attempts, 4)  # 1 initial + 3 retries
     mock_logger.warning.assert_has_calls([
@@ -643,7 +641,7 @@ class TestRunTransactionAsync(unittest.IsolatedAsyncioTestCase):
       nonlocal attempts
       attempts += 1
       if attempts == 1:
-        raise client.TransactionalPreconditionError('conflict')
+        raise client.TransactionalPreconditionError.make('conflict')
       return 'success'
 
     res = await transaction.run_transaction_async(
@@ -667,11 +665,9 @@ class TestRunTransactionAsync(unittest.IsolatedAsyncioTestCase):
     async def cb(_):
       nonlocal attempts
       attempts += 1
-      raise client.TransactionalPreconditionError(f'conflict {attempts}')
+      raise client.TransactionalPreconditionError.make(f'conflict {attempts}')
 
-    with self.assertRaisesRegex(
-        client.TransactionalPreconditionError, 'conflict 4'
-    ):
+    with self.assertRaisesRegex(client.RPCError, 'conflict 4'):
       await transaction.run_transaction_async(self.client, cb, max_retries=3)
     self.assertEqual(attempts, 4)
     mock_logger.warning.assert_has_calls([

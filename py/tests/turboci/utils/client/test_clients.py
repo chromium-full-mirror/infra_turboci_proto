@@ -50,7 +50,7 @@ class TestClients(unittest.TestCase):
   @mock.patch('time.sleep')
   def test_sync_client_retry_success(self, mock_sleep):
     mock_transport = mock.Mock(spec=client.TurboCITransport)
-    retryable_err = client.RetryableRPCError('retryable', None)
+    retryable_err = client.RetryableRPCError.make('retryable')
     mock_transport.call_unary.side_effect = [
         retryable_err,
         retryable_err,
@@ -106,7 +106,7 @@ class TestClients(unittest.TestCase):
   @mock.patch('time.sleep')
   def test_sync_client_retry_failure(self, mock_sleep):
     mock_transport = mock.Mock(spec=client.TurboCITransport)
-    retryable_err = client.RetryableRPCError('retryable', None)
+    retryable_err = client.RetryableRPCError.make('retryable')
     mock_transport.call_unary.side_effect = retryable_err
 
     mock_logger = mock.Mock()
@@ -155,7 +155,7 @@ class TestClients(unittest.TestCase):
   @mock.patch('time.sleep')
   def test_sync_client_non_retryable_failure(self, mock_sleep):
     mock_transport = mock.Mock(spec=client.TurboCITransport)
-    mock_transport.call_unary.side_effect = client.RPCError('fatal', None)
+    mock_transport.call_unary.side_effect = client.RPCError.make('fatal')
 
     mock_logger = mock.Mock()
     client_inst = client.Sync(
@@ -233,7 +233,7 @@ class TestClientsAsync(unittest.IsolatedAsyncioTestCase):
   @mock.patch('asyncio.sleep')
   async def test_async_client_retry_success(self, mock_sleep):
     mock_transport = mock.Mock(spec=client.TurboCIAsyncTransport)
-    retryable_err = client.RetryableRPCError('retryable', None)
+    retryable_err = client.RetryableRPCError.make('retryable')
     mock_transport.call_unary = mock.AsyncMock(
         side_effect=[
             retryable_err,
@@ -291,7 +291,7 @@ class TestClientsAsync(unittest.IsolatedAsyncioTestCase):
   @mock.patch('asyncio.sleep')
   async def test_async_client_retry_failure(self, mock_sleep):
     mock_transport = mock.Mock(spec=client.TurboCIAsyncTransport)
-    retryable_err = client.RetryableRPCError('retryable', None)
+    retryable_err = client.RetryableRPCError.make('retryable')
     mock_transport.call_unary = mock.AsyncMock(side_effect=retryable_err)
 
     mock_logger = mock.Mock()
@@ -341,7 +341,7 @@ class TestClientsAsync(unittest.IsolatedAsyncioTestCase):
   async def test_async_client_non_retryable_failure(self, mock_sleep):
     mock_transport = mock.Mock(spec=client.TurboCIAsyncTransport)
     mock_transport.call_unary = mock.AsyncMock(
-        side_effect=client.RPCError('fatal', None)
+        side_effect=client.RPCError.make('fatal')
     )
 
     mock_logger = mock.Mock()
