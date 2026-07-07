@@ -237,7 +237,7 @@ def execute_stage(
   if not opts:
     opts = HeartbeatOptions()
   process_uid = _make_process_uid(stage)
-  client.write_nodes(
+  client.WriteNodes(
       _make_transition_request(
           transition_to, process_uid, attempt_execution_policy
       ),
@@ -296,7 +296,7 @@ async def async_execute_stage(
   if not opts:
     opts = HeartbeatOptions()
   process_uid = _make_process_uid(stage)
-  await client.write_nodes(
+  await client.WriteNodes(
       _make_transition_request(
           transition_to, process_uid, attempt_execution_policy
       ),
@@ -582,7 +582,7 @@ class AttemptLifecycleManager(
   def _ping(self, req: write_nodes_request_pb2.WriteNodesRequest):
     """Sends a WriteNodes request, serializing it and tracking latency."""
     start = time.perf_counter()
-    self.client.write_nodes(
+    self.client.WriteNodes(
         req,
         options=transports.CallOptions(
             deadline=datetime.timedelta(seconds=self.opts.ping_timeout_sec)
@@ -705,7 +705,7 @@ class AttemptLifecycleManagerAsync(
   async def _ping(self, req: write_nodes_request_pb2.WriteNodesRequest):
     """Sends a WriteNodes request, serializing it and tracking latency."""
     start = time.perf_counter()
-    await self.client.write_nodes(
+    await self.client.WriteNodes(
         req,
         options=transports.CallOptions(
             deadline=datetime.timedelta(seconds=self.opts.ping_timeout_sec)

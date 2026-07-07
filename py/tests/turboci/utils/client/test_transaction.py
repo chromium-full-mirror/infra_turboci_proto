@@ -85,7 +85,7 @@ class TestObservedNodeSet(unittest.TestCase):
     self.assertEqual(len(self.ns.nodes), 2)
 
   def test_assert_missing_nodes_after_rev_set_raises(self):
-    self.ns.observe_read_work_plan(
+    self.ns.observe_ReadWorkPlan(
         read_workplan_response_pb2.ReadWorkPlanResponse(
             workplan=make_wp(self.wpid, 100)
         )
@@ -184,7 +184,7 @@ class TestObservedNodeSet(unittest.TestCase):
     )
     rsp.workplan.checks.append(make_check(self.wpid, 'check1', 50))
 
-    self.ns.observe_read_work_plan(rsp)
+    self.ns.observe_ReadWorkPlan(rsp)
 
     self.assertEqual(self.ns._rev, rsp.workplan.version)
     self.assertIn(ids.to_string(ids.check('check1')), self.ns.nodes)
@@ -200,14 +200,14 @@ class TestObservedNodeSet(unittest.TestCase):
     wp.checks.append(make_check(self.wpid, 'check1', 50))
     wp.stages.append(make_stage(self.wpid, 'stage1', 80))
 
-    self.ns.observe_query_nodes(req, rsp)
+    self.ns.observe_QueryNodes(req, rsp)
 
     self.assertEqual(self.ns._rev, wp.version)
     self.assertIn(ids.to_string(ids.check('check1')), self.ns.nodes)
     self.assertIn(ids.to_string(ids.stage('stage1')), self.ns.nodes)
 
   def test_generate_precondition(self):
-    self.ns.observe_read_work_plan(
+    self.ns.observe_ReadWorkPlan(
         read_workplan_response_pb2.ReadWorkPlanResponse(
             workplan=make_wp(self.wpid, 100)
         )
@@ -346,7 +346,7 @@ class TestTransactionalClient(unittest.TestCase):
         make_check(self.wpid, 'check1', 50)
     )
 
-    self.client.read_work_plan(read_workplan_request_pb2.ReadWorkPlanRequest())
+    self.client.ReadWorkPlan(read_workplan_request_pb2.ReadWorkPlanRequest())
 
     self.assertEqual(self.client._observed._rev, make_rev(100))
     self.assertIn(
@@ -354,7 +354,7 @@ class TestTransactionalClient(unittest.TestCase):
     )
 
   def test_write_nodes_injects_precondition_and_blocks_subsequent(self):
-    self.client._observed.observe_read_work_plan(
+    self.client._observed.observe_ReadWorkPlan(
         read_workplan_response_pb2.ReadWorkPlanResponse(
             workplan=make_wp(self.wpid, 100)
         )
@@ -366,7 +366,7 @@ class TestTransactionalClient(unittest.TestCase):
     )
 
     req = write_nodes_request_pb2.WriteNodesRequest()
-    self.client.write_nodes(req)
+    self.client.WriteNodes(req)
 
     self.assertTrue(req.HasField('txn'))
     self.assertEqual(req.txn.snapshot_version, make_rev(100))
@@ -377,31 +377,31 @@ class TestTransactionalClient(unittest.TestCase):
         client.TransactionMultipleWritesError,
         'transactional client used for more than one write',
     ):
-      self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+      self.client.WriteNodes(write_nodes_request_pb2.WriteNodesRequest())
 
   def test_write_nodes_failure_allows_retry(self):
     self.mock_transport.call_unary.side_effect = Exception('network error')
 
     with self.assertRaises(Exception):
-      self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+      self.client.WriteNodes(write_nodes_request_pb2.WriteNodesRequest())
 
     self.mock_transport.call_unary.side_effect = Exception(
         'another network error'
     )
     with self.assertRaisesRegex(Exception, 'another network error'):
-      self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+      self.client.WriteNodes(write_nodes_request_pb2.WriteNodesRequest())
 
     self.mock_transport.call_unary.side_effect = None
     self.mock_transport.call_unary.return_value = (
         write_nodes_response_pb2.WriteNodesResponse()
     )
-    self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+    self.client.WriteNodes(write_nodes_request_pb2.WriteNodesRequest())
 
     with self.assertRaisesRegex(
         client.TransactionMultipleWritesError,
         'transactional client used for more than one write',
     ):
-      self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+      self.client.WriteNodes(write_nodes_request_pb2.WriteNodesRequest())
 
   def test_with_node_filter(self):
     filtered_client = self.client.with_node_filter(
@@ -433,7 +433,7 @@ class TestTransactionalClient(unittest.TestCase):
     filtered_client.data['digest1'] = value_data_pb2.ValueData()
     filtered_client.data['digest2'] = value_data_pb2.ValueData()
 
-    filtered_client.read_work_plan(
+    filtered_client.ReadWorkPlan(
         read_workplan_request_pb2.ReadWorkPlanRequest()
     )
 
@@ -450,13 +450,13 @@ class TestTransactionalClient(unittest.TestCase):
     self.mock_transport.call_unary.return_value = (
         write_nodes_response_pb2.WriteNodesResponse()
     )
-    filtered_client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+    filtered_client.WriteNodes(write_nodes_request_pb2.WriteNodesRequest())
 
     with self.assertRaisesRegex(
         client.TransactionMultipleWritesError,
         'transactional client used for more than one write',
     ):
-      self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+      self.client.WriteNodes(write_nodes_request_pb2.WriteNodesRequest())
 
 
 class TestTransactionalClientAsync(unittest.IsolatedAsyncioTestCase):
@@ -488,7 +488,7 @@ class TestTransactionalClientAsync(unittest.IsolatedAsyncioTestCase):
     mock_response.workplan.checks.append(make_check(self.wpid, 'check1', 50))
     self.mock_transport.call_unary = mock.AsyncMock(return_value=mock_response)
 
-    await self.client.read_work_plan(
+    await self.client.ReadWorkPlan(
         read_workplan_request_pb2.ReadWorkPlanRequest()
     )
 
@@ -498,7 +498,7 @@ class TestTransactionalClientAsync(unittest.IsolatedAsyncioTestCase):
     )
 
   async def test_write_nodes_injects_precondition_and_blocks_subsequent(self):
-    self.client._observed.observe_read_work_plan(
+    self.client._observed.observe_ReadWorkPlan(
         read_workplan_response_pb2.ReadWorkPlanResponse(
             workplan=make_wp(self.wpid, 100)
         )
@@ -510,7 +510,7 @@ class TestTransactionalClientAsync(unittest.IsolatedAsyncioTestCase):
     )
 
     req = write_nodes_request_pb2.WriteNodesRequest()
-    await self.client.write_nodes(req)
+    await self.client.WriteNodes(req)
 
     self.assertTrue(req.HasField('txn'))
     self.assertEqual(req.txn.snapshot_version, make_rev(100))
@@ -521,7 +521,7 @@ class TestTransactionalClientAsync(unittest.IsolatedAsyncioTestCase):
         client.TransactionMultipleWritesError,
         'transactional client used for more than one write',
     ):
-      await self.client.write_nodes(write_nodes_request_pb2.WriteNodesRequest())
+      await self.client.WriteNodes(write_nodes_request_pb2.WriteNodesRequest())
 
 
 class TestRunTransaction(unittest.TestCase):

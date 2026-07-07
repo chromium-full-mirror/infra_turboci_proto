@@ -74,7 +74,7 @@ class Sync(state.State[threading.Lock]):
         time.sleep(next_sleep_time)
     raise Exception('impossible')
 
-  def create_work_plan(
+  def CreateWorkPlan(
       self,
       req: create_workplan_request_pb2.CreateWorkPlanRequest,
       options: transports.CallOptions | None = None,
@@ -84,7 +84,7 @@ class Sync(state.State[threading.Lock]):
         self._execute('CreateWorkPlan', req, options),
     )
 
-  def read_work_plan(
+  def ReadWorkPlan(
       self,
       req: read_workplan_request_pb2.ReadWorkPlanRequest,
       options: transports.CallOptions | None = None,
@@ -94,7 +94,7 @@ class Sync(state.State[threading.Lock]):
         self._execute('ReadWorkPlan', req, options),
     )
 
-  def write_nodes(
+  def WriteNodes(
       self,
       req: write_nodes_request_pb2.WriteNodesRequest,
       options: transports.CallOptions | None = None,
@@ -104,7 +104,7 @@ class Sync(state.State[threading.Lock]):
         self._execute('WriteNodes', req, options),
     )
 
-  def query_nodes(
+  def QueryNodes(
       self,
       req: query_nodes_request_pb2.QueryNodesRequest,
       options: transports.CallOptions | None = None,
@@ -114,7 +114,7 @@ class Sync(state.State[threading.Lock]):
         self._execute('QueryNodes', req, options),
     )
 
-  def allocate_work_node_ids(
+  def AllocateWorkNodeIDs(
       self,
       req: allocate_worknode_ids_request_pb2.AllocateWorkNodeIDsRequest,
       options: transports.CallOptions | None = None,
@@ -124,7 +124,7 @@ class Sync(state.State[threading.Lock]):
         self._execute('AllocateWorkNodeIDs', req, options),
     )
 
-  def cancel_work_plan(
+  def CancelWorkPlan(
       self,
       req: cancel_workplan_request_pb2.CancelWorkPlanRequest,
       options: transports.CallOptions | None = None,
@@ -171,7 +171,7 @@ class Async(state.State[state.NullLock]):
         await asyncio.sleep(next_sleep_time)
     raise Exception('impossible')
 
-  async def create_work_plan(
+  async def CreateWorkPlan(
       self,
       req: create_workplan_request_pb2.CreateWorkPlanRequest,
       options: transports.CallOptions | None = None,
@@ -181,7 +181,7 @@ class Async(state.State[state.NullLock]):
         await self._execute('CreateWorkPlan', req, options),
     )
 
-  async def read_work_plan(
+  async def ReadWorkPlan(
       self,
       req: read_workplan_request_pb2.ReadWorkPlanRequest,
       options: transports.CallOptions | None = None,
@@ -191,7 +191,7 @@ class Async(state.State[state.NullLock]):
         await self._execute('ReadWorkPlan', req, options),
     )
 
-  async def write_nodes(
+  async def WriteNodes(
       self,
       req: write_nodes_request_pb2.WriteNodesRequest,
       options: transports.CallOptions | None = None,
@@ -201,7 +201,7 @@ class Async(state.State[state.NullLock]):
         await self._execute('WriteNodes', req, options),
     )
 
-  async def query_nodes(
+  async def QueryNodes(
       self,
       req: query_nodes_request_pb2.QueryNodesRequest,
       options: transports.CallOptions | None = None,
@@ -211,7 +211,7 @@ class Async(state.State[state.NullLock]):
         await self._execute('QueryNodes', req, options),
     )
 
-  async def allocate_work_node_ids(
+  async def AllocateWorkNodeIDs(
       self,
       req: allocate_worknode_ids_request_pb2.AllocateWorkNodeIDsRequest,
       options: transports.CallOptions | None = None,
@@ -221,7 +221,7 @@ class Async(state.State[state.NullLock]):
         await self._execute('AllocateWorkNodeIDs', req, options),
     )
 
-  async def cancel_work_plan(
+  async def CancelWorkPlan(
       self,
       req: cancel_workplan_request_pb2.CancelWorkPlanRequest,
       options: transports.CallOptions | None = None,

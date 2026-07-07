@@ -272,11 +272,11 @@ class TestLifecycle(unittest.TestCase):
 
     def mock_write_nodes(*args, **kwargs):
       _ = (args, kwargs)
-      if self.client.write_nodes.call_count == 2:
+      if self.client.WriteNodes.call_count == 2:
         raise transient_error
       return default_rsp
 
-    self.client.write_nodes = mock.Mock(side_effect=mock_write_nodes)
+    self.client.WriteNodes = mock.Mock(side_effect=mock_write_nodes)
     hb = lifecycle.execute_stage(
         client=self.client, stage=make_stage(), opts=opts
     )
@@ -286,7 +286,7 @@ class TestLifecycle(unittest.TestCase):
         # Poll until we see 3 calls
         start = time.time()
         while (
-            self.client.write_nodes.call_count < 3 and time.time() - start < 1.0
+            self.client.WriteNodes.call_count < 3 and time.time() - start < 1.0
         ):
           time.sleep(0.001)
         assert hb._thread
@@ -308,7 +308,7 @@ class TestLifecycle(unittest.TestCase):
     permanent_error = errors.RPCError.make(
         "permanent", code=code_pb2.PERMISSION_DENIED
     )
-    self.client.write_nodes = mock.Mock(
+    self.client.WriteNodes = mock.Mock(
         side_effect=[
             write_nodes_response_pb2.WriteNodesResponse(
                 current_attempt_state=make_state(int(time.time()) + 10)
@@ -348,7 +348,7 @@ class TestLifecycle(unittest.TestCase):
           current_attempt_state=make_state(int(time.time()) + 10)
       )
 
-    self.client.write_nodes = mock.Mock(side_effect=mock_write_nodes)
+    self.client.WriteNodes = mock.Mock(side_effect=mock_write_nodes)
     hb = lifecycle.execute_stage(
         client=self.client, stage=make_stage(), opts=opts
     )
@@ -393,7 +393,7 @@ class TestLifecycle(unittest.TestCase):
 
     # First call (RUNNING) succeeds, subsequent heartbeats raise unexpected
     # errors
-    self.client.write_nodes = mock.Mock(
+    self.client.WriteNodes = mock.Mock(
         side_effect=[
             write_nodes_response_pb2.WriteNodesResponse(
                 current_attempt_state=make_state(int(time.time()) + 10)
@@ -748,11 +748,11 @@ class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
 
     async def mock_write_nodes(*args, **kwargs):
       _ = (args, kwargs)
-      if self.client.write_nodes.call_count == 2:
+      if self.client.WriteNodes.call_count == 2:
         raise transient_error
       return default_rsp
 
-    self.client.write_nodes = mock.AsyncMock(side_effect=mock_write_nodes)
+    self.client.WriteNodes = mock.AsyncMock(side_effect=mock_write_nodes)
     hb = await lifecycle.async_execute_stage(
         client=self.client, stage=make_stage(), opts=opts
     )
@@ -761,7 +761,7 @@ class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
       async with hb:
         start = asyncio.get_running_loop().time()
         while (
-            self.client.write_nodes.call_count < 3
+            self.client.WriteNodes.call_count < 3
             and asyncio.get_running_loop().time() - start < 1.0
         ):
           await asyncio.sleep(0.001)
@@ -784,7 +784,7 @@ class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
     permanent_error = errors.RPCError.make(
         "permanent", code=code_pb2.PERMISSION_DENIED
     )
-    self.client.write_nodes = mock.AsyncMock(
+    self.client.WriteNodes = mock.AsyncMock(
         side_effect=[
             write_nodes_response_pb2.WriteNodesResponse(
                 current_attempt_state=make_state(int(time.time()) + 10)
@@ -829,7 +829,7 @@ class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
           current_attempt_state=make_state(int(time.time()) + 10)
       )
 
-    self.client.write_nodes = mock.AsyncMock(side_effect=mock_write_nodes)
+    self.client.WriteNodes = mock.AsyncMock(side_effect=mock_write_nodes)
     hb = await lifecycle.async_execute_stage(
         client=self.client, stage=make_stage(), opts=opts
     )
@@ -906,7 +906,7 @@ class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
 
     # First call (RUNNING) succeeds, subsequent heartbeats raise unexpected
     # errors
-    self.client.write_nodes = mock.AsyncMock(
+    self.client.WriteNodes = mock.AsyncMock(
         side_effect=[
             write_nodes_response_pb2.WriteNodesResponse(
                 current_attempt_state=make_state(int(time.time()) + 10)

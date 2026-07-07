@@ -86,7 +86,7 @@ class ObservedNodeSet:
     for node in nodes:
       self._observe(node)
 
-  def observe_query_nodes(
+  def observe_QueryNodes(
       self,
       req: query_nodes_request_pb2.QueryNodesRequest,
       rsp: query_nodes_response_pb2.QueryNodesResponse,
@@ -109,7 +109,7 @@ class ObservedNodeSet:
             ):
               self._observe(x)
 
-  def observe_read_work_plan(
+  def observe_ReadWorkPlan(
       self,
       rsp: read_workplan_response_pb2.ReadWorkPlanResponse,
   ):
@@ -313,13 +313,13 @@ class _TransactionalBase(state.State[_LockT], typing.Generic[_LockT]):
       case read_workplan_response_pb2.ReadWorkPlanResponse():
         if self._node_filter:
           apply_node_predicate(self._node_filter, rsp.workplan, self.data)
-        self._observed.observe_read_work_plan(rsp)
+        self._observed.observe_ReadWorkPlan(rsp)
 
       case query_nodes_response_pb2.QueryNodesResponse():
         assert isinstance(req, query_nodes_request_pb2.QueryNodesRequest)
         if self._node_filter:
           apply_node_predicate(self._node_filter, rsp.workplans, self.data)
-        self._observed.observe_query_nodes(req, rsp)
+        self._observed.observe_QueryNodes(req, rsp)
 
       case write_nodes_response_pb2.WriteNodesResponse():
         self._write_called[0] = True

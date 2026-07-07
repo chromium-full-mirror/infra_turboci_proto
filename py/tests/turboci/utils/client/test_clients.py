@@ -40,7 +40,7 @@ class TestClients(unittest.TestCase):
     )
 
     self.assertIsInstance(
-        client_inst.read_work_plan(
+        client_inst.ReadWorkPlan(
             read_workplan_request_pb2.ReadWorkPlanRequest()
         ),
         read_workplan_response_pb2.ReadWorkPlanResponse,
@@ -74,7 +74,7 @@ class TestClients(unittest.TestCase):
     )
 
     self.assertIsInstance(
-        client_inst.read_work_plan(
+        client_inst.ReadWorkPlan(
             read_workplan_request_pb2.ReadWorkPlanRequest()
         ),
         read_workplan_response_pb2.ReadWorkPlanResponse,
@@ -124,7 +124,7 @@ class TestClients(unittest.TestCase):
     )
 
     with self.assertRaises(client.RetryableRPCError):
-      client_inst.read_work_plan(
+      client_inst.ReadWorkPlan(
           read_workplan_request_pb2.ReadWorkPlanRequest()
       )
 
@@ -166,7 +166,7 @@ class TestClients(unittest.TestCase):
     )
 
     with self.assertRaises(client.RPCError) as ctx:
-      client_inst.read_work_plan(
+      client_inst.ReadWorkPlan(
           read_workplan_request_pb2.ReadWorkPlanRequest()
       )
 
@@ -196,7 +196,7 @@ class TestClients(unittest.TestCase):
     client_inst.register_on_state_change(cb)
 
     self.assertIsInstance(
-        client_inst.write_nodes(write_nodes_request_pb2.WriteNodesRequest()),
+        client_inst.WriteNodes(write_nodes_request_pb2.WriteNodesRequest()),
         write_nodes_response_pb2.WriteNodesResponse,
     )
     self.assertEqual(client_inst.latest_attempt_state.version.ts.seconds, 123)
@@ -223,7 +223,7 @@ class TestClientsAsync(unittest.IsolatedAsyncioTestCase):
     )
 
     self.assertIsInstance(
-        await client_inst.read_work_plan(
+        await client_inst.ReadWorkPlan(
             read_workplan_request_pb2.ReadWorkPlanRequest()
         ),
         read_workplan_response_pb2.ReadWorkPlanResponse,
@@ -259,7 +259,7 @@ class TestClientsAsync(unittest.IsolatedAsyncioTestCase):
     )
 
     self.assertIsInstance(
-        await client_inst.read_work_plan(
+        await client_inst.ReadWorkPlan(
             read_workplan_request_pb2.ReadWorkPlanRequest()
         ),
         read_workplan_response_pb2.ReadWorkPlanResponse,
@@ -309,7 +309,7 @@ class TestClientsAsync(unittest.IsolatedAsyncioTestCase):
     )
 
     with self.assertRaises(client.RetryableRPCError):
-      await client_inst.read_work_plan(
+      await client_inst.ReadWorkPlan(
           read_workplan_request_pb2.ReadWorkPlanRequest()
       )
 
@@ -353,7 +353,7 @@ class TestClientsAsync(unittest.IsolatedAsyncioTestCase):
     )
 
     with self.assertRaises(client.RPCError) as ctx:
-      await client_inst.read_work_plan(
+      await client_inst.ReadWorkPlan(
           read_workplan_request_pb2.ReadWorkPlanRequest()
       )
 
@@ -383,7 +383,7 @@ class TestClientsAsync(unittest.IsolatedAsyncioTestCase):
     client_inst.register_on_state_change(cb)
 
     self.assertIsInstance(
-        await client_inst.write_nodes(
+        await client_inst.WriteNodes(
             write_nodes_request_pb2.WriteNodesRequest()
         ),
         write_nodes_response_pb2.WriteNodesResponse,
