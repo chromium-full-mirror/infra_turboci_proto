@@ -11,19 +11,8 @@ infrastructure in Open Source software such as Chromium.
 
 ### Getting the repo
 
-This repo uses [depot_tools] for obtaining the pinned copy of `protoc` and `buf`
-via the DEPS file. You can install it with [these instructions].
-
-Checking out this repo can be done by directly cloning this repo and then inside
-it running:
-
-```
-$ gclient sync
-```
-
-Which will pull the pinned `protoc` and `buf` binaries into ./tools.
-
-[these instructions]: https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up
+Just `git clone` it. All dependencies are pulled automatically when running
+`build.py <anything>`.
 
 ### Making Changes
 
@@ -204,11 +193,11 @@ a workflow is run.
 *   **Workplan:** A graph holding all nodes related to a single run of a
     workflow. See
     [graph/orchestrator/v1/workplan.proto](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/orchestrator/v1/workplan.proto).
-*   **Checks:** Nodes representing work the workplan intends to accomplish,
-    and the results of that work. Checks contain options (definition of the work
-    to do) and results. Checks form the public API of the workplan, allowing
-    the stages to be implementation details that typically don't need
-    examination. See
+*   **Checks:** Nodes representing work the workplan intends to accomplish, and
+    the results of that work. Checks contain options (definition of the work to
+    do) and results. Checks form the public API of the workplan, allowing the
+    stages to be implementation details that typically don't need examination.
+    See
     [graph/orchestrator/v1/check.proto](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/orchestrator/v1/check.proto).
 *   **Stages:** Executable nodes managed by the Orchestrator, which will have
     their stage executor run them once all dependencies are satisfied. Whereas
@@ -217,11 +206,11 @@ a workflow is run.
     more than one attempt due to retrying failures. See
     [graph/orchestrator/v1/stage.proto](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/orchestrator/v1/stage.proto).
 *   **Stage Executors:** Services registered to execute specific stage types,
-    based on the `type_url` of the stage's `args` field. Stage executors must run
-    in Google's internal infrastructure, but it's possible to use GCP-hosted
-    services via a Google-hosted proxy that invokes the GCP-hosted service.
-    Such a proxy exists for LUCI Buildbucket, and can be added for other
-    GCP-hosted services. See
+    based on the `type_url` of the stage's `args` field. Stage executors must
+    run in Google's internal infrastructure, but it's possible to use GCP-hosted
+    services via a Google-hosted proxy that invokes the GCP-hosted service. Such
+    a proxy exists for LUCI Buildbucket, and can be added for other GCP-hosted
+    services. See
     [graph/executor/v1/turbo_ci_stage_executor_service.proto](https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/executor/v1/turbo_ci_stage_executor_service.proto).
     Googlers looking to maintain a stage executor can find more information at
     [go/turboci-stage-maintainers](http://go/turboci-stage-maintainers).
@@ -231,8 +220,8 @@ a workflow is run.
 To cleanly separate the workplan's "skeleton" that the orchestrator needs to
 operate on from workplan-specific data, Turbo CI encapsulates workplan-specific
 payloads (Check Options, Check Results, Stage Args, and others) within protobuf
-`Any` "Value" messages. Checks and Stages contain both non-Value content
-(graph structure and other information the orchestrator directly uses) and Value
+`Any` "Value" messages. Checks and Stages contain both non-Value content (graph
+structure and other information the orchestrator directly uses) and Value
 content (which is meaningful to the workplan, its stages, and its readers, but
 can be opaque to the orchestrator).
 
@@ -260,10 +249,10 @@ used when sending data to the orchestrator vs. when retrieving data from it:
 
 Encapsulating payloads in Value messages not only decouples the core
 Orchestrator messages from workplan-specific messages, but also allows clients
-to request only the specific Values they care about (avoiding unnecessary
-proto dependencies) and allows the orchestrator to cleanly omit Value data that
-a client doesn't have permission to access if they can see some but not all of
-the content in a given check.
+to request only the specific Values they care about (avoiding unnecessary proto
+dependencies) and allows the orchestrator to cleanly omit Value data that a
+client doesn't have permission to access if they can see some but not all of the
+content in a given check.
 
 See [Repo layout](#repo-layout) for additional details.
 

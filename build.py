@@ -611,9 +611,18 @@ def task_test_go(verbose: None | str = None):
   check_call(args, cwd=_RepoRoot / 'go')
 
 
+def _clean_gclient_cruft():
+  (_RepoRoot / '.gclient_entries').unlink(missing_ok=True)
+  (_RepoRoot / '.gclient_previous_sync_commits').unlink(missing_ok=True)
+
+
 def task_all():
   """Shorthand to run all presubmit checks."""
   fail = False
+
+  # We used to have a .gclient spec embedded in this repo; clean up all the
+  # cruft.
+  _clean_gclient_cruft()
 
   with _fds() as fds:
 
