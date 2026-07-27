@@ -1,0 +1,14 @@
+# `./build.py <anything>` installs these automaticaly.
+
+@Subdir tools
+infra/3pp/tools/protoc/${os}-${arch=amd64,arm64}  version:3@32.1
+
+# This should roughly follow the version in infra.git
+infra/3pp/tools/go/${os}-${arch=amd64,arm64}      version:3@1.25.8
+
+@Subdir tools/bin
+infra/3pp/go/github.com/bufbuild/buf/${platform}  version:3@1.57.0
+
+infra/3pp/go/github.com/protocolbuffers/protoc-gen-go/${platform} version:3@1.36.11.chromium.1
+
+infra/3pp/go/github.com/grpc/protoc-gen-go-grpc/${platform}  version:3@1.80.0.chromium.2

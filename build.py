@@ -73,6 +73,17 @@ def check_call(cmd: list[str | Path], *, cwd: Path = _RepoRoot):
     sys.exit(ret)
 
 
+def _ensure_tools():
+  check_call([
+      'cipd',
+      'ensure',
+      '-root',
+      _RepoRoot,
+      '-ensure-file',
+      _RepoRoot / 'tools.ensure',
+  ])
+
+
 def task_clean():
   """Removes all generated files."""
   print('cleaning go/**/*.pb.go')
@@ -677,6 +688,8 @@ def main(args: list[str]):
 
   if fn is None:
     _help()
+
+  _ensure_tools()
 
   fn(*args[1:])
   print('ok')
