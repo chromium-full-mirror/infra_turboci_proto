@@ -40,7 +40,7 @@ func TestFilterRef(t *testing.T) {
 			// know google.protobuf.Value
 			Known: TypeSetBuilder{}.WithMessages((*structpb.Value)(nil)).MustBuild(),
 		}.Build(),
-		StageArgs: orchestratorpb.ValueMask_VALUE_MASK_VALUE_TYPE.Enum(),
+		IncludeData: []orchestratorpb.ValueSlot{orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS},
 	}.Build()
 
 	filter, err := ParseFilter(vf)
@@ -111,7 +111,7 @@ func TestFilterRef(t *testing.T) {
 
 	t.Run(`unwant_structural_inline`, func(t *testing.T) {
 		vf := proto.CloneOf(vf)
-		vf.ClearStageArgs()
+		vf.SetIncludeData(nil)
 
 		filter, err := ParseFilter(vf)
 		assert.NoErr(t, err)
@@ -129,7 +129,7 @@ func TestFilterRef(t *testing.T) {
 
 	t.Run(`unwant_structural_remote`, func(t *testing.T) {
 		vf := proto.CloneOf(vf)
-		vf.ClearStageArgs()
+		vf.SetIncludeData(nil)
 
 		filter, err := ParseFilter(vf)
 		assert.NoErr(t, err)
@@ -171,5 +171,33 @@ func TestFilterRef(t *testing.T) {
 			return false, errors.New("oh no auth exploded")
 		})
 		assert.ErrLike(t, err, "oh no auth exploded")
+	})
+}
+
+func TestParseFilter_LegacyFields(t *testing.T) {
+	t.Parallel()
+
+	t.Run("legacy_fallback", func(t *testing.T) {
+		vf := orchestratorpb.ValueFilter_builder{
+			CheckOptions: orchestratorpb.ValueMask_VALUE_MASK_VALUE_TYPE.Enum(),
+		}.Build()
+
+		pf, err := ParseFilter(vf)
+		assert.NoErr(t, err)
+		assert.True(t, pf.needData.HasAll(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_OPTION))
+		assert.True(t, pf.needData.HasAll(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_EDIT_REASON_DETAIL))
+		assert.True(t, pf.needData.HasAll(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_REASON_DETAIL))
+	})
+
+	t.Run("include_data_precedence", func(t *testing.T) {
+		vf := orchestratorpb.ValueFilter_builder{
+			IncludeData:  []orchestratorpb.ValueSlot{orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS},
+			CheckOptions: orchestratorpb.ValueMask_VALUE_MASK_VALUE_TYPE.Enum(),
+		}.Build()
+
+		pf, err := ParseFilter(vf)
+		assert.NoErr(t, err)
+		assert.True(t, pf.needData.HasAll(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS))
+		assert.False(t, pf.needData.HasAny(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_OPTION))
 	})
 }

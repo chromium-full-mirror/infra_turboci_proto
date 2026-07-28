@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n.turboci/graph/orchestrator/v1/value_mask.proto\x12\x1dturboci.graph.orchestrator.v1*S\n\tValueMask\x12\x16\n\x12VALUE_MASK_UNKNOWN\x10\x00\x12\x13\n\x0fVALUE_MASK_TYPE\x10\x01\x12\x19\n\x15VALUE_MASK_VALUE_TYPE\x10\x02\x42IP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n.turboci/graph/orchestrator/v1/value_mask.proto\x12\x1dturboci.graph.orchestrator.v1*W\n\tValueMask\x12\x16\n\x12VALUE_MASK_UNKNOWN\x10\x00\x12\x13\n\x0fVALUE_MASK_TYPE\x10\x01\x12\x19\n\x15VALUE_MASK_VALUE_TYPE\x10\x02\x1a\x02\x18\x01\x42IP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,6 +32,8 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'turboci.graph.orchestrator.
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
+  _globals['_VALUEMASK']._loaded_options = None
+  _globals['_VALUEMASK']._serialized_options = b'\030\001'
   _globals['_VALUEMASK']._serialized_start=81
-  _globals['_VALUEMASK']._serialized_end=164
+  _globals['_VALUEMASK']._serialized_end=168
 # @@protoc_insertion_point(module_scope)

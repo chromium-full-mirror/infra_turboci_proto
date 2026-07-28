@@ -34,16 +34,19 @@ func ParseFilter(vf *orchestratorpb.ValueFilter) (*ParsedFilter, error) {
 		return nil, err
 	}
 
-	var vfSet SlotSet
+	if len(vf.GetIncludeData()) > 0 {
+		return &ParsedFilter{SlotSet{}.Set(vf.GetIncludeData()...), ti}, nil
+	}
+
+	// Fallback to legacy fields.
 	// These two don't currently have a manual control in ValueMask.
-	vfSet = vfSet.Set(
+	vfSet := SlotSet{}.Set(
 		orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_EDIT_REASON_DETAIL,
 		orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_REASON_DETAIL,
 	)
 
 	setVF := func(slot orchestratorpb.ValueSlot, vm orchestratorpb.ValueMask) {
-		switch vm {
-		case orchestratorpb.ValueMask_VALUE_MASK_VALUE_TYPE:
+		if vm == orchestratorpb.ValueMask_VALUE_MASK_VALUE_TYPE {
 			vfSet = vfSet.Set(slot)
 		}
 	}

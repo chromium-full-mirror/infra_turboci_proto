@@ -233,13 +233,17 @@ type ReadWorkPlanRequest_builder struct {
 	// previous retrieval was performed.
 	SinceVersion *Revision
 	// Describes how ValueData messages within the node types matching the query
-	// criteria should be filtered in/out of the response. All other fields of
-	// ValueRef messages will always be included.
+	// criteria should be filtered in/out of the response.
 	//
-	// ValueData messages will be included only if:
-	// * Their containing node is included via `included_node_types`
-	// * AND their `type_url` matches the expression in `ValueFilter.wanted`
-	// * AND their containing node type's ValueMask in ValueFilter includes DATA
+	// ValueRefs for included nodes will always be included in the response (even
+	// if the data is not being returned) and will contain:
+	//   - type_url
+	//   - realm
+	//   - digest (unless you do not have read permission)
+	//   - omit_reason (if the data is omitted from the `value_data` map)
+	//
+	// The data for the ValueRef will be included in the response in the
+	// `value_data` map if the ValueRef matches this filter and is not omitted.
 	ValueFilter *ValueFilter
 	// Pagination token, so this query can resume consuming nodes with the next
 	// node in the stream. If omitted, returns nodes beginning with the first node

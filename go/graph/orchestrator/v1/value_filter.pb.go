@@ -24,22 +24,43 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Describes how ValueData messages within the WorkPlan content matching the
-// query criteria should be selected for inclusion in the response. We allow
-// some aspects of this selection to be specified hierarchically (on a
-// per-field basis) while other aspects are specified on a per-type_url basis.
+// Describes which data we want to include in the response, and how we want to
+// include it.
 //
-// For a ValueRef's ValueData to be included in the response, the field
-// containing the ValueRef (e.g. Check.options) must have a ValueMask that
-// includes the ValueData (e.g. VALUE_MASK_TYPE_VALUE) and also type_info.wanted
-// must include content matching the ValueRef's type_url. If either of these
-// conditions is not met, the ValueRef will be populated but the ValueData will
-// not be present in the value_data map on the response and (for inline
-// ValueData content) the `inline` field will be unset. In both cases,
-// ValueRef's omit_reason will be set to UNWANTED.
+// There are two components to this:
+//   - Is this a *type* that we want to handle?
+//   - And, as a secondary aspect, does this type need to be converted to
+//     JSONPB?
+//   - Is this in a slot (e.g. structural location in the graph) that we want
+//     to handle?
+//
+// Clients should request the narrowest possible amount of data necessary to
+// accomplish their task. Pulling data whose types or location in the graph the
+// client doesn't need will only waste time and bandwidth.
+//
+// The notable exception to this is clients which are retrieving data for
+// debugging or exploration (e.g. a UI where the user hasn't specifically
+// set a filter on the data to pull yet), or clients which are attempting to
+// serialize the graph in some agnostic way (though ideally the downstream
+// consumer of the serialized graph should just make its own queries instead).
+//
+// If a given ValueRef is 'wanted' (i.e. it has a type matched by `type_info`,
+// and is in a slot in `include_data`), the server will include the matching
+// data for it (keyed by digest) in the returned `value_data` map, which is part
+// of the query response.
+//
+// Some exceptions for wanted ValueRefs:
+//   - If you do not have read access, it will be marked as omitted with the
+//     NO_ACCESS reason. The digest will also be stripped in this case.
+//   - If the data is missing from the backend (e.g. expired), the omit reason
+//     will be MISSING (but the digest will be retained).
+//
+// ValueRefs which are unwanted (e.g. don't match `type_info` or `include_data`)
+// will be marked as omitted with the reason UNWANTED.
 type ValueFilter struct {
 	state                                      protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_TypeInfo                        *TypeInfo              `protobuf:"bytes,1,opt,name=type_info,json=typeInfo,proto3,oneof"`
+	xxx_hidden_IncludeData                     []ValueSlot            `protobuf:"varint,12,rep,packed,name=include_data,json=includeData,proto3,enum=turboci.graph.orchestrator.v1.ValueSlot"`
 	xxx_hidden_CheckOptions                    ValueMask              `protobuf:"varint,2,opt,name=check_options,json=checkOptions,proto3,enum=turboci.graph.orchestrator.v1.ValueMask,oneof"`
 	xxx_hidden_CheckResultData                 ValueMask              `protobuf:"varint,3,opt,name=check_result_data,json=checkResultData,proto3,enum=turboci.graph.orchestrator.v1.ValueMask,oneof"`
 	xxx_hidden_CheckEditOptions                ValueMask              `protobuf:"varint,4,opt,name=check_edit_options,json=checkEditOptions,proto3,enum=turboci.graph.orchestrator.v1.ValueMask,oneof"`
@@ -88,90 +109,107 @@ func (x *ValueFilter) GetTypeInfo() *TypeInfo {
 	return nil
 }
 
+func (x *ValueFilter) GetIncludeData() []ValueSlot {
+	if x != nil {
+		return x.xxx_hidden_IncludeData
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) GetCheckOptions() ValueMask {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 2) {
 			return x.xxx_hidden_CheckOptions
 		}
 	}
 	return ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) GetCheckResultData() ValueMask {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 2) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 3) {
 			return x.xxx_hidden_CheckResultData
 		}
 	}
 	return ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) GetCheckEditOptions() ValueMask {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 3) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 4) {
 			return x.xxx_hidden_CheckEditOptions
 		}
 	}
 	return ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) GetCheckEditResultData() ValueMask {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 4) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 5) {
 			return x.xxx_hidden_CheckEditResultData
 		}
 	}
 	return ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) GetStageArgs() ValueMask {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 5) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 6) {
 			return x.xxx_hidden_StageArgs
 		}
 	}
 	return ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) GetStageAttemptDetails() ValueMask {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 6) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 7) {
 			return x.xxx_hidden_StageAttemptDetails
 		}
 	}
 	return ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) GetStageAttemptProgressDetails() ValueMask {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 7) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 8) {
 			return x.xxx_hidden_StageAttemptProgressDetails
 		}
 	}
 	return ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) GetStageEditAttemptDetails() ValueMask {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 8) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 9) {
 			return x.xxx_hidden_StageEditAttemptDetails
 		}
 	}
 	return ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) GetStageEditAttemptProgressDetails() ValueMask {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 9) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 10) {
 			return x.xxx_hidden_StageEditAttemptProgressDetails
 		}
 	}
 	return ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) GetStageLegacyWorknode() ValueMask {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 10) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 11) {
 			return x.xxx_hidden_StageLegacyWorknode
 		}
 	}
@@ -182,54 +220,68 @@ func (x *ValueFilter) SetTypeInfo(v *TypeInfo) {
 	x.xxx_hidden_TypeInfo = v
 }
 
+func (x *ValueFilter) SetIncludeData(v []ValueSlot) {
+	x.xxx_hidden_IncludeData = v
+}
+
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) SetCheckOptions(v ValueMask) {
 	x.xxx_hidden_CheckOptions = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 12)
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) SetCheckResultData(v ValueMask) {
 	x.xxx_hidden_CheckResultData = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 12)
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) SetCheckEditOptions(v ValueMask) {
 	x.xxx_hidden_CheckEditOptions = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 12)
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) SetCheckEditResultData(v ValueMask) {
 	x.xxx_hidden_CheckEditResultData = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 12)
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) SetStageArgs(v ValueMask) {
 	x.xxx_hidden_StageArgs = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 12)
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) SetStageAttemptDetails(v ValueMask) {
 	x.xxx_hidden_StageAttemptDetails = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 7, 12)
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) SetStageAttemptProgressDetails(v ValueMask) {
 	x.xxx_hidden_StageAttemptProgressDetails = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 7, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 8, 12)
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) SetStageEditAttemptDetails(v ValueMask) {
 	x.xxx_hidden_StageEditAttemptDetails = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 8, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 9, 12)
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) SetStageEditAttemptProgressDetails(v ValueMask) {
 	x.xxx_hidden_StageEditAttemptProgressDetails = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 9, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 10, 12)
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) SetStageLegacyWorknode(v ValueMask) {
 	x.xxx_hidden_StageLegacyWorknode = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 10, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 11, 12)
 }
 
 func (x *ValueFilter) HasTypeInfo() bool {
@@ -239,127 +291,147 @@ func (x *ValueFilter) HasTypeInfo() bool {
 	return x.xxx_hidden_TypeInfo != nil
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) HasCheckOptions() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *ValueFilter) HasCheckResultData() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
-func (x *ValueFilter) HasCheckEditOptions() bool {
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
+func (x *ValueFilter) HasCheckResultData() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
-func (x *ValueFilter) HasCheckEditResultData() bool {
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
+func (x *ValueFilter) HasCheckEditOptions() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
 }
 
-func (x *ValueFilter) HasStageArgs() bool {
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
+func (x *ValueFilter) HasCheckEditResultData() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
 }
 
-func (x *ValueFilter) HasStageAttemptDetails() bool {
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
+func (x *ValueFilter) HasStageArgs() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
 }
 
-func (x *ValueFilter) HasStageAttemptProgressDetails() bool {
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
+func (x *ValueFilter) HasStageAttemptDetails() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 7)
 }
 
-func (x *ValueFilter) HasStageEditAttemptDetails() bool {
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
+func (x *ValueFilter) HasStageAttemptProgressDetails() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 8)
 }
 
-func (x *ValueFilter) HasStageEditAttemptProgressDetails() bool {
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
+func (x *ValueFilter) HasStageEditAttemptDetails() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 9)
 }
 
-func (x *ValueFilter) HasStageLegacyWorknode() bool {
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
+func (x *ValueFilter) HasStageEditAttemptProgressDetails() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 10)
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
+func (x *ValueFilter) HasStageLegacyWorknode() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 11)
+}
+
 func (x *ValueFilter) ClearTypeInfo() {
 	x.xxx_hidden_TypeInfo = nil
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) ClearCheckOptions() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
 	x.xxx_hidden_CheckOptions = ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) ClearCheckResultData() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
 	x.xxx_hidden_CheckResultData = ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) ClearCheckEditOptions() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
 	x.xxx_hidden_CheckEditOptions = ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) ClearCheckEditResultData() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
 	x.xxx_hidden_CheckEditResultData = ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) ClearStageArgs() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
 	x.xxx_hidden_StageArgs = ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) ClearStageAttemptDetails() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 7)
 	x.xxx_hidden_StageAttemptDetails = ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) ClearStageAttemptProgressDetails() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 7)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 8)
 	x.xxx_hidden_StageAttemptProgressDetails = ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) ClearStageEditAttemptDetails() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 8)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 9)
 	x.xxx_hidden_StageEditAttemptDetails = ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) ClearStageEditAttemptProgressDetails() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 9)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 10)
 	x.xxx_hidden_StageEditAttemptProgressDetails = ValueMask_VALUE_MASK_UNKNOWN
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 func (x *ValueFilter) ClearStageLegacyWorknode() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 10)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 11)
 	x.xxx_hidden_StageLegacyWorknode = ValueMask_VALUE_MASK_UNKNOWN
 }
 
@@ -368,25 +440,52 @@ type ValueFilter_builder struct {
 
 	// How to handle per-type_url decisions about including Values.
 	TypeInfo *TypeInfo
+	// Which slots in the graph do we want to include *data* for?
+	//
+	// Such slots will have their data returned in the response value_data map.
+	//
+	// If `include_data` is non-empty, all deprecated ValueMask fields below are
+	// ignored.
+	IncludeData []ValueSlot
 	// ValueMask for Values in Check.options.
+	//
+	// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 	CheckOptions *ValueMask
 	// ValueMask for Values in Check.results.data.
+	//
+	// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 	CheckResultData *ValueMask
 	// ValueMask for Values in Edit.check.options.
+	//
+	// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 	CheckEditOptions *ValueMask
 	// ValueMask for Values in Edit.check.results.data.
+	//
+	// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 	CheckEditResultData *ValueMask
 	// ValueMask for Values in Stage.args.
+	//
+	// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 	StageArgs *ValueMask
 	// ValueMask for Values in Stage.attempts.details.
+	//
+	// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 	StageAttemptDetails *ValueMask
 	// ValueMask for Values in Stage.attempts.progress.details.
+	//
+	// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 	StageAttemptProgressDetails *ValueMask
 	// ValueMask for Values in Edit.stage.attempts.details.
+	//
+	// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 	StageEditAttemptDetails *ValueMask
 	// ValueMask for Values in Edit.stage.attempts.progress.details.
+	//
+	// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 	StageEditAttemptProgressDetails *ValueMask
 	// ValueMask for Values in Stage.legacy.worknode.
+	//
+	// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_filter.proto.
 	StageLegacyWorknode *ValueMask
 }
 
@@ -395,44 +494,45 @@ func (b0 ValueFilter_builder) Build() *ValueFilter {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_TypeInfo = b.TypeInfo
+	x.xxx_hidden_IncludeData = b.IncludeData
 	if b.CheckOptions != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 12)
 		x.xxx_hidden_CheckOptions = *b.CheckOptions
 	}
 	if b.CheckResultData != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 12)
 		x.xxx_hidden_CheckResultData = *b.CheckResultData
 	}
 	if b.CheckEditOptions != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 12)
 		x.xxx_hidden_CheckEditOptions = *b.CheckEditOptions
 	}
 	if b.CheckEditResultData != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 12)
 		x.xxx_hidden_CheckEditResultData = *b.CheckEditResultData
 	}
 	if b.StageArgs != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 12)
 		x.xxx_hidden_StageArgs = *b.StageArgs
 	}
 	if b.StageAttemptDetails != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 7, 12)
 		x.xxx_hidden_StageAttemptDetails = *b.StageAttemptDetails
 	}
 	if b.StageAttemptProgressDetails != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 7, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 8, 12)
 		x.xxx_hidden_StageAttemptProgressDetails = *b.StageAttemptProgressDetails
 	}
 	if b.StageEditAttemptDetails != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 8, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 9, 12)
 		x.xxx_hidden_StageEditAttemptDetails = *b.StageEditAttemptDetails
 	}
 	if b.StageEditAttemptProgressDetails != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 9, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 10, 12)
 		x.xxx_hidden_StageEditAttemptProgressDetails = *b.StageEditAttemptProgressDetails
 	}
 	if b.StageLegacyWorknode != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 10, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 11, 12)
 		x.xxx_hidden_StageLegacyWorknode = *b.StageLegacyWorknode
 	}
 	return m0
@@ -442,22 +542,22 @@ var File_turboci_graph_orchestrator_v1_value_filter_proto protoreflect.FileDescr
 
 const file_turboci_graph_orchestrator_v1_value_filter_proto_rawDesc = "" +
 	"\n" +
-	"0turboci/graph/orchestrator/v1/value_filter.proto\x12\x1dturboci.graph.orchestrator.v1\x1a-turboci/graph/orchestrator/v1/type_info.proto\x1a.turboci/graph/orchestrator/v1/value_mask.proto\"\xce\n" +
-	"\n" +
+	"0turboci/graph/orchestrator/v1/value_filter.proto\x12\x1dturboci.graph.orchestrator.v1\x1a-turboci/graph/orchestrator/v1/type_info.proto\x1a.turboci/graph/orchestrator/v1/value_mask.proto\x1a.turboci/graph/orchestrator/v1/value_slot.proto\"\xc3\v\n" +
 	"\vValueFilter\x12I\n" +
-	"\ttype_info\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.TypeInfoH\x00R\btypeInfo\x88\x01\x01\x12R\n" +
-	"\rcheck_options\x18\x02 \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\x01R\fcheckOptions\x88\x01\x01\x12Y\n" +
-	"\x11check_result_data\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\x02R\x0fcheckResultData\x88\x01\x01\x12[\n" +
-	"\x12check_edit_options\x18\x04 \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\x03R\x10checkEditOptions\x88\x01\x01\x12b\n" +
-	"\x16check_edit_result_data\x18\x05 \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\x04R\x13checkEditResultData\x88\x01\x01\x12L\n" +
+	"\ttype_info\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.TypeInfoH\x00R\btypeInfo\x88\x01\x01\x12K\n" +
+	"\finclude_data\x18\f \x03(\x0e2(.turboci.graph.orchestrator.v1.ValueSlotR\vincludeData\x12V\n" +
+	"\rcheck_options\x18\x02 \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskB\x02\x18\x01H\x01R\fcheckOptions\x88\x01\x01\x12]\n" +
+	"\x11check_result_data\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskB\x02\x18\x01H\x02R\x0fcheckResultData\x88\x01\x01\x12_\n" +
+	"\x12check_edit_options\x18\x04 \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskB\x02\x18\x01H\x03R\x10checkEditOptions\x88\x01\x01\x12f\n" +
+	"\x16check_edit_result_data\x18\x05 \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskB\x02\x18\x01H\x04R\x13checkEditResultData\x88\x01\x01\x12P\n" +
 	"\n" +
-	"stage_args\x18\x06 \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\x05R\tstageArgs\x88\x01\x01\x12a\n" +
-	"\x15stage_attempt_details\x18\a \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\x06R\x13stageAttemptDetails\x88\x01\x01\x12r\n" +
-	"\x1estage_attempt_progress_details\x18\b \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\aR\x1bstageAttemptProgressDetails\x88\x01\x01\x12j\n" +
-	"\x1astage_edit_attempt_details\x18\t \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\bR\x17stageEditAttemptDetails\x88\x01\x01\x12{\n" +
+	"stage_args\x18\x06 \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskB\x02\x18\x01H\x05R\tstageArgs\x88\x01\x01\x12e\n" +
+	"\x15stage_attempt_details\x18\a \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskB\x02\x18\x01H\x06R\x13stageAttemptDetails\x88\x01\x01\x12v\n" +
+	"\x1estage_attempt_progress_details\x18\b \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskB\x02\x18\x01H\aR\x1bstageAttemptProgressDetails\x88\x01\x01\x12n\n" +
+	"\x1astage_edit_attempt_details\x18\t \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskB\x02\x18\x01H\bR\x17stageEditAttemptDetails\x88\x01\x01\x12\x7f\n" +
 	"#stage_edit_attempt_progress_details\x18\n" +
-	" \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\tR\x1fstageEditAttemptProgressDetails\x88\x01\x01\x12a\n" +
-	"\x15stage_legacy_worknode\x18\v \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskH\n" +
+	" \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskB\x02\x18\x01H\tR\x1fstageEditAttemptProgressDetails\x88\x01\x01\x12e\n" +
+	"\x15stage_legacy_worknode\x18\v \x01(\x0e2(.turboci.graph.orchestrator.v1.ValueMaskB\x02\x18\x01H\n" +
 	"R\x13stageLegacyWorknode\x88\x01\x01B\f\n" +
 	"\n" +
 	"_type_infoB\x10\n" +
@@ -476,25 +576,27 @@ var file_turboci_graph_orchestrator_v1_value_filter_proto_msgTypes = make([]prot
 var file_turboci_graph_orchestrator_v1_value_filter_proto_goTypes = []any{
 	(*ValueFilter)(nil), // 0: turboci.graph.orchestrator.v1.ValueFilter
 	(*TypeInfo)(nil),    // 1: turboci.graph.orchestrator.v1.TypeInfo
-	(ValueMask)(0),      // 2: turboci.graph.orchestrator.v1.ValueMask
+	(ValueSlot)(0),      // 2: turboci.graph.orchestrator.v1.ValueSlot
+	(ValueMask)(0),      // 3: turboci.graph.orchestrator.v1.ValueMask
 }
 var file_turboci_graph_orchestrator_v1_value_filter_proto_depIdxs = []int32{
 	1,  // 0: turboci.graph.orchestrator.v1.ValueFilter.type_info:type_name -> turboci.graph.orchestrator.v1.TypeInfo
-	2,  // 1: turboci.graph.orchestrator.v1.ValueFilter.check_options:type_name -> turboci.graph.orchestrator.v1.ValueMask
-	2,  // 2: turboci.graph.orchestrator.v1.ValueFilter.check_result_data:type_name -> turboci.graph.orchestrator.v1.ValueMask
-	2,  // 3: turboci.graph.orchestrator.v1.ValueFilter.check_edit_options:type_name -> turboci.graph.orchestrator.v1.ValueMask
-	2,  // 4: turboci.graph.orchestrator.v1.ValueFilter.check_edit_result_data:type_name -> turboci.graph.orchestrator.v1.ValueMask
-	2,  // 5: turboci.graph.orchestrator.v1.ValueFilter.stage_args:type_name -> turboci.graph.orchestrator.v1.ValueMask
-	2,  // 6: turboci.graph.orchestrator.v1.ValueFilter.stage_attempt_details:type_name -> turboci.graph.orchestrator.v1.ValueMask
-	2,  // 7: turboci.graph.orchestrator.v1.ValueFilter.stage_attempt_progress_details:type_name -> turboci.graph.orchestrator.v1.ValueMask
-	2,  // 8: turboci.graph.orchestrator.v1.ValueFilter.stage_edit_attempt_details:type_name -> turboci.graph.orchestrator.v1.ValueMask
-	2,  // 9: turboci.graph.orchestrator.v1.ValueFilter.stage_edit_attempt_progress_details:type_name -> turboci.graph.orchestrator.v1.ValueMask
-	2,  // 10: turboci.graph.orchestrator.v1.ValueFilter.stage_legacy_worknode:type_name -> turboci.graph.orchestrator.v1.ValueMask
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	2,  // 1: turboci.graph.orchestrator.v1.ValueFilter.include_data:type_name -> turboci.graph.orchestrator.v1.ValueSlot
+	3,  // 2: turboci.graph.orchestrator.v1.ValueFilter.check_options:type_name -> turboci.graph.orchestrator.v1.ValueMask
+	3,  // 3: turboci.graph.orchestrator.v1.ValueFilter.check_result_data:type_name -> turboci.graph.orchestrator.v1.ValueMask
+	3,  // 4: turboci.graph.orchestrator.v1.ValueFilter.check_edit_options:type_name -> turboci.graph.orchestrator.v1.ValueMask
+	3,  // 5: turboci.graph.orchestrator.v1.ValueFilter.check_edit_result_data:type_name -> turboci.graph.orchestrator.v1.ValueMask
+	3,  // 6: turboci.graph.orchestrator.v1.ValueFilter.stage_args:type_name -> turboci.graph.orchestrator.v1.ValueMask
+	3,  // 7: turboci.graph.orchestrator.v1.ValueFilter.stage_attempt_details:type_name -> turboci.graph.orchestrator.v1.ValueMask
+	3,  // 8: turboci.graph.orchestrator.v1.ValueFilter.stage_attempt_progress_details:type_name -> turboci.graph.orchestrator.v1.ValueMask
+	3,  // 9: turboci.graph.orchestrator.v1.ValueFilter.stage_edit_attempt_details:type_name -> turboci.graph.orchestrator.v1.ValueMask
+	3,  // 10: turboci.graph.orchestrator.v1.ValueFilter.stage_edit_attempt_progress_details:type_name -> turboci.graph.orchestrator.v1.ValueMask
+	3,  // 11: turboci.graph.orchestrator.v1.ValueFilter.stage_legacy_worknode:type_name -> turboci.graph.orchestrator.v1.ValueMask
+	12, // [12:12] is the sub-list for method output_type
+	12, // [12:12] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_value_filter_proto_init() }
@@ -504,6 +606,7 @@ func file_turboci_graph_orchestrator_v1_value_filter_proto_init() {
 	}
 	file_turboci_graph_orchestrator_v1_type_info_proto_init()
 	file_turboci_graph_orchestrator_v1_value_mask_proto_init()
+	file_turboci_graph_orchestrator_v1_value_slot_proto_init()
 	file_turboci_graph_orchestrator_v1_value_filter_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

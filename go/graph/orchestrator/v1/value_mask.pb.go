@@ -31,6 +31,10 @@ const (
 // the Java proto implementation appends `_VALUE` to enums, causing Java-only
 // collisions between e.g. VALUE_MASK_TYPE and VALUE_MASK_TYPE_VALUE if we were
 // to allow the latter.
+//
+// Deprecated.
+//
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/value_mask.proto.
 type ValueMask int32
 
 const (
@@ -82,11 +86,11 @@ var File_turboci_graph_orchestrator_v1_value_mask_proto protoreflect.FileDescrip
 
 const file_turboci_graph_orchestrator_v1_value_mask_proto_rawDesc = "" +
 	"\n" +
-	".turboci/graph/orchestrator/v1/value_mask.proto\x12\x1dturboci.graph.orchestrator.v1*S\n" +
+	".turboci/graph/orchestrator/v1/value_mask.proto\x12\x1dturboci.graph.orchestrator.v1*W\n" +
 	"\tValueMask\x12\x16\n" +
 	"\x12VALUE_MASK_UNKNOWN\x10\x00\x12\x13\n" +
 	"\x0fVALUE_MASK_TYPE\x10\x01\x12\x19\n" +
-	"\x15VALUE_MASK_VALUE_TYPE\x10\x02BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x15VALUE_MASK_VALUE_TYPE\x10\x02\x1a\x02\x18\x01BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_value_mask_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_value_mask_proto_goTypes = []any{
