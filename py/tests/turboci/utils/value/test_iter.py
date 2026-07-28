@@ -9,9 +9,9 @@ from turboci.graph.orchestrator.v1 import check_pb2
 from turboci.graph.orchestrator.v1 import edit_pb2
 from turboci.graph.orchestrator.v1 import stage_pb2
 from turboci.graph.orchestrator.v1 import value_ref_pb2
+from turboci.graph.orchestrator.v1 import value_slot_pb2
 from turboci.graph.orchestrator.v1 import workplan_pb2
 from turboci.utils import value
-from turboci.utils.value.iter import RefSlot
 
 
 class TestIter(unittest.TestCase):
@@ -38,11 +38,17 @@ class TestIter(unittest.TestCase):
     self.assertEqual(
         list(value.refs_in_stage(stage)),
         [
-            (RefSlot.StageArgs, ref_args),
-            (RefSlot.StageLegacyWorkNode, ref_worknode),
-            (RefSlot.StageEditReasonDetails, ref_stage_edit_detail),
-            (RefSlot.StageAttemptDetails, ref_attempt_detail),
-            (RefSlot.StageAttemptProgressDetails, ref_progress_detail),
+            (value_slot_pb2.VALUE_SLOT_STAGE_ARGS, ref_args),
+            (value_slot_pb2.VALUE_SLOT_STAGE_LEGACY_WORKNODE, ref_worknode),
+            (
+                value_slot_pb2.VALUE_SLOT_STAGE_EDIT_REASON_DETAIL,
+                ref_stage_edit_detail,
+            ),
+            (value_slot_pb2.VALUE_SLOT_ATTEMPT_DETAIL, ref_attempt_detail),
+            (
+                value_slot_pb2.VALUE_SLOT_ATTEMPT_PROGRESS_DETAIL,
+                ref_progress_detail,
+            ),
         ],
     )
 
@@ -58,8 +64,14 @@ class TestIter(unittest.TestCase):
     self.assertEqual(
         list(value.refs_in_edit(edit)),
         [
-            (RefSlot.StageEditReasonDetails, ref_reason),
-            (RefSlot.StageEditAttemptDetails, ref_attempt_detail),
+            (
+                value_slot_pb2.VALUE_SLOT_STAGE_EDIT_REASON_DETAIL,
+                ref_reason,
+            ),
+            (
+                value_slot_pb2.VALUE_SLOT_STAGE_EDIT_ATTEMPT_DETAIL,
+                ref_attempt_detail,
+            ),
         ],
     )
 
@@ -78,9 +90,15 @@ class TestIter(unittest.TestCase):
     self.assertEqual(
         list(value.refs_in_edit(edit)),
         [
-            (RefSlot.CheckEditReasonDetails, ref_reason),
-            (RefSlot.CheckEditOptions, ref_option),
-            (RefSlot.CheckEditResultsData, ref_result_data),
+            (
+                value_slot_pb2.VALUE_SLOT_CHECK_EDIT_REASON_DETAIL,
+                ref_reason,
+            ),
+            (value_slot_pb2.VALUE_SLOT_CHECK_EDIT_OPTION, ref_option),
+            (
+                value_slot_pb2.VALUE_SLOT_CHECK_EDIT_RESULT_DATA,
+                ref_result_data,
+            ),
         ],
     )
 
@@ -99,9 +117,12 @@ class TestIter(unittest.TestCase):
     self.assertEqual(
         list(value.refs_in_check(check)),
         [
-            (RefSlot.CheckOptions, ref_option),
-            (RefSlot.CheckResultsData, ref_result_data),
-            (RefSlot.CheckEditReasonDetails, ref_reason),
+            (value_slot_pb2.VALUE_SLOT_CHECK_OPTION, ref_option),
+            (value_slot_pb2.VALUE_SLOT_CHECK_RESULT_DATA, ref_result_data),
+            (
+                value_slot_pb2.VALUE_SLOT_CHECK_EDIT_REASON_DETAIL,
+                ref_reason,
+            ),
         ],
     )
 
@@ -117,8 +138,8 @@ class TestIter(unittest.TestCase):
     self.assertEqual(
         list(value.refs_in_workplan(wp)),
         [
-            (RefSlot.CheckOptions, ref_check_option),
-            (RefSlot.StageArgs, ref_stage_arg),
+            (value_slot_pb2.VALUE_SLOT_CHECK_OPTION, ref_check_option),
+            (value_slot_pb2.VALUE_SLOT_STAGE_ARGS, ref_stage_arg),
         ],
     )
 

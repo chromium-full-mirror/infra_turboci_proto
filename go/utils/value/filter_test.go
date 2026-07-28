@@ -48,7 +48,7 @@ func TestFilterRef(t *testing.T) {
 
 	t.Run(`want_binary_inline`, func(t *testing.T) {
 		ref := makeRef(t, nil, structpb.NewBoolValue(true))
-		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
+		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
 		assert.NoErr(t, err)
 		assert.Equal(t, orchestratorpb.OmitReason(0), ref.GetOmitReason())
 		assert.False(t, wantJSON)
@@ -59,7 +59,7 @@ func TestFilterRef(t *testing.T) {
 		ref := makeRef(t, mSrc, structpb.NewBoolValue(true))
 		dgst := "nP03LSTuMLuLfYp94hWnwHOj2kT2Pg_DikrWVQk2tJ4vAQ"
 
-		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
+		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
 		assert.NoErr(t, err)
 		assert.Equal(t, dgst, ref.GetDigest())
 		assert.False(t, wantJSON)
@@ -70,7 +70,7 @@ func TestFilterRef(t *testing.T) {
 		assert.NoErr(t, err)
 		ref := makeRef(t, nil, lst)
 
-		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
+		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
 		assert.NoErr(t, err)
 		assert.Equal(t, orchestratorpb.OmitReason(0), ref.GetOmitReason())
 		assert.True(t, wantJSON)
@@ -84,7 +84,7 @@ func TestFilterRef(t *testing.T) {
 		ref := makeRef(t, mSrc, lst)
 		dgst := "TiL2hG12z5bCnO-q4sXjaMqObIM7ZeZNAYcHd56bTRE1AQ"
 
-		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
+		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
 		assert.NoErr(t, err)
 		assert.Equal(t, orchestratorpb.OmitReason(0), ref.GetOmitReason())
 		assert.True(t, wantJSON)
@@ -98,7 +98,7 @@ func TestFilterRef(t *testing.T) {
 		filter, err := ParseFilter(vf)
 		assert.NoErr(t, err)
 
-		wantJSON, err := filter.Apply(StageArgsSlot, ref, func(realm string) (bool, error) {
+		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, func(realm string) (bool, error) {
 			return false, nil
 		})
 		assert.NoErr(t, err)
@@ -118,7 +118,7 @@ func TestFilterRef(t *testing.T) {
 
 		ref := makeRef(t, nil, structpb.NewBoolValue(true))
 
-		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
+		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
 		assert.NoErr(t, err)
 		assert.Equal(t, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED, ref.GetOmitReason())
 		assert.False(t, wantJSON)
@@ -138,7 +138,7 @@ func TestFilterRef(t *testing.T) {
 
 		ref := makeRef(t, mSrc, structpb.NewBoolValue(true))
 
-		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
+		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
 		assert.NoErr(t, err)
 		assert.Equal(t, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED, ref.GetOmitReason())
 		assert.False(t, wantJSON)
@@ -152,7 +152,7 @@ func TestFilterRef(t *testing.T) {
 		ref.SetTypeUrl(TypePrefix + "bogus.namespace.Message")
 		ref.GetInline().TypeUrl = TypePrefix + "bogus.namespace.Message"
 
-		wantJSON, err := filter.Apply(StageArgsSlot, ref, nil)
+		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
 		assert.NoErr(t, err)
 		assert.Equal(t, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED, ref.GetOmitReason())
 		assert.False(t, wantJSON)
@@ -167,7 +167,7 @@ func TestFilterRef(t *testing.T) {
 		filter, err := ParseFilter(vf)
 		assert.NoErr(t, err)
 
-		_, err = filter.Apply(StageArgsSlot, ref, func(realm string) (bool, error) {
+		_, err = filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, func(realm string) (bool, error) {
 			return false, errors.New("oh no auth exploded")
 		})
 		assert.ErrLike(t, err, "oh no auth exploded")

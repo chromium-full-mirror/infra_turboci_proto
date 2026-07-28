@@ -20,9 +20,11 @@ type ParsedFilter struct {
 	// This will need to be extended to e.g. a bitmask when there are more
 	// filterable things in Value (such as tags).
 	//
+	// A bitmask indicating which slots need data.
+	//
 	// Note that 'TYPE' is always wanted (just the TypeURL of the ValueRef).
-	vf map[RefSlot]bool
-	ti *TypeInfo
+	needData SlotSet
+	ti       *TypeInfo
 }
 
 // ParseFilter validates and preprocesses the given filter.
@@ -32,34 +34,36 @@ func ParseFilter(vf *orchestratorpb.ValueFilter) (*ParsedFilter, error) {
 		return nil, err
 	}
 
-	vfMap := map[RefSlot]bool{}
+	var vfSet SlotSet
 	// These two don't currently have a manual control in ValueMask.
-	vfMap[StageEditReasonDetailsSlot] = true
-	vfMap[CheckEditReasonDetailsSlot] = true
+	vfSet = vfSet.Set(
+		orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_EDIT_REASON_DETAIL,
+		orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_REASON_DETAIL,
+	)
 
-	setVF := func(slot RefSlot, vm orchestratorpb.ValueMask) {
+	setVF := func(slot orchestratorpb.ValueSlot, vm orchestratorpb.ValueMask) {
 		switch vm {
 		case orchestratorpb.ValueMask_VALUE_MASK_VALUE_TYPE:
-			vfMap[slot] = true
+			vfSet = vfSet.Set(slot)
 		}
 	}
-	setVF(StageArgsSlot, vf.GetStageArgs())
-	setVF(StageLegacyWorkNodeSlot, vf.GetStageLegacyWorknode())
-	setVF(StageAttemptDetailsSlot, vf.GetStageAttemptDetails())
-	setVF(StageAttemptProgressDetailsSlot, vf.GetStageAttemptProgressDetails())
-	setVF(StageEditAttemptDetailsSlot, vf.GetStageEditAttemptDetails())
+	setVF(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, vf.GetStageArgs())
+	setVF(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_LEGACY_WORKNODE, vf.GetStageLegacyWorknode())
+	setVF(orchestratorpb.ValueSlot_VALUE_SLOT_ATTEMPT_DETAIL, vf.GetStageAttemptDetails())
+	setVF(orchestratorpb.ValueSlot_VALUE_SLOT_ATTEMPT_PROGRESS_DETAIL, vf.GetStageAttemptProgressDetails())
+	setVF(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_EDIT_ATTEMPT_DETAIL, vf.GetStageEditAttemptDetails())
 
-	setVF(CheckOptionsSlot, vf.GetCheckOptions())
-	setVF(CheckResultsDataSlot, vf.GetCheckResultData())
-	setVF(CheckEditOptionsSlot, vf.GetCheckEditOptions())
-	setVF(CheckEditResultsDataSlot, vf.GetCheckResultData())
+	setVF(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_OPTION, vf.GetCheckOptions())
+	setVF(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_RESULT_DATA, vf.GetCheckResultData())
+	setVF(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_OPTION, vf.GetCheckEditOptions())
+	setVF(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_RESULT_DATA, vf.GetCheckEditResultData())
 
-	return &ParsedFilter{vfMap, ti}, nil
+	return &ParsedFilter{vfSet, ti}, nil
 }
 
 // Apply checks if a ValueRef passes the filter.
 //
-// It expects a RefSlot and a ValueRef, and:
+// It expects a Slot and a ValueRef, and:
 //   - [Omit]s the ref if the user does not have access (per `hasAccess`) or if
 //     the ref is unwanted.
 //   - Returns needsJSON = true if the user wants the data as JSON.
@@ -72,7 +76,7 @@ func ParseFilter(vf *orchestratorpb.ValueFilter) (*ParsedFilter, error) {
 //
 // See [RefsInStage], [RefsInStageAttempt] and [RefsInCheck] for iterators
 // which easily compose with this.
-func (pf *ParsedFilter) Apply(slot RefSlot, ref *orchestratorpb.ValueRef, hasAccess AccessCheck) (needsJSON bool, err error) {
+func (pf *ParsedFilter) Apply(slot orchestratorpb.ValueSlot, ref *orchestratorpb.ValueRef, hasAccess AccessCheck) (needsJSON bool, err error) {
 	access := true
 	if hasAccess != nil {
 		if access, err = hasAccess(ref.GetRealm()); err != nil {
@@ -83,7 +87,7 @@ func (pf *ParsedFilter) Apply(slot RefSlot, ref *orchestratorpb.ValueRef, hasAcc
 		Omit(ref, orchestratorpb.OmitReason_OMIT_REASON_NO_ACCESS)
 		return
 	}
-	if !pf.vf[slot] {
+	if !pf.needData.HasAll(slot) {
 		Omit(ref, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED)
 		return
 	}
