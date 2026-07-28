@@ -720,11 +720,14 @@ func (b0 WriteNodesRequest_Reason_builder) Build() *WriteNodesRequest_Reason {
 // All fields annotated as `(turboci).creation_only = true` can be set only
 // once in a sense that if a CheckWrite updates an existing check, values
 // of all these fields (if they are set) must match existing check values.
+//
+// Next ID: 11
 type WriteNodesRequest_CheckWrite struct {
 	state                      protoimpl.MessageState             `protogen:"opaque.v1"`
 	xxx_hidden_Identifier      *v1.Check                          `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
 	xxx_hidden_Realm           *string                            `protobuf:"bytes,2,opt,name=realm,proto3,oneof"`
 	xxx_hidden_Kind            CheckKind                          `protobuf:"varint,3,opt,name=kind,proto3,enum=turboci.graph.orchestrator.v1.CheckKind,oneof"`
+	xxx_hidden_SubType         *string                            `protobuf:"bytes,10,opt,name=sub_type,json=subType,proto3,oneof"`
 	xxx_hidden_DisplayName     *string                            `protobuf:"bytes,9,opt,name=display_name,json=displayName,proto3,oneof"`
 	xxx_hidden_Options         *[]*ValueWrite                     `protobuf:"bytes,4,rep,name=options,proto3"`
 	xxx_hidden_Dependencies    *WriteNodesRequest_DependencyGroup `protobuf:"bytes,5,opt,name=dependencies,proto3,oneof"`
@@ -788,6 +791,16 @@ func (x *WriteNodesRequest_CheckWrite) GetKind() CheckKind {
 	return CheckKind_CHECK_KIND_UNKNOWN
 }
 
+func (x *WriteNodesRequest_CheckWrite) GetSubType() string {
+	if x != nil {
+		if x.xxx_hidden_SubType != nil {
+			return *x.xxx_hidden_SubType
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *WriteNodesRequest_CheckWrite) GetDisplayName() string {
 	if x != nil {
 		if x.xxx_hidden_DisplayName != nil {
@@ -832,7 +845,7 @@ func (x *WriteNodesRequest_CheckWrite) GetFinalizeResults() bool {
 
 func (x *WriteNodesRequest_CheckWrite) GetState() CheckState {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 8) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 9) {
 			return x.xxx_hidden_State
 		}
 	}
@@ -845,17 +858,22 @@ func (x *WriteNodesRequest_CheckWrite) SetIdentifier(v *v1.Check) {
 
 func (x *WriteNodesRequest_CheckWrite) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 9)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 10)
 }
 
 func (x *WriteNodesRequest_CheckWrite) SetKind(v CheckKind) {
 	x.xxx_hidden_Kind = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 9)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 10)
+}
+
+func (x *WriteNodesRequest_CheckWrite) SetSubType(v string) {
+	x.xxx_hidden_SubType = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 10)
 }
 
 func (x *WriteNodesRequest_CheckWrite) SetDisplayName(v string) {
 	x.xxx_hidden_DisplayName = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 9)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 10)
 }
 
 func (x *WriteNodesRequest_CheckWrite) SetOptions(v []*ValueWrite) {
@@ -872,12 +890,12 @@ func (x *WriteNodesRequest_CheckWrite) SetResultData(v []*ValueWrite) {
 
 func (x *WriteNodesRequest_CheckWrite) SetFinalizeResults(v bool) {
 	x.xxx_hidden_FinalizeResults = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 7, 9)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 8, 10)
 }
 
 func (x *WriteNodesRequest_CheckWrite) SetState(v CheckState) {
 	x.xxx_hidden_State = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 8, 9)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 9, 10)
 }
 
 func (x *WriteNodesRequest_CheckWrite) HasIdentifier() bool {
@@ -901,11 +919,18 @@ func (x *WriteNodesRequest_CheckWrite) HasKind() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
-func (x *WriteNodesRequest_CheckWrite) HasDisplayName() bool {
+func (x *WriteNodesRequest_CheckWrite) HasSubType() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+}
+
+func (x *WriteNodesRequest_CheckWrite) HasDisplayName() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
 }
 
 func (x *WriteNodesRequest_CheckWrite) HasDependencies() bool {
@@ -919,14 +944,14 @@ func (x *WriteNodesRequest_CheckWrite) HasFinalizeResults() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 7)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 8)
 }
 
 func (x *WriteNodesRequest_CheckWrite) HasState() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 8)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 9)
 }
 
 func (x *WriteNodesRequest_CheckWrite) ClearIdentifier() {
@@ -943,8 +968,13 @@ func (x *WriteNodesRequest_CheckWrite) ClearKind() {
 	x.xxx_hidden_Kind = CheckKind_CHECK_KIND_UNKNOWN
 }
 
-func (x *WriteNodesRequest_CheckWrite) ClearDisplayName() {
+func (x *WriteNodesRequest_CheckWrite) ClearSubType() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_SubType = nil
+}
+
+func (x *WriteNodesRequest_CheckWrite) ClearDisplayName() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
 	x.xxx_hidden_DisplayName = nil
 }
 
@@ -953,12 +983,12 @@ func (x *WriteNodesRequest_CheckWrite) ClearDependencies() {
 }
 
 func (x *WriteNodesRequest_CheckWrite) ClearFinalizeResults() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 7)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 8)
 	x.xxx_hidden_FinalizeResults = false
 }
 
 func (x *WriteNodesRequest_CheckWrite) ClearState() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 8)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 9)
 	x.xxx_hidden_State = CheckState_CHECK_STATE_UNKNOWN
 }
 
@@ -986,6 +1016,40 @@ type WriteNodesRequest_CheckWrite_builder struct {
 	//
 	// Required when inserting a new check.
 	Kind *CheckKind
+	// An optional disambiguating sub-type of this check.
+	//
+	// Used to identify a specific, named, variant of this Check kind within
+	// WorkPlans belonging to the same workflow, to differentiate metrics and
+	// queries between Check kinds. This value should be computed by the
+	// workflow in some deterministic, low-cardinality, way (including leaving
+	// it unset).
+	//
+	// This must NOT contain high-cardinality data like change IDs, commit
+	// hashes, or arbitrary user-controlled data.
+	//
+	// Good examples:
+	//
+	//	kind:SOURCE   sub_type:"gerrit"
+	//	kind:BUILD    sub_type:"${branch_name}"
+	//	kind:ANALYSIS sub_type:"presubmit"
+	//	kind:ANALYSIS sub_type:"experimental"
+	//
+	// OK examples:
+	//
+	//	kind:BUILD    sub_type:"${branch_name}-${build_config_name}"
+	//	# e.g. if build_config_name has only one value for a given workflow,
+	//	# it's not needed; but if it has hundreds of values, it may be too
+	//	# high-cardinality. But if it's only got a handful of values, this is
+	//	# OK.
+	//
+	// BAD examples:
+	//
+	//	kind:SOURCE   sub_type:"changeid:123456..."
+	//	kind:SOURCE   sub_type:"git:bad...c0ffee"
+	//	kind:BUILD    sub_type:"${branch_name}-${flag1}-${flag2}-${flag3}..."
+	//
+	// Must adhere to the regex: /^[a-zA-Z0-9\(\)\-_./ ]{0,256}$/
+	SubType *string
 	// The display name of this Check.
 	//
 	// Optional. If set, overrides the existing value.
@@ -1037,26 +1101,30 @@ func (b0 WriteNodesRequest_CheckWrite_builder) Build() *WriteNodesRequest_CheckW
 	_, _ = b, x
 	x.xxx_hidden_Identifier = b.Identifier
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 9)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 10)
 		x.xxx_hidden_Realm = b.Realm
 	}
 	if b.Kind != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 9)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 10)
 		x.xxx_hidden_Kind = *b.Kind
 	}
+	if b.SubType != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 10)
+		x.xxx_hidden_SubType = b.SubType
+	}
 	if b.DisplayName != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 9)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 10)
 		x.xxx_hidden_DisplayName = b.DisplayName
 	}
 	x.xxx_hidden_Options = &b.Options
 	x.xxx_hidden_Dependencies = b.Dependencies
 	x.xxx_hidden_ResultData = &b.ResultData
 	if b.FinalizeResults != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 7, 9)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 8, 10)
 		x.xxx_hidden_FinalizeResults = *b.FinalizeResults
 	}
 	if b.State != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 8, 9)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 9, 10)
 		x.xxx_hidden_State = *b.State
 	}
 	return m0
@@ -2489,7 +2557,7 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/transaction_details.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\xb0%\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/transaction_details.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\xe7%\n" +
 	"\x11WriteNodesRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12T\n" +
 	"\x06reason\x18\x02 \x01(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonH\x01R\x06reason\x88\x01\x01\x12H\n" +
@@ -2515,18 +2583,20 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\amessage\x18\x01 \x01(\tH\x00R\amessage\x88\x01\x01\x12C\n" +
 	"\adetails\x18\x02 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteR\adetailsB\n" +
 	"\n" +
-	"\b_message\x1a\x84\x06\n" +
+	"\b_message\x1a\xbb\x06\n" +
 	"\n" +
 	"CheckWrite\x12@\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1b.turboci.graph.ids.v1.CheckH\x00R\n" +
 	"identifier\x88\x01\x01\x12#\n" +
 	"\x05realm\x18\x02 \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x01R\x05realm\x88\x01\x01\x12K\n" +
-	"\x04kind\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x02R\x04kind\x88\x01\x01\x123\n" +
+	"\x04kind\x18\x03 \x01(\x0e2(.turboci.graph.orchestrator.v1.CheckKindB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x02R\x04kind\x88\x01\x01\x12(\n" +
+	"\bsub_type\x18\n" +
+	" \x01(\tB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x03R\asubType\x88\x01\x01\x123\n" +
 	"\fdisplay_name\x18\t \x01(\tB\v\x82\x86\xf6\xfb\x0f\x05\n" +
 	"\x03\n" +
 	"\x01\n" +
-	"H\x03R\vdisplayName\x88\x01\x01\x12P\n" +
+	"H\x04R\vdisplayName\x88\x01\x01\x12P\n" +
 	"\aoptions\x18\x04 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteB\v\x82\x86\xf6\xfb\x0f\x05\n" +
 	"\x03\n" +
 	"\x01\n" +
@@ -2536,18 +2606,19 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\x03\n" +
 	"\x01\n" +
 	"\x12\x03\n" +
-	"\x01\x02H\x04R\fdependencies\x88\x01\x01\x12X\n" +
+	"\x01\x02H\x05R\fdependencies\x88\x01\x01\x12X\n" +
 	"\vresult_data\x18\x06 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteB\f\x82\x86\xf6\xfb\x0f\x06\n" +
 	"\x04\n" +
 	"\x02\x14\x1eR\n" +
 	"resultData\x12;\n" +
 	"\x10finalize_results\x18\a \x01(\bB\v\x82\x86\xf6\xfb\x0f\x05\n" +
 	"\x03\n" +
-	"\x01\x1eH\x05R\x0ffinalizeResults\x88\x01\x01\x12D\n" +
-	"\x05state\x18\b \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x06R\x05state\x88\x01\x01B\r\n" +
+	"\x01\x1eH\x06R\x0ffinalizeResults\x88\x01\x01\x12D\n" +
+	"\x05state\x18\b \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\aR\x05state\x88\x01\x01B\r\n" +
 	"\v_identifierB\b\n" +
 	"\x06_realmB\a\n" +
-	"\x05_kindB\x0f\n" +
+	"\x05_kindB\v\n" +
+	"\t_sub_typeB\x0f\n" +
 	"\r_display_nameB\x0f\n" +
 	"\r_dependenciesB\x13\n" +
 	"\x11_finalize_resultsB\b\n" +

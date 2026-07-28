@@ -18,7 +18,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Check(_message.Message):
-    __slots__ = ("identifier", "display_name", "created_by", "kind", "realm", "version", "state", "state_history", "dependencies", "options", "results", "edits")
+    __slots__ = ("identifier", "display_name", "created_by", "kind", "sub_type", "realm", "version", "state", "state_history", "dependencies", "options", "results", "edits")
     class StateHistoryEntry(_message.Message):
         __slots__ = ("state", "version")
         STATE_FIELD_NUMBER: _ClassVar[int]
@@ -45,6 +45,7 @@ class Check(_message.Message):
     DISPLAY_NAME_FIELD_NUMBER: _ClassVar[int]
     CREATED_BY_FIELD_NUMBER: _ClassVar[int]
     KIND_FIELD_NUMBER: _ClassVar[int]
+    SUB_TYPE_FIELD_NUMBER: _ClassVar[int]
     REALM_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
@@ -57,6 +58,7 @@ class Check(_message.Message):
     display_name: str
     created_by: _actor_pb2.Actor
     kind: _check_kind_pb2.CheckKind
+    sub_type: str
     realm: str
     version: _revision_pb2.Revision
     state: _check_state_pb2.CheckState
@@ -65,4 +67,4 @@ class Check(_message.Message):
     options: _containers.RepeatedCompositeFieldContainer[_value_ref_pb2.ValueRef]
     results: _containers.RepeatedCompositeFieldContainer[Check.Result]
     edits: _containers.RepeatedCompositeFieldContainer[_edit_pb2.Edit]
-    def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Check, _Mapping]] = ..., display_name: _Optional[str] = ..., created_by: _Optional[_Union[_actor_pb2.Actor, _Mapping]] = ..., kind: _Optional[_Union[_check_kind_pb2.CheckKind, str]] = ..., realm: _Optional[str] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ..., state_history: _Optional[_Iterable[_Union[Check.StateHistoryEntry, _Mapping]]] = ..., dependencies: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., options: _Optional[_Iterable[_Union[_value_ref_pb2.ValueRef, _Mapping]]] = ..., results: _Optional[_Iterable[_Union[Check.Result, _Mapping]]] = ..., edits: _Optional[_Iterable[_Union[_edit_pb2.Edit, _Mapping]]] = ...) -> None: ...
+    def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Check, _Mapping]] = ..., display_name: _Optional[str] = ..., created_by: _Optional[_Union[_actor_pb2.Actor, _Mapping]] = ..., kind: _Optional[_Union[_check_kind_pb2.CheckKind, str]] = ..., sub_type: _Optional[str] = ..., realm: _Optional[str] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ..., state_history: _Optional[_Iterable[_Union[Check.StateHistoryEntry, _Mapping]]] = ..., dependencies: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., options: _Optional[_Iterable[_Union[_value_ref_pb2.ValueRef, _Mapping]]] = ..., results: _Optional[_Iterable[_Union[Check.Result, _Mapping]]] = ..., edits: _Optional[_Iterable[_Union[_edit_pb2.Edit, _Mapping]]] = ...) -> None: ...
