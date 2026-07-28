@@ -58,6 +58,12 @@ const (
 //
 // See http://go/turbo-ci-acls (Googlers only) for detailed description of
 // relevant permissions and roles.
+//
+// Some endpoints in this API interact with Android legacy worknodes as stages
+// by calling the WorkNode API, which has credential requirements that apply
+// to this API when these endpoints operate on worknodes. gRPC callers already
+// satisfy these requirements, but maintainers of internal Google services
+// should see the WorkNode API documentation for additional details.
 type TurboCIOrchestratorClient interface {
 	// CreateWorkPlan creates a new WorkPlan and returns a Workplan Creator
 	// token, which can be used to create checks and stages in this Workplan.
@@ -246,6 +252,12 @@ func (c *turboCIOrchestratorClient) CancelWorkPlan(ctx context.Context, in *v1.C
 //
 // See http://go/turbo-ci-acls (Googlers only) for detailed description of
 // relevant permissions and roles.
+//
+// Some endpoints in this API interact with Android legacy worknodes as stages
+// by calling the WorkNode API, which has credential requirements that apply
+// to this API when these endpoints operate on worknodes. gRPC callers already
+// satisfy these requirements, but maintainers of internal Google services
+// should see the WorkNode API documentation for additional details.
 type TurboCIOrchestratorServer interface {
 	// CreateWorkPlan creates a new WorkPlan and returns a Workplan Creator
 	// token, which can be used to create checks and stages in this Workplan.
