@@ -270,13 +270,16 @@ class TestLifecycle(unittest.TestCase):
         current_attempt_state=make_state(int(time.time()) + 10)
     )
 
+    write_nodes_mock = mock.Mock()
+
     def mock_write_nodes(*args, **kwargs):
       _ = (args, kwargs)
-      if self.client.WriteNodes.call_count == 2:
+      if write_nodes_mock.call_count == 2:
         raise transient_error
       return default_rsp
 
-    self.client.WriteNodes = mock.Mock(side_effect=mock_write_nodes)
+    write_nodes_mock.side_effect = mock_write_nodes
+    self.client.WriteNodes = write_nodes_mock
     hb = lifecycle.execute_stage(
         client=self.client, stage=make_stage(), opts=opts
     )
@@ -285,9 +288,7 @@ class TestLifecycle(unittest.TestCase):
       with hb:
         # Poll until we see 3 calls
         start = time.time()
-        while (
-            self.client.WriteNodes.call_count < 3 and time.time() - start < 1.0
-        ):
+        while write_nodes_mock.call_count < 3 and time.time() - start < 1.0:
           time.sleep(0.001)
         assert hb._thread
         self.assertTrue(hb._thread.is_alive())
@@ -746,13 +747,16 @@ class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
         current_attempt_state=make_state(int(time.time()) + 10)
     )
 
+    write_nodes_mock = mock.AsyncMock()
+
     async def mock_write_nodes(*args, **kwargs):
       _ = (args, kwargs)
-      if self.client.WriteNodes.call_count == 2:
+      if write_nodes_mock.call_count == 2:
         raise transient_error
       return default_rsp
 
-    self.client.WriteNodes = mock.AsyncMock(side_effect=mock_write_nodes)
+    write_nodes_mock.side_effect = mock_write_nodes
+    self.client.WriteNodes = write_nodes_mock
     hb = await lifecycle.async_execute_stage(
         client=self.client, stage=make_stage(), opts=opts
     )
@@ -761,7 +765,7 @@ class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
       async with hb:
         start = asyncio.get_running_loop().time()
         while (
-            self.client.WriteNodes.call_count < 3
+            write_nodes_mock.call_count < 3
             and asyncio.get_running_loop().time() - start < 1.0
         ):
           await asyncio.sleep(0.001)
