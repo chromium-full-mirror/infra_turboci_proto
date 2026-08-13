@@ -20,7 +20,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class WriteNodesRequest(_message.Message):
-    __slots__ = ("token", "reason", "txn", "checks", "stages", "current_attempt", "current_stage")
+    __slots__ = ("token", "reason", "txn", "checks", "stages", "current_attempt", "current_stage", "stage_cancellations")
     class DependencyGroup(_message.Message):
         __slots__ = ("edges", "groups", "threshold")
         EDGES_FIELD_NUMBER: _ClassVar[int]
@@ -147,6 +147,11 @@ class WriteNodesRequest(_message.Message):
         CONTINUATION_GROUP_FIELD_NUMBER: _ClassVar[int]
         continuation_group: WriteNodesRequest.DependencyGroup
         def __init__(self, continuation_group: _Optional[_Union[WriteNodesRequest.DependencyGroup, _Mapping]] = ...) -> None: ...
+    class StageCancellation(_message.Message):
+        __slots__ = ("identifier",)
+        IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
+        identifier: _identifier_pb2.Stage
+        def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Stage, _Mapping]] = ...) -> None: ...
     TOKEN_FIELD_NUMBER: _ClassVar[int]
     REASON_FIELD_NUMBER: _ClassVar[int]
     TXN_FIELD_NUMBER: _ClassVar[int]
@@ -154,6 +159,7 @@ class WriteNodesRequest(_message.Message):
     STAGES_FIELD_NUMBER: _ClassVar[int]
     CURRENT_ATTEMPT_FIELD_NUMBER: _ClassVar[int]
     CURRENT_STAGE_FIELD_NUMBER: _ClassVar[int]
+    STAGE_CANCELLATIONS_FIELD_NUMBER: _ClassVar[int]
     token: str
     reason: WriteNodesRequest.Reason
     txn: _transaction_details_pb2.TransactionDetails
@@ -161,4 +167,5 @@ class WriteNodesRequest(_message.Message):
     stages: _containers.RepeatedCompositeFieldContainer[WriteNodesRequest.StageWrite]
     current_attempt: WriteNodesRequest.CurrentAttemptWrite
     current_stage: WriteNodesRequest.CurrentStageWrite
-    def __init__(self, token: _Optional[str] = ..., reason: _Optional[_Union[WriteNodesRequest.Reason, _Mapping]] = ..., txn: _Optional[_Union[_transaction_details_pb2.TransactionDetails, _Mapping]] = ..., checks: _Optional[_Iterable[_Union[WriteNodesRequest.CheckWrite, _Mapping]]] = ..., stages: _Optional[_Iterable[_Union[WriteNodesRequest.StageWrite, _Mapping]]] = ..., current_attempt: _Optional[_Union[WriteNodesRequest.CurrentAttemptWrite, _Mapping]] = ..., current_stage: _Optional[_Union[WriteNodesRequest.CurrentStageWrite, _Mapping]] = ...) -> None: ...
+    stage_cancellations: _containers.RepeatedCompositeFieldContainer[WriteNodesRequest.StageCancellation]
+    def __init__(self, token: _Optional[str] = ..., reason: _Optional[_Union[WriteNodesRequest.Reason, _Mapping]] = ..., txn: _Optional[_Union[_transaction_details_pb2.TransactionDetails, _Mapping]] = ..., checks: _Optional[_Iterable[_Union[WriteNodesRequest.CheckWrite, _Mapping]]] = ..., stages: _Optional[_Iterable[_Union[WriteNodesRequest.StageWrite, _Mapping]]] = ..., current_attempt: _Optional[_Union[WriteNodesRequest.CurrentAttemptWrite, _Mapping]] = ..., current_stage: _Optional[_Union[WriteNodesRequest.CurrentStageWrite, _Mapping]] = ..., stage_cancellations: _Optional[_Iterable[_Union[WriteNodesRequest.StageCancellation, _Mapping]]] = ...) -> None: ...
