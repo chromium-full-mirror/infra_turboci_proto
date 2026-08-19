@@ -70,7 +70,7 @@ class WriteNodesRequest(_message.Message):
         state: _check_state_pb2.CheckState
         def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Check, _Mapping]] = ..., realm: _Optional[str] = ..., kind: _Optional[_Union[_check_kind_pb2.CheckKind, str]] = ..., sub_type: _Optional[str] = ..., display_name: _Optional[str] = ..., options: _Optional[_Iterable[_Union[_value_write_pb2.ValueWrite, _Mapping]]] = ..., dependencies: _Optional[_Union[WriteNodesRequest.DependencyGroup, _Mapping]] = ..., result_data: _Optional[_Iterable[_Union[_value_write_pb2.ValueWrite, _Mapping]]] = ..., finalize_results: _Optional[bool] = ..., state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ...) -> None: ...
     class StageWrite(_message.Message):
-        __slots__ = ("identifier", "args", "realm", "display_name", "dependencies", "requested_stage_execution_policy", "assignments", "cancelled")
+        __slots__ = ("identifier", "args", "realm", "display_name", "dependencies", "requested_stage_execution_policy", "assignments")
         IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
         ARGS_FIELD_NUMBER: _ClassVar[int]
         REALM_FIELD_NUMBER: _ClassVar[int]
@@ -78,7 +78,6 @@ class WriteNodesRequest(_message.Message):
         DEPENDENCIES_FIELD_NUMBER: _ClassVar[int]
         REQUESTED_STAGE_EXECUTION_POLICY_FIELD_NUMBER: _ClassVar[int]
         ASSIGNMENTS_FIELD_NUMBER: _ClassVar[int]
-        CANCELLED_FIELD_NUMBER: _ClassVar[int]
         identifier: _identifier_pb2.Stage
         args: _value_write_pb2.ValueWrite
         realm: str
@@ -86,8 +85,7 @@ class WriteNodesRequest(_message.Message):
         dependencies: WriteNodesRequest.DependencyGroup
         requested_stage_execution_policy: _stage_execution_policy_pb2.StageExecutionPolicy
         assignments: _containers.RepeatedCompositeFieldContainer[_stage_pb2.Stage.Assignment]
-        cancelled: bool
-        def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Stage, _Mapping]] = ..., args: _Optional[_Union[_value_write_pb2.ValueWrite, _Mapping]] = ..., realm: _Optional[str] = ..., display_name: _Optional[str] = ..., dependencies: _Optional[_Union[WriteNodesRequest.DependencyGroup, _Mapping]] = ..., requested_stage_execution_policy: _Optional[_Union[_stage_execution_policy_pb2.StageExecutionPolicy, _Mapping]] = ..., assignments: _Optional[_Iterable[_Union[_stage_pb2.Stage.Assignment, _Mapping]]] = ..., cancelled: _Optional[bool] = ...) -> None: ...
+        def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Stage, _Mapping]] = ..., args: _Optional[_Union[_value_write_pb2.ValueWrite, _Mapping]] = ..., realm: _Optional[str] = ..., display_name: _Optional[str] = ..., dependencies: _Optional[_Union[WriteNodesRequest.DependencyGroup, _Mapping]] = ..., requested_stage_execution_policy: _Optional[_Union[_stage_execution_policy_pb2.StageExecutionPolicy, _Mapping]] = ..., assignments: _Optional[_Iterable[_Union[_stage_pb2.Stage.Assignment, _Mapping]]] = ...) -> None: ...
     class CurrentAttemptWrite(_message.Message):
         __slots__ = ("details", "progress", "state_transition")
         class StateTransition(_message.Message):

@@ -312,6 +312,9 @@ message WriteNodesRequest {
   // once in a sense that if a StageWrite overwrites an existing stage, values
   // of all these fields (if they are set) must match existing stage values.
   message StageWrite {
+    reserved 7;
+    reserved "cancelled";
+
     // The stage to write to.
     //
     // The work plan in the ID can either be unset or be equal to the work plan
@@ -386,16 +389,6 @@ message WriteNodesRequest {
     //
     // Currently not implemented.
     repeated Stage.Assignment assignments = 6 [(turboci).creation_only = true];
-
-    // If true, ensures that this Stage is marked for cancellation.
-    //
-    // See Stage.cancelled_by for how cancellation affects stages in different
-    // lifecycle states.
-    //
-    // Use the top-level `reason` field to provide the cancellation reason.
-    //
-    // Deprecated: Use stage_cancellations instead.
-    optional bool cancelled = 7 [deprecated = true];
   }
 
   // Write to zero or more Stages.

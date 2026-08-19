@@ -1168,7 +1168,6 @@ type WriteNodesRequest_StageWrite struct {
 	xxx_hidden_Dependencies                  *WriteNodesRequest_DependencyGroup `protobuf:"bytes,4,opt,name=dependencies,proto3,oneof"`
 	xxx_hidden_RequestedStageExecutionPolicy *StageExecutionPolicy              `protobuf:"bytes,5,opt,name=requested_stage_execution_policy,json=requestedStageExecutionPolicy,proto3,oneof"`
 	xxx_hidden_Assignments                   *[]*Stage_Assignment               `protobuf:"bytes,6,rep,name=assignments,proto3"`
-	xxx_hidden_Cancelled                     bool                               `protobuf:"varint,7,opt,name=cancelled,proto3,oneof"`
 	XXX_raceDetectHookData                   protoimpl.RaceDetectHookData
 	XXX_presence                             [1]uint32
 	unknownFields                            protoimpl.UnknownFields
@@ -1257,14 +1256,6 @@ func (x *WriteNodesRequest_StageWrite) GetAssignments() []*Stage_Assignment {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/write_nodes_request.proto.
-func (x *WriteNodesRequest_StageWrite) GetCancelled() bool {
-	if x != nil {
-		return x.xxx_hidden_Cancelled
-	}
-	return false
-}
-
 func (x *WriteNodesRequest_StageWrite) SetIdentifier(v *v1.Stage) {
 	x.xxx_hidden_Identifier = v
 }
@@ -1275,12 +1266,12 @@ func (x *WriteNodesRequest_StageWrite) SetArgs(v *ValueWrite) {
 
 func (x *WriteNodesRequest_StageWrite) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 8)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 7)
 }
 
 func (x *WriteNodesRequest_StageWrite) SetDisplayName(v string) {
 	x.xxx_hidden_DisplayName = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 8)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 7)
 }
 
 func (x *WriteNodesRequest_StageWrite) SetDependencies(v *WriteNodesRequest_DependencyGroup) {
@@ -1293,12 +1284,6 @@ func (x *WriteNodesRequest_StageWrite) SetRequestedStageExecutionPolicy(v *Stage
 
 func (x *WriteNodesRequest_StageWrite) SetAssignments(v []*Stage_Assignment) {
 	x.xxx_hidden_Assignments = &v
-}
-
-// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/write_nodes_request.proto.
-func (x *WriteNodesRequest_StageWrite) SetCancelled(v bool) {
-	x.xxx_hidden_Cancelled = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 7, 8)
 }
 
 func (x *WriteNodesRequest_StageWrite) HasIdentifier() bool {
@@ -1343,14 +1328,6 @@ func (x *WriteNodesRequest_StageWrite) HasRequestedStageExecutionPolicy() bool {
 	return x.xxx_hidden_RequestedStageExecutionPolicy != nil
 }
 
-// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/write_nodes_request.proto.
-func (x *WriteNodesRequest_StageWrite) HasCancelled() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 7)
-}
-
 func (x *WriteNodesRequest_StageWrite) ClearIdentifier() {
 	x.xxx_hidden_Identifier = nil
 }
@@ -1375,12 +1352,6 @@ func (x *WriteNodesRequest_StageWrite) ClearDependencies() {
 
 func (x *WriteNodesRequest_StageWrite) ClearRequestedStageExecutionPolicy() {
 	x.xxx_hidden_RequestedStageExecutionPolicy = nil
-}
-
-// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/write_nodes_request.proto.
-func (x *WriteNodesRequest_StageWrite) ClearCancelled() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 7)
-	x.xxx_hidden_Cancelled = false
 }
 
 type WriteNodesRequest_StageWrite_builder struct {
@@ -1450,17 +1421,6 @@ type WriteNodesRequest_StageWrite_builder struct {
 	//
 	// Currently not implemented.
 	Assignments []*Stage_Assignment
-	// If true, ensures that this Stage is marked for cancellation.
-	//
-	// See Stage.cancelled_by for how cancellation affects stages in different
-	// lifecycle states.
-	//
-	// Use the top-level `reason` field to provide the cancellation reason.
-	//
-	// Deprecated: Use stage_cancellations instead.
-	//
-	// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/write_nodes_request.proto.
-	Cancelled *bool
 }
 
 func (b0 WriteNodesRequest_StageWrite_builder) Build() *WriteNodesRequest_StageWrite {
@@ -1470,20 +1430,16 @@ func (b0 WriteNodesRequest_StageWrite_builder) Build() *WriteNodesRequest_StageW
 	x.xxx_hidden_Identifier = b.Identifier
 	x.xxx_hidden_Args = b.Args
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 8)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 7)
 		x.xxx_hidden_Realm = b.Realm
 	}
 	if b.DisplayName != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 8)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 7)
 		x.xxx_hidden_DisplayName = b.DisplayName
 	}
 	x.xxx_hidden_Dependencies = b.Dependencies
 	x.xxx_hidden_RequestedStageExecutionPolicy = b.RequestedStageExecutionPolicy
 	x.xxx_hidden_Assignments = &b.Assignments
-	if b.Cancelled != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 7, 8)
-		x.xxx_hidden_Cancelled = *b.Cancelled
-	}
 	return m0
 }
 
@@ -2657,7 +2613,7 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/transaction_details.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\xc6'\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a7turboci/graph/orchestrator/v1/transaction_details.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\xa2'\n" +
 	"\x11WriteNodesRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12T\n" +
 	"\x06reason\x18\x02 \x01(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonH\x01R\x06reason\x88\x01\x01\x12H\n" +
@@ -2723,7 +2679,7 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\r_display_nameB\x0f\n" +
 	"\r_dependenciesB\x13\n" +
 	"\x11_finalize_resultsB\b\n" +
-	"\x06_state\x1a\xf7\x05\n" +
+	"\x06_state\x1a\xd3\x05\n" +
 	"\n" +
 	"StageWrite\x12@\n" +
 	"\n" +
@@ -2735,16 +2691,13 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\fdependencies\x18\x04 \x01(\v2@.turboci.graph.orchestrator.v1.WriteNodesRequest.DependencyGroupB\x0e\x82\x86\xf6\xfb\x0f\b\x12\x04\n" +
 	"\x02\b\x02\x18\x01H\x04R\fdependencies\x88\x01\x01\x12\x8b\x01\n" +
 	" requested_stage_execution_policy\x18\x05 \x01(\v23.turboci.graph.orchestrator.v1.StageExecutionPolicyB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01H\x05R\x1drequestedStageExecutionPolicy\x88\x01\x01\x12[\n" +
-	"\vassignments\x18\x06 \x03(\v2/.turboci.graph.orchestrator.v1.Stage.AssignmentB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01R\vassignments\x12%\n" +
-	"\tcancelled\x18\a \x01(\bB\x02\x18\x01H\x06R\tcancelled\x88\x01\x01B\r\n" +
+	"\vassignments\x18\x06 \x03(\v2/.turboci.graph.orchestrator.v1.Stage.AssignmentB\b\x82\x86\xf6\xfb\x0f\x02\x18\x01R\vassignmentsB\r\n" +
 	"\v_identifierB\a\n" +
 	"\x05_argsB\b\n" +
 	"\x06_realmB\x0f\n" +
 	"\r_display_nameB\x0f\n" +
 	"\r_dependenciesB#\n" +
-	"!_requested_stage_execution_policyB\f\n" +
-	"\n" +
-	"_cancelled\x1a\xc3\x0e\n" +
+	"!_requested_stage_execution_policyJ\x04\b\a\x10\bR\tcancelled\x1a\xc3\x0e\n" +
 	"\x13CurrentAttemptWrite\x12C\n" +
 	"\adetails\x18\x01 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteR\adetails\x12a\n" +
 	"\bprogress\x18\x02 \x03(\v2E.turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttemptProgressR\bprogress\x12\x84\x01\n" +
