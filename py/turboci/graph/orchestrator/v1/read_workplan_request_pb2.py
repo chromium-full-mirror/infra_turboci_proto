@@ -29,7 +29,7 @@ from turboci.graph.orchestrator.v1 import revision_pb2 as turboci_dot_graph_dot_
 from turboci.graph.orchestrator.v1 import value_filter_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_value__filter__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n9turboci/graph/orchestrator/v1/read_workplan_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\x1a\x31turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a\x30turboci/graph/orchestrator/v1/value_filter.proto\"\xb4\x03\n\x13ReadWorkPlanRequest\x12\x12\n\x05token\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x38\n\x0bworkplan_id\x18\x02 \x01(\x0b\x32\x1e.turboci.graph.ids.v1.WorkPlanH\x01\x88\x01\x01\x12R\n\x13included_node_types\x18\x03 \x03(\x0e\x32$.turboci.graph.ids.v1.IdentifierKindB\x0f\x82\x86\xf6\xfb\x0f\t\x12\x07\n\x05\x02\x06\x08\t\n\x12\x43\n\rsince_version\x18\x04 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x02\x88\x01\x01\x12\x45\n\x0cvalue_filter\x18\x05 \x01(\x0b\x32*.turboci.graph.orchestrator.v1.ValueFilterH\x03\x88\x01\x01\x12\x1d\n\x10pagination_token\x18\x06 \x01(\tH\x04\x88\x01\x01\x42\x08\n\x06_tokenB\x0e\n\x0c_workplan_idB\x10\n\x0e_since_versionB\x0f\n\r_value_filterB\x13\n\x11_pagination_tokenBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n9turboci/graph/orchestrator/v1/read_workplan_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\x1a\x31turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a\x30turboci/graph/orchestrator/v1/value_filter.proto\"\x86\x04\n\x13ReadWorkPlanRequest\x12\x12\n\x05token\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x38\n\x0bworkplan_id\x18\x02 \x01(\x0b\x32\x1e.turboci.graph.ids.v1.WorkPlanH\x01\x88\x01\x01\x12R\n\x13included_node_types\x18\x03 \x03(\x0e\x32$.turboci.graph.ids.v1.IdentifierKindB\x0f\x82\x86\xf6\xfb\x0f\t\x12\x07\n\x05\x02\x06\x08\t\n\x12\x43\n\rsince_version\x18\x04 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x02\x88\x01\x01\x12\x45\n\x0cvalue_filter\x18\x05 \x01(\x0b\x32*.turboci.graph.orchestrator.v1.ValueFilterH\x03\x88\x01\x01\x12!\n\x10pagination_token\x18\x06 \x01(\tB\x02\x18\x01H\x04\x88\x01\x01\x12\x16\n\tpage_size\x18\x07 \x01(\x05H\x05\x88\x01\x01\x12\x17\n\npage_token\x18\x08 \x01(\tH\x06\x88\x01\x01\x42\x08\n\x06_tokenB\x0e\n\x0c_workplan_idB\x10\n\x0e_since_versionB\x0f\n\r_value_filterB\x13\n\x11_pagination_tokenB\x0c\n\n_page_sizeB\r\n\x0b_page_tokenBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -39,6 +39,8 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
   _globals['_READWORKPLANREQUEST'].fields_by_name['included_node_types']._loaded_options = None
   _globals['_READWORKPLANREQUEST'].fields_by_name['included_node_types']._serialized_options = b'\202\206\366\373\017\t\022\007\n\005\002\006\010\t\n'
+  _globals['_READWORKPLANREQUEST'].fields_by_name['pagination_token']._loaded_options = None
+  _globals['_READWORKPLANREQUEST'].fields_by_name['pagination_token']._serialized_options = b'\030\001'
   _globals['_READWORKPLANREQUEST']._serialized_start=323
-  _globals['_READWORKPLANREQUEST']._serialized_end=759
+  _globals['_READWORKPLANREQUEST']._serialized_end=841
 # @@protoc_insertion_point(module_scope)

@@ -34,6 +34,8 @@ type ReadWorkPlanRequest struct {
 	xxx_hidden_SinceVersion      *Revision              `protobuf:"bytes,4,opt,name=since_version,json=sinceVersion,proto3,oneof"`
 	xxx_hidden_ValueFilter       *ValueFilter           `protobuf:"bytes,5,opt,name=value_filter,json=valueFilter,proto3,oneof"`
 	xxx_hidden_PaginationToken   *string                `protobuf:"bytes,6,opt,name=pagination_token,json=paginationToken,proto3,oneof"`
+	xxx_hidden_PageSize          int32                  `protobuf:"varint,7,opt,name=page_size,json=pageSize,proto3,oneof"`
+	xxx_hidden_PageToken         *string                `protobuf:"bytes,8,opt,name=page_token,json=pageToken,proto3,oneof"`
 	XXX_raceDetectHookData       protoimpl.RaceDetectHookData
 	XXX_presence                 [1]uint32
 	unknownFields                protoimpl.UnknownFields
@@ -103,6 +105,7 @@ func (x *ReadWorkPlanRequest) GetValueFilter() *ValueFilter {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/read_workplan_request.proto.
 func (x *ReadWorkPlanRequest) GetPaginationToken() string {
 	if x != nil {
 		if x.xxx_hidden_PaginationToken != nil {
@@ -113,9 +116,26 @@ func (x *ReadWorkPlanRequest) GetPaginationToken() string {
 	return ""
 }
 
+func (x *ReadWorkPlanRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.xxx_hidden_PageSize
+	}
+	return 0
+}
+
+func (x *ReadWorkPlanRequest) GetPageToken() string {
+	if x != nil {
+		if x.xxx_hidden_PageToken != nil {
+			return *x.xxx_hidden_PageToken
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *ReadWorkPlanRequest) SetToken(v string) {
 	x.xxx_hidden_Token = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 6)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 8)
 }
 
 func (x *ReadWorkPlanRequest) SetWorkplanId(v *v1.WorkPlan) {
@@ -134,9 +154,20 @@ func (x *ReadWorkPlanRequest) SetValueFilter(v *ValueFilter) {
 	x.xxx_hidden_ValueFilter = v
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/read_workplan_request.proto.
 func (x *ReadWorkPlanRequest) SetPaginationToken(v string) {
 	x.xxx_hidden_PaginationToken = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 6)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 8)
+}
+
+func (x *ReadWorkPlanRequest) SetPageSize(v int32) {
+	x.xxx_hidden_PageSize = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 8)
+}
+
+func (x *ReadWorkPlanRequest) SetPageToken(v string) {
+	x.xxx_hidden_PageToken = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 7, 8)
 }
 
 func (x *ReadWorkPlanRequest) HasToken() bool {
@@ -167,11 +198,26 @@ func (x *ReadWorkPlanRequest) HasValueFilter() bool {
 	return x.xxx_hidden_ValueFilter != nil
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/read_workplan_request.proto.
 func (x *ReadWorkPlanRequest) HasPaginationToken() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
+}
+
+func (x *ReadWorkPlanRequest) HasPageSize() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
+}
+
+func (x *ReadWorkPlanRequest) HasPageToken() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 7)
 }
 
 func (x *ReadWorkPlanRequest) ClearToken() {
@@ -191,9 +237,20 @@ func (x *ReadWorkPlanRequest) ClearValueFilter() {
 	x.xxx_hidden_ValueFilter = nil
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/read_workplan_request.proto.
 func (x *ReadWorkPlanRequest) ClearPaginationToken() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
 	x.xxx_hidden_PaginationToken = nil
+}
+
+func (x *ReadWorkPlanRequest) ClearPageSize() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
+	x.xxx_hidden_PageSize = 0
+}
+
+func (x *ReadWorkPlanRequest) ClearPageToken() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 7)
+	x.xxx_hidden_PageToken = nil
 }
 
 type ReadWorkPlanRequest_builder struct {
@@ -253,7 +310,28 @@ type ReadWorkPlanRequest_builder struct {
 	// their values from the first page of this request. Attempting to use a
 	// pagination token while changing any other attributes of the request may
 	// result in unexpected or inconsistent results.
+	//
+	// Deprecated, please use `page_token` instead.
+	//
+	// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/read_workplan_request.proto.
 	PaginationToken *string
+	// Maximum page size in ***bytes**.
+	//
+	//   - If unspecified, at most 10MB will be returned.
+	//   - If specified with a value greater than 10MB, it will be coerced to 10MB.
+	//   - If specified with a value that's too small to fit even one piece of data
+	//     (stage, check, value, etc), we would return a larger page size to fit one
+	//     piece of data.
+	PageSize *int32
+	// Pagination token, so this query can resume consuming nodes with the next
+	// node in the stream. If omitted, returns nodes beginning with the first node
+	// in the stream.
+	//
+	// If provided, the other fields of the ReadWorkPlanRequest need to match
+	// their values from the first page of this request. Attempting to use a
+	// pagination token while changing any other attributes of the request may
+	// result in unexpected or inconsistent results.
+	PageToken *string
 }
 
 func (b0 ReadWorkPlanRequest_builder) Build() *ReadWorkPlanRequest {
@@ -261,7 +339,7 @@ func (b0 ReadWorkPlanRequest_builder) Build() *ReadWorkPlanRequest {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Token != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 6)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 8)
 		x.xxx_hidden_Token = b.Token
 	}
 	x.xxx_hidden_WorkplanId = b.WorkplanId
@@ -269,8 +347,16 @@ func (b0 ReadWorkPlanRequest_builder) Build() *ReadWorkPlanRequest {
 	x.xxx_hidden_SinceVersion = b.SinceVersion
 	x.xxx_hidden_ValueFilter = b.ValueFilter
 	if b.PaginationToken != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 6)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 8)
 		x.xxx_hidden_PaginationToken = b.PaginationToken
+	}
+	if b.PageSize != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 8)
+		x.xxx_hidden_PageSize = *b.PageSize
+	}
+	if b.PageToken != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 7, 8)
+		x.xxx_hidden_PageToken = b.PageToken
 	}
 	return m0
 }
@@ -279,7 +365,7 @@ var File_turboci_graph_orchestrator_v1_read_workplan_request_proto protoreflect.
 
 const file_turboci_graph_orchestrator_v1_read_workplan_request_proto_rawDesc = "" +
 	"\n" +
-	"9turboci/graph/orchestrator/v1/read_workplan_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a0turboci/graph/orchestrator/v1/value_filter.proto\"\x86\x04\n" +
+	"9turboci/graph/orchestrator/v1/read_workplan_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a*turboci/graph/ids/v1/identifier_kind.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a0turboci/graph/orchestrator/v1/value_filter.proto\"\xed\x04\n" +
 	"\x13ReadWorkPlanRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12D\n" +
 	"\vworkplan_id\x18\x02 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x01R\n" +
@@ -288,13 +374,19 @@ const file_turboci_graph_orchestrator_v1_read_workplan_request_proto_rawDesc = "
 	"\x05\x02\x06\b\t\n" +
 	"R\x11includedNodeTypes\x12Q\n" +
 	"\rsince_version\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\fsinceVersion\x88\x01\x01\x12R\n" +
-	"\fvalue_filter\x18\x05 \x01(\v2*.turboci.graph.orchestrator.v1.ValueFilterH\x03R\vvalueFilter\x88\x01\x01\x12.\n" +
-	"\x10pagination_token\x18\x06 \x01(\tH\x04R\x0fpaginationToken\x88\x01\x01B\b\n" +
+	"\fvalue_filter\x18\x05 \x01(\v2*.turboci.graph.orchestrator.v1.ValueFilterH\x03R\vvalueFilter\x88\x01\x01\x122\n" +
+	"\x10pagination_token\x18\x06 \x01(\tB\x02\x18\x01H\x04R\x0fpaginationToken\x88\x01\x01\x12 \n" +
+	"\tpage_size\x18\a \x01(\x05H\x05R\bpageSize\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"page_token\x18\b \x01(\tH\x06R\tpageToken\x88\x01\x01B\b\n" +
 	"\x06_tokenB\x0e\n" +
 	"\f_workplan_idB\x10\n" +
 	"\x0e_since_versionB\x0f\n" +
 	"\r_value_filterB\x13\n" +
-	"\x11_pagination_tokenBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x11_pagination_tokenB\f\n" +
+	"\n" +
+	"_page_sizeB\r\n" +
+	"\v_page_tokenBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_read_workplan_request_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_graph_orchestrator_v1_read_workplan_request_proto_goTypes = []any{

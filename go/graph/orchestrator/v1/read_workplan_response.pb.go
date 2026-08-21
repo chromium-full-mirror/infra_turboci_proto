@@ -32,6 +32,7 @@ type ReadWorkPlanResponse struct {
 	xxx_hidden_CurrentAttemptState *StageAttemptCurrentState `protobuf:"bytes,3,opt,name=current_attempt_state,json=currentAttemptState,proto3,oneof"`
 	xxx_hidden_Version             *Revision                 `protobuf:"bytes,4,opt,name=version,proto3,oneof"`
 	xxx_hidden_PaginationToken     *string                   `protobuf:"bytes,5,opt,name=pagination_token,json=paginationToken,proto3,oneof"`
+	xxx_hidden_NextPageToken       *string                   `protobuf:"bytes,6,opt,name=next_page_token,json=nextPageToken,proto3,oneof"`
 	XXX_raceDetectHookData         protoimpl.RaceDetectHookData
 	XXX_presence                   [1]uint32
 	unknownFields                  protoimpl.UnknownFields
@@ -91,10 +92,21 @@ func (x *ReadWorkPlanResponse) GetVersion() *Revision {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/read_workplan_response.proto.
 func (x *ReadWorkPlanResponse) GetPaginationToken() string {
 	if x != nil {
 		if x.xxx_hidden_PaginationToken != nil {
 			return *x.xxx_hidden_PaginationToken
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *ReadWorkPlanResponse) GetNextPageToken() string {
+	if x != nil {
+		if x.xxx_hidden_NextPageToken != nil {
+			return *x.xxx_hidden_NextPageToken
 		}
 		return ""
 	}
@@ -117,9 +129,15 @@ func (x *ReadWorkPlanResponse) SetVersion(v *Revision) {
 	x.xxx_hidden_Version = v
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/read_workplan_response.proto.
 func (x *ReadWorkPlanResponse) SetPaginationToken(v string) {
 	x.xxx_hidden_PaginationToken = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 5)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 6)
+}
+
+func (x *ReadWorkPlanResponse) SetNextPageToken(v string) {
+	x.xxx_hidden_NextPageToken = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 6)
 }
 
 func (x *ReadWorkPlanResponse) HasWorkplan() bool {
@@ -143,11 +161,19 @@ func (x *ReadWorkPlanResponse) HasVersion() bool {
 	return x.xxx_hidden_Version != nil
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/read_workplan_response.proto.
 func (x *ReadWorkPlanResponse) HasPaginationToken() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+}
+
+func (x *ReadWorkPlanResponse) HasNextPageToken() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
 }
 
 func (x *ReadWorkPlanResponse) ClearWorkplan() {
@@ -162,9 +188,15 @@ func (x *ReadWorkPlanResponse) ClearVersion() {
 	x.xxx_hidden_Version = nil
 }
 
+// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/read_workplan_response.proto.
 func (x *ReadWorkPlanResponse) ClearPaginationToken() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
 	x.xxx_hidden_PaginationToken = nil
+}
+
+func (x *ReadWorkPlanResponse) ClearNextPageToken() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	x.xxx_hidden_NextPageToken = nil
 }
 
 type ReadWorkPlanResponse_builder struct {
@@ -201,7 +233,16 @@ type ReadWorkPlanResponse_builder struct {
 	// with the next node in the stream. Callers looking to retrieve additional
 	// pages of results can do so by providing this token. If omitted, there are
 	// no further pages of results so no further queries are needed.
+	//
+	// Deprecated, please use `next_page_token` instead.
+	//
+	// Deprecated: Marked as deprecated in turboci/graph/orchestrator/v1/read_workplan_response.proto.
 	PaginationToken *string
+	// Opaque pagination token, so follow-on queries can resume consuming nodes
+	// with the next node in the stream. Callers looking to retrieve additional
+	// pages of results can do so by providing this token. If omitted, there are
+	// no further pages of results so no further queries are needed.
+	NextPageToken *string
 }
 
 func (b0 ReadWorkPlanResponse_builder) Build() *ReadWorkPlanResponse {
@@ -213,8 +254,12 @@ func (b0 ReadWorkPlanResponse_builder) Build() *ReadWorkPlanResponse {
 	x.xxx_hidden_CurrentAttemptState = b.CurrentAttemptState
 	x.xxx_hidden_Version = b.Version
 	if b.PaginationToken != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 5)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 6)
 		x.xxx_hidden_PaginationToken = b.PaginationToken
+	}
+	if b.NextPageToken != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 6)
+		x.xxx_hidden_NextPageToken = b.NextPageToken
 	}
 	return m0
 }
@@ -223,14 +268,15 @@ var File_turboci_graph_orchestrator_v1_read_workplan_response_proto protoreflect
 
 const file_turboci_graph_orchestrator_v1_read_workplan_response_proto_rawDesc = "" +
 	"\n" +
-	":turboci/graph/orchestrator/v1/read_workplan_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a.turboci/graph/orchestrator/v1/value_data.proto\x1a,turboci/graph/orchestrator/v1/workplan.proto\"\xdd\x04\n" +
+	":turboci/graph/orchestrator/v1/read_workplan_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a.turboci/graph/orchestrator/v1/value_data.proto\x1a,turboci/graph/orchestrator/v1/workplan.proto\"\xa2\x05\n" +
 	"\x14ReadWorkPlanResponse\x12H\n" +
 	"\bworkplan\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.WorkPlanH\x00R\bworkplan\x88\x01\x01\x12a\n" +
 	"\n" +
 	"value_data\x18\x02 \x03(\v2B.turboci.graph.orchestrator.v1.ReadWorkPlanResponse.ValueDataEntryR\tvalueData\x12p\n" +
 	"\x15current_attempt_state\x18\x03 \x01(\v27.turboci.graph.orchestrator.v1.StageAttemptCurrentStateH\x01R\x13currentAttemptState\x88\x01\x01\x12F\n" +
-	"\aversion\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\aversion\x88\x01\x01\x12.\n" +
-	"\x10pagination_token\x18\x05 \x01(\tH\x03R\x0fpaginationToken\x88\x01\x01\x1af\n" +
+	"\aversion\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\aversion\x88\x01\x01\x122\n" +
+	"\x10pagination_token\x18\x05 \x01(\tB\x02\x18\x01H\x03R\x0fpaginationToken\x88\x01\x01\x12+\n" +
+	"\x0fnext_page_token\x18\x06 \x01(\tH\x04R\rnextPageToken\x88\x01\x01\x1af\n" +
 	"\x0eValueDataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12>\n" +
 	"\x05value\x18\x02 \x01(\v2(.turboci.graph.orchestrator.v1.ValueDataR\x05value:\x028\x01B\v\n" +
@@ -238,7 +284,8 @@ const file_turboci_graph_orchestrator_v1_read_workplan_response_proto_rawDesc = 
 	"\x16_current_attempt_stateB\n" +
 	"\n" +
 	"\b_versionB\x13\n" +
-	"\x11_pagination_tokenBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x11_pagination_tokenB\x12\n" +
+	"\x10_next_page_tokenBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_read_workplan_response_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_read_workplan_response_proto_goTypes = []any{
