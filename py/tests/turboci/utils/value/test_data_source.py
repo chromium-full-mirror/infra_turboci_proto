@@ -83,6 +83,25 @@ class TestSimpleDataSource(unittest.TestCase):
     self.assertEqual(sds[dgst].binary.type_url, apb.type_url)
 
 
+  def test_copies_value_data(self):
+    """Verifies that SimpleDataSource copies ValueData instead of
+    referencing."""
+    sds = value.SimpleDataSource()
+    apb = any_pb2.Any()
+    apb.Pack(empty_pb2.Empty())
+    dgst = "some_digest"
+    val = value_data_pb2.ValueData(binary=apb)
+    sds[dgst] = val
+    self.assertIsNot(sds[dgst], val)
+    self.assertEqual(sds[dgst], val)
+
+    # Test update also copies
+    sds2 = value.SimpleDataSource()
+    sds2.update({dgst: val})
+    self.assertIsNot(sds2[dgst], val)
+    self.assertEqual(sds2[dgst], val)
+
+
 class TestLockedDataSource(unittest.TestCase):
 
   def test_locked_data_source(self):
@@ -188,10 +207,10 @@ class TestPickData(unittest.TestCase):
     apb.Pack(empty_pb2.Empty())
     dat = value.pick_data(
         value_data_pb2.ValueData(
-            binary=apb, conversion_failure='DATA_CONVERSION_FAILURE_ERROR'
-        ),
+            binary=apb,
+            conversion_failure='DATA_CONVERSION_FAILURE_ERROR'),
         value_data_pb2.ValueData(
-            json=value_data_pb2.ValueData.JsonAny(type_url=apb.type_url)
+            json=value_data_pb2.ValueData.JsonAny(type_url=apb.type_url),
         ),
     )
     self.assertEqual(dat.json.type_url, apb.type_url)
@@ -201,9 +220,8 @@ class TestPickData(unittest.TestCase):
     apb = any_pb2.Any()
     apb.Pack(empty_pb2.Empty())
     dat = value.pick_data(
-        value_data_pb2.ValueData(
-            json=value_data_pb2.ValueData.JsonAny(type_url=apb.type_url)
-        ),
+        value_data_pb2.ValueData(json=value_data_pb2.ValueData.JsonAny(
+            type_url=apb.type_url)),
         value_data_pb2.ValueData(binary=apb),
     )
     self.assertEqual(dat.json.type_url, apb.type_url)
@@ -214,7 +232,8 @@ class TestPickData(unittest.TestCase):
     dat = value.pick_data(
         value_data_pb2.ValueData(binary=apb),
         value_data_pb2.ValueData(
-            binary=apb, conversion_failure='DATA_CONVERSION_FAILURE_ERROR'
+            binary=apb,
+            conversion_failure='DATA_CONVERSION_FAILURE_ERROR'
         ),
     )
     self.assertEqual(dat.binary.type_url, apb.type_url)
@@ -227,15 +246,32 @@ class TestPickData(unittest.TestCase):
     apb = any_pb2.Any()
     apb.Pack(empty_pb2.Empty())
     dat = value.pick_data(
-        value_data_pb2.ValueData(
-            json=value_data_pb2.ValueData.JsonAny(type_url=apb.type_url)
-        ),
+        value_data_pb2.ValueData(json=value_data_pb2.ValueData.JsonAny(
+            type_url=apb.type_url)),
         value_data_pb2.ValueData(
             conversion_failure='DATA_CONVERSION_FAILURE_ERROR'
         ),
     )
     self.assertEqual(dat.json.type_url, apb.type_url)
     self.assertFalse(dat.HasField('conversion_failure'))
+
+  def test_pick_data_returns_copy(self):
+    # Scenario 1: No existing data, new_data is provided.
+    new_data_1 = value_data_pb2.ValueData(
+        json=value_data_pb2.ValueData.JsonAny(type_url='some_type'))
+    result_1 = value.pick_data(None, new_data_1)
+    self.assertIsNot(result_1, new_data_1)
+    self.assertEqual(result_1, new_data_1)
+
+    # Scenario 2: new_data is chosen over existing_data.
+    apb = any_pb2.Any()
+    apb.Pack(empty_pb2.Empty())
+    existing_data_2 = value_data_pb2.ValueData(binary=apb)
+    new_data_2 = value_data_pb2.ValueData(
+        json=value_data_pb2.ValueData.JsonAny(type_url=apb.type_url))
+    result_2 = value.pick_data(existing_data_2, new_data_2)
+    self.assertIsNot(result_2, new_data_2)
+    self.assertEqual(result_2, new_data_2)
 
 
 if __name__ == '__main__':
