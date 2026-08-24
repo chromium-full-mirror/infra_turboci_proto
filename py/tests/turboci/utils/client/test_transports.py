@@ -71,14 +71,14 @@ class MockRpcError(grpc.RpcError, grpc.Call):
 class TestTransports(unittest.TestCase):
 
   def test_grpc_transport_success(self):
-    mock_stub = mock.Mock()
+    mock_channel = mock.Mock()
     mock_method = mock.Mock()
-    setattr(mock_stub, 'CreateWorkPlan', mock_method)
+    mock_channel.unary_unary.return_value = mock_method
 
     mock_response = empty_pb2.Empty()
     mock_method.return_value = mock_response
 
-    transport = client.GrpcTransport(mock_stub)
+    transport = client.GrpcTransport(mock_channel)
     request = empty_pb2.Empty()
     options = client.CallOptions(
         deadline=datetime.timedelta(seconds=5), metadata={'key': 'value'}
@@ -92,15 +92,15 @@ class TestTransports(unittest.TestCase):
     )
 
   def test_grpc_transport_error(self):
-    mock_stub = mock.Mock()
+    mock_channel = mock.Mock()
     mock_method = mock.Mock()
-    setattr(mock_stub, 'CreateWorkPlan', mock_method)
+    mock_channel.unary_unary.return_value = mock_method
 
     # Use the real MockRpcError exception
     mock_err = MockRpcError(grpc.StatusCode.NOT_FOUND, 'not found')
     mock_method.side_effect = mock_err
 
-    transport = client.GrpcTransport(mock_stub)
+    transport = client.GrpcTransport(mock_channel)
     request = empty_pb2.Empty()
 
     with self.assertRaises(client.RPCError) as ctx:
@@ -113,14 +113,14 @@ class TestTransports(unittest.TestCase):
 class TestTransportsAsync(unittest.IsolatedAsyncioTestCase):
 
   async def test_grpc_async_transport_success(self):
-    mock_stub = mock.Mock()
+    mock_channel = mock.Mock()
     mock_method = mock.AsyncMock()
-    setattr(mock_stub, 'CreateWorkPlan', mock_method)
+    mock_channel.unary_unary.return_value = mock_method
 
     mock_response = empty_pb2.Empty()
     mock_method.return_value = mock_response
 
-    transport = client.GrpcAsyncTransport(mock_stub)
+    transport = client.GrpcAsyncTransport(mock_channel)
     request = empty_pb2.Empty()
     options = client.CallOptions(
         deadline=datetime.timedelta(seconds=5), metadata={'key': 'value'}
@@ -134,15 +134,15 @@ class TestTransportsAsync(unittest.IsolatedAsyncioTestCase):
     )
 
   async def test_grpc_async_transport_error(self):
-    mock_stub = mock.Mock()
+    mock_channel = mock.Mock()
     mock_method = mock.AsyncMock()
-    setattr(mock_stub, 'CreateWorkPlan', mock_method)
+    mock_channel.unary_unary.return_value = mock_method
 
     # Use the real MockRpcError exception
     mock_err = MockRpcError(grpc.StatusCode.NOT_FOUND, 'not found')
     mock_method.side_effect = mock_err
 
-    transport = client.GrpcAsyncTransport(mock_stub)
+    transport = client.GrpcAsyncTransport(mock_channel)
     request = empty_pb2.Empty()
 
     with self.assertRaises(client.RPCError) as ctx:
