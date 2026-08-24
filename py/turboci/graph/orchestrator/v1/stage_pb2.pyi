@@ -4,6 +4,7 @@ from google.api import field_behavior_pb2 as _field_behavior_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from turboci.graph.ids.v1 import identifier_pb2 as _identifier_pb2
 from turboci.graph.orchestrator.v1 import actor_pb2 as _actor_pb2
+from turboci.graph.orchestrator.v1 import builtin_executor_pb2 as _builtin_executor_pb2
 from turboci.graph.orchestrator.v1 import check_state_pb2 as _check_state_pb2
 from turboci.graph.orchestrator.v1 import dependencies_pb2 as _dependencies_pb2
 from turboci.graph.orchestrator.v1 import edit_pb2 as _edit_pb2
@@ -40,12 +41,14 @@ class Stage(_message.Message):
         version: _revision_pb2.Revision
         def __init__(self, state: _Optional[_Union[_stage_state_pb2.StageState, str]] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ...) -> None: ...
     class ExecutionPolicyState(_message.Message):
-        __slots__ = ("requested", "validated")
+        __slots__ = ("requested", "validated", "builtin_executor")
         REQUESTED_FIELD_NUMBER: _ClassVar[int]
         VALIDATED_FIELD_NUMBER: _ClassVar[int]
+        BUILTIN_EXECUTOR_FIELD_NUMBER: _ClassVar[int]
         requested: _stage_execution_policy_pb2.StageExecutionPolicy
         validated: _stage_execution_policy_pb2.StageExecutionPolicy
-        def __init__(self, requested: _Optional[_Union[_stage_execution_policy_pb2.StageExecutionPolicy, _Mapping]] = ..., validated: _Optional[_Union[_stage_execution_policy_pb2.StageExecutionPolicy, _Mapping]] = ...) -> None: ...
+        builtin_executor: _builtin_executor_pb2.BuiltinExecutor
+        def __init__(self, requested: _Optional[_Union[_stage_execution_policy_pb2.StageExecutionPolicy, _Mapping]] = ..., validated: _Optional[_Union[_stage_execution_policy_pb2.StageExecutionPolicy, _Mapping]] = ..., builtin_executor: _Optional[_Union[_builtin_executor_pb2.BuiltinExecutor, str]] = ...) -> None: ...
     class Attempt(_message.Message):
         __slots__ = ("identifier", "version", "last_heartbeat", "state", "state_history", "waiting_until", "process_uid", "details", "progress", "execution_policy")
         class StateHistoryEntry(_message.Message):
