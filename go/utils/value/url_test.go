@@ -9,7 +9,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"go.chromium.org/turboci/proto/go/internal/test/assert"
+	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func TestURL(t *testing.T) {

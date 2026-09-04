@@ -9,7 +9,7 @@ import (
 	"time"
 
 	idspb "go.chromium.org/turboci/proto/go/graph/ids/v1"
-	"go.chromium.org/turboci/proto/go/internal/test/assert"
+	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func TestWrap(t *testing.T) {

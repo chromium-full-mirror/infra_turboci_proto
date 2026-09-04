@@ -14,7 +14,7 @@ import (
 	commonpb "go.chromium.org/turboci/proto/go/data/common/v1"
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
 
-	"go.chromium.org/turboci/proto/go/internal/test/assert"
+	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func TestMakeTypeMatcher(t *testing.T) {

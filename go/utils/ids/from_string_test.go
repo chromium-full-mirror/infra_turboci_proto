@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"testing"
 
-	"go.chromium.org/turboci/proto/go/internal/test/assert"
+	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func ExampleFromString() {
