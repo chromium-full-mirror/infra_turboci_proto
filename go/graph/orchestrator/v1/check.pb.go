@@ -385,7 +385,7 @@ type Check_builder struct {
 	//
 	// Used as part of a Checks query for a coarse-grained filter.
 	Kind *CheckKind
-	// An optinoal disambiguating sub-type of this check, controlled by the
+	// An optional disambiguating sub-type of this check, controlled by the
 	// inserter of the Check.
 	//
 	// Identifies a specific, named, variant of this Check kind, to differentiate

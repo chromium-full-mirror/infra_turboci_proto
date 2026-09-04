@@ -36,6 +36,7 @@ type ValueWrite struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Data        *anypb.Any             `protobuf:"bytes,1,opt,name=data,proto3,oneof"`
 	xxx_hidden_Realm       *string                `protobuf:"bytes,2,opt,name=realm,proto3,oneof"`
+	xxx_hidden_Tags        *[]*Tag                `protobuf:"bytes,3,rep,name=tags,proto3"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -84,13 +85,26 @@ func (x *ValueWrite) GetRealm() string {
 	return ""
 }
 
+func (x *ValueWrite) GetTags() []*Tag {
+	if x != nil {
+		if x.xxx_hidden_Tags != nil {
+			return *x.xxx_hidden_Tags
+		}
+	}
+	return nil
+}
+
 func (x *ValueWrite) SetData(v *anypb.Any) {
 	x.xxx_hidden_Data = v
 }
 
 func (x *ValueWrite) SetRealm(v string) {
 	x.xxx_hidden_Realm = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+}
+
+func (x *ValueWrite) SetTags(v []*Tag) {
+	x.xxx_hidden_Tags = &v
 }
 
 func (x *ValueWrite) HasData() bool {
@@ -156,6 +170,13 @@ type ValueWrite_builder struct {
 	// See the surrounding context for this ValueWrite for which permissions
 	// will be checked for writing and/or reading this data.
 	Realm *string
+	// Additional tags to associate with the written data.
+	//
+	// Typically you should not set these directly; they should be generated for
+	// you using the `turboci.tag` field annotations in your protos, using one of
+	// the Turbo CI helper libraries (such as the Go or Python libraries in this
+	// repo).
+	Tags []*Tag
 }
 
 func (b0 ValueWrite_builder) Build() *ValueWrite {
@@ -164,9 +185,10 @@ func (b0 ValueWrite_builder) Build() *ValueWrite {
 	_, _ = b, x
 	x.xxx_hidden_Data = b.Data
 	if b.Realm != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
 		x.xxx_hidden_Realm = b.Realm
 	}
+	x.xxx_hidden_Tags = &b.Tags
 	return m0
 }
 
@@ -174,11 +196,12 @@ var File_turboci_graph_orchestrator_v1_value_write_proto protoreflect.FileDescri
 
 const file_turboci_graph_orchestrator_v1_value_write_proto_rawDesc = "" +
 	"\n" +
-	"/turboci/graph/orchestrator/v1/value_write.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x19google/protobuf/any.proto\"i\n" +
+	"/turboci/graph/orchestrator/v1/value_write.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x19google/protobuf/any.proto\x1a(turboci/graph/orchestrator/v1/tags.proto\"\xa1\x01\n" +
 	"\n" +
 	"ValueWrite\x12-\n" +
 	"\x04data\x18\x01 \x01(\v2\x14.google.protobuf.AnyH\x00R\x04data\x88\x01\x01\x12\x19\n" +
-	"\x05realm\x18\x02 \x01(\tH\x01R\x05realm\x88\x01\x01B\a\n" +
+	"\x05realm\x18\x02 \x01(\tH\x01R\x05realm\x88\x01\x01\x126\n" +
+	"\x04tags\x18\x03 \x03(\v2\".turboci.graph.orchestrator.v1.TagR\x04tagsB\a\n" +
 	"\x05_dataB\b\n" +
 	"\x06_realmBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
@@ -186,14 +209,16 @@ var file_turboci_graph_orchestrator_v1_value_write_proto_msgTypes = make([]proto
 var file_turboci_graph_orchestrator_v1_value_write_proto_goTypes = []any{
 	(*ValueWrite)(nil), // 0: turboci.graph.orchestrator.v1.ValueWrite
 	(*anypb.Any)(nil),  // 1: google.protobuf.Any
+	(*Tag)(nil),        // 2: turboci.graph.orchestrator.v1.Tag
 }
 var file_turboci_graph_orchestrator_v1_value_write_proto_depIdxs = []int32{
 	1, // 0: turboci.graph.orchestrator.v1.ValueWrite.data:type_name -> google.protobuf.Any
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 1: turboci.graph.orchestrator.v1.ValueWrite.tags:type_name -> turboci.graph.orchestrator.v1.Tag
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_value_write_proto_init() }
@@ -201,6 +226,7 @@ func file_turboci_graph_orchestrator_v1_value_write_proto_init() {
 	if File_turboci_graph_orchestrator_v1_value_write_proto != nil {
 		return
 	}
+	file_turboci_graph_orchestrator_v1_tags_proto_init()
 	file_turboci_graph_orchestrator_v1_value_write_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

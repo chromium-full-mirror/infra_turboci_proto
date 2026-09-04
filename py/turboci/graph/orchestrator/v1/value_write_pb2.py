@@ -23,9 +23,10 @@ _sym_db = _symbol_database.Default()
 
 
 from google.protobuf import any_pb2 as google_dot_protobuf_dot_any__pb2
+from turboci.graph.orchestrator.v1 import tags_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_tags__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n/turboci/graph/orchestrator/v1/value_write.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x19google/protobuf/any.proto\"\\\n\nValueWrite\x12\'\n\x04\x64\x61ta\x18\x01 \x01(\x0b\x32\x14.google.protobuf.AnyH\x00\x88\x01\x01\x12\x12\n\x05realm\x18\x02 \x01(\tH\x01\x88\x01\x01\x42\x07\n\x05_dataB\x08\n\x06_realmBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n/turboci/graph/orchestrator/v1/value_write.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x19google/protobuf/any.proto\x1a(turboci/graph/orchestrator/v1/tags.proto\"\x8e\x01\n\nValueWrite\x12\'\n\x04\x64\x61ta\x18\x01 \x01(\x0b\x32\x14.google.protobuf.AnyH\x00\x88\x01\x01\x12\x12\n\x05realm\x18\x02 \x01(\tH\x01\x88\x01\x01\x12\x30\n\x04tags\x18\x03 \x03(\x0b\x32\".turboci.graph.orchestrator.v1.TagB\x07\n\x05_dataB\x08\n\x06_realmBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,6 +34,6 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'turboci.graph.orchestrator.
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
-  _globals['_VALUEWRITE']._serialized_start=109
-  _globals['_VALUEWRITE']._serialized_end=201
+  _globals['_VALUEWRITE']._serialized_start=152
+  _globals['_VALUEWRITE']._serialized_end=294
 # @@protoc_insertion_point(module_scope)

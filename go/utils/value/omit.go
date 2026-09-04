@@ -31,6 +31,7 @@ func Omit(ref *orchestratorpb.ValueRef, reason orchestratorpb.OmitReason) {
 	case orchestratorpb.OmitReason_OMIT_REASON_NO_ACCESS:
 		ref.ClearDigest()
 		ref.ClearInline()
+		ref.SetTags(nil)
 
 	case orchestratorpb.OmitReason_OMIT_REASON_MISSING:
 		// No-op.

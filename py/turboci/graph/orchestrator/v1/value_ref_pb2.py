@@ -25,9 +25,10 @@ _sym_db = _symbol_database.Default()
 from google.api import field_behavior_pb2 as google_dot_api_dot_field__behavior__pb2
 from google.protobuf import any_pb2 as google_dot_protobuf_dot_any__pb2
 from turboci.graph.orchestrator.v1 import omit_reason_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_omit__reason__pb2
+from turboci.graph.orchestrator.v1 import tags_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_tags__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n-turboci/graph/orchestrator/v1/value_ref.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\x1a/turboci/graph/orchestrator/v1/omit_reason.proto\"\xfc\x01\n\x08ValueRef\x12\x15\n\x08type_url\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x12\n\x05realm\x18\x02 \x01(\tH\x01\x88\x01\x01\x12\x13\n\x06\x64igest\x18\x03 \x01(\tH\x02\x88\x01\x01\x12)\n\x06inline\x18\x04 \x01(\x0b\x32\x14.google.protobuf.AnyH\x03\x88\x01\x01\x12H\n\x0bomit_reason\x18\x05 \x01(\x0e\x32).turboci.graph.orchestrator.v1.OmitReasonB\x03\xe0\x41\x03H\x04\x88\x01\x01\x42\x0b\n\t_type_urlB\x08\n\x06_realmB\t\n\x07_digestB\t\n\x07_inlineB\x0e\n\x0c_omit_reasonBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n-turboci/graph/orchestrator/v1/value_ref.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/protobuf/any.proto\x1a/turboci/graph/orchestrator/v1/omit_reason.proto\x1a(turboci/graph/orchestrator/v1/tags.proto\"\xae\x02\n\x08ValueRef\x12\x15\n\x08type_url\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x12\n\x05realm\x18\x02 \x01(\tH\x01\x88\x01\x01\x12\x13\n\x06\x64igest\x18\x03 \x01(\tH\x02\x88\x01\x01\x12)\n\x06inline\x18\x04 \x01(\x0b\x32\x14.google.protobuf.AnyH\x03\x88\x01\x01\x12H\n\x0bomit_reason\x18\x05 \x01(\x0e\x32).turboci.graph.orchestrator.v1.OmitReasonB\x03\xe0\x41\x03H\x04\x88\x01\x01\x12\x30\n\x04tags\x18\x06 \x03(\x0b\x32\".turboci.graph.orchestrator.v1.TagB\x0b\n\t_type_urlB\x08\n\x06_realmB\t\n\x07_digestB\t\n\x07_inlineB\x0e\n\x0c_omit_reasonBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -37,6 +38,6 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
   _globals['_VALUEREF'].fields_by_name['omit_reason']._loaded_options = None
   _globals['_VALUEREF'].fields_by_name['omit_reason']._serialized_options = b'\340A\003'
-  _globals['_VALUEREF']._serialized_start=190
-  _globals['_VALUEREF']._serialized_end=442
+  _globals['_VALUEREF']._serialized_start=232
+  _globals['_VALUEREF']._serialized_end=534
 # @@protoc_insertion_point(module_scope)
