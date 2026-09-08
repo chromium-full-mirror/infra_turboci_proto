@@ -19,6 +19,11 @@ lint:
     - PACKAGE_SAME_GO_PACKAGE
   ignore:
     - google
+  ignore_only:
+    PACKAGE_VERSION_SUFFIX:
+      - testing
+    COMMENTS:
+      - testing
   enum_zero_value_suffix: _UNKNOWN
   rpc_allow_same_request_response: false
   rpc_allow_google_protobuf_empty_requests: false

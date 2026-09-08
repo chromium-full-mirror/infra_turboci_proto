@@ -1,0 +1,55 @@
+// Copyright 2026 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+syntax = "proto3";
+
+package testing.tags;
+
+import "turboci/tag.proto";
+
+option go_package = "go.chromium.org/turboci/proto/go/testing/tags;testingtagspb";
+option java_multiple_files = true;
+
+message MyMessage {
+  optional string tagged_field = 1 [(turboci.tag) = {}];
+
+  optional string untagged_field = 2;
+}
+
+enum TestEnum {
+  TEST_ENUM_UNKNOWN = 0;
+  TEST_ENUM_ONE = 1;
+  TEST_ENUM_TWO = 2;
+}
+
+message ComplexMessage {
+  message SubMessage {
+    optional string sub_tagged = 1 [(turboci.tag).alt_key = "previous.package.name.Message.field"];
+  }
+
+  optional string local_str = 1 [(turboci.tag).key_scope = VALUE_REF];
+  optional string workplan_str = 2 [(turboci.tag).value_scope = NODE];
+  optional string global_str = 3 [(turboci.tag).value_scope = WORK_PLAN];
+
+  optional bool local_bool = 4 [(turboci.tag).key_scope = VALUE_REF];
+  optional TestEnum local_enum = 5 [(turboci.tag).key_scope = VALUE_REF];
+  repeated string rep_str = 6 [(turboci.tag).key_scope = VALUE_REF];
+  map<string, SubMessage> map_sub = 7;
+  repeated SubMessage rep_sub = 8;
+  optional SubMessage sub = 9;
+
+  optional int64 split_index = 10 [
+    // allows us to QueryWorkPlans for WorkPlans with a split_index tag, but
+    // not filter on value.
+    (turboci.tag).key_scope = WORK_PLAN,
+    // allows us to QueryNodes on the value though.
+    (turboci.tag).value_scope = NODE
+  ];
+
+  optional bool explicit_presence_bool = 11 [(turboci.tag).index_unset = true];
+}
+
+message UnsupportedKindMessage {
+  optional bytes bad_field = 1 [(turboci.tag).key_scope = VALUE_REF];
+}

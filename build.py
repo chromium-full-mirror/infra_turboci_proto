@@ -377,15 +377,19 @@ def task_check_next_id():
     _task_check_next_id(fds)
 
 
-def protoc(*args: str):
+def protoc(*args: str, include_testing=False):
   with tempfile.NamedTemporaryFile() as argfile:
     argfile.writelines((arg + '\n').encode() for arg in args)
     # include the whole repo as a proto path
     argfile.write(b'-I.\n')
-    # compile all proto files under the turboci directory
+    # compile all proto files under the turboci and testing directories
     for file in quick_glob('turboci/**/*.proto'):
       argfile.write(file.encode())
       argfile.write(b'\n')
+    if include_testing:
+      for file in quick_glob('testing/**/*.proto'):
+        argfile.write(file.encode())
+        argfile.write(b'\n')
     argfile.flush()
     check_call(['protoc', f'@{argfile.name}'])
 
@@ -503,6 +507,7 @@ def task_compile_stubs(mode: None | str = None):
         '--go_opt=default_api_level=API_OPAQUE',
         f'--python_out={tpy}',
         f'--pyi_out={tpy}',
+        include_testing=True,
     )
 
     check = mode == 'check'
