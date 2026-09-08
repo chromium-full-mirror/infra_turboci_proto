@@ -16,34 +16,34 @@ option java_multiple_files = true;
 //
 // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX
 enum ReadScope {
-  // The default value; Item will be readable on the node (e.g. usable for Edge
-  // conditions).
-  READ_SCOPE_NODE = 0;
+  // The default value; Item will be readable on the ValueRef which contains it
+  // (e.g. usable for Edge conditions).
+  READ_SCOPE_VALUE_REF = 0;
 
-  // Redable at the WorkPlan level (allowing search for tagged nodes within a
+  // Readable at the Node level (allowing search for tagged nodes within a
   // WorkPlan via QueryNodes).
   //
-  // Also stored on the node itself (see READ_SCOPE_NODE).
+  // Also stored in the ValueRef itself (see READ_SCOPE_VALUE_REF).
   //
   // Writing a tag via a Check Option, and then later removing it by
   // overwriting the Option without that tag (e.g. while the Check is still
   // PLANNING) will make it so that searching for this Tag will no longer yield
   // that Check.
-  READ_SCOPE_WORK_PLAN = 1;
+  READ_SCOPE_NODE = 1;
 
-  // Readable globally (allowing search for tagged WorkPlans via
+  // Readable at the WorkPlan level (allowing search for tagged WorkPlans via
   // QueryWorkPlans).
   //
-  // Also readable at the WorkPlan level and stored on the node itself
-  // (READ_SCOPE_WORK_PLAN and READ_SCOPE_NODE respectively).
+  // Also readable at the Node level and the ValueRef itself
+  // (READ_SCOPE_NODE and READ_SCOPE_VALUE_REF respectively).
   //
   // These tags will only be searchable at the WorkPlan level once they belong
   // to some *immutable* piece of the WorkPlan (e.g. ValueWrites in a Stage
   // Attempt, Check Options for a Check in the PLANNED state or later, etc.)
   //
-  // Global-scoped tags should be used sparingly, as they are more costly
-  // to write performance than WorkPlan or Node-scoped tags.
-  READ_SCOPE_GLOBAL = 2;
+  // WorkPlan-scoped tags should be used sparingly, as they are more costly
+  // to write performance than Node or ValueRef-scoped tags.
+  READ_SCOPE_WORK_PLAN = 2;
 }
 
 // Tags allow WorkPlans to export queryable data from a ValueWrite.
@@ -79,7 +79,7 @@ message Tag {
 
   // Scope indicates the level at which the tag *key* can be read.
   //
-  // Defaults to READ_SCOPE_NODE.
+  // Defaults to READ_SCOPE_VALUE_REF.
   optional ReadScope scope = 2;
 
   // A single value associated with a tag.
@@ -91,7 +91,7 @@ message Tag {
     //
     // Must be <= `Tag.scope`.
     //
-    // Defaults to READ_SCOPE_NODE.
+    // Defaults to READ_SCOPE_VALUE_REF.
     optional ReadScope scope = 1;
 
     // Data for this value.

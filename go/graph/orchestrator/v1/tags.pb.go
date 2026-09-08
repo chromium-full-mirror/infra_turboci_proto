@@ -33,45 +33,45 @@ const (
 type ReadScope int32
 
 const (
-	// The default value; Item will be readable on the node (e.g. usable for Edge
-	// conditions).
-	ReadScope_READ_SCOPE_NODE ReadScope = 0
-	// Redable at the WorkPlan level (allowing search for tagged nodes within a
+	// The default value; Item will be readable on the ValueRef which contains it
+	// (e.g. usable for Edge conditions).
+	ReadScope_READ_SCOPE_VALUE_REF ReadScope = 0
+	// Readable at the Node level (allowing search for tagged nodes within a
 	// WorkPlan via QueryNodes).
 	//
-	// Also stored on the node itself (see READ_SCOPE_NODE).
+	// Also stored in the ValueRef itself (see READ_SCOPE_VALUE_REF).
 	//
 	// Writing a tag via a Check Option, and then later removing it by
 	// overwriting the Option without that tag (e.g. while the Check is still
 	// PLANNING) will make it so that searching for this Tag will no longer yield
 	// that Check.
-	ReadScope_READ_SCOPE_WORK_PLAN ReadScope = 1
-	// Readable globally (allowing search for tagged WorkPlans via
+	ReadScope_READ_SCOPE_NODE ReadScope = 1
+	// Readable at the WorkPlan level (allowing search for tagged WorkPlans via
 	// QueryWorkPlans).
 	//
-	// Also readable at the WorkPlan level and stored on the node itself
-	// (READ_SCOPE_WORK_PLAN and READ_SCOPE_NODE respectively).
+	// Also readable at the Node level and the ValueRef itself
+	// (READ_SCOPE_NODE and READ_SCOPE_VALUE_REF respectively).
 	//
 	// These tags will only be searchable at the WorkPlan level once they belong
 	// to some *immutable* piece of the WorkPlan (e.g. ValueWrites in a Stage
 	// Attempt, Check Options for a Check in the PLANNED state or later, etc.)
 	//
-	// Global-scoped tags should be used sparingly, as they are more costly
-	// to write performance than WorkPlan or Node-scoped tags.
-	ReadScope_READ_SCOPE_GLOBAL ReadScope = 2
+	// WorkPlan-scoped tags should be used sparingly, as they are more costly
+	// to write performance than Node or ValueRef-scoped tags.
+	ReadScope_READ_SCOPE_WORK_PLAN ReadScope = 2
 )
 
 // Enum value maps for ReadScope.
 var (
 	ReadScope_name = map[int32]string{
-		0: "READ_SCOPE_NODE",
-		1: "READ_SCOPE_WORK_PLAN",
-		2: "READ_SCOPE_GLOBAL",
+		0: "READ_SCOPE_VALUE_REF",
+		1: "READ_SCOPE_NODE",
+		2: "READ_SCOPE_WORK_PLAN",
 	}
 	ReadScope_value = map[string]int32{
-		"READ_SCOPE_NODE":      0,
-		"READ_SCOPE_WORK_PLAN": 1,
-		"READ_SCOPE_GLOBAL":    2,
+		"READ_SCOPE_VALUE_REF": 0,
+		"READ_SCOPE_NODE":      1,
+		"READ_SCOPE_WORK_PLAN": 2,
 	}
 )
 
@@ -175,7 +175,7 @@ func (x *Tag) GetScope() ReadScope {
 			return x.xxx_hidden_Scope
 		}
 	}
-	return ReadScope_READ_SCOPE_NODE
+	return ReadScope_READ_SCOPE_VALUE_REF
 }
 
 func (x *Tag) GetValues() []*Tag_Value {
@@ -222,7 +222,7 @@ func (x *Tag) ClearKey() {
 
 func (x *Tag) ClearScope() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_NODE
+	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_VALUE_REF
 }
 
 type Tag_builder struct {
@@ -233,7 +233,7 @@ type Tag_builder struct {
 	Key *string
 	// Scope indicates the level at which the tag *key* can be read.
 	//
-	// Defaults to READ_SCOPE_NODE.
+	// Defaults to READ_SCOPE_VALUE_REF.
 	Scope *ReadScope
 	// One or more values to associate with this tag.
 	//
@@ -299,7 +299,7 @@ func (x *Tag_Value) GetScope() ReadScope {
 			return x.xxx_hidden_Scope
 		}
 	}
-	return ReadScope_READ_SCOPE_NODE
+	return ReadScope_READ_SCOPE_VALUE_REF
 }
 
 func (x *Tag_Value) GetStrValue() string {
@@ -386,7 +386,7 @@ func (x *Tag_Value) HasIntValue() bool {
 
 func (x *Tag_Value) ClearScope() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_NODE
+	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_VALUE_REF
 }
 
 func (x *Tag_Value) ClearData() {
@@ -442,7 +442,7 @@ type Tag_Value_builder struct {
 	//
 	// Must be <= `Tag.scope`.
 	//
-	// Defaults to READ_SCOPE_NODE.
+	// Defaults to READ_SCOPE_VALUE_REF.
 	Scope *ReadScope
 	// Data for this value.
 	//
@@ -545,11 +545,11 @@ const file_turboci_graph_orchestrator_v1_tags_proto_rawDesc = "" +
 	"\x04dataB\b\n" +
 	"\x06_scopeB\x06\n" +
 	"\x04_keyB\b\n" +
-	"\x06_scope*Q\n" +
-	"\tReadScope\x12\x13\n" +
-	"\x0fREAD_SCOPE_NODE\x10\x00\x12\x18\n" +
-	"\x14READ_SCOPE_WORK_PLAN\x10\x01\x12\x15\n" +
-	"\x11READ_SCOPE_GLOBAL\x10\x02BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x06_scope*T\n" +
+	"\tReadScope\x12\x18\n" +
+	"\x14READ_SCOPE_VALUE_REF\x10\x00\x12\x13\n" +
+	"\x0fREAD_SCOPE_NODE\x10\x01\x12\x18\n" +
+	"\x14READ_SCOPE_WORK_PLAN\x10\x02BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_tags_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_tags_proto_msgTypes = make([]protoimpl.MessageInfo, 2)

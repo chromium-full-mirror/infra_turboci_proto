@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n(turboci/graph/orchestrator/v1/tags.proto\x12\x1dturboci.graph.orchestrator.v1\"\xbb\x02\n\x03Tag\x12\x10\n\x03key\x18\x01 \x01(\tH\x00\x88\x01\x01\x12<\n\x05scope\x18\x02 \x01(\x0e\x32(.turboci.graph.orchestrator.v1.ReadScopeH\x01\x88\x01\x01\x12\x38\n\x06values\x18\x03 \x03(\x0b\x32(.turboci.graph.orchestrator.v1.Tag.Value\x1a\x97\x01\n\x05Value\x12<\n\x05scope\x18\x01 \x01(\x0e\x32(.turboci.graph.orchestrator.v1.ReadScopeH\x01\x88\x01\x01\x12\x13\n\tstr_value\x18\x02 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x03 \x01(\x08H\x00\x12\x13\n\tint_value\x18\x04 \x01(\x03H\x00\x42\x06\n\x04\x64\x61taB\x08\n\x06_scopeB\x06\n\x04_keyB\x08\n\x06_scope*Q\n\tReadScope\x12\x13\n\x0fREAD_SCOPE_NODE\x10\x00\x12\x18\n\x14READ_SCOPE_WORK_PLAN\x10\x01\x12\x15\n\x11READ_SCOPE_GLOBAL\x10\x02\x42IP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n(turboci/graph/orchestrator/v1/tags.proto\x12\x1dturboci.graph.orchestrator.v1\"\xbb\x02\n\x03Tag\x12\x10\n\x03key\x18\x01 \x01(\tH\x00\x88\x01\x01\x12<\n\x05scope\x18\x02 \x01(\x0e\x32(.turboci.graph.orchestrator.v1.ReadScopeH\x01\x88\x01\x01\x12\x38\n\x06values\x18\x03 \x03(\x0b\x32(.turboci.graph.orchestrator.v1.Tag.Value\x1a\x97\x01\n\x05Value\x12<\n\x05scope\x18\x01 \x01(\x0e\x32(.turboci.graph.orchestrator.v1.ReadScopeH\x01\x88\x01\x01\x12\x13\n\tstr_value\x18\x02 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x03 \x01(\x08H\x00\x12\x13\n\tint_value\x18\x04 \x01(\x03H\x00\x42\x06\n\x04\x64\x61taB\x08\n\x06_scopeB\x06\n\x04_keyB\x08\n\x06_scope*T\n\tReadScope\x12\x18\n\x14READ_SCOPE_VALUE_REF\x10\x00\x12\x13\n\x0fREAD_SCOPE_NODE\x10\x01\x12\x18\n\x14READ_SCOPE_WORK_PLAN\x10\x02\x42IP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,7 +33,7 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
   _globals['_READSCOPE']._serialized_start=393
-  _globals['_READSCOPE']._serialized_end=474
+  _globals['_READSCOPE']._serialized_end=477
   _globals['_TAG']._serialized_start=76
   _globals['_TAG']._serialized_end=391
   _globals['_TAG_VALUE']._serialized_start=222
