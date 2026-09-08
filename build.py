@@ -210,10 +210,23 @@ def task_check_go_package():
 
 _filenameRegex = re.compile(r'^turboci/(?:.*/)?([^/]*)/v[^/]*/(.*)\.proto$')
 
+# Files which do not need to have their go package restricted.
+#
+# The turboci/tag.proto is intentionally designed for minimal syntax; requiring
+# it to have a package of `turboci.v1` just adds unnecessary noise, and the
+# typical rational for this (needing to version these for service API
+# versioning) does not apply.
+_filenameGoPackageExceptions = frozenset([
+    'turboci/tag.proto',
+])
+
 
 def _task_check_go_package(desc: FileDescriptorSet):
   ok = True
   for file in desc.file:
+    if file.name in _filenameGoPackageExceptions:
+      continue
+
     mtch = _filenameRegex.match(file.name)
     if not mtch:
       print(f'bad filename {file.name}')
