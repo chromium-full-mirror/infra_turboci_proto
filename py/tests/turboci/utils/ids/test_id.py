@@ -171,6 +171,47 @@ class ToFromIDTest(unittest.TestCase):
             id_utils.from_string(tc.ident_str), id_utils.wrap(tc.ident)
         )
 
+  def test_to_string__unsupported_type__raises_not_implemented_error(self):
+    unsupported = object()
+
+    with self.assertRaisesRegex(
+        NotImplementedError, r"^to_string\(<class 'object'>\)$"
+    ):
+      id_utils.to_string(unsupported)
+
+  def test_from_string__invalid_stage_prefix__raises_value_error(self):
+    invalid_cases = (
+        ('L1234567:X938215823', 'stage'),
+        (':Xcleared_stage', 'cleared stage'),
+        ('L1234567:X938215823:A3', 'stage attempt'),
+        ('L1234567:X938215823:V12345/7890', 'stage edit'),
+    )
+
+    for ident_str, desc in invalid_cases:
+      with self.subTest(case=desc):
+        with self.assertRaisesRegex(
+            ValueError,
+            r"^from_string: expected token to start with S, N or \?, got 'X'$",
+        ):
+          id_utils.from_string(ident_str)
+
+  def test_from_string__unrecognized_id__raises_value_error(self):
+    unrecognized_cases = (
+        ('', 'empty string'),
+        ('foo', 'unrecognized prefix'),
+        ('L1234567:Cbeans:X', 'unrecognized check suffix'),
+        ('L1234567:Cbeans:R3:extra', 'too many tokens'),
+    )
+
+    for ident_str, desc in unrecognized_cases:
+      with self.subTest(case=desc):
+        with self.assertRaisesRegex(
+            ValueError,
+            rf'^from_string: unrecognized ID {ident_str!r}$',
+        ):
+          id_utils.from_string(ident_str)
+
+
 
 class TestWrap(unittest.TestCase):
 
