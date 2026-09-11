@@ -463,16 +463,20 @@ func (x *ComplexMessage) ClearExplicitPresenceBool() {
 type ComplexMessage_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	LocalStr             *string
-	WorkplanStr          *string
-	GlobalStr            *string
-	LocalBool            *bool
-	LocalEnum            *TestEnum
-	RepStr               []string
-	MapSub               map[string]*ComplexMessage_SubMessage
-	RepSub               []*ComplexMessage_SubMessage
-	Sub                  *ComplexMessage_SubMessage
-	SplitIndex           *int64
+	LocalStr    *string
+	WorkplanStr *string
+	GlobalStr   *string
+	LocalBool   *bool
+	LocalEnum   *TestEnum
+	RepStr      []string
+	MapSub      map[string]*ComplexMessage_SubMessage
+	RepSub      []*ComplexMessage_SubMessage
+	Sub         *ComplexMessage_SubMessage
+	SplitIndex  *int64
+	// Normally tagged boolean fields (like local_bool above) will capture unset
+	// as `false`. For this field we explicitly disable that, so
+	// explicit_presence_bool will only be indexed if the field is explicitly
+	// assigned a value.
 	ExplicitPresenceBool *bool
 }
 
@@ -698,7 +702,7 @@ const file_testing_tags_demo_proto_rawDesc = "" +
 	" \x01(\x03B\n" +
 	"ʅ\xf6\xfb\x0f\x04\b\x02\x10\x01H\x06R\n" +
 	"splitIndex\x88\x01\x01\x12C\n" +
-	"\x16explicit_presence_bool\x18\v \x01(\bB\bʅ\xf6\xfb\x0f\x02 \x01H\aR\x14explicitPresenceBool\x88\x01\x01\x1al\n" +
+	"\x16explicit_presence_bool\x18\v \x01(\bB\bʅ\xf6\xfb\x0f\x02 \x00H\aR\x14explicitPresenceBool\x88\x01\x01\x1al\n" +
 	"\n" +
 	"SubMessage\x12O\n" +
 	"\n" +

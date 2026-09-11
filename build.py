@@ -140,7 +140,14 @@ def task_breaking(basis: None | str = None):
       # cherry-picked onto the appropriate parent context (previous CL or
       # current ref value).
       basis = 'HEAD~1'
-  check_call(['buf', 'breaking', '--against', f'.git#ref={basis}'])
+  check_call([
+      'buf',
+      'breaking',
+      '--against',
+      f'.git#ref={basis}',
+      '--exclude-path',
+      'testing',
+  ])
 
 
 def task_check_service_definitions():

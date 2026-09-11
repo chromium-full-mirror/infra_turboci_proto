@@ -47,7 +47,11 @@ message ComplexMessage {
     (turboci.tag).value_scope = NODE
   ];
 
-  optional bool explicit_presence_bool = 11 [(turboci.tag).index_unset = true];
+  // Normally tagged boolean fields (like local_bool above) will capture unset
+  // as `false`. For this field we explicitly disable that, so
+  // explicit_presence_bool will only be indexed if the field is explicitly
+  // assigned a value.
+  optional bool explicit_presence_bool = 11 [(turboci.tag).index_unset = false];
 }
 
 message UnsupportedKindMessage {

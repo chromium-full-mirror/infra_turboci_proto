@@ -67,7 +67,7 @@ const (
 // underlying message, or, if this is not possible, directly assemble the
 // orchestratorpb.ValueWrite.
 //
-// TODO: Compute tags from `msg`.
+// This internally calls [TagsFor] to generate tags for `msg`.
 func Write(msg proto.Message, realm ...string) (*orchestratorpb.ValueWrite, error) {
 	apb, ok := msg.(*anypb.Any)
 	if ok {
@@ -77,7 +77,7 @@ func Write(msg proto.Message, realm ...string) (*orchestratorpb.ValueWrite, erro
 	apb = &anypb.Any{}
 	err := anypb.MarshalFrom(apb, msg, proto.MarshalOptions{Deterministic: true})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("value.Write: %w", err)
 	}
 	actualRealm := RealmFromContainer
 	if len(realm) == 1 {
@@ -86,10 +86,15 @@ func Write(msg proto.Message, realm ...string) (*orchestratorpb.ValueWrite, erro
 		return nil, fmt.Errorf("value.Write: realm provided more than once")
 	}
 
+	tags, err := TagsFor(msg)
+	if err != nil {
+		return nil, fmt.Errorf("value.Write: extracting tags: %w", err)
+	}
+
 	return orchestratorpb.ValueWrite_builder{
 		Data:  apb,
 		Realm: &actualRealm,
-		// TODO: Compute tags when added to ValueWrite.
+		Tags:  tags.Proto(),
 	}.Build(), nil
 }
 
