@@ -259,13 +259,14 @@ func (b0 Tag_builder) Build() *Tag {
 
 // A single value associated with a tag.
 type Tag_Value struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Scope       ReadScope              `protobuf:"varint,1,opt,name=scope,proto3,enum=turboci.graph.orchestrator.v1.ReadScope,oneof"`
-	xxx_hidden_Data        isTag_Value_Data       `protobuf_oneof:"data"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state                     protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Scope          ReadScope              `protobuf:"varint,1,opt,name=scope,proto3,enum=turboci.graph.orchestrator.v1.ReadScope,oneof"`
+	xxx_hidden_DuplicateCount uint32                 `protobuf:"varint,2,opt,name=duplicate_count,json=duplicateCount,proto3,oneof"`
+	xxx_hidden_Data           isTag_Value_Data       `protobuf_oneof:"data"`
+	XXX_raceDetectHookData    protoimpl.RaceDetectHookData
+	XXX_presence              [1]uint32
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
 }
 
 func (x *Tag_Value) Reset() {
@@ -302,6 +303,13 @@ func (x *Tag_Value) GetScope() ReadScope {
 	return ReadScope_READ_SCOPE_VALUE_REF
 }
 
+func (x *Tag_Value) GetDuplicateCount() uint32 {
+	if x != nil {
+		return x.xxx_hidden_DuplicateCount
+	}
+	return 0
+}
+
 func (x *Tag_Value) GetStrValue() string {
 	if x != nil {
 		if x, ok := x.xxx_hidden_Data.(*tag_Value_StrValue); ok {
@@ -331,7 +339,12 @@ func (x *Tag_Value) GetIntValue() int64 {
 
 func (x *Tag_Value) SetScope(v ReadScope) {
 	x.xxx_hidden_Scope = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+}
+
+func (x *Tag_Value) SetDuplicateCount(v uint32) {
+	x.xxx_hidden_DuplicateCount = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
 }
 
 func (x *Tag_Value) SetStrValue(v string) {
@@ -351,6 +364,13 @@ func (x *Tag_Value) HasScope() bool {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Tag_Value) HasDuplicateCount() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
 func (x *Tag_Value) HasData() bool {
@@ -389,6 +409,11 @@ func (x *Tag_Value) ClearScope() {
 	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_VALUE_REF
 }
 
+func (x *Tag_Value) ClearDuplicateCount() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_DuplicateCount = 0
+}
+
 func (x *Tag_Value) ClearData() {
 	x.xxx_hidden_Data = nil
 }
@@ -412,9 +437,9 @@ func (x *Tag_Value) ClearIntValue() {
 }
 
 const Tag_Value_Data_not_set_case case_Tag_Value_Data = 0
-const Tag_Value_StrValue_case case_Tag_Value_Data = 2
-const Tag_Value_BoolValue_case case_Tag_Value_Data = 3
-const Tag_Value_IntValue_case case_Tag_Value_Data = 4
+const Tag_Value_StrValue_case case_Tag_Value_Data = 3
+const Tag_Value_BoolValue_case case_Tag_Value_Data = 4
+const Tag_Value_IntValue_case case_Tag_Value_Data = 5
 
 func (x *Tag_Value) WhichData() case_Tag_Value_Data {
 	if x == nil {
@@ -444,6 +469,15 @@ type Tag_Value_builder struct {
 	//
 	// Defaults to READ_SCOPE_VALUE_REF.
 	Scope *ReadScope
+	// Indicates how many times this value was duplicated.
+	//
+	// Unset/0 indicates that this value is unique.
+	// Values > 0 indicate how many duplications occurred.
+	//
+	// e.g. if this tag had values like ["a", "b", "a"], the "a" Value would set
+	// duplicate_count to `1` and the "b" Value would have `duplicate_count`
+	// unset.
+	DuplicateCount *uint32
 	// Data for this value.
 	//
 	// Must be set.
@@ -470,8 +504,12 @@ func (b0 Tag_Value_builder) Build() *Tag_Value {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Scope != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
 		x.xxx_hidden_Scope = *b.Scope
+	}
+	if b.DuplicateCount != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		x.xxx_hidden_DuplicateCount = *b.DuplicateCount
 	}
 	if b.StrValue != nil {
 		x.xxx_hidden_Data = &tag_Value_StrValue{*b.StrValue}
@@ -501,12 +539,12 @@ type isTag_Value_Data interface {
 
 type tag_Value_StrValue struct {
 	// A string value. Indexed verbatim and supports equality searches.
-	StrValue string `protobuf:"bytes,2,opt,name=str_value,json=strValue,proto3,oneof"`
+	StrValue string `protobuf:"bytes,3,opt,name=str_value,json=strValue,proto3,oneof"`
 }
 
 type tag_Value_BoolValue struct {
 	// A boolean value. Indexed verbatim and supports equality searches.
-	BoolValue bool `protobuf:"varint,3,opt,name=bool_value,json=boolValue,proto3,oneof"`
+	BoolValue bool `protobuf:"varint,4,opt,name=bool_value,json=boolValue,proto3,oneof"`
 }
 
 type tag_Value_IntValue struct {
@@ -518,7 +556,7 @@ type tag_Value_IntValue struct {
 	//   - failure_count=2
 	//
 	// And then query for failure_count>10, it will NOT be a match.
-	IntValue int64 `protobuf:"varint,4,opt,name=int_value,json=intValue,proto3,oneof"`
+	IntValue int64 `protobuf:"varint,5,opt,name=int_value,json=intValue,proto3,oneof"`
 }
 
 func (*tag_Value_StrValue) isTag_Value_Data() {}
@@ -531,19 +569,21 @@ var File_turboci_graph_orchestrator_v1_tags_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_tags_proto_rawDesc = "" +
 	"\n" +
-	"(turboci/graph/orchestrator/v1/tags.proto\x12\x1dturboci.graph.orchestrator.v1\"\xf5\x02\n" +
+	"(turboci/graph/orchestrator/v1/tags.proto\x12\x1dturboci.graph.orchestrator.v1\"\xb7\x03\n" +
 	"\x03Tag\x12\x15\n" +
 	"\x03key\x18\x01 \x01(\tH\x00R\x03key\x88\x01\x01\x12C\n" +
 	"\x05scope\x18\x02 \x01(\x0e2(.turboci.graph.orchestrator.v1.ReadScopeH\x01R\x05scope\x88\x01\x01\x12@\n" +
-	"\x06values\x18\x03 \x03(\v2(.turboci.graph.orchestrator.v1.Tag.ValueR\x06values\x1a\xbd\x01\n" +
+	"\x06values\x18\x03 \x03(\v2(.turboci.graph.orchestrator.v1.Tag.ValueR\x06values\x1a\xff\x01\n" +
 	"\x05Value\x12C\n" +
-	"\x05scope\x18\x01 \x01(\x0e2(.turboci.graph.orchestrator.v1.ReadScopeH\x01R\x05scope\x88\x01\x01\x12\x1d\n" +
-	"\tstr_value\x18\x02 \x01(\tH\x00R\bstrValue\x12\x1f\n" +
+	"\x05scope\x18\x01 \x01(\x0e2(.turboci.graph.orchestrator.v1.ReadScopeH\x01R\x05scope\x88\x01\x01\x12,\n" +
+	"\x0fduplicate_count\x18\x02 \x01(\rH\x02R\x0eduplicateCount\x88\x01\x01\x12\x1d\n" +
+	"\tstr_value\x18\x03 \x01(\tH\x00R\bstrValue\x12\x1f\n" +
 	"\n" +
-	"bool_value\x18\x03 \x01(\bH\x00R\tboolValue\x12\x1d\n" +
-	"\tint_value\x18\x04 \x01(\x03H\x00R\bintValueB\x06\n" +
+	"bool_value\x18\x04 \x01(\bH\x00R\tboolValue\x12\x1d\n" +
+	"\tint_value\x18\x05 \x01(\x03H\x00R\bintValueB\x06\n" +
 	"\x04dataB\b\n" +
-	"\x06_scopeB\x06\n" +
+	"\x06_scopeB\x12\n" +
+	"\x10_duplicate_countB\x06\n" +
 	"\x04_keyB\b\n" +
 	"\x06_scope*T\n" +
 	"\tReadScope\x12\x18\n" +

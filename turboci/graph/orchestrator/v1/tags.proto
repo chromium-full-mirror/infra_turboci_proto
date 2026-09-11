@@ -94,15 +94,25 @@ message Tag {
     // Defaults to READ_SCOPE_VALUE_REF.
     optional ReadScope scope = 1;
 
+    // Indicates how many times this value was duplicated.
+    //
+    // Unset/0 indicates that this value is unique.
+    // Values > 0 indicate how many duplications occurred.
+    //
+    // e.g. if this tag had values like ["a", "b", "a"], the "a" Value would set
+    // duplicate_count to `1` and the "b" Value would have `duplicate_count`
+    // unset.
+    optional uint32 duplicate_count = 2;
+
     // Data for this value.
     //
     // Must be set.
     oneof data {
       // A string value. Indexed verbatim and supports equality searches.
-      string str_value = 2;
+      string str_value = 3;
 
       // A boolean value. Indexed verbatim and supports equality searches.
-      bool bool_value = 3;
+      bool bool_value = 4;
 
       // A numeric (integer) value. Indexed both for equality and inequality.
       //
@@ -112,7 +122,7 @@ message Tag {
       //   * failure_count=2
       //
       // And then query for failure_count>10, it will NOT be a match.
-      int64 int_value = 4;
+      int64 int_value = 5;
     }
   }
 

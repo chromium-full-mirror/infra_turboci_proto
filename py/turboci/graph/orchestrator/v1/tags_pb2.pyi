@@ -19,16 +19,18 @@ READ_SCOPE_WORK_PLAN: ReadScope
 class Tag(_message.Message):
     __slots__ = ("key", "scope", "values")
     class Value(_message.Message):
-        __slots__ = ("scope", "str_value", "bool_value", "int_value")
+        __slots__ = ("scope", "duplicate_count", "str_value", "bool_value", "int_value")
         SCOPE_FIELD_NUMBER: _ClassVar[int]
+        DUPLICATE_COUNT_FIELD_NUMBER: _ClassVar[int]
         STR_VALUE_FIELD_NUMBER: _ClassVar[int]
         BOOL_VALUE_FIELD_NUMBER: _ClassVar[int]
         INT_VALUE_FIELD_NUMBER: _ClassVar[int]
         scope: ReadScope
+        duplicate_count: int
         str_value: str
         bool_value: bool
         int_value: int
-        def __init__(self, scope: _Optional[_Union[ReadScope, str]] = ..., str_value: _Optional[str] = ..., bool_value: _Optional[bool] = ..., int_value: _Optional[int] = ...) -> None: ...
+        def __init__(self, scope: _Optional[_Union[ReadScope, str]] = ..., duplicate_count: _Optional[int] = ..., str_value: _Optional[str] = ..., bool_value: _Optional[bool] = ..., int_value: _Optional[int] = ...) -> None: ...
     KEY_FIELD_NUMBER: _ClassVar[int]
     SCOPE_FIELD_NUMBER: _ClassVar[int]
     VALUES_FIELD_NUMBER: _ClassVar[int]
