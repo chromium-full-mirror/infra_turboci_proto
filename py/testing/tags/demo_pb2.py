@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 from turboci import tag_pb2 as turboci_dot_tag__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17testing/tags/demo.proto\x12\x0ctesting.tags\x1a\x11turboci/tag.proto\"o\n\tMyMessage\x12!\n\x0ctagged_field\x18\x01 \x01(\tB\x06\xca\x85\xf6\xfb\x0f\x00H\x00\x88\x01\x01\x12\x1b\n\x0euntagged_field\x18\x02 \x01(\tH\x01\x88\x01\x01\x42\x0f\n\r_tagged_fieldB\x11\n\x0f_untagged_field\"\xb2\x06\n\x0e\x43omplexMessage\x12 \n\tlocal_str\x18\x01 \x01(\tB\x08\xca\x85\xf6\xfb\x0f\x02\x08\x00H\x00\x88\x01\x01\x12#\n\x0cworkplan_str\x18\x02 \x01(\tB\x08\xca\x85\xf6\xfb\x0f\x02\x10\x01H\x01\x88\x01\x01\x12!\n\nglobal_str\x18\x03 \x01(\tB\x08\xca\x85\xf6\xfb\x0f\x02\x10\x02H\x02\x88\x01\x01\x12!\n\nlocal_bool\x18\x04 \x01(\x08\x42\x08\xca\x85\xf6\xfb\x0f\x02\x08\x00H\x03\x88\x01\x01\x12\x39\n\nlocal_enum\x18\x05 \x01(\x0e\x32\x16.testing.tags.TestEnumB\x08\xca\x85\xf6\xfb\x0f\x02\x08\x00H\x04\x88\x01\x01\x12\x19\n\x07rep_str\x18\x06 \x03(\tB\x08\xca\x85\xf6\xfb\x0f\x02\x08\x00\x12\x39\n\x07map_sub\x18\x07 \x03(\x0b\x32(.testing.tags.ComplexMessage.MapSubEntry\x12\x38\n\x07rep_sub\x18\x08 \x03(\x0b\x32\'.testing.tags.ComplexMessage.SubMessage\x12\x39\n\x03sub\x18\t \x01(\x0b\x32\'.testing.tags.ComplexMessage.SubMessageH\x05\x88\x01\x01\x12$\n\x0bsplit_index\x18\n \x01(\x03\x42\n\xca\x85\xf6\xfb\x0f\x04\x08\x02\x10\x01H\x06\x88\x01\x01\x12-\n\x16\x65xplicit_presence_bool\x18\x0b \x01(\x08\x42\x08\xca\x85\xf6\xfb\x0f\x02 \x00H\x07\x88\x01\x01\x1a\x61\n\nSubMessage\x12\x44\n\nsub_tagged\x18\x01 \x01(\tB+\xca\x85\xf6\xfb\x0f%\x1a#previous.package.name.Message.fieldH\x00\x88\x01\x01\x42\r\n\x0b_sub_tagged\x1aV\n\x0bMapSubEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x36\n\x05value\x18\x02 \x01(\x0b\x32\'.testing.tags.ComplexMessage.SubMessage:\x02\x38\x01\x42\x0c\n\n_local_strB\x0f\n\r_workplan_strB\r\n\x0b_global_strB\r\n\x0b_local_boolB\r\n\x0b_local_enumB\x06\n\x04_subB\x0e\n\x0c_split_indexB\x19\n\x17_explicit_presence_bool\"H\n\x16UnsupportedKindMessage\x12 \n\tbad_field\x18\x01 \x01(\x0c\x42\x08\xca\x85\xf6\xfb\x0f\x02\x08\x00H\x00\x88\x01\x01\x42\x0c\n\n_bad_field*G\n\x08TestEnum\x12\x15\n\x11TEST_ENUM_UNKNOWN\x10\x00\x12\x11\n\rTEST_ENUM_ONE\x10\x01\x12\x11\n\rTEST_ENUM_TWO\x10\x02\x42?P\x01Z;go.chromium.org/turboci/proto/go/testing/tags;testingtagspbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17testing/tags/demo.proto\x12\x0ctesting.tags\x1a\x11turboci/tag.proto\"o\n\tMyMessage\x12!\n\x0ctagged_field\x18\x01 \x01(\tB\x06\xca\x85\xf6\xfb\x0f\x00H\x00\x88\x01\x01\x12\x1b\n\x0euntagged_field\x18\x02 \x01(\tH\x01\x88\x01\x01\x42\x0f\n\r_tagged_fieldB\x11\n\x0f_untagged_field\"\xb2\x06\n\x0e\x43omplexMessage\x12 \n\tlocal_str\x18\x01 \x01(\tB\x08\xca\x85\xf6\xfb\x0f\x02\x08\x00H\x00\x88\x01\x01\x12#\n\x0cworkplan_str\x18\x02 \x01(\tB\x08\xca\x85\xf6\xfb\x0f\x02\x10\x01H\x01\x88\x01\x01\x12!\n\nglobal_str\x18\x03 \x01(\tB\x08\xca\x85\xf6\xfb\x0f\x02\x10\x02H\x02\x88\x01\x01\x12!\n\nlocal_bool\x18\x04 \x01(\x08\x42\x08\xca\x85\xf6\xfb\x0f\x02\x08\x00H\x03\x88\x01\x01\x12\x39\n\nlocal_enum\x18\x05 \x01(\x0e\x32\x16.testing.tags.TestEnumB\x08\xca\x85\xf6\xfb\x0f\x02\x08\x00H\x04\x88\x01\x01\x12\x19\n\x07rep_str\x18\x06 \x03(\tB\x08\xca\x85\xf6\xfb\x0f\x02\x08\x00\x12\x39\n\x07map_sub\x18\x07 \x03(\x0b\x32(.testing.tags.ComplexMessage.MapSubEntry\x12\x38\n\x07rep_sub\x18\x08 \x03(\x0b\x32\'.testing.tags.ComplexMessage.SubMessage\x12\x39\n\x03sub\x18\t \x01(\x0b\x32\'.testing.tags.ComplexMessage.SubMessageH\x05\x88\x01\x01\x12$\n\x0bsplit_index\x18\n \x01(\x03\x42\n\xca\x85\xf6\xfb\x0f\x04\x08\x02\x10\x01H\x06\x88\x01\x01\x12-\n\x16\x65xplicit_presence_bool\x18\x0b \x01(\x08\x42\x08\xca\x85\xf6\xfb\x0f\x02 \x00H\x07\x88\x01\x01\x1a\x61\n\nSubMessage\x12\x44\n\nsub_tagged\x18\x01 \x01(\tB+\xca\x85\xf6\xfb\x0f%\x1a#previous.package.name.Message.fieldH\x00\x88\x01\x01\x42\r\n\x0b_sub_tagged\x1aV\n\x0bMapSubEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x36\n\x05value\x18\x02 \x01(\x0b\x32\'.testing.tags.ComplexMessage.SubMessage:\x02\x38\x01\x42\x0c\n\n_local_strB\x0f\n\r_workplan_strB\r\n\x0b_global_strB\r\n\x0b_local_boolB\r\n\x0b_local_enumB\x06\n\x04_subB\x0e\n\x0c_split_indexB\x19\n\x17_explicit_presence_bool\"H\n\x16UnsupportedKindMessage\x12 \n\tbad_field\x18\x01 \x01(\x0c\x42\x08\xca\x85\xf6\xfb\x0f\x02\x08\x00H\x00\x88\x01\x01\x42\x0c\n\n_bad_field\"z\n\x10RecursiveMessage\x12\x33\n\x06\x64\x65\x65per\x18\x01 \x01(\x0b\x32\x1e.testing.tags.RecursiveMessageH\x00\x88\x01\x01\x12\x1b\n\x06tagged\x18\x02 \x01(\tB\x06\xca\x85\xf6\xfb\x0f\x00H\x01\x88\x01\x01\x42\t\n\x07_deeperB\t\n\x07_tagged\"\x86\x01\n\x18RecursiveUntaggedMessage\x12;\n\x06\x64\x65\x65per\x18\x01 \x01(\x0b\x32&.testing.tags.RecursiveUntaggedMessageH\x00\x88\x01\x01\x12\x15\n\x08untagged\x18\x02 \x01(\tH\x01\x88\x01\x01\x42\t\n\x07_deeperB\x0b\n\t_untagged\"N\n\x0eMutualMessageA\x12\x31\n\x06\x64\x65\x65per\x18\x01 \x01(\x0b\x32\x1c.testing.tags.MutualMessageBH\x00\x88\x01\x01\x42\t\n\x07_deeper\"v\n\x0eMutualMessageB\x12\x31\n\x06\x64\x65\x65per\x18\x01 \x01(\x0b\x32\x1c.testing.tags.MutualMessageAH\x00\x88\x01\x01\x12\x1b\n\x06tagged\x18\x02 \x01(\tB\x06\xca\x85\xf6\xfb\x0f\x00H\x01\x88\x01\x01\x42\t\n\x07_deeperB\t\n\x07_tagged\"^\n\x16MutualUntaggedMessageA\x12\x39\n\x06\x64\x65\x65per\x18\x01 \x01(\x0b\x32$.testing.tags.MutualUntaggedMessageBH\x00\x88\x01\x01\x42\t\n\x07_deeper\"\x82\x01\n\x16MutualUntaggedMessageB\x12\x39\n\x06\x64\x65\x65per\x18\x01 \x01(\x0b\x32$.testing.tags.MutualUntaggedMessageAH\x00\x88\x01\x01\x12\x15\n\x08untagged\x18\x02 \x01(\tH\x01\x88\x01\x01\x42\t\n\x07_deeperB\x0b\n\t_untagged*G\n\x08TestEnum\x12\x15\n\x11TEST_ENUM_UNKNOWN\x10\x00\x12\x11\n\rTEST_ENUM_ONE\x10\x01\x12\x11\n\rTEST_ENUM_TWO\x10\x02\x42?P\x01Z;go.chromium.org/turboci/proto/go/testing/tags;testingtagspbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -57,8 +57,12 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_COMPLEXMESSAGE'].fields_by_name['explicit_presence_bool']._serialized_options = b'\312\205\366\373\017\002 \000'
   _globals['_UNSUPPORTEDKINDMESSAGE'].fields_by_name['bad_field']._loaded_options = None
   _globals['_UNSUPPORTEDKINDMESSAGE'].fields_by_name['bad_field']._serialized_options = b'\312\205\366\373\017\002\010\000'
-  _globals['_TESTENUM']._serialized_start=1068
-  _globals['_TESTENUM']._serialized_end=1139
+  _globals['_RECURSIVEMESSAGE'].fields_by_name['tagged']._loaded_options = None
+  _globals['_RECURSIVEMESSAGE'].fields_by_name['tagged']._serialized_options = b'\312\205\366\373\017\000'
+  _globals['_MUTUALMESSAGEB'].fields_by_name['tagged']._loaded_options = None
+  _globals['_MUTUALMESSAGEB'].fields_by_name['tagged']._serialized_options = b'\312\205\366\373\017\000'
+  _globals['_TESTENUM']._serialized_start=1758
+  _globals['_TESTENUM']._serialized_end=1829
   _globals['_MYMESSAGE']._serialized_start=60
   _globals['_MYMESSAGE']._serialized_end=171
   _globals['_COMPLEXMESSAGE']._serialized_start=174
@@ -69,4 +73,16 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_COMPLEXMESSAGE_MAPSUBENTRY']._serialized_end=865
   _globals['_UNSUPPORTEDKINDMESSAGE']._serialized_start=994
   _globals['_UNSUPPORTEDKINDMESSAGE']._serialized_end=1066
+  _globals['_RECURSIVEMESSAGE']._serialized_start=1068
+  _globals['_RECURSIVEMESSAGE']._serialized_end=1190
+  _globals['_RECURSIVEUNTAGGEDMESSAGE']._serialized_start=1193
+  _globals['_RECURSIVEUNTAGGEDMESSAGE']._serialized_end=1327
+  _globals['_MUTUALMESSAGEA']._serialized_start=1329
+  _globals['_MUTUALMESSAGEA']._serialized_end=1407
+  _globals['_MUTUALMESSAGEB']._serialized_start=1409
+  _globals['_MUTUALMESSAGEB']._serialized_end=1527
+  _globals['_MUTUALUNTAGGEDMESSAGEA']._serialized_start=1529
+  _globals['_MUTUALUNTAGGEDMESSAGEA']._serialized_end=1623
+  _globals['_MUTUALUNTAGGEDMESSAGEB']._serialized_start=1626
+  _globals['_MUTUALUNTAGGEDMESSAGEB']._serialized_end=1756
 # @@protoc_insertion_point(module_scope)

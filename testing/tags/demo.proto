@@ -57,3 +57,31 @@ message ComplexMessage {
 message UnsupportedKindMessage {
   optional bytes bad_field = 1 [(turboci.tag).key_scope = VALUE_REF];
 }
+
+message RecursiveMessage {
+  optional RecursiveMessage deeper = 1;
+  optional string tagged = 2 [(turboci.tag) = {}];
+}
+
+message RecursiveUntaggedMessage {
+  optional RecursiveUntaggedMessage deeper = 1;
+  optional string untagged = 2;
+}
+
+message MutualMessageA {
+  optional MutualMessageB deeper = 1;
+}
+
+message MutualMessageB {
+  optional MutualMessageA deeper = 1;
+  optional string tagged = 2 [(turboci.tag) = {}];
+}
+
+message MutualUntaggedMessageA {
+  optional MutualUntaggedMessageB deeper = 1;
+}
+
+message MutualUntaggedMessageB {
+  optional MutualUntaggedMessageA deeper = 1;
+  optional string untagged = 2;
+}

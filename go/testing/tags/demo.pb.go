@@ -597,6 +597,554 @@ func (b0 UnsupportedKindMessage_builder) Build() *UnsupportedKindMessage {
 	return m0
 }
 
+type RecursiveMessage struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Deeper      *RecursiveMessage      `protobuf:"bytes,1,opt,name=deeper,proto3,oneof"`
+	xxx_hidden_Tagged      *string                `protobuf:"bytes,2,opt,name=tagged,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *RecursiveMessage) Reset() {
+	*x = RecursiveMessage{}
+	mi := &file_testing_tags_demo_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecursiveMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecursiveMessage) ProtoMessage() {}
+
+func (x *RecursiveMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_testing_tags_demo_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *RecursiveMessage) GetDeeper() *RecursiveMessage {
+	if x != nil {
+		return x.xxx_hidden_Deeper
+	}
+	return nil
+}
+
+func (x *RecursiveMessage) GetTagged() string {
+	if x != nil {
+		if x.xxx_hidden_Tagged != nil {
+			return *x.xxx_hidden_Tagged
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *RecursiveMessage) SetDeeper(v *RecursiveMessage) {
+	x.xxx_hidden_Deeper = v
+}
+
+func (x *RecursiveMessage) SetTagged(v string) {
+	x.xxx_hidden_Tagged = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *RecursiveMessage) HasDeeper() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Deeper != nil
+}
+
+func (x *RecursiveMessage) HasTagged() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *RecursiveMessage) ClearDeeper() {
+	x.xxx_hidden_Deeper = nil
+}
+
+func (x *RecursiveMessage) ClearTagged() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Tagged = nil
+}
+
+type RecursiveMessage_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Deeper *RecursiveMessage
+	Tagged *string
+}
+
+func (b0 RecursiveMessage_builder) Build() *RecursiveMessage {
+	m0 := &RecursiveMessage{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Deeper = b.Deeper
+	if b.Tagged != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_Tagged = b.Tagged
+	}
+	return m0
+}
+
+type RecursiveUntaggedMessage struct {
+	state                  protoimpl.MessageState    `protogen:"opaque.v1"`
+	xxx_hidden_Deeper      *RecursiveUntaggedMessage `protobuf:"bytes,1,opt,name=deeper,proto3,oneof"`
+	xxx_hidden_Untagged    *string                   `protobuf:"bytes,2,opt,name=untagged,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *RecursiveUntaggedMessage) Reset() {
+	*x = RecursiveUntaggedMessage{}
+	mi := &file_testing_tags_demo_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecursiveUntaggedMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecursiveUntaggedMessage) ProtoMessage() {}
+
+func (x *RecursiveUntaggedMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_testing_tags_demo_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *RecursiveUntaggedMessage) GetDeeper() *RecursiveUntaggedMessage {
+	if x != nil {
+		return x.xxx_hidden_Deeper
+	}
+	return nil
+}
+
+func (x *RecursiveUntaggedMessage) GetUntagged() string {
+	if x != nil {
+		if x.xxx_hidden_Untagged != nil {
+			return *x.xxx_hidden_Untagged
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *RecursiveUntaggedMessage) SetDeeper(v *RecursiveUntaggedMessage) {
+	x.xxx_hidden_Deeper = v
+}
+
+func (x *RecursiveUntaggedMessage) SetUntagged(v string) {
+	x.xxx_hidden_Untagged = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *RecursiveUntaggedMessage) HasDeeper() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Deeper != nil
+}
+
+func (x *RecursiveUntaggedMessage) HasUntagged() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *RecursiveUntaggedMessage) ClearDeeper() {
+	x.xxx_hidden_Deeper = nil
+}
+
+func (x *RecursiveUntaggedMessage) ClearUntagged() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Untagged = nil
+}
+
+type RecursiveUntaggedMessage_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Deeper   *RecursiveUntaggedMessage
+	Untagged *string
+}
+
+func (b0 RecursiveUntaggedMessage_builder) Build() *RecursiveUntaggedMessage {
+	m0 := &RecursiveUntaggedMessage{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Deeper = b.Deeper
+	if b.Untagged != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_Untagged = b.Untagged
+	}
+	return m0
+}
+
+type MutualMessageA struct {
+	state             protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Deeper *MutualMessageB        `protobuf:"bytes,1,opt,name=deeper,proto3,oneof"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *MutualMessageA) Reset() {
+	*x = MutualMessageA{}
+	mi := &file_testing_tags_demo_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MutualMessageA) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MutualMessageA) ProtoMessage() {}
+
+func (x *MutualMessageA) ProtoReflect() protoreflect.Message {
+	mi := &file_testing_tags_demo_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *MutualMessageA) GetDeeper() *MutualMessageB {
+	if x != nil {
+		return x.xxx_hidden_Deeper
+	}
+	return nil
+}
+
+func (x *MutualMessageA) SetDeeper(v *MutualMessageB) {
+	x.xxx_hidden_Deeper = v
+}
+
+func (x *MutualMessageA) HasDeeper() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Deeper != nil
+}
+
+func (x *MutualMessageA) ClearDeeper() {
+	x.xxx_hidden_Deeper = nil
+}
+
+type MutualMessageA_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Deeper *MutualMessageB
+}
+
+func (b0 MutualMessageA_builder) Build() *MutualMessageA {
+	m0 := &MutualMessageA{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Deeper = b.Deeper
+	return m0
+}
+
+type MutualMessageB struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Deeper      *MutualMessageA        `protobuf:"bytes,1,opt,name=deeper,proto3,oneof"`
+	xxx_hidden_Tagged      *string                `protobuf:"bytes,2,opt,name=tagged,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *MutualMessageB) Reset() {
+	*x = MutualMessageB{}
+	mi := &file_testing_tags_demo_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MutualMessageB) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MutualMessageB) ProtoMessage() {}
+
+func (x *MutualMessageB) ProtoReflect() protoreflect.Message {
+	mi := &file_testing_tags_demo_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *MutualMessageB) GetDeeper() *MutualMessageA {
+	if x != nil {
+		return x.xxx_hidden_Deeper
+	}
+	return nil
+}
+
+func (x *MutualMessageB) GetTagged() string {
+	if x != nil {
+		if x.xxx_hidden_Tagged != nil {
+			return *x.xxx_hidden_Tagged
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *MutualMessageB) SetDeeper(v *MutualMessageA) {
+	x.xxx_hidden_Deeper = v
+}
+
+func (x *MutualMessageB) SetTagged(v string) {
+	x.xxx_hidden_Tagged = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *MutualMessageB) HasDeeper() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Deeper != nil
+}
+
+func (x *MutualMessageB) HasTagged() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *MutualMessageB) ClearDeeper() {
+	x.xxx_hidden_Deeper = nil
+}
+
+func (x *MutualMessageB) ClearTagged() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Tagged = nil
+}
+
+type MutualMessageB_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Deeper *MutualMessageA
+	Tagged *string
+}
+
+func (b0 MutualMessageB_builder) Build() *MutualMessageB {
+	m0 := &MutualMessageB{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Deeper = b.Deeper
+	if b.Tagged != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_Tagged = b.Tagged
+	}
+	return m0
+}
+
+type MutualUntaggedMessageA struct {
+	state             protoimpl.MessageState  `protogen:"opaque.v1"`
+	xxx_hidden_Deeper *MutualUntaggedMessageB `protobuf:"bytes,1,opt,name=deeper,proto3,oneof"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *MutualUntaggedMessageA) Reset() {
+	*x = MutualUntaggedMessageA{}
+	mi := &file_testing_tags_demo_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MutualUntaggedMessageA) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MutualUntaggedMessageA) ProtoMessage() {}
+
+func (x *MutualUntaggedMessageA) ProtoReflect() protoreflect.Message {
+	mi := &file_testing_tags_demo_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *MutualUntaggedMessageA) GetDeeper() *MutualUntaggedMessageB {
+	if x != nil {
+		return x.xxx_hidden_Deeper
+	}
+	return nil
+}
+
+func (x *MutualUntaggedMessageA) SetDeeper(v *MutualUntaggedMessageB) {
+	x.xxx_hidden_Deeper = v
+}
+
+func (x *MutualUntaggedMessageA) HasDeeper() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Deeper != nil
+}
+
+func (x *MutualUntaggedMessageA) ClearDeeper() {
+	x.xxx_hidden_Deeper = nil
+}
+
+type MutualUntaggedMessageA_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Deeper *MutualUntaggedMessageB
+}
+
+func (b0 MutualUntaggedMessageA_builder) Build() *MutualUntaggedMessageA {
+	m0 := &MutualUntaggedMessageA{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Deeper = b.Deeper
+	return m0
+}
+
+type MutualUntaggedMessageB struct {
+	state                  protoimpl.MessageState  `protogen:"opaque.v1"`
+	xxx_hidden_Deeper      *MutualUntaggedMessageA `protobuf:"bytes,1,opt,name=deeper,proto3,oneof"`
+	xxx_hidden_Untagged    *string                 `protobuf:"bytes,2,opt,name=untagged,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *MutualUntaggedMessageB) Reset() {
+	*x = MutualUntaggedMessageB{}
+	mi := &file_testing_tags_demo_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MutualUntaggedMessageB) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MutualUntaggedMessageB) ProtoMessage() {}
+
+func (x *MutualUntaggedMessageB) ProtoReflect() protoreflect.Message {
+	mi := &file_testing_tags_demo_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *MutualUntaggedMessageB) GetDeeper() *MutualUntaggedMessageA {
+	if x != nil {
+		return x.xxx_hidden_Deeper
+	}
+	return nil
+}
+
+func (x *MutualUntaggedMessageB) GetUntagged() string {
+	if x != nil {
+		if x.xxx_hidden_Untagged != nil {
+			return *x.xxx_hidden_Untagged
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *MutualUntaggedMessageB) SetDeeper(v *MutualUntaggedMessageA) {
+	x.xxx_hidden_Deeper = v
+}
+
+func (x *MutualUntaggedMessageB) SetUntagged(v string) {
+	x.xxx_hidden_Untagged = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *MutualUntaggedMessageB) HasDeeper() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Deeper != nil
+}
+
+func (x *MutualUntaggedMessageB) HasUntagged() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *MutualUntaggedMessageB) ClearDeeper() {
+	x.xxx_hidden_Deeper = nil
+}
+
+func (x *MutualUntaggedMessageB) ClearUntagged() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Untagged = nil
+}
+
+type MutualUntaggedMessageB_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Deeper   *MutualUntaggedMessageA
+	Untagged *string
+}
+
+func (b0 MutualUntaggedMessageB_builder) Build() *MutualUntaggedMessageB {
+	m0 := &MutualUntaggedMessageB{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Deeper = b.Deeper
+	if b.Untagged != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_Untagged = b.Untagged
+	}
+	return m0
+}
+
 type ComplexMessage_SubMessage struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_SubTagged   *string                `protobuf:"bytes,1,opt,name=sub_tagged,json=subTagged,proto3,oneof"`
@@ -608,7 +1156,7 @@ type ComplexMessage_SubMessage struct {
 
 func (x *ComplexMessage_SubMessage) Reset() {
 	*x = ComplexMessage_SubMessage{}
-	mi := &file_testing_tags_demo_proto_msgTypes[3]
+	mi := &file_testing_tags_demo_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -620,7 +1168,7 @@ func (x *ComplexMessage_SubMessage) String() string {
 func (*ComplexMessage_SubMessage) ProtoMessage() {}
 
 func (x *ComplexMessage_SubMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_testing_tags_demo_proto_msgTypes[3]
+	mi := &file_testing_tags_demo_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -723,33 +1271,71 @@ const file_testing_tags_demo_proto_rawDesc = "" +
 	"\x16UnsupportedKindMessage\x12*\n" +
 	"\tbad_field\x18\x01 \x01(\fB\bʅ\xf6\xfb\x0f\x02\b\x00H\x00R\bbadField\x88\x01\x01B\f\n" +
 	"\n" +
-	"_bad_field*G\n" +
+	"_bad_field\"\x8a\x01\n" +
+	"\x10RecursiveMessage\x12;\n" +
+	"\x06deeper\x18\x01 \x01(\v2\x1e.testing.tags.RecursiveMessageH\x00R\x06deeper\x88\x01\x01\x12#\n" +
+	"\x06tagged\x18\x02 \x01(\tB\x06ʅ\xf6\xfb\x0f\x00H\x01R\x06tagged\x88\x01\x01B\t\n" +
+	"\a_deeperB\t\n" +
+	"\a_tagged\"\x98\x01\n" +
+	"\x18RecursiveUntaggedMessage\x12C\n" +
+	"\x06deeper\x18\x01 \x01(\v2&.testing.tags.RecursiveUntaggedMessageH\x00R\x06deeper\x88\x01\x01\x12\x1f\n" +
+	"\buntagged\x18\x02 \x01(\tH\x01R\buntagged\x88\x01\x01B\t\n" +
+	"\a_deeperB\v\n" +
+	"\t_untagged\"V\n" +
+	"\x0eMutualMessageA\x129\n" +
+	"\x06deeper\x18\x01 \x01(\v2\x1c.testing.tags.MutualMessageBH\x00R\x06deeper\x88\x01\x01B\t\n" +
+	"\a_deeper\"\x86\x01\n" +
+	"\x0eMutualMessageB\x129\n" +
+	"\x06deeper\x18\x01 \x01(\v2\x1c.testing.tags.MutualMessageAH\x00R\x06deeper\x88\x01\x01\x12#\n" +
+	"\x06tagged\x18\x02 \x01(\tB\x06ʅ\xf6\xfb\x0f\x00H\x01R\x06tagged\x88\x01\x01B\t\n" +
+	"\a_deeperB\t\n" +
+	"\a_tagged\"f\n" +
+	"\x16MutualUntaggedMessageA\x12A\n" +
+	"\x06deeper\x18\x01 \x01(\v2$.testing.tags.MutualUntaggedMessageBH\x00R\x06deeper\x88\x01\x01B\t\n" +
+	"\a_deeper\"\x94\x01\n" +
+	"\x16MutualUntaggedMessageB\x12A\n" +
+	"\x06deeper\x18\x01 \x01(\v2$.testing.tags.MutualUntaggedMessageAH\x00R\x06deeper\x88\x01\x01\x12\x1f\n" +
+	"\buntagged\x18\x02 \x01(\tH\x01R\buntagged\x88\x01\x01B\t\n" +
+	"\a_deeperB\v\n" +
+	"\t_untagged*G\n" +
 	"\bTestEnum\x12\x15\n" +
 	"\x11TEST_ENUM_UNKNOWN\x10\x00\x12\x11\n" +
 	"\rTEST_ENUM_ONE\x10\x01\x12\x11\n" +
 	"\rTEST_ENUM_TWO\x10\x02B?P\x01Z;go.chromium.org/turboci/proto/go/testing/tags;testingtagspbb\x06proto3"
 
 var file_testing_tags_demo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_testing_tags_demo_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_testing_tags_demo_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_testing_tags_demo_proto_goTypes = []any{
 	(TestEnum)(0),                     // 0: testing.tags.TestEnum
 	(*MyMessage)(nil),                 // 1: testing.tags.MyMessage
 	(*ComplexMessage)(nil),            // 2: testing.tags.ComplexMessage
 	(*UnsupportedKindMessage)(nil),    // 3: testing.tags.UnsupportedKindMessage
-	(*ComplexMessage_SubMessage)(nil), // 4: testing.tags.ComplexMessage.SubMessage
-	nil,                               // 5: testing.tags.ComplexMessage.MapSubEntry
+	(*RecursiveMessage)(nil),          // 4: testing.tags.RecursiveMessage
+	(*RecursiveUntaggedMessage)(nil),  // 5: testing.tags.RecursiveUntaggedMessage
+	(*MutualMessageA)(nil),            // 6: testing.tags.MutualMessageA
+	(*MutualMessageB)(nil),            // 7: testing.tags.MutualMessageB
+	(*MutualUntaggedMessageA)(nil),    // 8: testing.tags.MutualUntaggedMessageA
+	(*MutualUntaggedMessageB)(nil),    // 9: testing.tags.MutualUntaggedMessageB
+	(*ComplexMessage_SubMessage)(nil), // 10: testing.tags.ComplexMessage.SubMessage
+	nil,                               // 11: testing.tags.ComplexMessage.MapSubEntry
 }
 var file_testing_tags_demo_proto_depIdxs = []int32{
-	0, // 0: testing.tags.ComplexMessage.local_enum:type_name -> testing.tags.TestEnum
-	5, // 1: testing.tags.ComplexMessage.map_sub:type_name -> testing.tags.ComplexMessage.MapSubEntry
-	4, // 2: testing.tags.ComplexMessage.rep_sub:type_name -> testing.tags.ComplexMessage.SubMessage
-	4, // 3: testing.tags.ComplexMessage.sub:type_name -> testing.tags.ComplexMessage.SubMessage
-	4, // 4: testing.tags.ComplexMessage.MapSubEntry.value:type_name -> testing.tags.ComplexMessage.SubMessage
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	0,  // 0: testing.tags.ComplexMessage.local_enum:type_name -> testing.tags.TestEnum
+	11, // 1: testing.tags.ComplexMessage.map_sub:type_name -> testing.tags.ComplexMessage.MapSubEntry
+	10, // 2: testing.tags.ComplexMessage.rep_sub:type_name -> testing.tags.ComplexMessage.SubMessage
+	10, // 3: testing.tags.ComplexMessage.sub:type_name -> testing.tags.ComplexMessage.SubMessage
+	4,  // 4: testing.tags.RecursiveMessage.deeper:type_name -> testing.tags.RecursiveMessage
+	5,  // 5: testing.tags.RecursiveUntaggedMessage.deeper:type_name -> testing.tags.RecursiveUntaggedMessage
+	7,  // 6: testing.tags.MutualMessageA.deeper:type_name -> testing.tags.MutualMessageB
+	6,  // 7: testing.tags.MutualMessageB.deeper:type_name -> testing.tags.MutualMessageA
+	9,  // 8: testing.tags.MutualUntaggedMessageA.deeper:type_name -> testing.tags.MutualUntaggedMessageB
+	8,  // 9: testing.tags.MutualUntaggedMessageB.deeper:type_name -> testing.tags.MutualUntaggedMessageA
+	10, // 10: testing.tags.ComplexMessage.MapSubEntry.value:type_name -> testing.tags.ComplexMessage.SubMessage
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_testing_tags_demo_proto_init() }
@@ -761,13 +1347,19 @@ func file_testing_tags_demo_proto_init() {
 	file_testing_tags_demo_proto_msgTypes[1].OneofWrappers = []any{}
 	file_testing_tags_demo_proto_msgTypes[2].OneofWrappers = []any{}
 	file_testing_tags_demo_proto_msgTypes[3].OneofWrappers = []any{}
+	file_testing_tags_demo_proto_msgTypes[4].OneofWrappers = []any{}
+	file_testing_tags_demo_proto_msgTypes[5].OneofWrappers = []any{}
+	file_testing_tags_demo_proto_msgTypes[6].OneofWrappers = []any{}
+	file_testing_tags_demo_proto_msgTypes[7].OneofWrappers = []any{}
+	file_testing_tags_demo_proto_msgTypes[8].OneofWrappers = []any{}
+	file_testing_tags_demo_proto_msgTypes[9].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_testing_tags_demo_proto_rawDesc), len(file_testing_tags_demo_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   5,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

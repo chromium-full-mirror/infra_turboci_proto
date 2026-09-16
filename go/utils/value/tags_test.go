@@ -285,6 +285,87 @@ func TestTagsFor(t *testing.T) {
 			}.Build(),
 			wantErr: "testing.tags.UnsupportedKindMessage.bad_field: turboci.tag: unsupported field kind bytes",
 		},
+		{
+			name: "RecursiveMessage",
+			msg: testingtagspb.RecursiveMessage_builder{
+				Tagged: proto.String("root"),
+				Deeper: testingtagspb.RecursiveMessage_builder{
+					Tagged: proto.String("level1"),
+					Deeper: testingtagspb.RecursiveMessage_builder{
+						Tagged: proto.String("level2"),
+					}.Build(),
+				}.Build(),
+			}.Build(),
+			wantTags: Tags{
+				"testing.tags.RecursiveMessage.tagged": tag("level1", "level2", "root"),
+			},
+		},
+		{
+			name: "RecursiveUntaggedMessage",
+			msg: testingtagspb.RecursiveUntaggedMessage_builder{
+				Untagged: proto.String("root"),
+				Deeper: testingtagspb.RecursiveUntaggedMessage_builder{
+					Untagged: proto.String("level1"),
+					Deeper: testingtagspb.RecursiveUntaggedMessage_builder{
+						Untagged: proto.String("level2"),
+					}.Build(),
+				}.Build(),
+			}.Build(),
+		},
+		{
+			name: "MutualMessageA_with_nested_tags",
+			msg: testingtagspb.MutualMessageA_builder{
+				Deeper: testingtagspb.MutualMessageB_builder{
+					Tagged: proto.String("b_level1"),
+					Deeper: testingtagspb.MutualMessageA_builder{
+						Deeper: testingtagspb.MutualMessageB_builder{
+							Tagged: proto.String("b_level2"),
+						}.Build(),
+					}.Build(),
+				}.Build(),
+			}.Build(),
+			wantTags: Tags{
+				"testing.tags.MutualMessageB.tagged": tag("b_level1", "b_level2"),
+			},
+		},
+		{
+			name: "MutualMessageB_with_nested_tags",
+			msg: testingtagspb.MutualMessageB_builder{
+				Tagged: proto.String("b_root"),
+				Deeper: testingtagspb.MutualMessageA_builder{
+					Deeper: testingtagspb.MutualMessageB_builder{
+						Tagged: proto.String("b_nested"),
+					}.Build(),
+				}.Build(),
+			}.Build(),
+			wantTags: Tags{
+				"testing.tags.MutualMessageB.tagged": tag("b_nested", "b_root"),
+			},
+		},
+		{
+			name: "MutualUntaggedMessageA",
+			msg: testingtagspb.MutualUntaggedMessageA_builder{
+				Deeper: testingtagspb.MutualUntaggedMessageB_builder{
+					Untagged: proto.String("level1"),
+					Deeper: testingtagspb.MutualUntaggedMessageA_builder{
+						Deeper: testingtagspb.MutualUntaggedMessageB_builder{
+							Untagged: proto.String("level2"),
+						}.Build(),
+					}.Build(),
+				}.Build(),
+			}.Build(),
+		},
+		{
+			name: "MutualUntaggedMessageB",
+			msg: testingtagspb.MutualUntaggedMessageB_builder{
+				Untagged: proto.String("level1"),
+				Deeper: testingtagspb.MutualUntaggedMessageA_builder{
+					Deeper: testingtagspb.MutualUntaggedMessageB_builder{
+						Untagged: proto.String("level2"),
+					}.Build(),
+				}.Build(),
+			}.Build(),
+		},
 	}
 
 	for _, tc := range tests {

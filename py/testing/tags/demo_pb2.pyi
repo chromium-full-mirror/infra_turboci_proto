@@ -68,3 +68,47 @@ class UnsupportedKindMessage(_message.Message):
     BAD_FIELD_FIELD_NUMBER: _ClassVar[int]
     bad_field: bytes
     def __init__(self, bad_field: _Optional[bytes] = ...) -> None: ...
+
+class RecursiveMessage(_message.Message):
+    __slots__ = ("deeper", "tagged")
+    DEEPER_FIELD_NUMBER: _ClassVar[int]
+    TAGGED_FIELD_NUMBER: _ClassVar[int]
+    deeper: RecursiveMessage
+    tagged: str
+    def __init__(self, deeper: _Optional[_Union[RecursiveMessage, _Mapping]] = ..., tagged: _Optional[str] = ...) -> None: ...
+
+class RecursiveUntaggedMessage(_message.Message):
+    __slots__ = ("deeper", "untagged")
+    DEEPER_FIELD_NUMBER: _ClassVar[int]
+    UNTAGGED_FIELD_NUMBER: _ClassVar[int]
+    deeper: RecursiveUntaggedMessage
+    untagged: str
+    def __init__(self, deeper: _Optional[_Union[RecursiveUntaggedMessage, _Mapping]] = ..., untagged: _Optional[str] = ...) -> None: ...
+
+class MutualMessageA(_message.Message):
+    __slots__ = ("deeper",)
+    DEEPER_FIELD_NUMBER: _ClassVar[int]
+    deeper: MutualMessageB
+    def __init__(self, deeper: _Optional[_Union[MutualMessageB, _Mapping]] = ...) -> None: ...
+
+class MutualMessageB(_message.Message):
+    __slots__ = ("deeper", "tagged")
+    DEEPER_FIELD_NUMBER: _ClassVar[int]
+    TAGGED_FIELD_NUMBER: _ClassVar[int]
+    deeper: MutualMessageA
+    tagged: str
+    def __init__(self, deeper: _Optional[_Union[MutualMessageA, _Mapping]] = ..., tagged: _Optional[str] = ...) -> None: ...
+
+class MutualUntaggedMessageA(_message.Message):
+    __slots__ = ("deeper",)
+    DEEPER_FIELD_NUMBER: _ClassVar[int]
+    deeper: MutualUntaggedMessageB
+    def __init__(self, deeper: _Optional[_Union[MutualUntaggedMessageB, _Mapping]] = ...) -> None: ...
+
+class MutualUntaggedMessageB(_message.Message):
+    __slots__ = ("deeper", "untagged")
+    DEEPER_FIELD_NUMBER: _ClassVar[int]
+    UNTAGGED_FIELD_NUMBER: _ClassVar[int]
+    deeper: MutualUntaggedMessageA
+    untagged: str
+    def __init__(self, deeper: _Optional[_Union[MutualUntaggedMessageA, _Mapping]] = ..., untagged: _Optional[str] = ...) -> None: ...

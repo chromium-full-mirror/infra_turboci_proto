@@ -7,6 +7,7 @@ package value
 import (
 	"fmt"
 	"iter"
+	"maps"
 	"sync"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
@@ -71,6 +72,18 @@ func (t *tagFieldExtractor) extract(tags Tags, val protoreflect.Value) {
 	}
 }
 
+// makeSubmessageTagFieldExtractor makes a tagFieldExtractor to recurse into
+// the message covered by `extractor`.
+//
+// Handles repeated fields as well as `map<*, msgType>` fields.
+func makeSubmessageTagFieldExtractor(field protoreflect.FieldDescriptor, extractor tagExtractor) *tagFieldExtractor {
+	return &tagFieldExtractor{
+		isMap:          field.IsMap(),
+		isList:         field.IsList(),
+		recurseMessage: extractor,
+	}
+}
+
 // tagExtractor knows how to extract ValueTags from some specific message type.
 //
 // The keys of the map are the fields which may need some kind of extraction.
@@ -101,7 +114,7 @@ var (
 	// tagExtractorPoolMu synchronizes access to [tagExtractorPool].
 	tagExtractorPoolMu sync.RWMutex
 
-	// a nil *tagExtractor and nil error indicates that this message doesn't
+	// a nil tagExtractor and nil error indicates that this message doesn't
 	// transitively have any tagged fields.
 	tagExtractorPool = map[protoreflect.MessageDescriptor]tagExtractorPoolEntry{}
 )
@@ -278,75 +291,118 @@ func makeTagFieldExtractor(field protoreflect.FieldDescriptor, tag *tagspb.Tag) 
 	}, nil
 }
 
-// computeTagExtractorLocked computes, caches and returns the tagExtractor for
-// messages whose type is `msg`.
-func computeTagExtractorLocked(msg protoreflect.MessageDescriptor) (tagExtractor, error) {
-	entry, has := tagExtractorPool[msg]
-	if has {
-		return entry.extractor, entry.err
+// submsgDesc returns the target MessageDescriptor if field is a message field
+// or map-to-message field, or nil otherwise.
+func submsgDesc(field protoreflect.FieldDescriptor) protoreflect.MessageDescriptor {
+	if field.IsMap() {
+		if field.MapValue().Kind() == protoreflect.MessageKind {
+			return field.MapValue().Message()
+		}
+		return nil
+	}
+	if field.Kind() == protoreflect.MessageKind {
+		return field.Message()
+	}
+	return nil
+}
+
+// exploreType recursively walks `msg`, adding an entry to `toAdd` which
+// describes how to extract all tags (including recursion) for `msg`.
+//
+// If `msg` is mutually recursive with another type we are exploring, this adds
+// it to toConverge to be addressed later in `fixupConvergence`.
+func exploreType(
+	msg protoreflect.MessageDescriptor,
+	toAdd map[protoreflect.MessageDescriptor]tagExtractorPoolEntry,
+	toConverge map[protoreflect.FieldDescriptor]protoreflect.MessageDescriptor,
+) error {
+	// Ensure that `msg` has not already been explored.
+	if _, ok := toAdd[msg]; ok {
+		return nil
 	}
 
-	// Ok, we need to generate a new extractor for this message descriptor.
+	// Add this so that recursion stops.
+	toAdd[msg] = tagExtractorPoolEntry{}
+
 	extractor := tagExtractor{}
-	entry = tagExtractorPoolEntry{extractor: extractor}
-	// Set it while we recurse.
-	tagExtractorPool[msg] = entry
-
-	fields := msg.Fields()
-	var msgFields []protoreflect.FieldDescriptor
-
-	// Loop over all fields - if they are tagged, add them to extractor.
-	for field := range rangeProtoSeq(fields) {
-		tag := proto.GetExtension(field.Options(), tagspb.E_Tag).(*tagspb.Tag)
+	for field := range rangeProtoSeq(msg.Fields()) {
+		// First, check if this field is directly tagged.
+		tag, _ := proto.GetExtension(field.Options(), tagspb.E_Tag).(*tagspb.Tag)
 		if tag != nil {
-			var err error
-			extractor[field], err = makeTagFieldExtractor(field, tag)
+			fExt, err := makeTagFieldExtractor(field, tag)
 			if err != nil {
-				return nil, err
+				return err
 			}
+			extractor[field] = fExt
+			continue
+		}
+
+		// Check to see if this field has a message kind.
+		sub := submsgDesc(field)
+		if sub == nil {
+			continue
+		}
+
+		// If the message kind is already in the global pool, we can either return
+		// its error, incorporate its extractor, or skip it (if the message has
+		// no tags and no recursions).
+		if entry, has := tagExtractorPool[sub]; has {
+			if entry.err != nil {
+				return entry.err
+			}
+			if entry.extractor != nil {
+				extractor[field] = makeSubmessageTagFieldExtractor(field, entry.extractor)
+			}
+			continue
+		}
+
+		// If the sub message was *not* in the global pool explore the sub message
+		// type.
+		if err := exploreType(sub, toAdd, toConverge); err != nil {
+			return err
+		}
+
+		// If the now-explored type has ANY tagged fields (or known recursions), we
+		// can directly set it in our extractor.
+		if ext := toAdd[sub]; len(ext.extractor) > 0 {
+			extractor[field] = makeSubmessageTagFieldExtractor(field, ext.extractor)
 		} else {
-			if (field.IsMap() && field.MapValue().Kind() == protoreflect.MessageKind) ||
-				field.Kind() == protoreflect.MessageKind {
-				msgFields = append(msgFields, field)
+			// Otherwise, mark this field as needing convergence.
+			toConverge[field] = sub
+		}
+	}
+
+	// If there are any entries that we know for sure, go ahead and set this in
+	// toAdd.
+	if len(extractor) > 0 {
+		toAdd[msg] = tagExtractorPoolEntry{extractor: extractor}
+	}
+	return nil
+}
+
+// fixupConvergence iterates through `toConverge` fixing up entries in `toAdd`
+// until iterating through toConverge yields no changes.
+//
+// Fixing up an entry includes updating toAdd to indicate that a type does, in
+// fact, need to recurse into some other type.
+func fixupConvergence(
+	toAdd map[protoreflect.MessageDescriptor]tagExtractorPoolEntry,
+	toConverge map[protoreflect.FieldDescriptor]protoreflect.MessageDescriptor,
+) {
+	for siz := len(toConverge) + 1; len(toConverge) < siz; siz = len(toConverge) {
+		for field, subMsg := range toConverge {
+			if ext := toAdd[subMsg].extractor; ext != nil {
+				parentMsg := field.ContainingMessage()
+				parentExtractor := toAdd[parentMsg].extractor
+				if parentExtractor == nil {
+					parentExtractor = tagExtractor{}
+					toAdd[parentMsg] = tagExtractorPoolEntry{extractor: parentExtractor}
+				}
+				parentExtractor[field] = makeSubmessageTagFieldExtractor(field, ext)
+				delete(toConverge, field)
 			}
 		}
 	}
-
-	// Finally, after getting all of our scalar fields recorded, check any message
-	// fields. This will allow recursive messages like:
-	//
-	//    message Recurse {
-	//       Recurse deeper = 1;
-	//       optional string tagged = 2 [(turboci.tag).key_scope = EDGE];
-	//    }
-	//
-	// To work correctly.
-	for _, field := range msgFields {
-		msgDesc := field.Message()
-		if field.IsMap() {
-			msgDesc = field.MapValue().Message()
-		}
-		innerExtractor, err := computeTagExtractorLocked(msgDesc)
-		if err != nil {
-			entry = tagExtractorPoolEntry{err: err}
-			tagExtractorPool[msg] = entry
-			return nil, err
-		}
-		if innerExtractor != nil {
-			extractor[field] = &tagFieldExtractor{
-				isMap:          field.IsMap(),
-				isList:         field.IsList(),
-				recurseMessage: innerExtractor,
-			}
-		}
-	}
-
-	// If it turns out that extractor was empty, nil it out.
-	if len(extractor) == 0 {
-		tagExtractorPool[msg] = tagExtractorPoolEntry{}
-	}
-
-	return entry.extractor, entry.err
 }
 
 // getTagExtractor returns the tagExtractor for `msg`, or an error.
@@ -364,5 +420,25 @@ func getTagExtractor(msg protoreflect.MessageDescriptor) (tagExtractor, error) {
 
 	tagExtractorPoolMu.Lock()
 	defer tagExtractorPoolMu.Unlock()
-	return computeTagExtractorLocked(msg)
+
+	if entry, has := tagExtractorPool[msg]; has {
+		return entry.extractor, entry.err
+	}
+
+	toAdd := map[protoreflect.MessageDescriptor]tagExtractorPoolEntry{}
+	toConverge := map[protoreflect.FieldDescriptor]protoreflect.MessageDescriptor{}
+
+	if err := exploreType(msg, toAdd, toConverge); err != nil {
+		tagExtractorPool[msg] = tagExtractorPoolEntry{err: err}
+		return nil, err
+	}
+
+	if len(toConverge) > 0 {
+		fixupConvergence(toAdd, toConverge)
+	}
+
+	maps.Copy(tagExtractorPool, toAdd)
+
+	entry = tagExtractorPool[msg]
+	return entry.extractor, entry.err
 }
