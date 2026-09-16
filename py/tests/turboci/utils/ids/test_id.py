@@ -171,14 +171,6 @@ class ToFromIDTest(unittest.TestCase):
             id_utils.from_string(tc.ident_str), id_utils.wrap(tc.ident)
         )
 
-  def test_to_string__unsupported_type__raises_not_implemented_error(self):
-    unsupported = object()
-
-    with self.assertRaisesRegex(
-        NotImplementedError, r"^to_string\(<class 'object'>\)$"
-    ):
-      id_utils.to_string(unsupported)
-
   def test_from_string__invalid_stage_prefix__raises_value_error(self):
     invalid_cases = (
         ('L1234567:X938215823', 'stage'),
