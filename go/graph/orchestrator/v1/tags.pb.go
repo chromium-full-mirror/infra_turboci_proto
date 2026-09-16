@@ -237,7 +237,10 @@ type Tag_builder struct {
 	Scope *ReadScope
 	// One or more values to associate with this tag.
 	//
-	// Will be deduplicated on `value`, retaining the highest scope.
+	// Must be sorted and unique on `data`.
+	//
+	// The sort order is (proto tag #, data). That is, strings before bools,
+	// bools before ints.
 	Values []*Tag_Value
 }
 

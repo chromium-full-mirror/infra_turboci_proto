@@ -176,6 +176,15 @@ type ValueWrite_builder struct {
 	// you using the `turboci.tag` field annotations in your protos, using one of
 	// the Turbo CI helper libraries (such as the Go or Python libraries in this
 	// repo).
+	//
+	// These must be fully normalized or the server will reject them. This means:
+	//   - This field must be sorted an unique on `key`.
+	//   - Each Tag's `values` must be sorted and unique (see Tag.values).
+	//
+	// Tags are subject to server-imposed limits which restrict:
+	//   - Tag key length.
+	//   - Number of values per Tag.
+	//   - Amount of data in Tag values.
 	Tags []*Tag
 }
 
