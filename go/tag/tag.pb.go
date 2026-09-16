@@ -19,7 +19,7 @@
 //
 // buf:lint:ignore PACKAGE_VERSION_SUFFIX
 
-package tagspb
+package tagpb
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -390,7 +390,7 @@ const file_turboci_tag_proto_rawDesc = "" +
 	"\tVALUE_REF\x10\x00\x12\b\n" +
 	"\x04NODE\x10\x01\x12\r\n" +
 	"\tWORK_PLAN\x10\x02:D\n" +
-	"\x03tag\x12\x1d.google.protobuf.FieldOptions\x18\xd9\xe0\xbe\xff\x01 \x01(\v2\f.turboci.TagR\x03tag\x88\x01\x01B0P\x01Z,go.chromium.org/turboci/proto/go/tags;tagspbb\x06proto3"
+	"\x03tag\x12\x1d.google.protobuf.FieldOptions\x18\xd9\xe0\xbe\xff\x01 \x01(\v2\f.turboci.TagR\x03tag\x88\x01\x01B.P\x01Z*go.chromium.org/turboci/proto/go/tag;tagpbb\x06proto3"
 
 var file_turboci_tag_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_tag_proto_msgTypes = make([]protoimpl.MessageInfo, 1)

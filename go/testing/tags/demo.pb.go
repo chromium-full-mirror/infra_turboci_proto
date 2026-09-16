@@ -11,7 +11,7 @@
 package testingtagspb
 
 import (
-	_ "go.chromium.org/turboci/proto/go/tags"
+	_ "go.chromium.org/turboci/proto/go/tag"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"

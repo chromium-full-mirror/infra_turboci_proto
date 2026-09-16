@@ -11,7 +11,7 @@ import (
 	"sync"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
-	tagspb "go.chromium.org/turboci/proto/go/tags"
+	tagpb "go.chromium.org/turboci/proto/go/tag"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -200,15 +200,15 @@ func makeFieldExtractor(field protoreflect.FieldDescriptor) func(v protoreflect.
 // calculateScopes calculates the effective captureUnset, keyScope and valueScope
 // for a field, given the tag annotation proto and the kind of the field.
 //
-// In particular, this converts the source-annotation friendly tagspb.ReadScope
+// In particular, this converts the source-annotation friendly tagpb.ReadScope
 // to the API orchestratorpb.ReadScope enum, ensures that keyScope is >=
 // valueScope, and applies the default index_unset logic for bool fields.
-func calculateScopes(tag *tagspb.Tag, kind protoreflect.Kind) (captureUnset bool, keyScope, valueScope orchestratorpb.ReadScope) {
-	toReadScope := func(in tagspb.ReadScope) orchestratorpb.ReadScope {
+func calculateScopes(tag *tagpb.Tag, kind protoreflect.Kind) (captureUnset bool, keyScope, valueScope orchestratorpb.ReadScope) {
+	toReadScope := func(in tagpb.ReadScope) orchestratorpb.ReadScope {
 		switch in {
-		case tagspb.ReadScope_NODE:
+		case tagpb.ReadScope_NODE:
 			return orchestratorpb.ReadScope_READ_SCOPE_NODE
-		case tagspb.ReadScope_WORK_PLAN:
+		case tagpb.ReadScope_WORK_PLAN:
 			return orchestratorpb.ReadScope_READ_SCOPE_WORK_PLAN
 		}
 		return orchestratorpb.ReadScope_READ_SCOPE_VALUE_REF
@@ -229,7 +229,7 @@ func calculateScopes(tag *tagspb.Tag, kind protoreflect.Kind) (captureUnset bool
 
 // makeTagFieldExtractor returns a tagFieldExtractor for the field + tag,
 // or an error if this field cannot be tagged.
-func makeTagFieldExtractor(field protoreflect.FieldDescriptor, tag *tagspb.Tag) (*tagFieldExtractor, error) {
+func makeTagFieldExtractor(field protoreflect.FieldDescriptor, tag *tagpb.Tag) (*tagFieldExtractor, error) {
 	keys := append([]string{string(field.FullName())}, tag.GetAltKey()...)
 	codec := makeFieldExtractor(field)
 	if codec == nil {
@@ -327,7 +327,7 @@ func exploreType(
 	extractor := tagExtractor{}
 	for field := range rangeProtoSeq(msg.Fields()) {
 		// First, check if this field is directly tagged.
-		tag, _ := proto.GetExtension(field.Options(), tagspb.E_Tag).(*tagspb.Tag)
+		tag, _ := proto.GetExtension(field.Options(), tagpb.E_Tag).(*tagpb.Tag)
 		if tag != nil {
 			fExt, err := makeTagFieldExtractor(field, tag)
 			if err != nil {
