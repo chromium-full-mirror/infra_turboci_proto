@@ -10,7 +10,7 @@ import (
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
 )
 
-// Inline returns a ValueRef (with inline data).
+// Inline returns a ValueRef (with inline data and extracted tags).
 func Inline(msg proto.Message, realm string) (*orchestratorpb.ValueRef, error) {
 	vw, err := Write(msg, realm)
 	if err != nil {
@@ -20,7 +20,7 @@ func Inline(msg proto.Message, realm string) (*orchestratorpb.ValueRef, error) {
 }
 
 // MustInline is the same as [Inline], except that it panics on error (i.e. if
-// `msg` cannot be marshaled.
+// `msg` cannot be marshaled).
 func MustInline(msg proto.Message, realm string) *orchestratorpb.ValueRef {
 	ret, err := Inline(msg, realm)
 	if err != nil {

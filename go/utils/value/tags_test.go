@@ -64,7 +64,7 @@ func scopedTag[T taggableValue](keyScope, valScope orchestratorpb.ReadScope, val
 		Values: make(map[TagValue]*ScopeCount, len(vals)),
 	}
 	for _, v := range vals {
-		t.getScopeCount(tagVal(v)).Increment(valScope)
+		t.getScopeCount(tagVal(v)).increment(valScope, 1)
 	}
 	return t
 }

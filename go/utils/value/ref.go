@@ -15,6 +15,8 @@ import (
 // This is roughly equivalent to [Inline] when given a message and a realm,
 // except that this is a purely mechanical proto message assembly which cannot
 // error.
+//
+// Tags are assumed to be immutable and are copied by pointer, not cloned.
 func InlineRef(vw *orchestratorpb.ValueWrite) *orchestratorpb.ValueRef {
 	dgst := ComputeDigest(vw.GetData())
 	return orchestratorpb.ValueRef_builder{
@@ -22,6 +24,6 @@ func InlineRef(vw *orchestratorpb.ValueWrite) *orchestratorpb.ValueRef {
 		Realm:   proto.String(vw.GetRealm()),
 		Inline:  vw.GetData(),
 		Digest:  proto.String(string(dgst)),
-		// TODO: copy tag data when added to ValueWrite/ValueRef.
+		Tags:    vw.GetTags(),
 	}.Build()
 }

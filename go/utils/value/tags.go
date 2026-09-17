@@ -71,20 +71,36 @@ func (v TagValue) String() string {
 	return v.Proto().String()
 }
 
+// ScopeCount aggregates the maximum observed read scope of a particular tag
+// value and the total number of instances of this value.
 type ScopeCount struct {
+	// Scope indicates the level at which this *value* can be read.
 	Scope orchestratorpb.ReadScope
-	// Total count (not duplicate count)
+	// Total count of instances of this particular value (not duplicate count).
 	Count uint32
 }
 
-func (s *ScopeCount) Increment(scope orchestratorpb.ReadScope) {
+// increment sets Scope to the max of the current and given scopes, and
+// increments count by `delta`.
+func (s *ScopeCount) increment(scope orchestratorpb.ReadScope, delta uint32) {
 	s.Scope = max(s.Scope, scope)
-	s.Count++
+	s.Count += delta
 }
 
 // Tag is an easier in-process representation of an orchestratorpb.Tag.
+//
+// Primarily intended to be used in conjunction with [TagsFor], rarely
+// constructed directly (perhaps only in tests).
 type Tag struct {
-	Scope  orchestratorpb.ReadScope
+	// Scope indicates the level at which the tag *key* can be read.
+	Scope orchestratorpb.ReadScope
+
+	// Values are unique tag values.
+	//
+	// If a tag happens to have multiple identical values, they'll be deduplicated
+	// in this map, with their scope and total count aggregated in ScopeCount.
+	//
+	// Do not construct or modify directly. Use [TagTemplate] or [Tag.AddValue].
 	Values map[TagValue]*ScopeCount
 }
 
@@ -100,12 +116,13 @@ func (t *Tag) getScopeCount(tv TagValue) *ScopeCount {
 	return cur
 }
 
+// AddValue inserts a value of the tag.
 func (t *Tag) AddValue(tv *orchestratorpb.Tag_Value) {
 	enc, scope, ok := makeTagValue(tv)
 	if !ok {
 		return
 	}
-	t.getScopeCount(enc).Increment(scope)
+	t.getScopeCount(enc).increment(scope, tv.GetDuplicateCount()+1)
 }
 
 // Proto returns this as an orchestratorpb.Tag with the given key.
@@ -155,12 +172,15 @@ func (t *Tag) Proto(key string) *orchestratorpb.Tag {
 // protos.
 type Tags map[string]*Tag
 
-// Proto converts this Tags into a list of orchestratorpb.Tag protos.
+// Proto converts this Tags into a normalized list of orchestratorpb.Tag protos.
 func (t Tags) Proto() []*orchestratorpb.Tag {
 	ret := make([]*orchestratorpb.Tag, 0, len(t))
 	for k, val := range t {
 		ret = append(ret, val.Proto(k))
 	}
+	slices.SortFunc(ret, func(a, b *orchestratorpb.Tag) int {
+		return cmp.Compare(a.GetKey(), b.GetKey())
+	})
 	return ret
 }
 
@@ -173,7 +193,7 @@ func (t Tags) getData(key string) *Tag {
 	return cur
 }
 
-// Add adds tag data in proto form.
+// Add adds tag data in proto form, merging tags with identical keys.
 func (t Tags) Add(tags iter.Seq[*orchestratorpb.Tag]) {
 	for tag := range tags {
 		dat := t.getData(tag.GetKey())
