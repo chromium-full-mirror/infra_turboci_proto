@@ -28,11 +28,19 @@ func TestWriteMatchesRef(t *testing.T) {
 		write := orchestratorpb.ValueWrite_builder{
 			Realm: proto.String("realm"),
 			Data:  data1,
+			Tags: Tags{
+				"t1": &Tag{}, // TODO
+				"t2": &Tag{}, // TODO
+			}.Proto(),
 		}.Build()
 		ref := orchestratorpb.ValueRef_builder{
 			Realm:   proto.String("realm"),
 			TypeUrl: proto.String(data1.TypeUrl),
 			Inline:  data1,
+			Tags: Tags{
+				"t1": &Tag{}, // TODO
+				"t2": &Tag{}, // TODO
+			}.Proto(),
 		}.Build()
 		assert.True(t, WriteMatchesRef(write, ref))
 	})
