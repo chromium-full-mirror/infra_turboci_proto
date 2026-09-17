@@ -19,6 +19,11 @@ import (
 // tagFieldExtractor understands how to extract tag(s) for one specific field
 // in one specific proto message.
 type tagFieldExtractor struct {
+	// facts about the shape of the field extracted from the FieldDescriptor.
+	isEnum bool
+	isList bool
+	isMap  bool
+
 	// captureUnset, if true, will cause tag extraction for this field to occur
 	// even if `msg.Has(field)` would return false.
 	//
@@ -26,49 +31,86 @@ type tagFieldExtractor struct {
 	// types.
 	captureUnset bool
 
-	// toTags yields all tags for this field.
-	// it is `nil` if this field does not have extractable values.
-	toTags func(v protoreflect.Value) iter.Seq[*orchestratorpb.Tag]
+	// extractScalar extracts a single scalar value for this field and appends to
+	// the provided slice.
+	//
+	// This appends to a slice []*Tag_Value because enum scalars extract two
+	// values, and to avoid extra intermediate allocations of returning tiny
+	// slices.
+	extractScalar func(*[]*orchestratorpb.Tag_Value, protoreflect.Value, orchestratorpb.ReadScope)
+	// The tag keys which this extractor will yield.
+	// If this is empty, this field only does recurseMessage.
+	keys       []string
+	keyScope   orchestratorpb.ReadScope
+	valueScope orchestratorpb.ReadScope
 
 	// otherwise, recurseMessage will be set with zero or more of [isList, isMap].
 	recurseMessage tagExtractor
-	isList         bool
-	isMap          bool
+}
+
+// rangeValues returns an iterator over the 'target' value:
+//   - the value itself for singular fields
+//   - each value in the list for repeated fields
+//   - the map value for map fields
+func (t *tagFieldExtractor) rangeValues(val protoreflect.Value) iter.Seq[protoreflect.Value] {
+	if t.isMap {
+		return func(yield func(protoreflect.Value) bool) {
+			for _, val := range val.Map().Range {
+				if !yield(val) {
+					return
+				}
+			}
+		}
+	}
+
+	if t.isList {
+		return func(yield func(protoreflect.Value) bool) {
+			lst := val.List()
+			for i := 0; i < lst.Len(); i++ {
+				if !yield(lst.Get(i)) {
+					return
+				}
+			}
+		}
+	}
+
+	return func(yield func(protoreflect.Value) bool) {
+		yield(val)
+	}
 }
 
 // extract updates `tags` for this field, given the value `val`.
 func (t *tagFieldExtractor) extract(tags Tags, val protoreflect.Value) {
-	// `toTags` != nil means that we need to directly extract from `val`.
-	if t.toTags != nil {
-		tags.Add(t.toTags(val))
+	// We need to extract the scalar(s) from this field.
+	if t.extractScalar != nil {
+		expectedValues := 1
+		if t.isList {
+			expectedValues = val.List().Len()
+		}
+		if t.isEnum {
+			expectedValues *= 2
+		}
+		values := make([]*orchestratorpb.Tag_Value, 0, expectedValues)
+		for val := range t.rangeValues(val) {
+			t.extractScalar(&values, val, t.valueScope)
+		}
+		tags.Add(func(yield func(*orchestratorpb.Tag) bool) {
+			for _, key := range t.keys {
+				if !yield(orchestratorpb.Tag_builder{
+					Key:    &key,
+					Scope:  t.keyScope.Enum(),
+					Values: values,
+				}.Build()) {
+					return
+				}
+			}
+		})
 		return
 	}
 
-	// Otherwise, we need to recurse; this is either singleton recursion, list
-	// recursion, or map (values) recursion.
-	it := func(yield func(protoreflect.Message) bool) {
-		yield(val.Message())
-	}
-	if t.isMap {
-		it = func(yield func(protoreflect.Message) bool) {
-			for _, val := range val.Map().Range {
-				if !yield(val.Message()) {
-					return
-				}
-			}
-		}
-	} else if t.isList {
-		it = func(yield func(protoreflect.Message) bool) {
-			for val := range rangeProtoSeq(val.List()) {
-				if !yield(val.Message()) {
-					return
-				}
-			}
-		}
-	}
-
-	for msg := range it {
-		t.recurseMessage.extract(tags, msg)
+	// Otherwise, we need to recurse into some message(s).
+	for val := range t.rangeValues(val) {
+		t.recurseMessage.extract(tags, val.Message())
 	}
 }
 
@@ -119,78 +161,68 @@ var (
 	tagExtractorPool = map[protoreflect.MessageDescriptor]tagExtractorPoolEntry{}
 )
 
-// rangeProtoSeq converts a Len()+Get(int) E object into an iter.Seq[E].
-func rangeProtoSeq[S interface {
-	Len() int
-	Get(int) E
-}, E any](seq S) iter.Seq[E] {
-	return func(yield func(E) bool) {
-		for i := 0; i < seq.Len(); i++ {
-			if !yield(seq.Get(i)) {
-				return
-			}
-		}
-	}
-}
-
-// makeFieldExtractor returns a function which extracts a *single* scalar value
-// into one *or more* Tag_Value proto messages.
+// makeTagScalarExtractor returns a function which extracts a *single* scalar
+// value into one *or more* Tag_Value proto messages with the given scope.
 //
 // Returns nil if extraction from this field kind is not possible.
-func makeFieldExtractor(field protoreflect.FieldDescriptor) func(v protoreflect.Value) []*orchestratorpb.Tag_Value {
+func makeTagScalarExtractor(field protoreflect.FieldDescriptor) func(*[]*orchestratorpb.Tag_Value, protoreflect.Value, orchestratorpb.ReadScope) {
 	switch field.Kind() {
 	case protoreflect.EnumKind:
 		vals := field.Enum().Values()
 
-		return func(v protoreflect.Value) []*orchestratorpb.Tag_Value {
+		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, scope orchestratorpb.ReadScope) {
 			enum := v.Enum()
-			return []*orchestratorpb.Tag_Value{
-				orchestratorpb.Tag_Value_builder{
+			*out = append(
+				*out, orchestratorpb.Tag_Value_builder{
+					Scope:    &scope,
 					IntValue: proto.Int64(int64(enum)),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
+					Scope:    &scope,
 					StrValue: proto.String(string(vals.ByNumber(enum).Name())),
 				}.Build(),
-			}
+			)
 		}
 
 	case protoreflect.BoolKind:
-		return func(v protoreflect.Value) []*orchestratorpb.Tag_Value {
-			return []*orchestratorpb.Tag_Value{
-				orchestratorpb.Tag_Value_builder{
-					BoolValue: proto.Bool(v.Bool()),
-				}.Build(),
-			}
+		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, scope orchestratorpb.ReadScope) {
+			*out = append(*out, orchestratorpb.Tag_Value_builder{
+				Scope:     &scope,
+				BoolValue: proto.Bool(v.Bool()),
+			}.Build())
 		}
 
 	case protoreflect.StringKind:
-		return func(v protoreflect.Value) []*orchestratorpb.Tag_Value {
-			return []*orchestratorpb.Tag_Value{
+		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, scope orchestratorpb.ReadScope) {
+			*out = append(*out,
 				orchestratorpb.Tag_Value_builder{
+					Scope:    &scope,
 					StrValue: proto.String(v.String()),
 				}.Build(),
-			}
+			)
 		}
 
 	case protoreflect.Int32Kind, protoreflect.Int64Kind,
 		protoreflect.Sint32Kind, protoreflect.Sint64Kind,
 		protoreflect.Sfixed32Kind, protoreflect.Sfixed64Kind:
 
-		return func(v protoreflect.Value) []*orchestratorpb.Tag_Value {
-			return []*orchestratorpb.Tag_Value{
+		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, scope orchestratorpb.ReadScope) {
+			*out = append(*out,
 				orchestratorpb.Tag_Value_builder{
+					Scope:    &scope,
 					IntValue: proto.Int64(v.Int()),
 				}.Build(),
-			}
+			)
 		}
 
 	case protoreflect.Fixed32Kind, protoreflect.Uint32Kind:
-		return func(v protoreflect.Value) []*orchestratorpb.Tag_Value {
-			return []*orchestratorpb.Tag_Value{
+		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, scope orchestratorpb.ReadScope) {
+			*out = append(*out,
 				orchestratorpb.Tag_Value_builder{
+					Scope:    &scope,
 					IntValue: proto.Int64(int64(v.Uint())),
 				}.Build(),
-			}
+			)
 		}
 	}
 
@@ -231,7 +263,8 @@ func calculateScopes(tag *tagpb.Tag, kind protoreflect.Kind) (captureUnset bool,
 // or an error if this field cannot be tagged.
 func makeTagFieldExtractor(field protoreflect.FieldDescriptor, tag *tagpb.Tag) (*tagFieldExtractor, error) {
 	keys := append([]string{string(field.FullName())}, tag.GetAltKey()...)
-	codec := makeFieldExtractor(field)
+	captureUnset, keyScope, valueScope := calculateScopes(tag, field.Kind())
+	codec := makeTagScalarExtractor(field)
 	if codec == nil {
 		return nil, fmt.Errorf("%s: turboci.tag: unsupported field kind %s", field.FullName(), field.Kind())
 	}
@@ -239,55 +272,14 @@ func makeTagFieldExtractor(field protoreflect.FieldDescriptor, tag *tagpb.Tag) (
 		return nil, fmt.Errorf("%s: turboci.tag: unsupported field: map", field.FullName())
 	}
 
-	captureUnset, keyScope, valueScope := calculateScopes(tag, field.Kind())
-	if field.IsList() {
-		return &tagFieldExtractor{
-			captureUnset: captureUnset,
-			toTags: func(v protoreflect.Value) iter.Seq[*orchestratorpb.Tag] {
-				lst := v.List()
-
-				return func(yield func(*orchestratorpb.Tag) bool) {
-					for i := 0; i < lst.Len(); i++ {
-						values := codec(lst.Get(i))
-						for _, val := range values {
-							val.SetScope(valueScope)
-						}
-						for _, key := range keys {
-							tag := orchestratorpb.Tag_builder{
-								Key:    &key,
-								Scope:  &keyScope,
-								Values: values,
-							}.Build()
-							if !yield(tag) {
-								return
-							}
-						}
-					}
-				}
-			},
-		}, nil
-	}
-
 	return &tagFieldExtractor{
-		captureUnset: captureUnset,
-		toTags: func(v protoreflect.Value) iter.Seq[*orchestratorpb.Tag] {
-			values := codec(v)
-			for _, val := range values {
-				val.SetScope(valueScope)
-			}
-			return func(yield func(*orchestratorpb.Tag) bool) {
-				for _, key := range keys {
-					tag := orchestratorpb.Tag_builder{
-						Key:    &key,
-						Scope:  &keyScope,
-						Values: values,
-					}.Build()
-					if !yield(tag) {
-						return
-					}
-				}
-			}
-		},
+		keys:          keys,
+		keyScope:      keyScope,
+		valueScope:    valueScope,
+		captureUnset:  captureUnset,
+		isEnum:        field.Kind() == protoreflect.EnumKind,
+		isList:        field.IsList(),
+		extractScalar: codec,
 	}, nil
 }
 
@@ -325,7 +317,10 @@ func exploreType(
 	toAdd[msg] = tagExtractorPoolEntry{}
 
 	extractor := tagExtractor{}
-	for field := range rangeProtoSeq(msg.Fields()) {
+	fields := msg.Fields()
+	for i := 0; i < fields.Len(); i++ {
+		field := fields.Get(i)
+
 		// First, check if this field is directly tagged.
 		tag, _ := proto.GetExtension(field.Options(), tagpb.E_Tag).(*tagpb.Tag)
 		if tag != nil {
