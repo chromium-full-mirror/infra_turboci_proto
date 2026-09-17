@@ -112,3 +112,29 @@ class MutualUntaggedMessageB(_message.Message):
     deeper: MutualUntaggedMessageA
     untagged: str
     def __init__(self, deeper: _Optional[_Union[MutualUntaggedMessageA, _Mapping]] = ..., untagged: _Optional[str] = ...) -> None: ...
+
+class LoopMessageA(_message.Message):
+    __slots__ = ("deeper",)
+    DEEPER_FIELD_NUMBER: _ClassVar[int]
+    deeper: LoopMessageB
+    def __init__(self, deeper: _Optional[_Union[LoopMessageB, _Mapping]] = ...) -> None: ...
+
+class LoopMessageB(_message.Message):
+    __slots__ = ("deeper",)
+    DEEPER_FIELD_NUMBER: _ClassVar[int]
+    deeper: LoopMessageC
+    def __init__(self, deeper: _Optional[_Union[LoopMessageC, _Mapping]] = ...) -> None: ...
+
+class LoopMessageC(_message.Message):
+    __slots__ = ("deeper",)
+    DEEPER_FIELD_NUMBER: _ClassVar[int]
+    deeper: LoopMessageD
+    def __init__(self, deeper: _Optional[_Union[LoopMessageD, _Mapping]] = ...) -> None: ...
+
+class LoopMessageD(_message.Message):
+    __slots__ = ("deeper", "tagged")
+    DEEPER_FIELD_NUMBER: _ClassVar[int]
+    TAGGED_FIELD_NUMBER: _ClassVar[int]
+    deeper: LoopMessageA
+    tagged: str
+    def __init__(self, deeper: _Optional[_Union[LoopMessageA, _Mapping]] = ..., tagged: _Optional[str] = ...) -> None: ...

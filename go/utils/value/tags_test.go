@@ -561,3 +561,43 @@ func TestTagsProto(t *testing.T) {
 		}.Build(), protos[0])
 	})
 }
+
+func TestTagsForConvergence(t *testing.T) {
+	// This test checks that our convergence process actually, you know,
+	// converges. An earlier version had a mistake which resulted in the
+	// convergence loop terminating after a single pass.
+	//
+	// This test sets up a D -> A -> B -> C -> D chain, which forces all four
+	// messages into the toConverge set.
+	//
+	// Because Go iterates maps in a randomized order, it's POSSIBLE for the
+	// buggy implementation to get lucky and visit these in reverse order (it's
+	// about a 4% chance). We clear the pool and run the test 4 times to make the
+	// odds of getting lucky vanishingly small.
+	msg := testingtagspb.LoopMessageD_builder{
+		Tagged: proto.String("d_root"),
+		Deeper: testingtagspb.LoopMessageA_builder{
+			Deeper: testingtagspb.LoopMessageB_builder{
+				Deeper: testingtagspb.LoopMessageC_builder{
+					Deeper: testingtagspb.LoopMessageD_builder{
+						Tagged: proto.String("d_nested"),
+					}.Build(),
+				}.Build(),
+			}.Build(),
+		}.Build(),
+	}.Build()
+
+	want := Tags{
+		"testing.tags.LoopMessageD.tagged": tag("d_nested", "d_root"),
+	}
+
+	for range 10 {
+		tagExtractorPoolMu.Lock()
+		clear(tagExtractorPool)
+		tagExtractorPoolMu.Unlock()
+
+		tags, err := TagsFor(msg)
+		assert.NoErr(t, err)
+		assert.Match(t, want, tags)
+	}
+}

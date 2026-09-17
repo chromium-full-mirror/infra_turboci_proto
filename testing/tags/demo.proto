@@ -85,3 +85,20 @@ message MutualUntaggedMessageB {
   optional MutualUntaggedMessageA deeper = 1;
   optional string untagged = 2;
 }
+
+message LoopMessageA {
+  optional LoopMessageB deeper = 1;
+}
+
+message LoopMessageB {
+  optional LoopMessageC deeper = 1;
+}
+
+message LoopMessageC {
+  optional LoopMessageD deeper = 1;
+}
+
+message LoopMessageD {
+  optional LoopMessageA deeper = 1;
+  optional string tagged = 2 [(turboci.tag) = {}];
+}

@@ -1145,6 +1145,313 @@ func (b0 MutualUntaggedMessageB_builder) Build() *MutualUntaggedMessageB {
 	return m0
 }
 
+type LoopMessageA struct {
+	state             protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Deeper *LoopMessageB          `protobuf:"bytes,1,opt,name=deeper,proto3,oneof"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *LoopMessageA) Reset() {
+	*x = LoopMessageA{}
+	mi := &file_testing_tags_demo_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoopMessageA) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoopMessageA) ProtoMessage() {}
+
+func (x *LoopMessageA) ProtoReflect() protoreflect.Message {
+	mi := &file_testing_tags_demo_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *LoopMessageA) GetDeeper() *LoopMessageB {
+	if x != nil {
+		return x.xxx_hidden_Deeper
+	}
+	return nil
+}
+
+func (x *LoopMessageA) SetDeeper(v *LoopMessageB) {
+	x.xxx_hidden_Deeper = v
+}
+
+func (x *LoopMessageA) HasDeeper() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Deeper != nil
+}
+
+func (x *LoopMessageA) ClearDeeper() {
+	x.xxx_hidden_Deeper = nil
+}
+
+type LoopMessageA_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Deeper *LoopMessageB
+}
+
+func (b0 LoopMessageA_builder) Build() *LoopMessageA {
+	m0 := &LoopMessageA{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Deeper = b.Deeper
+	return m0
+}
+
+type LoopMessageB struct {
+	state             protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Deeper *LoopMessageC          `protobuf:"bytes,1,opt,name=deeper,proto3,oneof"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *LoopMessageB) Reset() {
+	*x = LoopMessageB{}
+	mi := &file_testing_tags_demo_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoopMessageB) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoopMessageB) ProtoMessage() {}
+
+func (x *LoopMessageB) ProtoReflect() protoreflect.Message {
+	mi := &file_testing_tags_demo_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *LoopMessageB) GetDeeper() *LoopMessageC {
+	if x != nil {
+		return x.xxx_hidden_Deeper
+	}
+	return nil
+}
+
+func (x *LoopMessageB) SetDeeper(v *LoopMessageC) {
+	x.xxx_hidden_Deeper = v
+}
+
+func (x *LoopMessageB) HasDeeper() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Deeper != nil
+}
+
+func (x *LoopMessageB) ClearDeeper() {
+	x.xxx_hidden_Deeper = nil
+}
+
+type LoopMessageB_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Deeper *LoopMessageC
+}
+
+func (b0 LoopMessageB_builder) Build() *LoopMessageB {
+	m0 := &LoopMessageB{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Deeper = b.Deeper
+	return m0
+}
+
+type LoopMessageC struct {
+	state             protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Deeper *LoopMessageD          `protobuf:"bytes,1,opt,name=deeper,proto3,oneof"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *LoopMessageC) Reset() {
+	*x = LoopMessageC{}
+	mi := &file_testing_tags_demo_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoopMessageC) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoopMessageC) ProtoMessage() {}
+
+func (x *LoopMessageC) ProtoReflect() protoreflect.Message {
+	mi := &file_testing_tags_demo_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *LoopMessageC) GetDeeper() *LoopMessageD {
+	if x != nil {
+		return x.xxx_hidden_Deeper
+	}
+	return nil
+}
+
+func (x *LoopMessageC) SetDeeper(v *LoopMessageD) {
+	x.xxx_hidden_Deeper = v
+}
+
+func (x *LoopMessageC) HasDeeper() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Deeper != nil
+}
+
+func (x *LoopMessageC) ClearDeeper() {
+	x.xxx_hidden_Deeper = nil
+}
+
+type LoopMessageC_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Deeper *LoopMessageD
+}
+
+func (b0 LoopMessageC_builder) Build() *LoopMessageC {
+	m0 := &LoopMessageC{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Deeper = b.Deeper
+	return m0
+}
+
+type LoopMessageD struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Deeper      *LoopMessageA          `protobuf:"bytes,1,opt,name=deeper,proto3,oneof"`
+	xxx_hidden_Tagged      *string                `protobuf:"bytes,2,opt,name=tagged,proto3,oneof"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *LoopMessageD) Reset() {
+	*x = LoopMessageD{}
+	mi := &file_testing_tags_demo_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoopMessageD) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoopMessageD) ProtoMessage() {}
+
+func (x *LoopMessageD) ProtoReflect() protoreflect.Message {
+	mi := &file_testing_tags_demo_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *LoopMessageD) GetDeeper() *LoopMessageA {
+	if x != nil {
+		return x.xxx_hidden_Deeper
+	}
+	return nil
+}
+
+func (x *LoopMessageD) GetTagged() string {
+	if x != nil {
+		if x.xxx_hidden_Tagged != nil {
+			return *x.xxx_hidden_Tagged
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *LoopMessageD) SetDeeper(v *LoopMessageA) {
+	x.xxx_hidden_Deeper = v
+}
+
+func (x *LoopMessageD) SetTagged(v string) {
+	x.xxx_hidden_Tagged = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *LoopMessageD) HasDeeper() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Deeper != nil
+}
+
+func (x *LoopMessageD) HasTagged() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *LoopMessageD) ClearDeeper() {
+	x.xxx_hidden_Deeper = nil
+}
+
+func (x *LoopMessageD) ClearTagged() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Tagged = nil
+}
+
+type LoopMessageD_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Deeper *LoopMessageA
+	Tagged *string
+}
+
+func (b0 LoopMessageD_builder) Build() *LoopMessageD {
+	m0 := &LoopMessageD{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Deeper = b.Deeper
+	if b.Tagged != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_Tagged = b.Tagged
+	}
+	return m0
+}
+
 type ComplexMessage_SubMessage struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_SubTagged   *string                `protobuf:"bytes,1,opt,name=sub_tagged,json=subTagged,proto3,oneof"`
@@ -1156,7 +1463,7 @@ type ComplexMessage_SubMessage struct {
 
 func (x *ComplexMessage_SubMessage) Reset() {
 	*x = ComplexMessage_SubMessage{}
-	mi := &file_testing_tags_demo_proto_msgTypes[9]
+	mi := &file_testing_tags_demo_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1168,7 +1475,7 @@ func (x *ComplexMessage_SubMessage) String() string {
 func (*ComplexMessage_SubMessage) ProtoMessage() {}
 
 func (x *ComplexMessage_SubMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_testing_tags_demo_proto_msgTypes[9]
+	mi := &file_testing_tags_demo_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1297,14 +1604,28 @@ const file_testing_tags_demo_proto_rawDesc = "" +
 	"\x06deeper\x18\x01 \x01(\v2$.testing.tags.MutualUntaggedMessageAH\x00R\x06deeper\x88\x01\x01\x12\x1f\n" +
 	"\buntagged\x18\x02 \x01(\tH\x01R\buntagged\x88\x01\x01B\t\n" +
 	"\a_deeperB\v\n" +
-	"\t_untagged*G\n" +
+	"\t_untagged\"R\n" +
+	"\fLoopMessageA\x127\n" +
+	"\x06deeper\x18\x01 \x01(\v2\x1a.testing.tags.LoopMessageBH\x00R\x06deeper\x88\x01\x01B\t\n" +
+	"\a_deeper\"R\n" +
+	"\fLoopMessageB\x127\n" +
+	"\x06deeper\x18\x01 \x01(\v2\x1a.testing.tags.LoopMessageCH\x00R\x06deeper\x88\x01\x01B\t\n" +
+	"\a_deeper\"R\n" +
+	"\fLoopMessageC\x127\n" +
+	"\x06deeper\x18\x01 \x01(\v2\x1a.testing.tags.LoopMessageDH\x00R\x06deeper\x88\x01\x01B\t\n" +
+	"\a_deeper\"\x82\x01\n" +
+	"\fLoopMessageD\x127\n" +
+	"\x06deeper\x18\x01 \x01(\v2\x1a.testing.tags.LoopMessageAH\x00R\x06deeper\x88\x01\x01\x12#\n" +
+	"\x06tagged\x18\x02 \x01(\tB\x06ʅ\xf6\xfb\x0f\x00H\x01R\x06tagged\x88\x01\x01B\t\n" +
+	"\a_deeperB\t\n" +
+	"\a_tagged*G\n" +
 	"\bTestEnum\x12\x15\n" +
 	"\x11TEST_ENUM_UNKNOWN\x10\x00\x12\x11\n" +
 	"\rTEST_ENUM_ONE\x10\x01\x12\x11\n" +
 	"\rTEST_ENUM_TWO\x10\x02B?P\x01Z;go.chromium.org/turboci/proto/go/testing/tags;testingtagspbb\x06proto3"
 
 var file_testing_tags_demo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_testing_tags_demo_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_testing_tags_demo_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_testing_tags_demo_proto_goTypes = []any{
 	(TestEnum)(0),                     // 0: testing.tags.TestEnum
 	(*MyMessage)(nil),                 // 1: testing.tags.MyMessage
@@ -1316,26 +1637,34 @@ var file_testing_tags_demo_proto_goTypes = []any{
 	(*MutualMessageB)(nil),            // 7: testing.tags.MutualMessageB
 	(*MutualUntaggedMessageA)(nil),    // 8: testing.tags.MutualUntaggedMessageA
 	(*MutualUntaggedMessageB)(nil),    // 9: testing.tags.MutualUntaggedMessageB
-	(*ComplexMessage_SubMessage)(nil), // 10: testing.tags.ComplexMessage.SubMessage
-	nil,                               // 11: testing.tags.ComplexMessage.MapSubEntry
+	(*LoopMessageA)(nil),              // 10: testing.tags.LoopMessageA
+	(*LoopMessageB)(nil),              // 11: testing.tags.LoopMessageB
+	(*LoopMessageC)(nil),              // 12: testing.tags.LoopMessageC
+	(*LoopMessageD)(nil),              // 13: testing.tags.LoopMessageD
+	(*ComplexMessage_SubMessage)(nil), // 14: testing.tags.ComplexMessage.SubMessage
+	nil,                               // 15: testing.tags.ComplexMessage.MapSubEntry
 }
 var file_testing_tags_demo_proto_depIdxs = []int32{
 	0,  // 0: testing.tags.ComplexMessage.local_enum:type_name -> testing.tags.TestEnum
-	11, // 1: testing.tags.ComplexMessage.map_sub:type_name -> testing.tags.ComplexMessage.MapSubEntry
-	10, // 2: testing.tags.ComplexMessage.rep_sub:type_name -> testing.tags.ComplexMessage.SubMessage
-	10, // 3: testing.tags.ComplexMessage.sub:type_name -> testing.tags.ComplexMessage.SubMessage
+	15, // 1: testing.tags.ComplexMessage.map_sub:type_name -> testing.tags.ComplexMessage.MapSubEntry
+	14, // 2: testing.tags.ComplexMessage.rep_sub:type_name -> testing.tags.ComplexMessage.SubMessage
+	14, // 3: testing.tags.ComplexMessage.sub:type_name -> testing.tags.ComplexMessage.SubMessage
 	4,  // 4: testing.tags.RecursiveMessage.deeper:type_name -> testing.tags.RecursiveMessage
 	5,  // 5: testing.tags.RecursiveUntaggedMessage.deeper:type_name -> testing.tags.RecursiveUntaggedMessage
 	7,  // 6: testing.tags.MutualMessageA.deeper:type_name -> testing.tags.MutualMessageB
 	6,  // 7: testing.tags.MutualMessageB.deeper:type_name -> testing.tags.MutualMessageA
 	9,  // 8: testing.tags.MutualUntaggedMessageA.deeper:type_name -> testing.tags.MutualUntaggedMessageB
 	8,  // 9: testing.tags.MutualUntaggedMessageB.deeper:type_name -> testing.tags.MutualUntaggedMessageA
-	10, // 10: testing.tags.ComplexMessage.MapSubEntry.value:type_name -> testing.tags.ComplexMessage.SubMessage
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	11, // 10: testing.tags.LoopMessageA.deeper:type_name -> testing.tags.LoopMessageB
+	12, // 11: testing.tags.LoopMessageB.deeper:type_name -> testing.tags.LoopMessageC
+	13, // 12: testing.tags.LoopMessageC.deeper:type_name -> testing.tags.LoopMessageD
+	10, // 13: testing.tags.LoopMessageD.deeper:type_name -> testing.tags.LoopMessageA
+	14, // 14: testing.tags.ComplexMessage.MapSubEntry.value:type_name -> testing.tags.ComplexMessage.SubMessage
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_testing_tags_demo_proto_init() }
@@ -1353,13 +1682,17 @@ func file_testing_tags_demo_proto_init() {
 	file_testing_tags_demo_proto_msgTypes[7].OneofWrappers = []any{}
 	file_testing_tags_demo_proto_msgTypes[8].OneofWrappers = []any{}
 	file_testing_tags_demo_proto_msgTypes[9].OneofWrappers = []any{}
+	file_testing_tags_demo_proto_msgTypes[10].OneofWrappers = []any{}
+	file_testing_tags_demo_proto_msgTypes[11].OneofWrappers = []any{}
+	file_testing_tags_demo_proto_msgTypes[12].OneofWrappers = []any{}
+	file_testing_tags_demo_proto_msgTypes[13].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_testing_tags_demo_proto_rawDesc), len(file_testing_tags_demo_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   11,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

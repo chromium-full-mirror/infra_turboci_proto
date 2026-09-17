@@ -389,7 +389,8 @@ func fixupConvergence(
 	toAdd map[protoreflect.MessageDescriptor]tagExtractorPoolEntry,
 	toConverge map[protoreflect.FieldDescriptor]protoreflect.MessageDescriptor,
 ) {
-	for siz := len(toConverge) + 1; len(toConverge) < siz; siz = len(toConverge) {
+	for prevLen := -1; len(toConverge) != prevLen; {
+		prevLen = len(toConverge)
 		for field, subMsg := range toConverge {
 			if ext := toAdd[subMsg].extractor; ext != nil {
 				parentMsg := field.ContainingMessage()
