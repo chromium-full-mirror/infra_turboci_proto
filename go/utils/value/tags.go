@@ -42,33 +42,20 @@ func TagsFor(msg proto.Message) (Tags, error) {
 // process.
 type tagValue struct{ encodedTagValue string }
 
-func makeTagValue(value any) (tagValue, bool) {
-	tv := &orchestratorpb.Tag_Value{}
-	switch v := value.(type) {
-	case *orchestratorpb.Tag_Value:
-		tv = v
-		if !tv.HasData() {
-			return tagValue{}, false
-		}
-		if tv.HasScope() || tv.HasDuplicateCount() {
-			tv = proto.CloneOf(tv)
-			tv.ClearScope()
-			tv.ClearDuplicateCount()
-		}
-	case string:
-		tv.SetStrValue(v)
-	case bool:
-		tv.SetBoolValue(v)
-	case int:
-		tv.SetIntValue(int64(v))
-	case int64:
-		tv.SetIntValue(int64(v))
-	case int32:
-		tv.SetIntValue(int64(v))
-	case uint32:
-		tv.SetIntValue(int64(v))
-	default:
+// makeTagValue makes a `tagValue` from a Tag_Value proto.
+//
+// Ignores duplicate count and scope.
+//
+// Returns the encoded value plus OK (which can only be false if `tv` does not
+// have the `data` oneof set to anything).
+func makeTagValue(tv *orchestratorpb.Tag_Value) (tagValue, bool) {
+	if !tv.HasData() {
 		return tagValue{}, false
+	}
+	if tv.HasScope() || tv.HasDuplicateCount() {
+		tv = proto.CloneOf(tv)
+		tv.ClearScope()
+		tv.ClearDuplicateCount()
 	}
 	enc, err := proto.MarshalOptions{Deterministic: true}.Marshal(tv)
 	if err != nil {
@@ -172,7 +159,7 @@ func (t *Tag) Values() []*orchestratorpb.Tag_Value {
 //
 // If the value is an invalid type or does not exist in this tag, count is zero.
 func (t *Tag) HasValue(value any) (count uint32, scope orchestratorpb.ReadScope) {
-	enc, ok := makeTagValue(value)
+	enc, ok := makeTagValue(newTagValue(value, 0))
 	if !ok {
 		return 0, 0
 	}
@@ -181,15 +168,6 @@ func (t *Tag) HasValue(value any) (count uint32, scope orchestratorpb.ReadScope)
 		return 0, 0
 	}
 	return got.count, got.scope
-}
-
-// NewTag constructs a Tag given enumeration of its values.
-func NewTag(tv ...*orchestratorpb.Tag_Value) *Tag {
-	t := &Tag{values: make(map[tagValue]*scopeCount, len(tv))}
-	for _, v := range tv {
-		t.AddValue(v)
-	}
-	return t
 }
 
 func (t *Tag) getScopeCount(tv tagValue) *scopeCount {
@@ -226,6 +204,17 @@ func (t *Tag) Proto(key string) *orchestratorpb.Tag {
 // protos.
 type Tags map[string]*Tag
 
+// MakeTags is a helper function for:
+//
+//	t := Tags{}
+//	t.Add(slices.Values(tags))
+//	return t
+func MakeTags(tags ...*orchestratorpb.Tag) Tags {
+	t := Tags{}
+	t.Add(slices.Values(tags))
+	return t
+}
+
 // Proto converts this Tags into a normalized list of orchestratorpb.Tag protos.
 func (t Tags) Proto() []*orchestratorpb.Tag {
 	ret := make([]*orchestratorpb.Tag, 0, len(t))
@@ -247,7 +236,8 @@ func (t Tags) getData(key string) *Tag {
 	return cur
 }
 
-// Add adds tag data in proto form, merging tags with identical keys.
+// Add adds tag data in proto form from an iter, merging tags with
+// identical keys.
 func (t Tags) Add(tags iter.Seq[*orchestratorpb.Tag]) {
 	for tag := range tags {
 		dat := t.getData(tag.GetKey())
@@ -256,4 +246,58 @@ func (t Tags) Add(tags iter.Seq[*orchestratorpb.Tag]) {
 			dat.AddValue(value)
 		}
 	}
+}
+
+// newTagValue makes a new Tag_Value with optional `scope`.
+func newTagValue(v any, scope orchestratorpb.ReadScope) *orchestratorpb.Tag_Value {
+	tv := &orchestratorpb.Tag_Value{}
+	if scope != 0 {
+		tv.SetScope(scope)
+	}
+	switch v := any(v).(type) {
+	case *orchestratorpb.Tag_Value:
+		return v
+	case string:
+		tv.SetStrValue(v)
+	case bool:
+		tv.SetBoolValue(v)
+	case int:
+		tv.SetIntValue(int64(v))
+	case int32:
+		tv.SetIntValue(int64(v))
+	case int64:
+		tv.SetIntValue(int64(v))
+	case uint32:
+		tv.SetIntValue(int64(v))
+	default:
+		panic(fmt.Errorf("unsupported TagValue type: %T", v))
+	}
+	return tv
+}
+
+// TagBuilder allows easier construction of a Tag.
+type TagBuilder struct {
+	Key string
+
+	KeyScope   orchestratorpb.ReadScope
+	ValueScope orchestratorpb.ReadScope
+
+	Strings []string
+	Bools   []bool
+	Ints    []int
+}
+
+// Build renders the TagTemplate to a Tag.
+func (t TagBuilder) Build() *orchestratorpb.Tag {
+	tg := Tag{Scope: t.KeyScope}
+	for _, val := range t.Strings {
+		tg.AddValue(newTagValue(val, t.ValueScope))
+	}
+	for _, val := range t.Bools {
+		tg.AddValue(newTagValue(val, t.ValueScope))
+	}
+	for _, val := range t.Ints {
+		tg.AddValue(newTagValue(val, t.ValueScope))
+	}
+	return tg.Proto(t.Key)
 }

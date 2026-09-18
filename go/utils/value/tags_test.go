@@ -5,7 +5,6 @@
 package value
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -19,7 +18,6 @@ import (
 )
 
 const (
-	valueRef = orchestratorpb.ReadScope_READ_SCOPE_VALUE_REF
 	node     = orchestratorpb.ReadScope_READ_SCOPE_NODE
 	workPlan = orchestratorpb.ReadScope_READ_SCOPE_WORK_PLAN
 )
@@ -31,49 +29,6 @@ func init() {
 	))
 }
 
-type taggableValue interface {
-	~string | ~bool | ~int | ~int32 | ~int64 | ~uint32 | tagValue
-}
-
-func tagVal[T taggableValue](v T) tagValue {
-	var tv *orchestratorpb.Tag_Value
-	switch v := any(v).(type) {
-	case tagValue:
-		return v
-	case string:
-		tv = orchestratorpb.Tag_Value_builder{StrValue: proto.String(v)}.Build()
-	case bool:
-		tv = orchestratorpb.Tag_Value_builder{BoolValue: proto.Bool(v)}.Build()
-	case int:
-		tv = orchestratorpb.Tag_Value_builder{IntValue: proto.Int64(int64(v))}.Build()
-	case int64:
-		tv = orchestratorpb.Tag_Value_builder{IntValue: proto.Int64(v)}.Build()
-	case int32:
-		tv = orchestratorpb.Tag_Value_builder{IntValue: proto.Int64(int64(v))}.Build()
-	case uint32:
-		tv = orchestratorpb.Tag_Value_builder{IntValue: proto.Int64(int64(v))}.Build()
-	default:
-		panic(fmt.Errorf("unsupported tagVal type: %T", v))
-	}
-	enc, ok := makeTagValue(tv)
-	if !ok {
-		panic(fmt.Errorf("failed to make TagValue from %v", v))
-	}
-	return enc
-}
-
-func tag[T taggableValue](vals ...T) *Tag {
-	return scopedTag(valueRef, valueRef, vals...)
-}
-
-func scopedTag[T taggableValue](keyScope, valScope orchestratorpb.ReadScope, vals ...T) *Tag {
-	t := &Tag{Scope: keyScope}
-	for _, v := range vals {
-		t.getScopeCount(tagVal(v)).increment(valScope, 1)
-	}
-	return t
-}
-
 func TestTagsFor(t *testing.T) {
 	t.Parallel()
 
@@ -82,6 +37,9 @@ func TestTagsFor(t *testing.T) {
 		msg      proto.Message
 		wantErr  string
 		wantTags Tags
+		// extraAssert is called after comparing to wantTags to allow additional
+		// assertions.
+		extraAssert func(t *testing.T, tags Tags)
 	}{
 		{
 			name: "nil",
@@ -102,86 +60,139 @@ func TestTagsFor(t *testing.T) {
 			msg: testingtagspb.MyMessage_builder{
 				TaggedField: proto.String("hello"),
 			}.Build(),
-			wantTags: Tags{
-				"testing.tags.MyMessage.tagged_field": tag("hello"),
-			},
+			wantTags: MakeTags(
+				TagBuilder{
+					Key:     "testing.tags.MyMessage.tagged_field",
+					Strings: []string{"hello"},
+				}.Build(),
+			),
 		},
 		{
 			name: "ComplexMessage.local_str",
 			msg: testingtagspb.ComplexMessage_builder{
 				LocalStr: proto.String("foo"),
 			}.Build(),
-			wantTags: Tags{
-				"testing.tags.ComplexMessage.local_str": tag("foo"),
+			wantTags: MakeTags(
+				TagBuilder{
+					Key:     "testing.tags.ComplexMessage.local_str",
+					Strings: []string{"foo"},
+				}.Build(),
+
 				// NOTE: local_bool captures false even when unset.
-				"testing.tags.ComplexMessage.local_bool": tag(false),
-			},
+				TagBuilder{
+					Key:   "testing.tags.ComplexMessage.local_bool",
+					Bools: []bool{false},
+				}.Build(),
+			),
 		},
 		{
 			name: "ComplexMessage.workplan_str",
 			msg: testingtagspb.ComplexMessage_builder{
 				WorkplanStr: proto.String("foo"),
 			}.Build(),
-			wantTags: Tags{
+			wantTags: MakeTags(
 				// because it's set to value_scope=NODE, both the key and value are
 				// set to NODE.
-				"testing.tags.ComplexMessage.workplan_str": scopedTag(node, node, "foo"),
+				TagBuilder{
+					Key:        "testing.tags.ComplexMessage.workplan_str",
+					KeyScope:   node,
+					ValueScope: node,
+					Strings:    []string{"foo"},
+				}.Build(),
+
 				// NOTE: local_bool captures false even when unset.
-				"testing.tags.ComplexMessage.local_bool": tag(false),
-			},
+				TagBuilder{
+					Key:   "testing.tags.ComplexMessage.local_bool",
+					Bools: []bool{false},
+				}.Build(),
+			),
 		},
 		{
 			name: "ComplexMessage.global_str",
 			msg: testingtagspb.ComplexMessage_builder{
 				GlobalStr: proto.String("foo"),
 			}.Build(),
-			wantTags: Tags{
+			wantTags: MakeTags(
 				// because it's set to value_scope=WORK_PLAN, both the key and value are
 				// set to WORK_PLAN.
-				"testing.tags.ComplexMessage.global_str": scopedTag(workPlan, workPlan, "foo"),
+				TagBuilder{
+					Key:        "testing.tags.ComplexMessage.global_str",
+					KeyScope:   workPlan,
+					ValueScope: workPlan,
+					Strings:    []string{"foo"},
+				}.Build(),
+
 				// NOTE: local_bool captures false even when unset.
-				"testing.tags.ComplexMessage.local_bool": tag(false),
-			},
+				TagBuilder{
+					Key:   "testing.tags.ComplexMessage.local_bool",
+					Bools: []bool{false},
+				}.Build(),
+			),
 		},
 		{
 			name: "ComplexMessage.local_bool=true",
 			msg: testingtagspb.ComplexMessage_builder{
 				LocalBool: proto.Bool(true),
 			}.Build(),
-			wantTags: Tags{
-				"testing.tags.ComplexMessage.local_bool": tag(true),
-			},
+			wantTags: MakeTags(
+				TagBuilder{
+					Key:   "testing.tags.ComplexMessage.local_bool",
+					Bools: []bool{true},
+				}.Build(),
+			),
 		},
 		{
 			name: "ComplexMessage.local_bool__unset",
 			msg:  testingtagspb.ComplexMessage_builder{}.Build(),
-			wantTags: Tags{
+			wantTags: MakeTags(
 				// NOTE: local_bool captures false even when unset.
-				"testing.tags.ComplexMessage.local_bool": tag(false),
-			},
+				TagBuilder{
+					Key:   "testing.tags.ComplexMessage.local_bool",
+					Bools: []bool{false},
+				}.Build(),
+			),
 		},
 		{
 			name: "ComplexMessage.local_enum",
 			msg: testingtagspb.ComplexMessage_builder{
 				LocalEnum: testingtagspb.TestEnum_TEST_ENUM_ONE.Enum(),
 			}.Build(),
-			wantTags: Tags{
+			wantTags: MakeTags(
 				// We pick up the numeric and string representations of the enum.
-				"testing.tags.ComplexMessage.local_enum": tag(tagVal(1), tagVal("TEST_ENUM_ONE")),
+				TagBuilder{
+					Key:     "testing.tags.ComplexMessage.local_enum",
+					Strings: []string{"TEST_ENUM_ONE"},
+					Ints:    []int{1},
+				}.Build(),
+
 				// NOTE: local_bool captures false even when unset.
-				"testing.tags.ComplexMessage.local_bool": tag(false),
-			},
+				TagBuilder{
+					Key:   "testing.tags.ComplexMessage.local_bool",
+					Bools: []bool{false},
+				}.Build(),
+			),
 		},
 		{
 			name: "ComplexMessage.rep_str",
 			msg: testingtagspb.ComplexMessage_builder{
 				RepStr: []string{"c", "a", "b", "a"},
 			}.Build(),
-			wantTags: Tags{
+			wantTags: MakeTags(
 				// Sorted and unique values.
-				"testing.tags.ComplexMessage.rep_str": tag("a", "a", "b", "c"),
+				TagBuilder{
+					Key:     "testing.tags.ComplexMessage.rep_str",
+					Strings: []string{"a", "a", "b", "c"},
+				}.Build(),
+
 				// NOTE: local_bool captures false even when unset.
-				"testing.tags.ComplexMessage.local_bool": tag(false),
+				TagBuilder{
+					Key:   "testing.tags.ComplexMessage.local_bool",
+					Bools: []bool{false},
+				}.Build(),
+			),
+			extraAssert: func(t *testing.T, tags Tags) {
+				count, _ := tags["testing.tags.ComplexMessage.rep_str"].HasValue("a")
+				assert.Equal(t, uint32(2), count)
 			},
 		},
 		{
@@ -193,14 +204,23 @@ func TestTagsFor(t *testing.T) {
 					"k3": testingtagspb.ComplexMessage_SubMessage_builder{SubTagged: proto.String("sub1")}.Build(),
 				},
 			}.Build(),
-			wantTags: Tags{
+			wantTags: MakeTags(
 				// Note that the keys are ignored and the values are collapsed.
-				"testing.tags.ComplexMessage.SubMessage.sub_tagged": tag("sub1", "sub1", "sub2"),
+				TagBuilder{
+					Key:     "testing.tags.ComplexMessage.SubMessage.sub_tagged",
+					Strings: []string{"sub1", "sub1", "sub2"},
+				}.Build(),
 				// This field also has an alt_key, so it's duplicated to the previous key.
-				"previous.package.name.Message.field": tag("sub1", "sub1", "sub2"),
+				TagBuilder{
+					Key:     "previous.package.name.Message.field",
+					Strings: []string{"sub1", "sub1", "sub2"},
+				}.Build(),
 				// NOTE: local_bool captures false even when unset.
-				"testing.tags.ComplexMessage.local_bool": tag(false),
-			},
+				TagBuilder{
+					Key:   "testing.tags.ComplexMessage.local_bool",
+					Bools: []bool{false},
+				}.Build(),
+			),
 		},
 		{
 			name: "ComplexMessage.rep_sub",
@@ -211,14 +231,23 @@ func TestTagsFor(t *testing.T) {
 					testingtagspb.ComplexMessage_SubMessage_builder{SubTagged: proto.String("sub1")}.Build(),
 				},
 			}.Build(),
-			wantTags: Tags{
+			wantTags: MakeTags(
 				// Values are collapsed.
-				"testing.tags.ComplexMessage.SubMessage.sub_tagged": tag("sub1", "sub1", "sub2"),
+				TagBuilder{
+					Key:     "testing.tags.ComplexMessage.SubMessage.sub_tagged",
+					Strings: []string{"sub1", "sub1", "sub2"},
+				}.Build(),
 				// This field also has an alt_key, so it's duplicated to the previous key.
-				"previous.package.name.Message.field": tag("sub1", "sub1", "sub2"),
+				TagBuilder{
+					Key:     "previous.package.name.Message.field",
+					Strings: []string{"sub1", "sub1", "sub2"},
+				}.Build(),
 				// NOTE: local_bool captures false even when unset.
-				"testing.tags.ComplexMessage.local_bool": tag(false),
-			},
+				TagBuilder{
+					Key:   "testing.tags.ComplexMessage.local_bool",
+					Bools: []bool{false},
+				}.Build(),
+			),
 		},
 		{
 			name: "ComplexMessage.sub",
@@ -227,26 +256,43 @@ func TestTagsFor(t *testing.T) {
 					SubTagged: proto.String("hi"),
 				}.Build(),
 			}.Build(),
-			wantTags: Tags{
-				"testing.tags.ComplexMessage.SubMessage.sub_tagged": tag("hi"),
+			wantTags: MakeTags(
+				TagBuilder{
+					Key:     "testing.tags.ComplexMessage.SubMessage.sub_tagged",
+					Strings: []string{"hi"},
+				}.Build(),
 				// This field also has an alt_key, so it's duplicated to the previous key.
-				"previous.package.name.Message.field": tag("hi"),
+				TagBuilder{
+					Key:     "previous.package.name.Message.field",
+					Strings: []string{"hi"},
+				}.Build(),
 				// NOTE: local_bool captures false even when unset.
-				"testing.tags.ComplexMessage.local_bool": tag(false),
-			},
+				TagBuilder{
+					Key:   "testing.tags.ComplexMessage.local_bool",
+					Bools: []bool{false},
+				}.Build(),
+			),
 		},
 		{
 			name: "ComplexMessage.split_index",
 			msg: testingtagspb.ComplexMessage_builder{
 				SplitIndex: proto.Int64(123),
 			}.Build(),
-			wantTags: Tags{
+			wantTags: MakeTags(
 				// This has the key indexed at the WORK_PLAN level, but the value is
 				// only indexed at the NODE level.
-				"testing.tags.ComplexMessage.split_index": scopedTag(workPlan, node, 123),
+				TagBuilder{
+					Key:        "testing.tags.ComplexMessage.split_index",
+					KeyScope:   workPlan,
+					ValueScope: node,
+					Ints:       []int{123},
+				}.Build(),
 				// NOTE: local_bool captures false even when unset.
-				"testing.tags.ComplexMessage.local_bool": tag(false),
-			},
+				TagBuilder{
+					Key:   "testing.tags.ComplexMessage.local_bool",
+					Bools: []bool{false},
+				}.Build(),
+			),
 		},
 		{
 			name: "ComplexMessage.MULTIPLE",
@@ -271,17 +317,51 @@ func TestTagsFor(t *testing.T) {
 				SplitIndex: proto.Int64(123),
 				// ExplicitPresenceBool does NOT get picked up by default.
 			}.Build(),
-			wantTags: Tags{
-				"testing.tags.ComplexMessage.local_str":             tag("foo"),
-				"testing.tags.ComplexMessage.workplan_str":          scopedTag(node, node, "wp"),
-				"testing.tags.ComplexMessage.global_str":            scopedTag(workPlan, workPlan, "bar"),
-				"testing.tags.ComplexMessage.local_bool":            tag(false),
-				"testing.tags.ComplexMessage.local_enum":            tag(tagVal(1), tagVal("TEST_ENUM_ONE")),
-				"testing.tags.ComplexMessage.rep_str":               tag("a", "a", "b", "c"),
-				"testing.tags.ComplexMessage.split_index":           scopedTag(workPlan, node, 123),
-				"testing.tags.ComplexMessage.SubMessage.sub_tagged": tag("rep1", "rep2", "single", "sub1", "sub2"),
-				"previous.package.name.Message.field":               tag("rep1", "rep2", "single", "sub1", "sub2"),
-			},
+			wantTags: MakeTags(
+				TagBuilder{
+					Key:     "testing.tags.ComplexMessage.local_str",
+					Strings: []string{"foo"},
+				}.Build(),
+				TagBuilder{
+					Key:        "testing.tags.ComplexMessage.workplan_str",
+					KeyScope:   node,
+					ValueScope: node,
+					Strings:    []string{"wp"},
+				}.Build(),
+				TagBuilder{
+					Key:        "testing.tags.ComplexMessage.global_str",
+					KeyScope:   workPlan,
+					ValueScope: workPlan,
+					Strings:    []string{"bar"},
+				}.Build(),
+				TagBuilder{
+					Key:   "testing.tags.ComplexMessage.local_bool",
+					Bools: []bool{false},
+				}.Build(),
+				TagBuilder{
+					Key:     "testing.tags.ComplexMessage.local_enum",
+					Strings: []string{"TEST_ENUM_ONE"},
+					Ints:    []int{1},
+				}.Build(),
+				TagBuilder{
+					Key:     "testing.tags.ComplexMessage.rep_str",
+					Strings: []string{"a", "a", "b", "c"},
+				}.Build(),
+				TagBuilder{
+					Key:        "testing.tags.ComplexMessage.split_index",
+					KeyScope:   workPlan,
+					ValueScope: node,
+					Ints:       []int{123},
+				}.Build(),
+				TagBuilder{
+					Key:     "testing.tags.ComplexMessage.SubMessage.sub_tagged",
+					Strings: []string{"rep1", "rep2", "single", "sub1", "sub2"},
+				}.Build(),
+				TagBuilder{
+					Key:     "previous.package.name.Message.field",
+					Strings: []string{"rep1", "rep2", "single", "sub1", "sub2"},
+				}.Build(),
+			),
 		},
 		{
 			name: "unsupported_kind",
@@ -301,9 +381,12 @@ func TestTagsFor(t *testing.T) {
 					}.Build(),
 				}.Build(),
 			}.Build(),
-			wantTags: Tags{
-				"testing.tags.RecursiveMessage.tagged": tag("level1", "level2", "root"),
-			},
+			wantTags: MakeTags(
+				TagBuilder{
+					Key:     "testing.tags.RecursiveMessage.tagged",
+					Strings: []string{"level1", "level2", "root"},
+				}.Build(),
+			),
 		},
 		{
 			name: "RecursiveUntaggedMessage",
@@ -329,9 +412,12 @@ func TestTagsFor(t *testing.T) {
 					}.Build(),
 				}.Build(),
 			}.Build(),
-			wantTags: Tags{
-				"testing.tags.MutualMessageB.tagged": tag("b_level1", "b_level2"),
-			},
+			wantTags: MakeTags(
+				TagBuilder{
+					Key:     "testing.tags.MutualMessageB.tagged",
+					Strings: []string{"b_level1", "b_level2"},
+				}.Build(),
+			),
 		},
 		{
 			name: "MutualMessageB_with_nested_tags",
@@ -343,9 +429,12 @@ func TestTagsFor(t *testing.T) {
 					}.Build(),
 				}.Build(),
 			}.Build(),
-			wantTags: Tags{
-				"testing.tags.MutualMessageB.tagged": tag("b_nested", "b_root"),
-			},
+			wantTags: MakeTags(
+				TagBuilder{
+					Key:     "testing.tags.MutualMessageB.tagged",
+					Strings: []string{"b_nested", "b_root"},
+				}.Build(),
+			),
 		},
 		{
 			name: "MutualUntaggedMessageA",
@@ -383,6 +472,9 @@ func TestTagsFor(t *testing.T) {
 			} else {
 				assert.NoErr(t, err)
 				assert.Match(t, tc.wantTags, tags)
+				if tc.extraAssert != nil {
+					tc.extraAssert(t, tags)
+				}
 			}
 		})
 	}
@@ -394,10 +486,15 @@ func TestTagsProto(t *testing.T) {
 	t.Run("basic", func(t *testing.T) {
 		t.Parallel()
 
-		tags := Tags{
-			"my.tag": scopedTag(workPlan, node, tagVal("val1"), tagVal(42), tagVal("val1")),
-		}
-		protos := tags.Proto()
+		protos := MakeTags(
+			TagBuilder{
+				Key:        "my.tag",
+				KeyScope:   workPlan,
+				ValueScope: node,
+				Strings:    []string{"val1", "val1"},
+				Ints:       []int{42},
+			}.Build(),
+		).Proto()
 		assert.Len(t, protos, 1)
 		assert.Match(t, orchestratorpb.Tag_builder{
 			Key:   proto.String("my.tag"),
@@ -419,10 +516,20 @@ func TestTagsProto(t *testing.T) {
 	t.Run("strings_sorted_lexicographically", func(t *testing.T) {
 		t.Parallel()
 
-		tags := Tags{
-			"my.tag": scopedTag(workPlan, node, "zebra", "", "banana", "apple", "banana"),
-		}
-		protos := tags.Proto()
+		protos := MakeTags(
+			TagBuilder{
+				Key:        "my.tag",
+				KeyScope:   workPlan,
+				ValueScope: node,
+				Strings: []string{
+					"zebra",
+					"",
+					"banana",
+					"apple",
+					"banana",
+				},
+			}.Build(),
+		).Proto()
 		assert.Len(t, protos, 1)
 		assert.Match(t, orchestratorpb.Tag_builder{
 			Key:   proto.String("my.tag"),
@@ -452,10 +559,14 @@ func TestTagsProto(t *testing.T) {
 	t.Run("booleans_false_before_true", func(t *testing.T) {
 		t.Parallel()
 
-		tags := Tags{
-			"my.tag": scopedTag(workPlan, node, true, false, true),
-		}
-		protos := tags.Proto()
+		protos := MakeTags(
+			TagBuilder{
+				Key:        "my.tag",
+				KeyScope:   workPlan,
+				ValueScope: node,
+				Bools:      []bool{true, false, true},
+			}.Build(),
+		).Proto()
 		assert.Len(t, protos, 1)
 		assert.Match(t, orchestratorpb.Tag_builder{
 			Key:   proto.String("my.tag"),
@@ -477,10 +588,14 @@ func TestTagsProto(t *testing.T) {
 	t.Run("integers_sorted_numerically", func(t *testing.T) {
 		t.Parallel()
 
-		tags := Tags{
-			"my.tag": scopedTag(workPlan, node, 42, -100, 0, 10, -100),
-		}
-		protos := tags.Proto()
+		protos := MakeTags(
+			TagBuilder{
+				Key:        "my.tag",
+				KeyScope:   workPlan,
+				ValueScope: node,
+				Ints:       []int{42, -100, 0, 10, -100},
+			}.Build(),
+		).Proto()
 		assert.Len(t, protos, 1)
 		assert.Match(t, orchestratorpb.Tag_builder{
 			Key:   proto.String("my.tag"),
@@ -510,21 +625,17 @@ func TestTagsProto(t *testing.T) {
 	t.Run("mixed_type_ordering", func(t *testing.T) {
 		t.Parallel()
 
-		// StrValue (case 3) < BoolValue (case 4) < IntValue (case 5).
-		// Input values are provided in scrambled order across types.
-		tags := Tags{
-			"my.tag": scopedTag(workPlan, node,
-				tagVal(100),
-				tagVal("zebra"),
-				tagVal(true),
-				tagVal(-5),
-				tagVal("apple"),
-				tagVal(false),
-				tagVal("apple"),
-				tagVal(0),
-			),
-		}
-		protos := tags.Proto()
+		// StrValue < BoolValue < IntValue.
+		protos := MakeTags(
+			TagBuilder{
+				Key:        "my.tag",
+				KeyScope:   workPlan,
+				ValueScope: node,
+				Ints:       []int{100, -5, 0},
+				Strings:    []string{"zebra", "apple", "apple"},
+				Bools:      []bool{true, false},
+			}.Build(),
+		).Proto()
 		assert.Len(t, protos, 1)
 		assert.Match(t, orchestratorpb.Tag_builder{
 			Key:   proto.String("my.tag"),
@@ -592,9 +703,12 @@ func TestTagsForConvergence(t *testing.T) {
 		}.Build(),
 	}.Build()
 
-	want := Tags{
-		"testing.tags.LoopMessageD.tagged": tag("d_nested", "d_root"),
-	}
+	want := MakeTags(
+		TagBuilder{
+			Key:     "testing.tags.LoopMessageD.tagged",
+			Strings: []string{"d_nested", "d_root"},
+		}.Build(),
+	)
 
 	for range 10 {
 		tagExtractorPoolMu.Lock()
