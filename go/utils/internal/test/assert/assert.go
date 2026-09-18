@@ -42,12 +42,19 @@ func Equal[T comparable](t *testing.T, want, got T) {
 	}
 }
 
+// DefaultOptions will be added to the options in Match.
+//
+// Only update this at init()-time. Updating this while tests run is likely
+// to cause a data race.
+var DefaultOptions []cmp.Option
+
 // Match fails the test if got and want do not match.
 // It uses go-cmp and automatically handles proto messages correctly.
 // Additional cmp.Options can be passed (e.g., protocmp.IgnoreUnknown()).
 func Match(t *testing.T, want, got any, opts ...cmp.Option) {
 	t.Helper()
 	allOpts := append([]cmp.Option{protocmp.Transform()}, opts...)
+	allOpts = append(allOpts, DefaultOptions...)
 	if diff := cmp.Diff(want, got, allOpts...); diff != "" {
 		t.Errorf("Mismatch (-want +got):\n%s", diff)
 	}

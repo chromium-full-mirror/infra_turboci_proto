@@ -35,31 +35,50 @@ func TagsFor(msg proto.Message) (Tags, error) {
 	return ret, nil
 }
 
-// TagValue is an encoded orchestratorpb.Tag_Value containing only the Value
+// tagValue is an encoded orchestratorpb.Tag_Value containing only the Value
 // oneof in the message (no Scope).
 //
 // This exists only to facilitate its use as a Go map key within the current
 // process.
-type TagValue struct{ encodedTagValue string }
+type tagValue struct{ encodedTagValue string }
 
-func makeTagValue(tv *orchestratorpb.Tag_Value) (TagValue, orchestratorpb.ReadScope, bool) {
-	if !tv.HasData() {
-		return TagValue{}, 0, false
-	}
-	scope := tv.GetScope()
-	if tv.HasScope() {
-		tv = proto.CloneOf(tv)
-		tv.ClearScope()
+func makeTagValue(value any) (tagValue, bool) {
+	tv := &orchestratorpb.Tag_Value{}
+	switch v := value.(type) {
+	case *orchestratorpb.Tag_Value:
+		tv = v
+		if !tv.HasData() {
+			return tagValue{}, false
+		}
+		if tv.HasScope() || tv.HasDuplicateCount() {
+			tv = proto.CloneOf(tv)
+			tv.ClearScope()
+			tv.ClearDuplicateCount()
+		}
+	case string:
+		tv.SetStrValue(v)
+	case bool:
+		tv.SetBoolValue(v)
+	case int:
+		tv.SetIntValue(int64(v))
+	case int64:
+		tv.SetIntValue(int64(v))
+	case int32:
+		tv.SetIntValue(int64(v))
+	case uint32:
+		tv.SetIntValue(int64(v))
+	default:
+		return tagValue{}, false
 	}
 	enc, err := proto.MarshalOptions{Deterministic: true}.Marshal(tv)
 	if err != nil {
-		return TagValue{}, 0, false
+		panic(fmt.Errorf("value.makeTagValue: %s", err))
 	}
-	return TagValue{string(enc)}, scope, true
+	return tagValue{string(enc)}, true
 }
 
-// Proto unmarshals the encoded Tag_Value.
-func (v TagValue) Proto() *orchestratorpb.Tag_Value {
+// proto unmarshals the encoded Tag_Value.
+func (v tagValue) proto() *orchestratorpb.Tag_Value {
 	ret := orchestratorpb.Tag_Value{}
 	if err := proto.Unmarshal([]byte(v.encodedTagValue), &ret); err != nil {
 		panic(fmt.Errorf("value.TagValue.Proto(): %s", err))
@@ -67,24 +86,24 @@ func (v TagValue) Proto() *orchestratorpb.Tag_Value {
 	return &ret
 }
 
-func (v TagValue) String() string {
-	return v.Proto().String()
+func (v tagValue) String() string {
+	return v.proto().String()
 }
 
-// ScopeCount aggregates the maximum observed read scope of a particular tag
+// scopeCount aggregates the maximum observed read scope of a particular tag
 // value and the total number of instances of this value.
-type ScopeCount struct {
-	// Scope indicates the level at which this *value* can be read.
-	Scope orchestratorpb.ReadScope
+type scopeCount struct {
+	// scope indicates the level at which this *value* can be read.
+	scope orchestratorpb.ReadScope
 	// Total count of instances of this particular value (not duplicate count).
-	Count uint32
+	count uint32
 }
 
 // increment sets Scope to the max of the current and given scopes, and
 // increments count by `delta`.
-func (s *ScopeCount) increment(scope orchestratorpb.ReadScope, delta uint32) {
-	s.Scope = max(s.Scope, scope)
-	s.Count += delta
+func (s *scopeCount) increment(scope orchestratorpb.ReadScope, delta uint32) {
+	s.scope = max(s.scope, scope)
+	s.count += delta
 }
 
 // Tag is an easier in-process representation of an orchestratorpb.Tag.
@@ -95,47 +114,22 @@ type Tag struct {
 	// Scope indicates the level at which the tag *key* can be read.
 	Scope orchestratorpb.ReadScope
 
-	// Values are unique tag values.
-	//
-	// If a tag happens to have multiple identical values, they'll be deduplicated
-	// in this map, with their scope and total count aggregated in ScopeCount.
-	//
-	// Do not construct or modify directly. Use [TagTemplate] or [Tag.AddValue].
-	Values map[TagValue]*ScopeCount
+	values map[tagValue]*scopeCount
 }
 
-func (t *Tag) getScopeCount(tv TagValue) *ScopeCount {
-	if t.Values == nil {
-		t.Values = map[TagValue]*ScopeCount{}
-	}
-	cur := t.Values[tv]
-	if cur == nil {
-		cur = &ScopeCount{}
-		t.Values[tv] = cur
-	}
-	return cur
-}
+// Values returns all Values contained in this Tag, in normalized order.
+func (t *Tag) Values() []*orchestratorpb.Tag_Value {
+	values := make([]*orchestratorpb.Tag_Value, 0, len(t.values))
 
-// AddValue inserts a value of the tag.
-func (t *Tag) AddValue(tv *orchestratorpb.Tag_Value) {
-	enc, scope, ok := makeTagValue(tv)
-	if !ok {
-		return
-	}
-	t.getScopeCount(enc).increment(scope, tv.GetDuplicateCount()+1)
-}
-
-// Proto returns this as an orchestratorpb.Tag with the given key.
-func (t *Tag) Proto(key string) *orchestratorpb.Tag {
-	values := make([]*orchestratorpb.Tag_Value, 0, len(t.Values))
-	for vt, scopeCount := range t.Values {
-		vtp := vt.Proto()
-		vtp.SetScope(scopeCount.Scope)
-		if scopeCount.Count > 1 {
-			vtp.SetDuplicateCount(scopeCount.Count - 1)
+	for vt, scopeCount := range t.values {
+		vtp := vt.proto()
+		vtp.SetScope(scopeCount.scope)
+		if scopeCount.count > 1 {
+			vtp.SetDuplicateCount(scopeCount.count - 1)
 		}
 		values = append(values, vtp)
 	}
+
 	// Sort all the values.
 	slices.SortFunc(values, func(a, b *orchestratorpb.Tag_Value) int {
 		if typeOrder := a.WhichData() - b.WhichData(); typeOrder != 0 {
@@ -161,10 +155,70 @@ func (t *Tag) Proto(key string) *orchestratorpb.Tag {
 			panic("impossible")
 		}
 	})
+
+	return values
+}
+
+// HasValue checks to see if this Tag contains the given value.
+//
+// value must be one of the following types:
+//   - *orchestratorpb.Tag_Value (scope and duplicate count are ignored)
+//   - int, int32, int64, uint32
+//   - string
+//   - bool
+//
+// Returns the *total* count of this value (not duplicate count), plus the
+// scope.
+//
+// If the value is an invalid type or does not exist in this tag, count is zero.
+func (t *Tag) HasValue(value any) (count uint32, scope orchestratorpb.ReadScope) {
+	enc, ok := makeTagValue(value)
+	if !ok {
+		return 0, 0
+	}
+	got, ok := t.values[enc]
+	if !ok {
+		return 0, 0
+	}
+	return got.count, got.scope
+}
+
+// NewTag constructs a Tag given enumeration of its values.
+func NewTag(tv ...*orchestratorpb.Tag_Value) *Tag {
+	t := &Tag{values: make(map[tagValue]*scopeCount, len(tv))}
+	for _, v := range tv {
+		t.AddValue(v)
+	}
+	return t
+}
+
+func (t *Tag) getScopeCount(tv tagValue) *scopeCount {
+	if t.values == nil {
+		t.values = map[tagValue]*scopeCount{}
+	}
+	cur := t.values[tv]
+	if cur == nil {
+		cur = &scopeCount{}
+		t.values[tv] = cur
+	}
+	return cur
+}
+
+// AddValue inserts a value of the tag.
+func (t *Tag) AddValue(tv *orchestratorpb.Tag_Value) {
+	enc, ok := makeTagValue(tv)
+	if !ok {
+		return
+	}
+	t.getScopeCount(enc).increment(tv.GetScope(), tv.GetDuplicateCount()+1)
+}
+
+// Proto returns this as an orchestratorpb.Tag with the given key.
+func (t *Tag) Proto(key string) *orchestratorpb.Tag {
 	return orchestratorpb.Tag_builder{
 		Key:    &key,
 		Scope:  t.Scope.Enum(),
-		Values: values,
+		Values: t.Values(),
 	}.Build()
 }
 

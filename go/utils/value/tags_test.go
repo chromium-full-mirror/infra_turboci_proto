@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
@@ -23,14 +24,21 @@ const (
 	workPlan = orchestratorpb.ReadScope_READ_SCOPE_WORK_PLAN
 )
 
-type taggableValue interface {
-	~string | ~bool | ~int | ~int32 | ~int64 | ~uint32 | TagValue
+func init() {
+	assert.DefaultOptions = append(assert.DefaultOptions, cmp.AllowUnexported(
+		Tag{},
+		scopeCount{},
+	))
 }
 
-func tagVal[T taggableValue](v T) TagValue {
+type taggableValue interface {
+	~string | ~bool | ~int | ~int32 | ~int64 | ~uint32 | tagValue
+}
+
+func tagVal[T taggableValue](v T) tagValue {
 	var tv *orchestratorpb.Tag_Value
 	switch v := any(v).(type) {
-	case TagValue:
+	case tagValue:
 		return v
 	case string:
 		tv = orchestratorpb.Tag_Value_builder{StrValue: proto.String(v)}.Build()
@@ -47,7 +55,7 @@ func tagVal[T taggableValue](v T) TagValue {
 	default:
 		panic(fmt.Errorf("unsupported tagVal type: %T", v))
 	}
-	enc, _, ok := makeTagValue(tv)
+	enc, ok := makeTagValue(tv)
 	if !ok {
 		panic(fmt.Errorf("failed to make TagValue from %v", v))
 	}
@@ -59,10 +67,7 @@ func tag[T taggableValue](vals ...T) *Tag {
 }
 
 func scopedTag[T taggableValue](keyScope, valScope orchestratorpb.ReadScope, vals ...T) *Tag {
-	t := &Tag{
-		Scope:  keyScope,
-		Values: make(map[TagValue]*ScopeCount, len(vals)),
-	}
+	t := &Tag{Scope: keyScope}
 	for _, v := range vals {
 		t.getScopeCount(tagVal(v)).increment(valScope, 1)
 	}
