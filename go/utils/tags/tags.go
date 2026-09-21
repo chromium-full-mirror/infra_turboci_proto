@@ -12,7 +12,9 @@ import (
 	"strings"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+	tagpb "go.chromium.org/turboci/proto/go/tag"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // ForMessage extracts all TurboCI tags/data for the given message.
@@ -33,6 +35,51 @@ func ForMessage(msg proto.Message) (Map, error) {
 		ret = nil
 	}
 	return ret, nil
+}
+
+// FieldTags is an `iter.Seq2[protoreflect.FieldDescriptor, *tagpb.Tag]` which
+// yields field + normalized Tag protos for the type `M`.
+//
+// This allows you to answer "If I used ForMessage on an instance of M, what
+// tags could it contain?"
+//
+// Note: You can turn this into a map with [maps.Collect].
+func FieldTags[M proto.Message](yield func(protoreflect.FieldDescriptor, *tagpb.Tag) bool) {
+	var m M
+	msg := m.ProtoReflect().Descriptor()
+	te, err := getTagExtractor(msg)
+	if err != nil {
+		return
+	}
+	visited := map[protoreflect.MessageDescriptor]struct{}{}
+
+	var walk func(desc protoreflect.MessageDescriptor, te tagExtractor) iter.Seq2[protoreflect.FieldDescriptor, *tagpb.Tag]
+	walk = func(desc protoreflect.MessageDescriptor, te tagExtractor) iter.Seq2[protoreflect.FieldDescriptor, *tagpb.Tag] {
+		return func(yield func(protoreflect.FieldDescriptor, *tagpb.Tag) bool) {
+			if _, ok := visited[desc]; ok {
+				return
+			}
+			visited[desc] = struct{}{}
+
+			for field, tfe := range te {
+				if tfe.extractScalar != nil {
+					tag := proto.GetExtension(field.Options(), tagpb.E_Tag).(*tagpb.Tag)
+					if tag != nil {
+						if !yield(field, normalizeTag(tag, field.Kind())) {
+							return
+						}
+					}
+				} else {
+					for field, tag := range walk(submsgDesc(field), tfe.recurseMessage) {
+						if !yield(field, tag) {
+							return
+						}
+					}
+				}
+			}
+		}
+	}
+	walk(m.ProtoReflect().Descriptor(), te)(yield)
 }
 
 // tagValue is an encoded orchestratorpb.Tag_Value containing only the Value

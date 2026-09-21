@@ -5,9 +5,11 @@
 package tags
 
 import (
+	"cmp"
 	"fmt"
 	"iter"
 	"maps"
+	"slices"
 	"sync"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
@@ -229,41 +231,55 @@ func makeTagScalarExtractor(field protoreflect.FieldDescriptor) func(*[]*orchest
 	return nil
 }
 
-// calculateScopes calculates the effective captureUnset, keyScope and valueScope
-// for a field, given the tag annotation proto and the kind of the field.
-//
-// In particular, this converts the source-annotation friendly tagpb.ReadScope
-// to the API orchestratorpb.ReadScope enum, ensures that keyScope is >=
-// valueScope, and applies the default index_unset logic for bool fields.
-func calculateScopes(tag *tagpb.Tag, kind protoreflect.Kind) (captureUnset bool, keyScope, valueScope orchestratorpb.ReadScope) {
-	toReadScope := func(in tagpb.ReadScope) orchestratorpb.ReadScope {
-		switch in {
-		case tagpb.ReadScope_NODE:
-			return orchestratorpb.ReadScope_READ_SCOPE_NODE
-		case tagpb.ReadScope_WORK_PLAN:
-			return orchestratorpb.ReadScope_READ_SCOPE_WORK_PLAN
+// toReadScope converts the source-annotation friendly tagpb.ReadScope to
+// orchestratorpb.ReadScope.
+func toReadScope(in tagpb.ReadScope) orchestratorpb.ReadScope {
+	switch in {
+	case tagpb.ReadScope_NODE:
+		return orchestratorpb.ReadScope_READ_SCOPE_NODE
+	case tagpb.ReadScope_WORK_PLAN:
+		return orchestratorpb.ReadScope_READ_SCOPE_WORK_PLAN
+	}
+	return orchestratorpb.ReadScope_READ_SCOPE_VALUE_REF
+}
+
+// normalizeTag normalizes `tag`:
+//   - KeyScope is set to max(keyScope, valueScope)
+//   - IndexUnset defaults to true for boolean fields
+//   - sorted and unique AltKey
+func normalizeTag(tag *tagpb.Tag, kind protoreflect.Kind) *tagpb.Tag {
+	var tagCopy *tagpb.Tag
+	get := func() *tagpb.Tag {
+		if tagCopy == nil {
+			tagCopy = proto.CloneOf(tag)
 		}
-		return orchestratorpb.ReadScope_READ_SCOPE_VALUE_REF
+		return tagCopy
 	}
 
-	valueScope = toReadScope(tag.GetValueScope())
-	keyScope = max(valueScope, toReadScope(tag.GetKeyScope()))
+	if tag.GetKeyScope() < tag.GetValueScope() {
+		get().SetKeyScope(tag.GetValueScope())
+	}
 
-	if tag.HasIndexUnset() {
-		captureUnset = tag.GetIndexUnset()
-	} else {
+	if !tag.HasIndexUnset() && kind == protoreflect.BoolKind {
 		// Bool defaults to capturing unset.
-		captureUnset = kind == protoreflect.BoolKind
+		get().SetIndexUnset(true)
 	}
 
-	return
+	ak := tag.GetAltKey()
+	for i := 1; i < len(ak); i++ {
+		if ak[i-1] >= ak[i] {
+			get().SetAltKey(slices.Compact(slices.Sorted(slices.Values(ak))))
+			break
+		}
+	}
+
+	return cmp.Or(tagCopy, tag)
 }
 
 // makeTagFieldExtractor returns a tagFieldExtractor for the field + tag,
 // or an error if this field cannot be tagged.
 func makeTagFieldExtractor(field protoreflect.FieldDescriptor, tag *tagpb.Tag) (*tagFieldExtractor, error) {
 	keys := append([]string{string(field.FullName())}, tag.GetAltKey()...)
-	captureUnset, keyScope, valueScope := calculateScopes(tag, field.Kind())
 	codec := makeTagScalarExtractor(field)
 	if codec == nil {
 		return nil, fmt.Errorf("%s: turboci.tag: unsupported field kind %s", field.FullName(), field.Kind())
@@ -274,9 +290,9 @@ func makeTagFieldExtractor(field protoreflect.FieldDescriptor, tag *tagpb.Tag) (
 
 	return &tagFieldExtractor{
 		keys:          keys,
-		keyScope:      keyScope,
-		valueScope:    valueScope,
-		captureUnset:  captureUnset,
+		keyScope:      toReadScope(tag.GetKeyScope()),
+		valueScope:    toReadScope(tag.GetValueScope()),
+		captureUnset:  tag.GetIndexUnset(),
 		isEnum:        field.Kind() == protoreflect.EnumKind,
 		isList:        field.IsList(),
 		extractScalar: codec,
@@ -322,8 +338,8 @@ func exploreType(
 		field := fields.Get(i)
 
 		// First, check if this field is directly tagged.
-		tag, _ := proto.GetExtension(field.Options(), tagpb.E_Tag).(*tagpb.Tag)
-		if tag != nil {
+		if tag := proto.GetExtension(field.Options(), tagpb.E_Tag).(*tagpb.Tag); tag != nil {
+			tag = normalizeTag(tag, field.Kind())
 			fExt, err := makeTagFieldExtractor(field, tag)
 			if err != nil {
 				return err

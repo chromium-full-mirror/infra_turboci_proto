@@ -5,6 +5,7 @@
 package tags
 
 import (
+	"maps"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -16,6 +17,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+	tagpb "go.chromium.org/turboci/proto/go/tag"
 	testingtagspb "go.chromium.org/turboci/proto/go/testing/tags"
 
 	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
@@ -765,4 +767,77 @@ func TestTagsForConvergence(t *testing.T) {
 		assert.NoErr(t, err)
 		assert.Match(t, want, tags)
 	}
+}
+
+func fieldTagsTestCase[M proto.Message](want map[string]*tagpb.Tag) (name string, tc func(t *testing.T)) {
+	var zero M
+	return string(zero.ProtoReflect().Descriptor().FullName()), func(t *testing.T) {
+		t.Parallel()
+
+		expectedFields := maps.Clone(want)
+		for field, tag := range FieldTags[M] {
+			name := string(field.FullName())
+			want, ok := expectedFields[name]
+			if assert.True(t, ok, assert.Explain("field %q was not expected", name)) {
+				if !assert.Match(t, want, tag) {
+					t.Logf(">> %q", name)
+				}
+				delete(expectedFields, name)
+			}
+		}
+		assert.Equal(t, len(expectedFields), 0, assert.Explain("expectedFields: %v", expectedFields))
+	}
+}
+
+func TestMetadata(t *testing.T) {
+	t.Parallel()
+
+	t.Run(fieldTagsTestCase[*testingtagspb.MyMessage](map[string]*tagpb.Tag{
+		"testing.tags.MyMessage.tagged_field": {},
+	}))
+
+	t.Run(fieldTagsTestCase[*testingtagspb.ComplexMessage](map[string]*tagpb.Tag{
+		"testing.tags.ComplexMessage.SubMessage.sub_tagged": tagpb.Tag_builder{
+			AltKey: []string{"previous.package.name.Message.field"},
+		}.Build(),
+		"testing.tags.ComplexMessage.local_str": tagpb.Tag_builder{
+			KeyScope: tagpb.ReadScope_VALUE_REF.Enum(),
+		}.Build(),
+		"testing.tags.ComplexMessage.workplan_str": tagpb.Tag_builder{
+			KeyScope:   tagpb.ReadScope_NODE.Enum(),
+			ValueScope: tagpb.ReadScope_NODE.Enum(),
+		}.Build(),
+		"testing.tags.ComplexMessage.global_str": tagpb.Tag_builder{
+			KeyScope:   tagpb.ReadScope_WORK_PLAN.Enum(),
+			ValueScope: tagpb.ReadScope_WORK_PLAN.Enum(),
+		}.Build(),
+		"testing.tags.ComplexMessage.local_bool": tagpb.Tag_builder{
+			KeyScope:   tagpb.ReadScope_VALUE_REF.Enum(),
+			IndexUnset: proto.Bool(true),
+		}.Build(),
+		"testing.tags.ComplexMessage.local_enum": tagpb.Tag_builder{
+			KeyScope: tagpb.ReadScope_VALUE_REF.Enum(),
+		}.Build(),
+		"testing.tags.ComplexMessage.rep_str": tagpb.Tag_builder{
+			KeyScope: tagpb.ReadScope_VALUE_REF.Enum(),
+		}.Build(),
+		"testing.tags.ComplexMessage.split_index": tagpb.Tag_builder{
+			KeyScope:   tagpb.ReadScope_WORK_PLAN.Enum(),
+			ValueScope: tagpb.ReadScope_NODE.Enum(),
+		}.Build(),
+		"testing.tags.ComplexMessage.explicit_presence_bool": tagpb.Tag_builder{
+			IndexUnset: proto.Bool(false),
+		}.Build(),
+	}))
+
+	// Messages which are improperly tagged yield nothing.
+	t.Run(fieldTagsTestCase[*testingtagspb.UnsupportedKindMessage](nil))
+
+	t.Run(fieldTagsTestCase[*testingtagspb.RecursiveMessage](map[string]*tagpb.Tag{
+		"testing.tags.RecursiveMessage.tagged": {},
+	}))
+
+	t.Run(fieldTagsTestCase[*testingtagspb.LoopMessageD](map[string]*tagpb.Tag{
+		"testing.tags.LoopMessageD.tagged": {},
+	}))
 }
