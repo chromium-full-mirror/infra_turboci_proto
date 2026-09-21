@@ -24,7 +24,7 @@ func TestWriteMatchesRef(t *testing.T) {
 	data1, _ := anypb.New(&emptypb.Empty{})
 	data2, _ := anypb.New(&structpb.Struct{})
 
-	t.Run(`match inline`, func(t *testing.T) {
+	t.Run(`no-match inline-only`, func(t *testing.T) {
 		t.Parallel()
 		write := orchestratorpb.ValueWrite_builder{
 			Realm: proto.String("realm"),
@@ -37,13 +37,13 @@ func TestWriteMatchesRef(t *testing.T) {
 		ref := orchestratorpb.ValueRef_builder{
 			Realm:   proto.String("realm"),
 			TypeUrl: proto.String(data1.TypeUrl),
-			Inline:  data1,
 			Tags: tags.MakeMap(
 				tags.Builder{Key: "t1", Strings: []string{"t1hi"}}.Build(),
 				tags.Builder{Key: "t2", Strings: []string{"t2hi"}}.Build(),
 			).Proto(),
 		}.Build()
-		assert.True(t, WriteMatchesRef(write, ref))
+		// False because digest is always required.
+		assert.False(t, WriteMatchesRef(write, ref))
 	})
 
 	t.Run(`match digest`, func(t *testing.T) {
@@ -51,11 +51,19 @@ func TestWriteMatchesRef(t *testing.T) {
 		write := orchestratorpb.ValueWrite_builder{
 			Realm: proto.String("realm"),
 			Data:  data1,
+			Tags: tags.MakeMap(
+				tags.Builder{Key: "t1", Strings: []string{"t1hi"}}.Build(),
+				tags.Builder{Key: "t2", Strings: []string{"t2hi"}}.Build(),
+			).Proto(),
 		}.Build()
 		ref := orchestratorpb.ValueRef_builder{
 			Realm:   proto.String("realm"),
 			TypeUrl: proto.String(data1.TypeUrl),
 			Digest:  proto.String(string(ComputeDigest(data1))),
+			Tags: tags.MakeMap(
+				tags.Builder{Key: "t1", Strings: []string{"t1hi"}}.Build(),
+				tags.Builder{Key: "t2", Strings: []string{"t2hi"}}.Build(),
+			).Proto(),
 		}.Build()
 		assert.True(t, WriteMatchesRef(write, ref))
 	})
@@ -137,7 +145,8 @@ func TestRefMatchesRef(t *testing.T) {
 			TypeUrl: proto.String(data1.TypeUrl),
 			Inline:  data1,
 		}.Build()
-		assert.True(t, RefMatchesRef(a, b))
+		// False because digest is always required.
+		assert.False(t, RefMatchesRef(a, b))
 	})
 
 	t.Run(`match inline-digest`, func(t *testing.T) {
@@ -152,7 +161,8 @@ func TestRefMatchesRef(t *testing.T) {
 			TypeUrl: proto.String(data1.TypeUrl),
 			Digest:  proto.String(digest1),
 		}.Build()
-		assert.True(t, RefMatchesRef(a, b))
+		// False because digest is always required.
+		assert.False(t, RefMatchesRef(a, b))
 	})
 
 	t.Run(`match digest-inline`, func(t *testing.T) {
@@ -167,7 +177,8 @@ func TestRefMatchesRef(t *testing.T) {
 			TypeUrl: proto.String(data1.TypeUrl),
 			Inline:  data1,
 		}.Build()
-		assert.True(t, RefMatchesRef(a, b))
+		// False because digest is always required.
+		assert.False(t, RefMatchesRef(a, b))
 	})
 
 	t.Run(`match digest-digest`, func(t *testing.T) {

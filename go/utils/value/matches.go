@@ -15,7 +15,10 @@ import (
 // WriteMatchesRef returns true if the ValueWrite and ValueRef have the
 // same content (including tags).
 //
-// If `ref` has a digest, this will compute a digest for `write`.
+// `ref` must have a digest.
+//
+// If `ref` has both `inline` and `digest`, it is the caller's responsibility
+// to ensure these match.
 func WriteMatchesRef(write *orchestratorpb.ValueWrite, ref *orchestratorpb.ValueRef) bool {
 	if write.GetRealm() != ref.GetRealm() || write.GetData().GetTypeUrl() != ref.GetTypeUrl() {
 		return false
@@ -25,6 +28,10 @@ func WriteMatchesRef(write *orchestratorpb.ValueWrite, ref *orchestratorpb.Value
 	) {
 		return false
 	}
+	if !ref.HasDigest() {
+		// ref is invalid as it doesn't have digest set
+		return false
+	}
 	if ref.HasInline() {
 		return proto.Equal(write.GetData(), ref.GetInline())
 	}
@@ -32,35 +39,25 @@ func WriteMatchesRef(write *orchestratorpb.ValueWrite, ref *orchestratorpb.Value
 }
 
 // RefMatchesRef returns true if the two refs match (including tags).
+//
+// If the refs contain inline data, it's the caller's responsibility to ensure
+// this matches the refs' digests.
 func RefMatchesRef(a, b *orchestratorpb.ValueRef) bool {
 	if a.GetRealm() != b.GetRealm() || a.GetTypeUrl() != b.GetTypeUrl() {
 		return false
 	}
 
-	if !slices.EqualFunc(a.GetTags(), b.GetTags(),
-		func(a, b *orchestratorpb.Tag) bool { return proto.Equal(a, b) },
-	) {
+	if !a.HasDigest() || !b.HasDigest() {
+		// ValueRefs without digest are invalid.
 		return false
 	}
 
-	const A = 0
-	const B = 1
-	inline := []bool{a.HasInline(), b.HasInline()}
-	digest := []bool{a.HasDigest(), b.HasDigest()}
-
-	switch {
-	case inline[A] && inline[B]:
-		return proto.Equal(a.GetInline(), b.GetInline())
-
-	case inline[A] && digest[B]:
-		return string(ComputeDigest(a.GetInline())) == b.GetDigest()
-
-	case digest[A] && inline[B]:
-		return a.GetDigest() == string(ComputeDigest(b.GetInline()))
-
-	case digest[A] && digest[B]:
-		return a.GetDigest() == b.GetDigest()
+	if a.GetDigest() != b.GetDigest() {
+		return false
 	}
 
-	return false
+	// Lastly, compare all the tags.
+	return slices.EqualFunc(a.GetTags(), b.GetTags(),
+		func(a, b *orchestratorpb.Tag) bool { return proto.Equal(a, b) },
+	)
 }
