@@ -9,6 +9,10 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
+	"google.golang.org/protobuf/types/dynamicpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
@@ -31,6 +35,29 @@ func init() {
 
 func TestTagsFor(t *testing.T) {
 	t.Parallel()
+
+	// Note we construct a completely separate descriptor pool using raw
+	// binary descriptors embedded into the binary. This simulates "normal"
+	// dynamic descriptor pools. We shouldn't directly reuse MessageDescriptor
+	// already present in the built-in registry, since it may have ties to other
+	// built-in descriptors, and then we'll be testing something weird, not truly
+	// dynamic descriptor pools.
+	dynreg := &protoregistry.Files{}
+	for _, path := range []string{
+		// Note: order matters - need to register leafs of the dep graph first.
+		"google/protobuf/descriptor.proto",
+		"google/protobuf/empty.proto",
+		"turboci/tag.proto",
+		"testing/tags/demo.proto",
+	} {
+		fd, err := protoregistry.GlobalFiles.FindFileByPath(path)
+		assert.NoErr(t, err)
+		fdp := protodesc.ToFileDescriptorProto(fd)
+		fd, err = protodesc.NewFile(fdp, dynreg)
+		assert.NoErr(t, err)
+		err = dynreg.RegisterFile(fd)
+		assert.NoErr(t, err)
+	}
 
 	tests := []struct {
 		name     string
@@ -466,15 +493,34 @@ func TestTagsFor(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			tags, err := ForMessage(tc.msg)
-			if tc.wantErr != "" {
-				assert.ErrLike(t, err, tc.wantErr)
-			} else {
-				assert.NoErr(t, err)
-				assert.Match(t, tc.wantTags, tags)
-				if tc.extraAssert != nil {
-					tc.extraAssert(t, tags)
-				}
+			// Construct a dynamicpb counterpart of `tc.msg`.
+			blob, err := proto.Marshal(tc.msg)
+			assert.NoErr(t, err)
+			desc, err := dynreg.FindDescriptorByName(tc.msg.ProtoReflect().Descriptor().FullName())
+			assert.NoErr(t, err)
+			dyn := dynamicpb.NewMessage(desc.(protoreflect.MessageDescriptor))
+			err = proto.Unmarshal(blob, dyn)
+			assert.NoErr(t, err)
+
+			for _, subcase := range []struct {
+				name string
+				msg  proto.Message
+			}{
+				{name: "static desc pool", msg: tc.msg},
+				{name: "dynamic desc pool", msg: dyn},
+			} {
+				t.Run(subcase.name, func(t *testing.T) {
+					tags, err := ForMessage(subcase.msg)
+					if tc.wantErr != "" {
+						assert.ErrLike(t, err, tc.wantErr)
+					} else {
+						assert.NoErr(t, err)
+						assert.Match(t, tc.wantTags, tags)
+						if tc.extraAssert != nil {
+							tc.extraAssert(t, tags)
+						}
+					}
+				})
 			}
 		})
 	}
