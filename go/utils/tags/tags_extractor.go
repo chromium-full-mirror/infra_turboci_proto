@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package value
+package tags
 
 import (
 	"fmt"
@@ -80,7 +80,7 @@ func (t *tagFieldExtractor) rangeValues(val protoreflect.Value) iter.Seq[protore
 }
 
 // extract updates `tags` for this field, given the value `val`.
-func (t *tagFieldExtractor) extract(tags Tags, val protoreflect.Value) {
+func (t *tagFieldExtractor) extract(tags Map, val protoreflect.Value) {
 	// We need to extract the scalar(s) from this field.
 	if t.extractScalar != nil {
 		expectedValues := 1
@@ -133,7 +133,7 @@ type tagExtractor map[protoreflect.FieldDescriptor]*tagFieldExtractor
 
 // extract walks the extractor, updating `tags` for any relevant fields in
 // `msg`.
-func (t tagExtractor) extract(tags Tags, msg protoreflect.Message) {
+func (t tagExtractor) extract(tags Map, msg protoreflect.Message) {
 	for field, extractor := range t {
 		if extractor.captureUnset || msg.Has(field) {
 			extractor.extract(tags, msg.Get(field))

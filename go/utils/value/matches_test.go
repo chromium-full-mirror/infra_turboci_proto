@@ -15,6 +15,7 @@ import (
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
 
 	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
+	"go.chromium.org/turboci/proto/go/utils/tags"
 )
 
 func TestWriteMatchesRef(t *testing.T) {
@@ -28,18 +29,18 @@ func TestWriteMatchesRef(t *testing.T) {
 		write := orchestratorpb.ValueWrite_builder{
 			Realm: proto.String("realm"),
 			Data:  data1,
-			Tags: MakeTags(
-				TagBuilder{Key: "t1", Strings: []string{"t1hi"}}.Build(),
-				TagBuilder{Key: "t2", Strings: []string{"t2hi"}}.Build(),
+			Tags: tags.MakeMap(
+				tags.Builder{Key: "t1", Strings: []string{"t1hi"}}.Build(),
+				tags.Builder{Key: "t2", Strings: []string{"t2hi"}}.Build(),
 			).Proto(),
 		}.Build()
 		ref := orchestratorpb.ValueRef_builder{
 			Realm:   proto.String("realm"),
 			TypeUrl: proto.String(data1.TypeUrl),
 			Inline:  data1,
-			Tags: MakeTags(
-				TagBuilder{Key: "t1", Strings: []string{"t1hi"}}.Build(),
-				TagBuilder{Key: "t2", Strings: []string{"t2hi"}}.Build(),
+			Tags: tags.MakeMap(
+				tags.Builder{Key: "t1", Strings: []string{"t1hi"}}.Build(),
+				tags.Builder{Key: "t2", Strings: []string{"t2hi"}}.Build(),
 			).Proto(),
 		}.Build()
 		assert.True(t, WriteMatchesRef(write, ref))

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package value
+package tags
 
 import (
 	"cmp"
@@ -15,14 +15,14 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// TagsFor extracts all TurboCI tags/data for the given message.
+// ForMessage extracts all TurboCI tags/data for the given message.
 //
 // Usually this is called automatically via [Write].
-func TagsFor(msg proto.Message) (Tags, error) {
+func ForMessage(msg proto.Message) (Map, error) {
 	if msg == nil {
 		return nil, nil
 	}
-	ret := Tags{}
+	ret := Map{}
 	msgR := msg.ProtoReflect()
 	extractor, err := getTagExtractor(msgR.Descriptor())
 	if err != nil {
@@ -95,7 +95,7 @@ func (s *scopeCount) increment(scope orchestratorpb.ReadScope, delta uint32) {
 
 // Tag is an easier in-process representation of an orchestratorpb.Tag.
 //
-// Primarily intended to be used in conjunction with [TagsFor], rarely
+// Primarily intended to be used in conjunction with [ForMessage], rarely
 // constructed directly (perhaps only in tests).
 type Tag struct {
 	// Scope indicates the level at which the tag *key* can be read.
@@ -200,23 +200,23 @@ func (t *Tag) Proto(key string) *orchestratorpb.Tag {
 	}.Build()
 }
 
-// Tags is a convenient form of, and convertible to, a repeated set of Tags
+// Map is a convenient form of, and convertible to, a repeated set of Tag
 // protos.
-type Tags map[string]*Tag
+type Map map[string]*Tag
 
-// MakeTags is a helper function for:
+// MakeMap is a helper function for:
 //
 //	t := Tags{}
 //	t.Add(slices.Values(tags))
 //	return t
-func MakeTags(tags ...*orchestratorpb.Tag) Tags {
-	t := Tags{}
+func MakeMap(tags ...*orchestratorpb.Tag) Map {
+	t := Map{}
 	t.Add(slices.Values(tags))
 	return t
 }
 
 // Proto converts this Tags into a normalized list of orchestratorpb.Tag protos.
-func (t Tags) Proto() []*orchestratorpb.Tag {
+func (t Map) Proto() []*orchestratorpb.Tag {
 	ret := make([]*orchestratorpb.Tag, 0, len(t))
 	for k, val := range t {
 		ret = append(ret, val.Proto(k))
@@ -227,7 +227,7 @@ func (t Tags) Proto() []*orchestratorpb.Tag {
 	return ret
 }
 
-func (t Tags) getData(key string) *Tag {
+func (t Map) getData(key string) *Tag {
 	cur := t[key]
 	if cur == nil {
 		cur = &Tag{}
@@ -238,7 +238,7 @@ func (t Tags) getData(key string) *Tag {
 
 // Add adds tag data in proto form from an iter, merging tags with
 // identical keys.
-func (t Tags) Add(tags iter.Seq[*orchestratorpb.Tag]) {
+func (t Map) Add(tags iter.Seq[*orchestratorpb.Tag]) {
 	for tag := range tags {
 		dat := t.getData(tag.GetKey())
 		dat.Scope = max(dat.Scope, tag.GetScope())
@@ -275,8 +275,8 @@ func newTagValue(v any, scope orchestratorpb.ReadScope) *orchestratorpb.Tag_Valu
 	return tv
 }
 
-// TagBuilder allows easier construction of a Tag.
-type TagBuilder struct {
+// Builder allows easier construction of a Tag.
+type Builder struct {
 	Key string
 
 	KeyScope   orchestratorpb.ReadScope
@@ -288,7 +288,7 @@ type TagBuilder struct {
 }
 
 // Build renders the TagTemplate to a Tag.
-func (t TagBuilder) Build() *orchestratorpb.Tag {
+func (t Builder) Build() *orchestratorpb.Tag {
 	tg := Tag{Scope: t.KeyScope}
 	for _, val := range t.Strings {
 		tg.AddValue(newTagValue(val, t.ValueScope))

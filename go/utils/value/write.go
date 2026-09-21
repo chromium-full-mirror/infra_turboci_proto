@@ -11,6 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+	"go.chromium.org/turboci/proto/go/utils/tags"
 )
 
 // These constants are special values which can be used with [Write].
@@ -67,7 +68,7 @@ const (
 // underlying message, or, if this is not possible, directly assemble the
 // orchestratorpb.ValueWrite.
 //
-// This internally calls [TagsFor] to generate tags for `msg`.
+// This internally calls [tags.ForMessage] to generate tags for `msg`.
 func Write(msg proto.Message, realm ...string) (*orchestratorpb.ValueWrite, error) {
 	apb, ok := msg.(*anypb.Any)
 	if ok {
@@ -86,7 +87,7 @@ func Write(msg proto.Message, realm ...string) (*orchestratorpb.ValueWrite, erro
 		return nil, fmt.Errorf("value.Write: realm provided more than once")
 	}
 
-	tags, err := TagsFor(msg)
+	tags, err := tags.ForMessage(msg)
 	if err != nil {
 		return nil, fmt.Errorf("value.Write: extracting tags: %w", err)
 	}
