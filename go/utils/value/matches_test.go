@@ -23,106 +23,147 @@ func TestWriteMatchesRef(t *testing.T) {
 
 	data1, _ := anypb.New(&emptypb.Empty{})
 	data2, _ := anypb.New(&structpb.Struct{})
+	digest1 := string(ComputeDigest(data1))
+	digest2 := string(ComputeDigest(data2))
 
-	t.Run(`no-match inline-only`, func(t *testing.T) {
-		t.Parallel()
-		write := orchestratorpb.ValueWrite_builder{
-			Realm: proto.String("realm"),
-			Data:  data1,
-			Tags: tags.MakeMap(
-				tags.Builder{Key: "t1", Strings: []string{"t1hi"}}.Build(),
-				tags.Builder{Key: "t2", Strings: []string{"t2hi"}}.Build(),
-			).Proto(),
-		}.Build()
-		ref := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Tags: tags.MakeMap(
-				tags.Builder{Key: "t1", Strings: []string{"t1hi"}}.Build(),
-				tags.Builder{Key: "t2", Strings: []string{"t2hi"}}.Build(),
-			).Proto(),
-		}.Build()
-		// False because digest is always required.
-		assert.False(t, WriteMatchesRef(write, ref))
-	})
+	tags1 := tags.MakeMap(
+		tags.Builder{Key: "t1", Strings: []string{"t1hi"}}.Build(),
+		tags.Builder{Key: "t2", Strings: []string{"t2hi"}}.Build(),
+	).Proto()
+	tags2 := tags.MakeMap(
+		tags.Builder{Key: "t1", Strings: []string{"other"}}.Build(),
+	).Proto()
 
-	t.Run(`match digest`, func(t *testing.T) {
-		t.Parallel()
-		write := orchestratorpb.ValueWrite_builder{
-			Realm: proto.String("realm"),
-			Data:  data1,
-			Tags: tags.MakeMap(
-				tags.Builder{Key: "t1", Strings: []string{"t1hi"}}.Build(),
-				tags.Builder{Key: "t2", Strings: []string{"t2hi"}}.Build(),
-			).Proto(),
-		}.Build()
-		ref := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Digest:  proto.String(string(ComputeDigest(data1))),
-			Tags: tags.MakeMap(
-				tags.Builder{Key: "t1", Strings: []string{"t1hi"}}.Build(),
-				tags.Builder{Key: "t2", Strings: []string{"t2hi"}}.Build(),
-			).Proto(),
-		}.Build()
-		assert.True(t, WriteMatchesRef(write, ref))
-	})
+	cases := []struct {
+		name               string
+		write              *orchestratorpb.ValueWrite
+		ref                *orchestratorpb.ValueRef
+		matchesWithoutTags bool
+		matchesWithTags    bool
+	}{
+		{
+			name: "no-match inline-only",
+			write: orchestratorpb.ValueWrite_builder{
+				Realm: proto.String("realm"),
+				Data:  data1,
+				Tags:  tags1,
+			}.Build(),
+			ref: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Inline:  data1,
+				Tags:    tags1,
+			}.Build(),
+			// False because digest is always required.
+		},
+		{
+			name: "match digest",
+			write: orchestratorpb.ValueWrite_builder{
+				Realm: proto.String("realm"),
+				Data:  data1,
+				Tags:  tags1,
+			}.Build(),
+			ref: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest1),
+				Tags:    tags1,
+			}.Build(),
+			matchesWithoutTags: true,
+			matchesWithTags:    true,
+		},
+		{
+			name: "match inline+digest",
+			write: orchestratorpb.ValueWrite_builder{
+				Realm: proto.String("realm"),
+				Data:  data1,
+				Tags:  tags1,
+			}.Build(),
+			ref: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Inline:  data1,
+				Digest:  proto.String(digest1),
+				Tags:    tags1,
+			}.Build(),
+			matchesWithoutTags: true,
+			matchesWithTags:    true,
+		},
+		{
+			name: "mismatch tags",
+			write: orchestratorpb.ValueWrite_builder{
+				Realm: proto.String("realm"),
+				Data:  data1,
+				Tags:  tags1,
+			}.Build(),
+			ref: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest1),
+				Tags:    tags2,
+			}.Build(),
+			matchesWithoutTags: true,
+		},
+		{
+			name: "mismatch realm",
+			write: orchestratorpb.ValueWrite_builder{
+				Realm: proto.String("realm1"),
+				Data:  data1,
+			}.Build(),
+			ref: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm2"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest1),
+				Inline:  data1,
+			}.Build(),
+		},
+		{
+			name: "mismatch type url",
+			write: orchestratorpb.ValueWrite_builder{
+				Realm: proto.String("realm"),
+				Data:  data1,
+			}.Build(),
+			ref: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data2.TypeUrl),
+				Digest:  proto.String(digest1),
+				Inline:  data1,
+			}.Build(),
+		},
+		{
+			name: "mismatch inline data",
+			write: orchestratorpb.ValueWrite_builder{
+				Realm: proto.String("realm"),
+				Data:  data1,
+			}.Build(),
+			ref: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest1),
+				Inline:  data2,
+			}.Build(),
+		},
+		{
+			name: "mismatch digest",
+			write: orchestratorpb.ValueWrite_builder{
+				Realm: proto.String("realm"),
+				Data:  data1,
+			}.Build(),
+			ref: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest2),
+			}.Build(),
+		},
+	}
 
-	t.Run(`mismatch realm`, func(t *testing.T) {
-		t.Parallel()
-		write := orchestratorpb.ValueWrite_builder{
-			Realm: proto.String("realm1"),
-			Data:  data1,
-		}.Build()
-		ref := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm2"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Inline:  data1,
-		}.Build()
-		assert.False(t, WriteMatchesRef(write, ref))
-	})
-
-	t.Run(`mismatch type url`, func(t *testing.T) {
-		t.Parallel()
-		write := orchestratorpb.ValueWrite_builder{
-			Realm: proto.String("realm"),
-			Data:  data1,
-		}.Build()
-		ref := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data2.TypeUrl),
-			Inline:  data1,
-		}.Build()
-		assert.False(t, WriteMatchesRef(write, ref))
-	})
-
-	t.Run(`mismatch inline data`, func(t *testing.T) {
-		t.Parallel()
-		write := orchestratorpb.ValueWrite_builder{
-			Realm: proto.String("realm"),
-			Data:  data1,
-		}.Build()
-		ref := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Inline:  data2,
-		}.Build()
-		assert.False(t, WriteMatchesRef(write, ref))
-	})
-
-	t.Run(`mismatch digest`, func(t *testing.T) {
-		t.Parallel()
-		write := orchestratorpb.ValueWrite_builder{
-			Realm: proto.String("realm"),
-			Data:  data1,
-		}.Build()
-		ref := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Digest:  proto.String(string(ComputeDigest(data2))),
-		}.Build()
-		assert.False(t, WriteMatchesRef(write, ref))
-	})
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, tc.matchesWithoutTags, WriteMatchesRef(tc.write, tc.ref, WithoutTagMatch))
+			assert.Equal(t, tc.matchesWithTags, WriteMatchesRef(tc.write, tc.ref, WithTagMatch))
+		})
+	}
 }
 
 func TestRefMatchesRef(t *testing.T) {
@@ -133,140 +174,171 @@ func TestRefMatchesRef(t *testing.T) {
 	digest1 := string(ComputeDigest(data1))
 	digest2 := string(ComputeDigest(data2))
 
-	t.Run(`match inline-inline`, func(t *testing.T) {
-		t.Parallel()
-		a := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Inline:  data1,
-		}.Build()
-		b := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Inline:  data1,
-		}.Build()
-		// False because digest is always required.
-		assert.False(t, RefMatchesRef(a, b))
-	})
+	tags1 := tags.MakeMap(
+		tags.Builder{Key: "t1", Strings: []string{"t1hi"}}.Build(),
+		tags.Builder{Key: "t2", Strings: []string{"t2hi"}}.Build(),
+	).Proto()
+	tags2 := tags.MakeMap(
+		tags.Builder{Key: "t1", Strings: []string{"other"}}.Build(),
+	).Proto()
 
-	t.Run(`match inline-digest`, func(t *testing.T) {
-		t.Parallel()
-		a := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Inline:  data1,
-		}.Build()
-		b := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Digest:  proto.String(digest1),
-		}.Build()
-		// False because digest is always required.
-		assert.False(t, RefMatchesRef(a, b))
-	})
+	cases := []struct {
+		name               string
+		a                  *orchestratorpb.ValueRef
+		b                  *orchestratorpb.ValueRef
+		matchesWithoutTags bool
+		matchesWithTags    bool
+	}{
+		{
+			name: "match inline-inline",
+			a: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Inline:  data1,
+			}.Build(),
+			b: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Inline:  data1,
+			}.Build(),
+			// False because digest is always required.
+		},
+		{
+			name: "match inline-digest",
+			a: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Inline:  data1,
+			}.Build(),
+			b: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest1),
+			}.Build(),
+			// False because digest is always required.
+		},
+		{
+			name: "match digest-inline",
+			a: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest1),
+			}.Build(),
+			b: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Inline:  data1,
+			}.Build(),
+			// False because digest is always required.
+		},
+		{
+			name: "match digest-digest",
+			a: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest1),
+				Tags:    tags1,
+			}.Build(),
+			b: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest1),
+				Tags:    tags1,
+			}.Build(),
+			matchesWithoutTags: true,
+			matchesWithTags:    true,
+		},
+		{
+			name: "mismatch tags",
+			a: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest1),
+				Tags:    tags1,
+			}.Build(),
+			b: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest1),
+				Tags:    tags2,
+			}.Build(),
+			matchesWithoutTags: true,
+		},
+		{
+			name: "mismatch realm",
+			a: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm1"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest1),
+				Inline:  data1,
+			}.Build(),
+			b: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm2"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest1),
+				Inline:  data1,
+			}.Build(),
+		},
+		{
+			name: "mismatch type url",
+			a: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String("type1"),
+				Digest:  proto.String(digest1),
+				Inline:  data1,
+			}.Build(),
+			b: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String("type2"),
+				Digest:  proto.String(digest1),
+				Inline:  data1,
+			}.Build(),
+		},
+		{
+			name: "mismatch inline data",
+			a: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Inline:  data1,
+			}.Build(),
+			b: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Inline:  data2,
+			}.Build(),
+		},
+		{
+			name: "mismatch digest",
+			a: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest1),
+			}.Build(),
+			b: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Digest:  proto.String(digest2),
+			}.Build(),
+		},
+		{
+			name: "one missing content",
+			a: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+				Inline:  data1,
+			}.Build(),
+			b: orchestratorpb.ValueRef_builder{
+				Realm:   proto.String("realm"),
+				TypeUrl: proto.String(data1.TypeUrl),
+			}.Build(),
+		},
+	}
 
-	t.Run(`match digest-inline`, func(t *testing.T) {
-		t.Parallel()
-		a := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Digest:  proto.String(digest1),
-		}.Build()
-		b := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Inline:  data1,
-		}.Build()
-		// False because digest is always required.
-		assert.False(t, RefMatchesRef(a, b))
-	})
-
-	t.Run(`match digest-digest`, func(t *testing.T) {
-		t.Parallel()
-		a := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Digest:  proto.String(digest1),
-		}.Build()
-		b := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Digest:  proto.String(digest1),
-		}.Build()
-		assert.True(t, RefMatchesRef(a, b))
-	})
-
-	t.Run(`mismatch realm`, func(t *testing.T) {
-		t.Parallel()
-		a := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm1"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Inline:  data1,
-		}.Build()
-		b := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm2"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Inline:  data1,
-		}.Build()
-		assert.False(t, RefMatchesRef(a, b))
-	})
-
-	t.Run(`mismatch type url`, func(t *testing.T) {
-		t.Parallel()
-		a := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String("type1"),
-			Inline:  data1,
-		}.Build()
-		b := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String("type2"),
-			Inline:  data1,
-		}.Build()
-		assert.False(t, RefMatchesRef(a, b))
-	})
-
-	t.Run(`mismatch inline data`, func(t *testing.T) {
-		t.Parallel()
-		a := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Inline:  data1,
-		}.Build()
-		b := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Inline:  data2,
-		}.Build()
-		assert.False(t, RefMatchesRef(a, b))
-	})
-
-	t.Run(`mismatch digest`, func(t *testing.T) {
-		t.Parallel()
-		a := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Digest:  proto.String(digest1),
-		}.Build()
-		b := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Digest:  proto.String(digest2),
-		}.Build()
-		assert.False(t, RefMatchesRef(a, b))
-	})
-
-	t.Run(`one missing content`, func(t *testing.T) {
-		t.Parallel()
-		a := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-			Inline:  data1,
-		}.Build()
-		b := orchestratorpb.ValueRef_builder{
-			Realm:   proto.String("realm"),
-			TypeUrl: proto.String(data1.TypeUrl),
-		}.Build()
-		assert.False(t, RefMatchesRef(a, b))
-	})
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, tc.matchesWithoutTags, RefMatchesRef(tc.a, tc.b, WithoutTagMatch))
+			assert.Equal(t, tc.matchesWithTags, RefMatchesRef(tc.a, tc.b, WithTagMatch))
+		})
+	}
 }

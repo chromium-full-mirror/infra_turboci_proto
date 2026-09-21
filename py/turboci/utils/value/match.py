@@ -9,7 +9,10 @@ from turboci.utils.value import digest
 
 
 def write_matches_ref(
-    write: value_write_pb2.ValueWrite, ref: value_ref_pb2.ValueRef
+    write: value_write_pb2.ValueWrite,
+    ref: value_ref_pb2.ValueRef,
+    *,
+    match_tags: bool = True,
 ) -> bool:
   """Returns True if `write` realm and content (including tags) matches `ref`'s.
 
@@ -21,23 +24,29 @@ def write_matches_ref(
   if write.realm != ref.realm or write.data.type_url != ref.type_url:
     return False
 
-  if write.tags != ref.tags:
-    return False
-
   if not ref.HasField('digest'):
     # ref is invalid as it doesn't have digest set
     return False
 
   # If the ref happens to have `inline` set, directly compare it.
   if ref.HasField('inline'):
-    return write.data == ref.inline
+    data_matches = write.data == ref.inline
+  else:
+    # Otherwise, compute the digest of the data and compare it to the ref
+    # digest.
+    data_matches = digest.Digest.compute(write.data) == ref.digest
 
-  # Otherwise, compute the digest of the data and compare it to the ref digest.
-  return digest.Digest.compute(write.data) == ref.digest
+  if not data_matches or not match_tags:
+    return data_matches
+
+  return write.tags == ref.tags
 
 
 def ref_matches_ref(
-    a: value_ref_pb2.ValueRef, b: value_ref_pb2.ValueRef
+    a: value_ref_pb2.ValueRef,
+    b: value_ref_pb2.ValueRef,
+    *,
+    match_tags: bool = True,
 ) -> bool:
   """Returns True if `a` and `b` have the same realm and content.
 
@@ -53,7 +62,8 @@ def ref_matches_ref(
     # one of the refs is invalid as it doesn't have digest set
     return False
 
-  if a.digest != b.digest:
-    return False
+  data_matches = a.digest == b.digest
+  if not data_matches or not match_tags:
+    return data_matches
 
   return a.tags == b.tags

@@ -45,6 +45,12 @@ class TestMatch(unittest.TestCase):
     self.assertTrue(value.write_matches_ref(write_tagged, ref_tagged))
     self.assertFalse(value.write_matches_ref(write_tagged, ref_inline))
     self.assertFalse(value.write_matches_ref(write, ref_tagged))
+    self.assertTrue(
+        value.write_matches_ref(write_tagged, ref_inline, match_tags=False)
+    )
+    self.assertTrue(
+        value.write_matches_ref(write, ref_tagged, match_tags=False)
+    )
 
     # Match digest
     ref_digest = value.ref(msg, 'project:realm')
@@ -141,6 +147,12 @@ class TestMatch(unittest.TestCase):
     self.assertTrue(value.ref_matches_ref(ref_tagged_a, ref_tagged_b))
     self.assertFalse(value.ref_matches_ref(ref_tagged_a, ref_a))
     self.assertFalse(value.ref_matches_ref(ref_a, ref_tagged_b))
+    self.assertTrue(
+        value.ref_matches_ref(ref_tagged_a, ref_a, match_tags=False)
+    )
+    self.assertTrue(
+        value.ref_matches_ref(ref_a, ref_tagged_b, match_tags=False)
+    )
 
     # Digest vs Digest
     self.assertTrue(value.ref_matches_ref(ref_b, ref_b))
