@@ -14,7 +14,6 @@ import (
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
 
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 	"go.chromium.org/turboci/proto/go/utils/tags"
 )
 
@@ -160,8 +159,12 @@ func TestWriteMatchesRef(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			assert.Equal(t, tc.matchesWithoutTags, WriteMatchesRef(tc.write, tc.ref, WithoutTagMatch))
-			assert.Equal(t, tc.matchesWithTags, WriteMatchesRef(tc.write, tc.ref, WithTagMatch))
+			if got := WriteMatchesRef(tc.write, tc.ref, WithoutTagMatch); got != tc.matchesWithoutTags {
+				t.Errorf("WriteMatchesRef(WithoutTagMatch) = %v, want %v", got, tc.matchesWithoutTags)
+			}
+			if got := WriteMatchesRef(tc.write, tc.ref, WithTagMatch); got != tc.matchesWithTags {
+				t.Errorf("WriteMatchesRef(WithTagMatch) = %v, want %v", got, tc.matchesWithTags)
+			}
 		})
 	}
 }
@@ -337,8 +340,12 @@ func TestRefMatchesRef(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			assert.Equal(t, tc.matchesWithoutTags, RefMatchesRef(tc.a, tc.b, WithoutTagMatch))
-			assert.Equal(t, tc.matchesWithTags, RefMatchesRef(tc.a, tc.b, WithTagMatch))
+			if got := RefMatchesRef(tc.a, tc.b, WithoutTagMatch); got != tc.matchesWithoutTags {
+				t.Errorf("RefMatchesRef(WithoutTagMatch) = %v, want %v", got, tc.matchesWithoutTags)
+			}
+			if got := RefMatchesRef(tc.a, tc.b, WithTagMatch); got != tc.matchesWithTags {
+				t.Errorf("RefMatchesRef(WithTagMatch) = %v, want %v", got, tc.matchesWithTags)
+			}
 		})
 	}
 }

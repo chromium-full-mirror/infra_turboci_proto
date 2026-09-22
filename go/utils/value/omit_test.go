@@ -5,15 +5,17 @@
 package value
 
 import (
+	"fmt"
 	"slices"
+	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/testing/protocmp"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
-
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func TestOmit(t *testing.T) {
@@ -133,14 +135,20 @@ func TestOmit(t *testing.T) {
 			ref := proto.Clone(tc.ref).(*orchestratorpb.ValueRef)
 
 			if tc.panicMatch != "" {
-				assert.PanicLike(t, func() {
-					Omit(ref, tc.reason)
-				}, tc.panicMatch)
+				defer func() {
+					r := recover()
+					if r == nil || !strings.Contains(fmt.Sprint(r), tc.panicMatch) {
+						t.Errorf("expected panic containing %q, got: %v", tc.panicMatch, r)
+					}
+				}()
+				Omit(ref, tc.reason)
 				return
 			}
 
 			Omit(ref, tc.reason)
-			assert.Match(t, tc.want, ref)
+			if diff := cmp.Diff(tc.want, ref, protocmp.Transform()); diff != "" {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
 		})
 	}
 }

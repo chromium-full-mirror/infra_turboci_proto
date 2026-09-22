@@ -5,6 +5,7 @@
 package value
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/base64"
 	"strings"
@@ -16,8 +17,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
-
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func TestComputeDigest(t *testing.T) {
@@ -50,31 +49,51 @@ func TestComputeDigest(t *testing.T) {
 			t.Parallel()
 
 			apb, err := anypb.New(tc.msg)
-			assert.NoErr(t, err)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 
 			dgst := ComputeDigest(apb)
-			assert.Equal(t, tc.want, dgst)
+			if dgst != tc.want {
+				t.Errorf("got %q, want %q", dgst, tc.want)
+			}
 
 			dgstPb, err := dgst.ToProto()
-			assert.NoErr(t, err)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 
 			wantSize := proto.Size(apb)
 			enc, err := proto.Marshal(apb)
-			assert.NoErr(t, err)
-			assert.Equal(t, wantSize, len(enc))
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if len(enc) != wantSize {
+				t.Errorf("got len(enc) = %d, want %d", len(enc), wantSize)
+			}
 
 			detEnc := DeterministicallySerializeAny(apb)
-			assert.Len(t, detEnc, wantSize)
+			if len(detEnc) != wantSize {
+				t.Errorf("got len(detEnc) = %d, want %d", len(detEnc), wantSize)
+			}
 
 			dec := &anypb.Any{}
-			assert.NoErr(t, proto.Unmarshal(detEnc, dec))
+			if err := proto.Unmarshal(detEnc, dec); err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 
-			assert.True(t, proto.Equal(dec, apb))
+			if !proto.Equal(dec, apb) {
+				t.Errorf("expected proto.Equal(dec, apb) to be true")
+			}
 
 			sha := sha256.Sum256(detEnc)
-			assert.Match(t, sha[:], dgstPb.GetHash())
+			if !bytes.Equal(sha[:], dgstPb.GetHash()) {
+				t.Errorf("hash mismatch: got %x, want %x", dgstPb.GetHash(), sha[:])
+			}
 
-			assert.Equal(t, uint64(wantSize), dgstPb.GetSizeBytes())
+			if got, want := dgstPb.GetSizeBytes(), uint64(wantSize); got != want {
+				t.Errorf("got SizeBytes = %d, want %d", got, want)
+			}
 		})
 	}
 }
@@ -125,7 +144,9 @@ func TestDigestToProtoErrors(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			_, err := tc.digest.ToProto()
-			assert.ErrLike(t, err, tc.wantErr)
+			if err == nil || !strings.Contains(err.Error(), tc.wantErr) {
+				t.Fatalf("expected error containing %q, got %v", tc.wantErr, err)
+			}
 		})
 	}
 }

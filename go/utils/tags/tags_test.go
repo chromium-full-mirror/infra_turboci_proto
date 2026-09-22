@@ -6,6 +6,7 @@ package tags
 
 import (
 	"maps"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -13,6 +14,7 @@ import (
 	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
+	"google.golang.org/protobuf/testing/protocmp"
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/dynamicpb"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -20,8 +22,6 @@ import (
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
 	tagpb "go.chromium.org/turboci/proto/go/tag"
 	testingtagspb "go.chromium.org/turboci/proto/go/testing/tags"
-
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 const (
@@ -29,11 +29,12 @@ const (
 	workPlan = orchestratorpb.ReadScope_READ_SCOPE_WORK_PLAN
 )
 
-func init() {
-	assert.DefaultOptions = append(assert.DefaultOptions, cmp.AllowUnexported(
+var cmpOpts = []cmp.Option{
+	protocmp.Transform(),
+	cmp.AllowUnexported(
 		Tag{},
 		scopeCount{},
-	))
+	),
 }
 
 func TestTagsFor(t *testing.T) {
@@ -56,12 +57,18 @@ func TestTagsFor(t *testing.T) {
 	} {
 		path := exemplar.ProtoReflect().Descriptor().ParentFile().Path()
 		fd, err := protoregistry.GlobalFiles.FindFileByPath(path)
-		assert.NoErr(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 		fdp := protodesc.ToFileDescriptorProto(fd)
 		fd, err = protodesc.NewFile(fdp, dynreg)
-		assert.NoErr(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 		err = dynreg.RegisterFile(fd)
-		assert.NoErr(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 	}
 
 	tests := []struct {
@@ -224,7 +231,9 @@ func TestTagsFor(t *testing.T) {
 			),
 			extraAssert: func(t *testing.T, tags Map) {
 				count, _ := tags["testing.tags.ComplexMessage.rep_str"].HasValue("a")
-				assert.Equal(t, uint32(2), count)
+				if count != 2 {
+					t.Errorf("expected count 2, got %d", count)
+				}
 			},
 		},
 		{
@@ -500,12 +509,18 @@ func TestTagsFor(t *testing.T) {
 
 			// Construct a dynamicpb counterpart of `tc.msg`.
 			blob, err := proto.Marshal(tc.msg)
-			assert.NoErr(t, err)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 			desc, err := dynreg.FindDescriptorByName(tc.msg.ProtoReflect().Descriptor().FullName())
-			assert.NoErr(t, err)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 			dyn := dynamicpb.NewMessage(desc.(protoreflect.MessageDescriptor))
 			err = proto.Unmarshal(blob, dyn)
-			assert.NoErr(t, err)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 
 			for _, subcase := range []struct {
 				name string
@@ -517,10 +532,16 @@ func TestTagsFor(t *testing.T) {
 				t.Run(subcase.name, func(t *testing.T) {
 					tags, err := ForMessage(subcase.msg)
 					if tc.wantErr != "" {
-						assert.ErrLike(t, err, tc.wantErr)
+						if err == nil || !strings.Contains(err.Error(), tc.wantErr) {
+							t.Fatalf("expected error containing %q, got %v", tc.wantErr, err)
+						}
 					} else {
-						assert.NoErr(t, err)
-						assert.Match(t, tc.wantTags, tags)
+						if err != nil {
+							t.Fatalf("unexpected error: %v", err)
+						}
+						if diff := cmp.Diff(tc.wantTags, tags, cmpOpts...); diff != "" {
+							t.Errorf("mismatch (-want +got):\n%s", diff)
+						}
 						if tc.extraAssert != nil {
 							tc.extraAssert(t, tags)
 						}
@@ -546,8 +567,10 @@ func TestTagsProto(t *testing.T) {
 				Ints:       []int{42},
 			}.Build(),
 		).Proto()
-		assert.Len(t, protos, 1)
-		assert.Match(t, orchestratorpb.Tag_builder{
+		if len(protos) != 1 {
+			t.Fatalf("expected length 1, got %d: %v", len(protos), protos)
+		}
+		want := orchestratorpb.Tag_builder{
 			Key:   proto.String("my.tag"),
 			Scope: orchestratorpb.ReadScope_READ_SCOPE_WORK_PLAN.Enum(),
 			Values: []*orchestratorpb.Tag_Value{
@@ -561,7 +584,10 @@ func TestTagsProto(t *testing.T) {
 					IntValue: proto.Int64(42),
 				}.Build(),
 			},
-		}.Build(), protos[0])
+		}.Build()
+		if diff := cmp.Diff(want, protos[0], cmpOpts...); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("strings_sorted_lexicographically", func(t *testing.T) {
@@ -581,8 +607,10 @@ func TestTagsProto(t *testing.T) {
 				},
 			}.Build(),
 		).Proto()
-		assert.Len(t, protos, 1)
-		assert.Match(t, orchestratorpb.Tag_builder{
+		if len(protos) != 1 {
+			t.Fatalf("expected length 1, got %d: %v", len(protos), protos)
+		}
+		want := orchestratorpb.Tag_builder{
 			Key:   proto.String("my.tag"),
 			Scope: orchestratorpb.ReadScope_READ_SCOPE_WORK_PLAN.Enum(),
 			Values: []*orchestratorpb.Tag_Value{
@@ -604,7 +632,10 @@ func TestTagsProto(t *testing.T) {
 					StrValue: proto.String("zebra"),
 				}.Build(),
 			},
-		}.Build(), protos[0])
+		}.Build()
+		if diff := cmp.Diff(want, protos[0], cmpOpts...); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("booleans_false_before_true", func(t *testing.T) {
@@ -618,8 +649,10 @@ func TestTagsProto(t *testing.T) {
 				Bools:      []bool{true, false, true},
 			}.Build(),
 		).Proto()
-		assert.Len(t, protos, 1)
-		assert.Match(t, orchestratorpb.Tag_builder{
+		if len(protos) != 1 {
+			t.Fatalf("expected length 1, got %d: %v", len(protos), protos)
+		}
+		want := orchestratorpb.Tag_builder{
 			Key:   proto.String("my.tag"),
 			Scope: orchestratorpb.ReadScope_READ_SCOPE_WORK_PLAN.Enum(),
 			Values: []*orchestratorpb.Tag_Value{
@@ -633,7 +666,10 @@ func TestTagsProto(t *testing.T) {
 					DuplicateCount: proto.Uint32(1),
 				}.Build(),
 			},
-		}.Build(), protos[0])
+		}.Build()
+		if diff := cmp.Diff(want, protos[0], cmpOpts...); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("integers_sorted_numerically", func(t *testing.T) {
@@ -647,8 +683,10 @@ func TestTagsProto(t *testing.T) {
 				Ints:       []int{42, -100, 0, 10, -100},
 			}.Build(),
 		).Proto()
-		assert.Len(t, protos, 1)
-		assert.Match(t, orchestratorpb.Tag_builder{
+		if len(protos) != 1 {
+			t.Fatalf("expected length 1, got %d: %v", len(protos), protos)
+		}
+		want := orchestratorpb.Tag_builder{
 			Key:   proto.String("my.tag"),
 			Scope: orchestratorpb.ReadScope_READ_SCOPE_WORK_PLAN.Enum(),
 			Values: []*orchestratorpb.Tag_Value{
@@ -670,7 +708,10 @@ func TestTagsProto(t *testing.T) {
 					IntValue: proto.Int64(42),
 				}.Build(),
 			},
-		}.Build(), protos[0])
+		}.Build()
+		if diff := cmp.Diff(want, protos[0], cmpOpts...); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("mixed_type_ordering", func(t *testing.T) {
@@ -687,8 +728,10 @@ func TestTagsProto(t *testing.T) {
 				Bools:      []bool{true, false},
 			}.Build(),
 		).Proto()
-		assert.Len(t, protos, 1)
-		assert.Match(t, orchestratorpb.Tag_builder{
+		if len(protos) != 1 {
+			t.Fatalf("expected length 1, got %d: %v", len(protos), protos)
+		}
+		want := orchestratorpb.Tag_builder{
 			Key:   proto.String("my.tag"),
 			Scope: orchestratorpb.ReadScope_READ_SCOPE_WORK_PLAN.Enum(),
 			Values: []*orchestratorpb.Tag_Value{
@@ -725,7 +768,10 @@ func TestTagsProto(t *testing.T) {
 					IntValue: proto.Int64(100),
 				}.Build(),
 			},
-		}.Build(), protos[0])
+		}.Build()
+		if diff := cmp.Diff(want, protos[0], cmpOpts...); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 }
 
@@ -767,8 +813,12 @@ func TestTagsForConvergence(t *testing.T) {
 		tagExtractorPoolMu.Unlock()
 
 		tags, err := ForMessage(msg)
-		assert.NoErr(t, err)
-		assert.Match(t, want, tags)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if diff := cmp.Diff(want, tags, cmpOpts...); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	}
 }
 
@@ -781,14 +831,18 @@ func fieldTagsTestCase[M proto.Message](want map[string]*tagpb.Tag) (name string
 		for field, tag := range FieldTags[M] {
 			name := string(field.FullName())
 			want, ok := expectedFields[name]
-			if assert.True(t, ok, assert.Explain("field %q was not expected", name)) {
-				if !assert.Match(t, want, tag) {
-					t.Logf(">> %q", name)
-				}
-				delete(expectedFields, name)
+			if !ok {
+				t.Errorf("field %q was not expected", name)
+				continue
 			}
+			if diff := cmp.Diff(want, tag, cmpOpts...); diff != "" {
+				t.Errorf("mismatch for %q (-want +got):\n%s", name, diff)
+			}
+			delete(expectedFields, name)
 		}
-		assert.Equal(t, len(expectedFields), 0, assert.Explain("expectedFields: %v", expectedFields))
+		if len(expectedFields) != 0 {
+			t.Errorf("expectedFields not empty: %v", expectedFields)
+		}
 	}
 }
 

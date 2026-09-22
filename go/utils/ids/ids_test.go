@@ -6,52 +6,70 @@ package ids
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/testing/protocmp"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	idspb "go.chromium.org/turboci/proto/go/graph/ids/v1"
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func TestCheckErr(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		cid, err := CheckErr("hello")
-		assert.NoErr(t, err)
-		assert.Match(t, idspb.Check_builder{
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		want := idspb.Check_builder{
 			Id: proto.String("hello"),
-		}.Build(), cid)
+		}.Build()
+		if diff := cmp.Diff(want, cid, protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("bad", func(t *testing.T) {
 		_, err := CheckErr("hello:world")
-		assert.ErrLike(t, err, `id.Check: id: "hello:world" contains ":"`)
+		wantErr := `id.Check: id: "hello:world" contains ":"`
+		if err == nil || !strings.Contains(err.Error(), wantErr) {
+			t.Fatalf("expected error containing %q, got %v", wantErr, err)
+		}
 	})
 }
 
 func TestCheckResultErr(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		id, err := CheckResultErr("h", 1)
-		assert.NoErr(t, err)
-		assert.Match(t,
-			idspb.CheckResult_builder{
-				Check: idspb.Check_builder{Id: proto.String("h")}.Build(),
-				Idx:   proto.Int32(1),
-			}.Build(),
-			id,
-		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		want := idspb.CheckResult_builder{
+			Check: idspb.Check_builder{Id: proto.String("h")}.Build(),
+			Idx:   proto.Int32(1),
+		}.Build()
+		if diff := cmp.Diff(want, id, protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("bad checkid", func(t *testing.T) {
 		_, err := CheckResultErr("h:", 1)
-		assert.ErrLike(t, err, `id.CheckResult: id.Check: id: "h:" contains ":"`)
+		wantErr := `id.CheckResult: id.Check: id: "h:" contains ":"`
+		if err == nil || !strings.Contains(err.Error(), wantErr) {
+			t.Fatalf("expected error containing %q, got %v", wantErr, err)
+		}
 	})
 
 	t.Run("bad idx", func(t *testing.T) {
 		_, err := CheckResultErr("h", 0)
-		assert.ErrLike(t, err, `id.CheckResult: resultIdx: 0 must be in [1, max(int32)]`)
+		wantErr := `id.CheckResult: resultIdx: 0 must be in [1, max(int32)]`
+		if err == nil || !strings.Contains(err.Error(), wantErr) {
+			t.Fatalf("expected error containing %q, got %v", wantErr, err)
+		}
 	})
 }
 
@@ -60,72 +78,95 @@ func TestCheckEditErr(t *testing.T) {
 
 	t.Run("ok", func(t *testing.T) {
 		id, err := CheckEditErr("h", ts)
-		assert.NoErr(t, err)
-		assert.Match(t,
-			idspb.CheckEdit_builder{
-				Check:   idspb.Check_builder{Id: proto.String("h")}.Build(),
-				Version: timestamppb.New(ts),
-			}.Build(),
-			id,
-		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		want := idspb.CheckEdit_builder{
+			Check:   idspb.Check_builder{Id: proto.String("h")}.Build(),
+			Version: timestamppb.New(ts),
+		}.Build()
+		if diff := cmp.Diff(want, id, protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("bad checkid", func(t *testing.T) {
 		_, err := CheckEditErr("h:", ts)
-		assert.ErrLike(t, err, `id.CheckEdit: id.Check: id: "h:" contains ":"`)
+		wantErr := `id.CheckEdit: id.Check: id: "h:" contains ":"`
+		if err == nil || !strings.Contains(err.Error(), wantErr) {
+			t.Fatalf("expected error containing %q, got %v", wantErr, err)
+		}
 	})
 
 	t.Run("bad ts", func(t *testing.T) {
 		_, err := CheckEditErr("h", time.Time{})
-		assert.ErrLike(t, err, `id.CheckEdit: zero timestamp`)
+		wantErr := `id.CheckEdit: zero timestamp`
+		if err == nil || !strings.Contains(err.Error(), wantErr) {
+			t.Fatalf("expected error containing %q, got %v", wantErr, err)
+		}
 	})
 }
 
 func TestStageErr(t *testing.T) {
 	t.Run("ok S", func(t *testing.T) {
 		id, err := StageErr(StageNotWorknode, "something")
-		assert.NoErr(t, err)
-		assert.Match(t,
-			idspb.Stage_builder{Id: proto.String("something"), IsWorknode: proto.Bool(false)}.Build(),
-			id,
-		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		want := idspb.Stage_builder{Id: proto.String("something"), IsWorknode: proto.Bool(false)}.Build()
+		if diff := cmp.Diff(want, id, protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 	t.Run("ok N", func(t *testing.T) {
 		id, err := StageErr(StageIsWorknode, "something")
-		assert.NoErr(t, err)
-		assert.Match(t,
-			idspb.Stage_builder{Id: proto.String("something"), IsWorknode: proto.Bool(true)}.Build(),
-			id,
-		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		want := idspb.Stage_builder{Id: proto.String("something"), IsWorknode: proto.Bool(true)}.Build()
+		if diff := cmp.Diff(want, id, protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("empty prefix", func(t *testing.T) {
 		_, err := StageErr(StageIsUnknown, "")
-		assert.ErrLike(t, err, `id.Stage: stageID: zero length`)
+		wantErr := `id.Stage: stageID: zero length`
+		if err == nil || !strings.Contains(err.Error(), wantErr) {
+			t.Fatalf("expected error containing %q, got %v", wantErr, err)
+		}
 	})
 
 	t.Run("bad format", func(t *testing.T) {
 		_, err := StageErr(StageIsUnknown, "some:thing")
-		assert.ErrLike(t, err, `id.Stage: stageID: "some:thing" contains ":"`)
+		wantErr := `id.Stage: stageID: "some:thing" contains ":"`
+		if err == nil || !strings.Contains(err.Error(), wantErr) {
+			t.Fatalf("expected error containing %q, got %v", wantErr, err)
+		}
 	})
 }
 
 func TestStageAttemptErr(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		id, err := StageAttemptErr(StageNotWorknode, "something", 1)
-		assert.NoErr(t, err)
-		assert.Match(t,
-			idspb.StageAttempt_builder{
-				Stage: idspb.Stage_builder{Id: proto.String("something"), IsWorknode: proto.Bool(false)}.Build(),
-				Idx:   proto.Int32(1),
-			}.Build(),
-			id,
-		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		want := idspb.StageAttempt_builder{
+			Stage: idspb.Stage_builder{Id: proto.String("something"), IsWorknode: proto.Bool(false)}.Build(),
+			Idx:   proto.Int32(1),
+		}.Build()
+		if diff := cmp.Diff(want, id, protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("bad idx", func(t *testing.T) {
 		_, err := StageAttemptErr(StageNotWorknode, "something", 0)
-		assert.ErrLike(t, err, `id.StageAttempt: attemptIdx: 0 must be in [1, max(int32)]`)
+		wantErr := `id.StageAttempt: attemptIdx: 0 must be in [1, max(int32)]`
+		if err == nil || !strings.Contains(err.Error(), wantErr) {
+			t.Fatalf("expected error containing %q, got %v", wantErr, err)
+		}
 	})
 }
 
@@ -134,80 +175,105 @@ func TestStageEditErr(t *testing.T) {
 
 	t.Run("ok", func(t *testing.T) {
 		id, err := StageEditErr(StageNotWorknode, "something", ts)
-		assert.NoErr(t, err)
-		assert.Match(t,
-			idspb.StageEdit_builder{
-				Stage: idspb.Stage_builder{
-					Id:         proto.String("something"),
-					IsWorknode: proto.Bool(false),
-				}.Build(),
-				Version: timestamppb.New(ts),
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		want := idspb.StageEdit_builder{
+			Stage: idspb.Stage_builder{
+				Id:         proto.String("something"),
+				IsWorknode: proto.Bool(false),
 			}.Build(),
-			id,
-		)
+			Version: timestamppb.New(ts),
+		}.Build()
+		if diff := cmp.Diff(want, id, protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("bad ts", func(t *testing.T) {
 		_, err := StageEditErr(StageNotWorknode, "something", time.Time{})
-		assert.ErrLike(t, err, `id.StageEdit: zero timestamp`)
+		wantErr := `id.StageEdit: zero timestamp`
+		if err == nil || !strings.Contains(err.Error(), wantErr) {
+			t.Fatalf("expected error containing %q, got %v", wantErr, err)
+		}
 	})
 }
 
 func TestSetWorkplanErr(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		id, err := CheckErr("c")
-		assert.NoErr(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 		id, err = SetWorkplanErr(id, "Lwp")
-		assert.NoErr(t, err)
-		assert.Match(t,
-			idspb.Check_builder{
-				WorkPlan: idspb.WorkPlan_builder{Id: proto.String("Lwp")}.Build(),
-				Id:       proto.String("c"),
-			}.Build(),
-			id,
-		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		want := idspb.Check_builder{
+			WorkPlan: idspb.WorkPlan_builder{Id: proto.String("Lwp")}.Build(),
+			Id:       proto.String("c"),
+		}.Build()
+		if diff := cmp.Diff(want, id, protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("bad workplan", func(t *testing.T) {
 		id, err := CheckErr("c")
-		assert.NoErr(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 		_, err = SetWorkplanErr(id, "Lw:p")
-		assert.ErrLike(t, err, `id.SetWorkplan: workPlanID: "Lw:p" contains ":"`)
+		wantErr := `id.SetWorkplan: workPlanID: "Lw:p" contains ":"`
+		if err == nil || !strings.Contains(err.Error(), wantErr) {
+			t.Fatalf("expected error containing %q, got %v", wantErr, err)
+		}
 	})
 }
 
 func TestSetWorkplan(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		id := SetWorkplan(must(CheckErr("c")), "Lwp")
-		assert.Match(t,
-			idspb.Check_builder{
-				WorkPlan: idspb.WorkPlan_builder{Id: proto.String("Lwp")}.Build(),
-				Id:       proto.String("c"),
-			}.Build(),
-			id,
-		)
+		want := idspb.Check_builder{
+			WorkPlan: idspb.WorkPlan_builder{Id: proto.String("Lwp")}.Build(),
+			Id:       proto.String("c"),
+		}.Build()
+		if diff := cmp.Diff(want, id, protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("panic", func(t *testing.T) {
-		assert.PanicLike(t, func() {
-			SetWorkplan(must(CheckErr("c")), "Lw:p")
-		}, `contains ":"`)
+		defer func() {
+			r := recover()
+			if r == nil || !strings.Contains(fmt.Sprint(r), `contains ":"`) {
+				t.Errorf(`expected panic containing "contains \":\"", got: %v`, r)
+			}
+		}()
+		SetWorkplan(must(CheckErr("c")), "Lw:p")
 	})
 }
 
 func TestStage(t *testing.T) {
 	t.Run(`ok`, func(t *testing.T) {
 		sid := Stage("hello")
-		assert.Match(t, idspb.Stage_builder{
+		want := idspb.Stage_builder{
 			Id:         proto.String("hello"),
 			IsWorknode: proto.Bool(false),
-		}.Build(), sid)
+		}.Build()
+		if diff := cmp.Diff(want, sid, protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("panic", func(t *testing.T) {
-		assert.PanicLike(t, func() {
-			Stage("")
-		}, `zero length`)
+		defer func() {
+			r := recover()
+			if r == nil || !strings.Contains(fmt.Sprint(r), `zero length`) {
+				t.Errorf(`expected panic containing "zero length", got: %v`, r)
+			}
+		}()
+		Stage("")
 	})
 }
 

@@ -12,8 +12,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
-
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 type NodeType string
@@ -129,7 +127,9 @@ func TestRefsInStage(t *testing.T) {
 		found++
 	}
 
-	assert.Equal(t, expect, found)
+	if found != expect {
+		t.Errorf("got %d, want %d", found, expect)
+	}
 }
 
 // TestRefsInStageAttempt ensures that `RefsInStageAttempt` actually covers all
@@ -147,7 +147,9 @@ func TestRefsInStageAttempt(t *testing.T) {
 		found++
 	}
 
-	assert.Equal(t, expect, found)
+	if found != expect {
+		t.Errorf("got %d, want %d", found, expect)
+	}
 }
 
 // TestRefsInStageEdit ensures that `RefsInStageEdit` actually covers all
@@ -166,7 +168,9 @@ func TestRefsInStageEdit(t *testing.T) {
 		found++
 	}
 
-	assert.Equal(t, expect, found)
+	if found != expect {
+		t.Errorf("got %d, want %d", found, expect)
+	}
 }
 
 // TestRefsInCheck ensures that `RefsInCheck` actually covers all ValueRefs in
@@ -183,7 +187,9 @@ func TestRefsInCheck(t *testing.T) {
 		found++
 	}
 
-	assert.Equal(t, expect, found)
+	if found != expect {
+		t.Errorf("got %d, want %d", found, expect)
+	}
 }
 
 // TestRefsInCheckEdit ensures that `RefsInCheckEdit` actually covers all
@@ -204,5 +210,7 @@ func TestRefsInCheckEdit(t *testing.T) {
 		found++
 	}
 
-	assert.Equal(t, expect, found)
+	if found != expect {
+		t.Errorf("got %d, want %d", found, expect)
+	}
 }

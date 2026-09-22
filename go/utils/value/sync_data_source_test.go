@@ -20,8 +20,6 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
-
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func TestDataSource(t *testing.T) {
@@ -51,11 +49,17 @@ func TestDataSource(t *testing.T) {
 
 	ds := SyncDataSourceFromMap(dat)
 
-	assert.True(t, ds.Retrieve("1").HasBinary())
+	if !ds.Retrieve("1").HasBinary() {
+		t.Errorf("expected ds.Retrieve(\"1\").HasBinary() to be true")
+	}
 
-	assert.True(t, ds.Retrieve("4").HasJson())
+	if !ds.Retrieve("4").HasJson() {
+		t.Errorf("expected ds.Retrieve(\"4\").HasJson() to be true")
+	}
 
-	assert.Nil(t, ds.Retrieve("NX"))
+	if got := ds.Retrieve("NX"); got != nil {
+		t.Errorf("expected nil for NX, got %v", got)
+	}
 
 	ds.Intern("2", mkJson())
 	ds.Intern("4", mkBin())
@@ -63,12 +67,20 @@ func TestDataSource(t *testing.T) {
 
 	// At this point, 1, 3, 5 are binary and 2, 4, 6 are JSON.
 
-	assert.True(t, ds.Retrieve("2").HasJson())
+	if !ds.Retrieve("2").HasJson() {
+		t.Errorf("expected ds.Retrieve(\"2\").HasJson() to be true")
+	}
 
-	assert.True(t, ds.Retrieve("4").HasJson())
+	if !ds.Retrieve("4").HasJson() {
+		t.Errorf("expected ds.Retrieve(\"4\").HasJson() to be true")
+	}
 
-	assert.Nil(t, ds.Retrieve("NX"))
-	assert.Equal(t, int64(6+proto.Size(mkBin())*3+proto.Size(mkJson())*3), ds.DataSize())
+	if got := ds.Retrieve("NX"); got != nil {
+		t.Errorf("expected nil for NX, got %v", got)
+	}
+	if got, want := ds.DataSize(), int64(6+proto.Size(mkBin())*3+proto.Size(mkJson())*3); got != want {
+		t.Errorf("got DataSize() = %d, want %d", got, want)
+	}
 }
 
 type mockDatum struct {

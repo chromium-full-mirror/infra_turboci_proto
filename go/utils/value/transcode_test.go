@@ -8,6 +8,7 @@ import (
 	"math"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/encoding/protowire"
 	"google.golang.org/protobuf/proto"
@@ -16,8 +17,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
-
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func TestHasUnknownFields(t *testing.T) {
@@ -31,9 +30,13 @@ func TestHasUnknownFields(t *testing.T) {
 
 		e := &emptypb.Empty{}
 
-		assert.NoErr(t, proto.Unmarshal(buf, e))
+		if err := proto.Unmarshal(buf, e); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		assert.True(t, hasUnknownFields(e.ProtoReflect()))
+		if !hasUnknownFields(e.ProtoReflect()) {
+			t.Errorf("expected hasUnknownFields to be true")
+		}
 	})
 
 	t.Run(`list`, func(t *testing.T) {
@@ -50,13 +53,21 @@ func TestHasUnknownFields(t *testing.T) {
 		outer = protowire.AppendBytes(outer, inner)
 
 		l := &structpb.ListValue{}
-		assert.NoErr(t, proto.Unmarshal(outer, l))
+		if err := proto.Unmarshal(outer, l); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		newList, err := structpb.NewList([]any{1.234})
-		assert.NoErr(t, err)
-		assert.Match(t, newList, l, protocmp.IgnoreUnknown())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if diff := cmp.Diff(newList, l, protocmp.Transform(), protocmp.IgnoreUnknown()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 
-		assert.True(t, hasUnknownFields(l.ProtoReflect()))
+		if !hasUnknownFields(l.ProtoReflect()) {
+			t.Errorf("expected hasUnknownFields to be true")
+		}
 	})
 
 	t.Run(`map`, func(t *testing.T) {
@@ -79,13 +90,21 @@ func TestHasUnknownFields(t *testing.T) {
 		outer = protowire.AppendBytes(outer, mapVal)
 
 		s := &structpb.Struct{}
-		assert.NoErr(t, proto.Unmarshal(outer, s))
+		if err := proto.Unmarshal(outer, s); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		newStruct, err := structpb.NewStruct(map[string]any{"key": 1.234})
-		assert.NoErr(t, err)
-		assert.Match(t, newStruct, s, protocmp.IgnoreUnknown())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if diff := cmp.Diff(newStruct, s, protocmp.Transform(), protocmp.IgnoreUnknown()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 
-		assert.True(t, hasUnknownFields(s.ProtoReflect()))
+		if !hasUnknownFields(s.ProtoReflect()) {
+			t.Errorf("expected hasUnknownFields to be true")
+		}
 	})
 
 	t.Run(`nested`, func(t *testing.T) {
@@ -112,15 +131,23 @@ func TestHasUnknownFields(t *testing.T) {
 		outer = protowire.AppendBytes(outer, structVal)
 
 		v := &structpb.Value{}
-		assert.NoErr(t, proto.Unmarshal(outer, v))
+		if err := proto.Unmarshal(outer, v); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		newStruct, err := structpb.NewStruct(map[string]any{"key": 1.234})
-		assert.NoErr(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		val := structpb.NewStructValue(newStruct)
-		assert.Match(t, val, v, protocmp.IgnoreUnknown())
+		if diff := cmp.Diff(val, v, protocmp.Transform(), protocmp.IgnoreUnknown()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 
-		assert.True(t, hasUnknownFields(v.ProtoReflect()))
+		if !hasUnknownFields(v.ProtoReflect()) {
+			t.Errorf("expected hasUnknownFields to be true")
+		}
 	})
 }
 
@@ -135,10 +162,13 @@ func TestEnsureJSONInSource(t *testing.T) {
 
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
 
-		assert.Match(t, orchestratorpb.ValueData_JsonAny_builder{
+		want := orchestratorpb.ValueData_JsonAny_builder{
 			TypeUrl: proto.String(URL[*structpb.Value]()),
 			Value:   proto.String(`"hi"`),
-		}.Build(), dSrc.Retrieve(Digest(v.GetDigest())).GetJson())
+		}.Build()
+		if diff := cmp.Diff(want, dSrc.Retrieve(Digest(v.GetDigest())).GetJson(), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run(`already_absorbed`, func(t *testing.T) {
@@ -151,10 +181,13 @@ func TestEnsureJSONInSource(t *testing.T) {
 
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
 
-		assert.Match(t, orchestratorpb.ValueData_JsonAny_builder{
+		want := orchestratorpb.ValueData_JsonAny_builder{
 			TypeUrl: proto.String(URL[*structpb.Value]()),
 			Value:   proto.String(`"hi"`),
-		}.Build(), dSrc.Retrieve(Digest(v.GetDigest())).GetJson())
+		}.Build()
+		if diff := cmp.Diff(want, dSrc.Retrieve(Digest(v.GetDigest())).GetJson(), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run(`already_json`, func(t *testing.T) {
@@ -168,10 +201,13 @@ func TestEnsureJSONInSource(t *testing.T) {
 		// should be a no-op
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
 
-		assert.Match(t, orchestratorpb.ValueData_JsonAny_builder{
+		want := orchestratorpb.ValueData_JsonAny_builder{
 			TypeUrl: proto.String(URL[*structpb.Value]()),
 			Value:   proto.String(`"hi"`),
-		}.Build(), dSrc.Retrieve(Digest(v.GetDigest())).GetJson())
+		}.Build()
+		if diff := cmp.Diff(want, dSrc.Retrieve(Digest(v.GetDigest())).GetJson(), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run(`not_in_registry`, func(t *testing.T) {
@@ -184,7 +220,9 @@ func TestEnsureJSONInSource(t *testing.T) {
 		}.Build()
 
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
-		assert.Equal(t, 0, len(dSrc))
+		if len(dSrc) != 0 {
+			t.Errorf("expected empty dSrc, got len %d", len(dSrc))
+		}
 	})
 
 	t.Run(`unknown_fields`, func(t *testing.T) {
@@ -194,16 +232,21 @@ func TestEnsureJSONInSource(t *testing.T) {
 		v := MustInline(&emptypb.Empty{}, "proj:realm")
 
 		raw, err := proto.Marshal(structpb.NewStringValue("hi"))
-		assert.NoErr(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 		v.GetInline().Value = raw
 
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
 
-		assert.Match(t, orchestratorpb.ValueData_JsonAny_builder{
+		want := orchestratorpb.ValueData_JsonAny_builder{
 			TypeUrl:          proto.String(URL[*emptypb.Empty]()),
 			Value:            proto.String("{}"),
 			HasUnknownFields: proto.Bool(true),
-		}.Build(), dSrc.Retrieve(Digest(v.GetDigest())).GetJson())
+		}.Build()
+		if diff := cmp.Diff(want, dSrc.Retrieve(Digest(v.GetDigest())).GetJson(), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run(`missing descriptor`, func(t *testing.T) {
@@ -219,10 +262,13 @@ func TestEnsureJSONInSource(t *testing.T) {
 
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
 
-		assert.Match(t, orchestratorpb.ValueData_builder{
+		want := orchestratorpb.ValueData_builder{
 			Binary:            rawData,
 			ConversionFailure: orchestratorpb.DataConversionFailure_DATA_CONVERSION_FAILURE_NO_DESCRIPTOR.Enum(),
-		}.Build(), dSrc.Retrieve(dgst))
+		}.Build()
+		if diff := cmp.Diff(want, dSrc.Retrieve(dgst), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run(`conversion failure sticky`, func(t *testing.T) {
@@ -241,17 +287,19 @@ func TestEnsureJSONInSource(t *testing.T) {
 
 		AbsorbAsJSON(dSrc, v, protojson.MarshalOptions{})
 
-		assert.Match(t, orchestratorpb.ValueData_builder{
+		want := orchestratorpb.ValueData_builder{
 			Binary:            emptyInline,
 			ConversionFailure: orchestratorpb.DataConversionFailure_DATA_CONVERSION_FAILURE_NO_DESCRIPTOR.Enum(),
-		}.Build(), dSrc.Retrieve(dgst))
+		}.Build()
+		if diff := cmp.Diff(want, dSrc.Retrieve(dgst), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 
 		// A second, unrelated, inline'd Empty.
 		AbsorbAsJSON(dSrc, MustInline(&emptypb.Empty{}, "other:realm"), protojson.MarshalOptions{})
 
-		assert.Match(t, orchestratorpb.ValueData_builder{
-			Binary:            emptyInline,
-			ConversionFailure: orchestratorpb.DataConversionFailure_DATA_CONVERSION_FAILURE_NO_DESCRIPTOR.Enum(),
-		}.Build(), dSrc.Retrieve(dgst))
+		if diff := cmp.Diff(want, dSrc.Retrieve(dgst), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 }

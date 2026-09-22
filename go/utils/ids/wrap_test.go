@@ -8,170 +8,272 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
+	"google.golang.org/protobuf/testing/protocmp"
+
 	idspb "go.chromium.org/turboci/proto/go/graph/ids/v1"
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func TestWrap(t *testing.T) {
 	t.Run("WorkPlan", func(t *testing.T) {
 		id := Workplan("wp")
 		wrapped := Wrap(id)
-		assert.Match(t, id, wrapped.GetWorkPlan())
+		if diff := cmp.Diff(id, wrapped.GetWorkPlan(), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("Stage", func(t *testing.T) {
 		id := Stage("s")
 		wrapped := Wrap(id)
-		assert.Match(t, id, wrapped.GetStage())
+		if diff := cmp.Diff(id, wrapped.GetStage(), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("StageAttempt", func(t *testing.T) {
 		id := must(StageAttemptErr(StageNotWorknode, "s", 1))
 		wrapped := Wrap(id)
-		assert.Match(t, id, wrapped.GetStageAttempt())
+		if diff := cmp.Diff(id, wrapped.GetStageAttempt(), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("StageEdit", func(t *testing.T) {
 		id := must(StageEditErr(StageNotWorknode, "s", time.Unix(1, 0)))
 		wrapped := Wrap(id)
-		assert.Match(t, id, wrapped.GetStageEdit())
+		if diff := cmp.Diff(id, wrapped.GetStageEdit(), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("Check", func(t *testing.T) {
 		id := Check("c")
 		wrapped := Wrap(id)
-		assert.Match(t, id, wrapped.GetCheck())
+		if diff := cmp.Diff(id, wrapped.GetCheck(), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("CheckResult", func(t *testing.T) {
 		id := must(CheckResultErr("c", 1))
 		wrapped := Wrap(id)
-		assert.Match(t, id, wrapped.GetCheckResult())
+		if diff := cmp.Diff(id, wrapped.GetCheckResult(), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("CheckEdit", func(t *testing.T) {
 		id := must(CheckEditErr("c", time.Unix(1, 0)))
 		wrapped := Wrap(id)
-		assert.Match(t, id, wrapped.GetCheckEdit())
+		if diff := cmp.Diff(id, wrapped.GetCheckEdit(), protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("Identifier", func(t *testing.T) {
 		id := Wrap(Check("c"))
 		wrapped := Wrap(id)
-		assert.Match(t, id, wrapped)
+		if diff := cmp.Diff(id, wrapped, protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	})
 
 	t.Run("nil", func(t *testing.T) {
 		var id *idspb.Check
-		assert.Nil(t, Wrap(id))
+		if got := Wrap(id); got != nil {
+			t.Errorf("expected nil, got %v", got)
+		}
 	})
 }
 
 func TestKindOf(t *testing.T) {
-	assert.Equal(t, idspb.IdentifierKind_IDENTIFIER_KIND_WORK_PLAN, KindOf(Workplan("wp")))
-	assert.Equal(t, idspb.IdentifierKind_IDENTIFIER_KIND_STAGE, KindOf(Stage("s")))
-	assert.Equal(t, idspb.IdentifierKind_IDENTIFIER_KIND_STAGE_ATTEMPT, KindOf(must(StageAttemptErr(StageNotWorknode, "s", 1))))
-	assert.Equal(t, idspb.IdentifierKind_IDENTIFIER_KIND_STAGE_EDIT, KindOf(must(StageEditErr(StageNotWorknode, "s", time.Unix(1, 0)))))
-	assert.Equal(t, idspb.IdentifierKind_IDENTIFIER_KIND_CHECK, KindOf(Check("c")))
-	assert.Equal(t, idspb.IdentifierKind_IDENTIFIER_KIND_CHECK_RESULT, KindOf(must(CheckResultErr("c", 1))))
-	assert.Equal(t, idspb.IdentifierKind_IDENTIFIER_KIND_CHECK_EDIT, KindOf(must(CheckEditErr("c", time.Unix(1, 0)))))
+	if got, want := KindOf(Workplan("wp")), idspb.IdentifierKind_IDENTIFIER_KIND_WORK_PLAN; got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
+	if got, want := KindOf(Stage("s")), idspb.IdentifierKind_IDENTIFIER_KIND_STAGE; got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
+	if got, want := KindOf(must(StageAttemptErr(StageNotWorknode, "s", 1))), idspb.IdentifierKind_IDENTIFIER_KIND_STAGE_ATTEMPT; got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
+	if got, want := KindOf(must(StageEditErr(StageNotWorknode, "s", time.Unix(1, 0)))), idspb.IdentifierKind_IDENTIFIER_KIND_STAGE_EDIT; got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
+	if got, want := KindOf(Check("c")), idspb.IdentifierKind_IDENTIFIER_KIND_CHECK; got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
+	if got, want := KindOf(must(CheckResultErr("c", 1))), idspb.IdentifierKind_IDENTIFIER_KIND_CHECK_RESULT; got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
+	if got, want := KindOf(must(CheckEditErr("c", time.Unix(1, 0)))), idspb.IdentifierKind_IDENTIFIER_KIND_CHECK_EDIT; got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
 }
 
 func TestRoot(t *testing.T) {
 	t.Run("WorkPlan", func(t *testing.T) {
 		id := Workplan("wp")
 		wp, check, stage := Root(id)
-		assert.Match(t, id, wp)
-		assert.Nil(t, check)
-		assert.Nil(t, stage)
+		if diff := cmp.Diff(id, wp, protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
+		if check != nil {
+			t.Errorf("expected nil check, got %v", check)
+		}
+		if stage != nil {
+			t.Errorf("expected nil stage, got %v", stage)
+		}
 	})
 
 	t.Run("Stage", func(t *testing.T) {
 		id := SetWorkplan(Stage("s"), "wp")
 		wp, check, stage := Root(id)
-		assert.Equal(t, "wp", wp.GetId())
-		assert.Nil(t, check)
-		assert.Equal(t, "s", stage.GetId())
+		if got := wp.GetId(); got != "wp" {
+			t.Errorf("got %q, want \"wp\"", got)
+		}
+		if check != nil {
+			t.Errorf("expected nil check, got %v", check)
+		}
+		if got := stage.GetId(); got != "s" {
+			t.Errorf("got %q, want \"s\"", got)
+		}
 	})
 
 	t.Run("StageAttempt", func(t *testing.T) {
 		id := SetWorkplan(must(StageAttemptErr(StageNotWorknode, "s", 1)), "wp")
 		wp, check, stage := Root(id)
-		assert.Equal(t, "wp", wp.GetId())
-		assert.Nil(t, check)
-		assert.Equal(t, "s", stage.GetId())
+		if got := wp.GetId(); got != "wp" {
+			t.Errorf("got %q, want \"wp\"", got)
+		}
+		if check != nil {
+			t.Errorf("expected nil check, got %v", check)
+		}
+		if got := stage.GetId(); got != "s" {
+			t.Errorf("got %q, want \"s\"", got)
+		}
 	})
 
 	t.Run("StageEdit", func(t *testing.T) {
 		id := SetWorkplan(must(StageEditErr(StageNotWorknode, "s", time.Unix(1, 0))), "wp")
 		wp, check, stage := Root(id)
-		assert.Equal(t, "wp", wp.GetId())
-		assert.Nil(t, check)
-		assert.Equal(t, "s", stage.GetId())
+		if got := wp.GetId(); got != "wp" {
+			t.Errorf("got %q, want \"wp\"", got)
+		}
+		if check != nil {
+			t.Errorf("expected nil check, got %v", check)
+		}
+		if got := stage.GetId(); got != "s" {
+			t.Errorf("got %q, want \"s\"", got)
+		}
 	})
 
 	t.Run("Check", func(t *testing.T) {
 		id := SetWorkplan(Check("c"), "wp")
 		wp, check, stage := Root(id)
-		assert.Equal(t, "wp", wp.GetId())
-		assert.Equal(t, "c", check.GetId())
-		assert.Nil(t, stage)
+		if got := wp.GetId(); got != "wp" {
+			t.Errorf("got %q, want \"wp\"", got)
+		}
+		if got := check.GetId(); got != "c" {
+			t.Errorf("got %q, want \"c\"", got)
+		}
+		if stage != nil {
+			t.Errorf("expected nil stage, got %v", stage)
+		}
 	})
 
 	t.Run("CheckResult", func(t *testing.T) {
 		id := SetWorkplan(must(CheckResultErr("c", 1)), "wp")
 		wp, check, stage := Root(id)
-		assert.Equal(t, "wp", wp.GetId())
-		assert.Equal(t, "c", check.GetId())
-		assert.Nil(t, stage)
+		if got := wp.GetId(); got != "wp" {
+			t.Errorf("got %q, want \"wp\"", got)
+		}
+		if got := check.GetId(); got != "c" {
+			t.Errorf("got %q, want \"c\"", got)
+		}
+		if stage != nil {
+			t.Errorf("expected nil stage, got %v", stage)
+		}
 	})
 
 	t.Run("CheckEdit", func(t *testing.T) {
 		id := SetWorkplan(must(CheckEditErr("c", time.Unix(1, 0))), "wp")
 		wp, check, stage := Root(id)
-		assert.Equal(t, "wp", wp.GetId())
-		assert.Equal(t, "c", check.GetId())
-		assert.Nil(t, stage)
+		if got := wp.GetId(); got != "wp" {
+			t.Errorf("got %q, want \"wp\"", got)
+		}
+		if got := check.GetId(); got != "c" {
+			t.Errorf("got %q, want \"c\"", got)
+		}
+		if stage != nil {
+			t.Errorf("expected nil stage, got %v", stage)
+		}
 	})
 
 	t.Run("nil", func(t *testing.T) {
 		wp, check, stage := Root[*idspb.Check](nil)
-		assert.Nil(t, wp)
-		assert.Nil(t, check)
-		assert.Nil(t, stage)
+		if wp != nil {
+			t.Errorf("expected nil wp, got %v", wp)
+		}
+		if check != nil {
+			t.Errorf("expected nil check, got %v", check)
+		}
+		if stage != nil {
+			t.Errorf("expected nil stage, got %v", stage)
+		}
 	})
 }
 
 func TestStageRoot(t *testing.T) {
 	id := must(StageAttemptErr(StageNotWorknode, "s", 1))
-	assert.Equal(t, "s", StageRoot(id).GetId())
+	if got := StageRoot(id).GetId(); got != "s" {
+		t.Errorf("got %q, want \"s\"", got)
+	}
 }
 
 func TestCheckRoot(t *testing.T) {
 	id := must(CheckResultErr("c", 1))
-	assert.Equal(t, "c", CheckRoot(id).GetId())
+	if got := CheckRoot(id).GetId(); got != "c" {
+		t.Errorf("got %q, want \"c\"", got)
+	}
 }
 
 func TestSameRoot(t *testing.T) {
 	c1 := Check("c")
 	c2, err := CheckEditErr("c", time.Now())
-	assert.NoErr(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	c3 := Check("other")
 
-	assert.True(t, SameRoot(c1, c2))
-	assert.False(t, SameRoot(c1, c3))
-	assert.False(t, SameRoot(c1, (*idspb.Check)(nil)))
+	if !SameRoot(c1, c2) {
+		t.Errorf("expected SameRoot(c1, c2) to be true")
+	}
+	if SameRoot(c1, c3) {
+		t.Errorf("expected SameRoot(c1, c3) to be false")
+	}
+	if SameRoot(c1, (*idspb.Check)(nil)) {
+		t.Errorf("expected SameRoot(c1, nil) to be false")
+	}
 
 	s1 := Stage("s")
 	sa, err := StageAttemptErr(StageNotWorknode, "s", 1)
-	assert.NoErr(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	s1wp := SetWorkplan(Stage("s"), "wp")
 
-	assert.False(t, SameRoot(c1, s1))
-	assert.False(t, SameRoot(s1, s1wp))
-	assert.True(t, SameRoot(s1, sa))
+	if SameRoot(c1, s1) {
+		t.Errorf("expected SameRoot(c1, s1) to be false")
+	}
+	if SameRoot(s1, s1wp) {
+		t.Errorf("expected SameRoot(s1, s1wp) to be false")
+	}
+	if !SameRoot(s1, sa) {
+		t.Errorf("expected SameRoot(s1, sa) to be true")
+	}
 }
 
 func TestSameWorkplan(t *testing.T) {
@@ -179,7 +281,13 @@ func TestSameWorkplan(t *testing.T) {
 	c2 := SetWorkplan(Check("c2"), "wp")
 	c3 := SetWorkplan(Check("c1"), "other")
 
-	assert.True(t, SameWorkPlan(c1, c2))
-	assert.False(t, SameWorkPlan(c1, c3))
-	assert.False(t, SameWorkPlan(c1, (*idspb.Check)(nil)))
+	if !SameWorkPlan(c1, c2) {
+		t.Errorf("expected SameWorkPlan(c1, c2) to be true")
+	}
+	if SameWorkPlan(c1, c3) {
+		t.Errorf("expected SameWorkPlan(c1, c3) to be false")
+	}
+	if SameWorkPlan(c1, (*idspb.Check)(nil)) {
+		t.Errorf("expected SameWorkPlan(c1, nil) to be false")
+	}
 }

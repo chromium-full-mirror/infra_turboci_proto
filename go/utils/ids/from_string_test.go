@@ -6,9 +6,8 @@ package ids
 
 import (
 	"fmt"
+	"strings"
 	"testing"
-
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func ExampleFromString() {
@@ -124,9 +123,11 @@ func TestFromStringErrorConditions(t *testing.T) {
 			t.Parallel()
 			_, err := FromString(test.input)
 			if test.expectedErr == "" {
-				assert.NoErr(t, err)
-			} else {
-				assert.ErrLike(t, err, test.expectedErr)
+				if err != nil {
+					t.Fatalf("unexpected error: %v", err)
+				}
+			} else if err == nil || !strings.Contains(err.Error(), test.expectedErr) {
+				t.Fatalf("expected error containing %q, got %v", test.expectedErr, err)
 			}
 		})
 	}

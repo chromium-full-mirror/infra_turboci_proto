@@ -6,14 +6,13 @@ package value
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
-
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 // Tests [filterState.filterRef] by virtue of Stage.Args.
@@ -44,14 +43,22 @@ func TestFilterRef(t *testing.T) {
 	}.Build()
 
 	filter, err := ParseFilter(vf)
-	assert.NoErr(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	t.Run(`want_binary_inline`, func(t *testing.T) {
 		ref := makeRef(t, nil, structpb.NewBoolValue(true))
 		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
-		assert.NoErr(t, err)
-		assert.Equal(t, orchestratorpb.OmitReason(0), ref.GetOmitReason())
-		assert.False(t, wantJSON)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got := ref.GetOmitReason(); got != orchestratorpb.OmitReason(0) {
+			t.Errorf("got OmitReason %v, want 0", got)
+		}
+		if wantJSON {
+			t.Errorf("expected wantJSON to be false")
+		}
 	})
 
 	t.Run(`want_binary_remote`, func(t *testing.T) {
@@ -60,53 +67,89 @@ func TestFilterRef(t *testing.T) {
 		dgst := "nP03LSTuMLuLfYp94hWnwHOj2kT2Pg_DikrWVQk2tJ4vAQ"
 
 		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
-		assert.NoErr(t, err)
-		assert.Equal(t, dgst, ref.GetDigest())
-		assert.False(t, wantJSON)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got := ref.GetDigest(); got != dgst {
+			t.Errorf("got digest %q, want %q", got, dgst)
+		}
+		if wantJSON {
+			t.Errorf("expected wantJSON to be false")
+		}
 	})
 
 	t.Run(`want_json_inline`, func(t *testing.T) {
 		lst, err := structpb.NewList([]any{true})
-		assert.NoErr(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 		ref := makeRef(t, nil, lst)
 
 		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
-		assert.NoErr(t, err)
-		assert.Equal(t, orchestratorpb.OmitReason(0), ref.GetOmitReason())
-		assert.True(t, wantJSON)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got := ref.GetOmitReason(); got != orchestratorpb.OmitReason(0) {
+			t.Errorf("got OmitReason %v, want 0", got)
+		}
+		if !wantJSON {
+			t.Errorf("expected wantJSON to be true")
+		}
 	})
 
 	t.Run(`want_json_remote`, func(t *testing.T) {
 		mSrc := SimpleDataSource{}
 		lst, err := structpb.NewList([]any{true})
-		assert.NoErr(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		ref := makeRef(t, mSrc, lst)
 		dgst := "TiL2hG12z5bCnO-q4sXjaMqObIM7ZeZNAYcHd56bTRE1AQ"
 
 		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
-		assert.NoErr(t, err)
-		assert.Equal(t, orchestratorpb.OmitReason(0), ref.GetOmitReason())
-		assert.True(t, wantJSON)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got := ref.GetOmitReason(); got != orchestratorpb.OmitReason(0) {
+			t.Errorf("got OmitReason %v, want 0", got)
+		}
+		if !wantJSON {
+			t.Errorf("expected wantJSON to be true")
+		}
 
-		assert.Equal(t, dgst, ref.GetDigest())
+		if got := ref.GetDigest(); got != dgst {
+			t.Errorf("got digest %q, want %q", got, dgst)
+		}
 	})
 
 	t.Run(`want_no_access`, func(t *testing.T) {
 		ref := makeRef(t, nil, structpb.NewBoolValue(true))
 
 		filter, err := ParseFilter(vf)
-		assert.NoErr(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, func(realm string) (bool, error) {
 			return false, nil
 		})
-		assert.NoErr(t, err)
-		assert.Equal(t, orchestratorpb.OmitReason_OMIT_REASON_NO_ACCESS, ref.GetOmitReason())
-		assert.False(t, wantJSON)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got := ref.GetOmitReason(); got != orchestratorpb.OmitReason_OMIT_REASON_NO_ACCESS {
+			t.Errorf("got OmitReason %v, want %v", got, orchestratorpb.OmitReason_OMIT_REASON_NO_ACCESS)
+		}
+		if wantJSON {
+			t.Errorf("expected wantJSON to be false")
+		}
 
-		assert.False(t, ref.HasDigest())
-		assert.False(t, ref.HasInline())
+		if ref.HasDigest() {
+			t.Errorf("expected ref.HasDigest() to be false")
+		}
+		if ref.HasInline() {
+			t.Errorf("expected ref.HasInline() to be false")
+		}
 	})
 
 	t.Run(`unwant_structural_inline`, func(t *testing.T) {
@@ -114,17 +157,29 @@ func TestFilterRef(t *testing.T) {
 		vf.SetIncludeData(nil)
 
 		filter, err := ParseFilter(vf)
-		assert.NoErr(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		ref := makeRef(t, nil, structpb.NewBoolValue(true))
 
 		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
-		assert.NoErr(t, err)
-		assert.Equal(t, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED, ref.GetOmitReason())
-		assert.False(t, wantJSON)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got := ref.GetOmitReason(); got != orchestratorpb.OmitReason_OMIT_REASON_UNWANTED {
+			t.Errorf("got OmitReason %v, want %v", got, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED)
+		}
+		if wantJSON {
+			t.Errorf("expected wantJSON to be false")
+		}
 
-		assert.Equal(t, "nP03LSTuMLuLfYp94hWnwHOj2kT2Pg_DikrWVQk2tJ4vAQ", ref.GetDigest())
-		assert.False(t, ref.HasInline())
+		if got, want := ref.GetDigest(), "nP03LSTuMLuLfYp94hWnwHOj2kT2Pg_DikrWVQk2tJ4vAQ"; got != want {
+			t.Errorf("got digest %q, want %q", got, want)
+		}
+		if ref.HasInline() {
+			t.Errorf("expected ref.HasInline() to be false")
+		}
 	})
 
 	t.Run(`unwant_structural_remote`, func(t *testing.T) {
@@ -132,19 +187,31 @@ func TestFilterRef(t *testing.T) {
 		vf.SetIncludeData(nil)
 
 		filter, err := ParseFilter(vf)
-		assert.NoErr(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		mSrc := SimpleDataSource{}
 
 		ref := makeRef(t, mSrc, structpb.NewBoolValue(true))
 
 		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
-		assert.NoErr(t, err)
-		assert.Equal(t, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED, ref.GetOmitReason())
-		assert.False(t, wantJSON)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got := ref.GetOmitReason(); got != orchestratorpb.OmitReason_OMIT_REASON_UNWANTED {
+			t.Errorf("got OmitReason %v, want %v", got, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED)
+		}
+		if wantJSON {
+			t.Errorf("expected wantJSON to be false")
+		}
 
-		assert.Equal(t, "nP03LSTuMLuLfYp94hWnwHOj2kT2Pg_DikrWVQk2tJ4vAQ", ref.GetDigest())
-		assert.False(t, ref.HasInline())
+		if got, want := ref.GetDigest(), "nP03LSTuMLuLfYp94hWnwHOj2kT2Pg_DikrWVQk2tJ4vAQ"; got != want {
+			t.Errorf("got digest %q, want %q", got, want)
+		}
+		if ref.HasInline() {
+			t.Errorf("expected ref.HasInline() to be false")
+		}
 	})
 
 	t.Run(`unwant_type_inline`, func(t *testing.T) {
@@ -153,24 +220,38 @@ func TestFilterRef(t *testing.T) {
 		ref.GetInline().TypeUrl = TypePrefix + "bogus.namespace.Message"
 
 		wantJSON, err := filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, nil)
-		assert.NoErr(t, err)
-		assert.Equal(t, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED, ref.GetOmitReason())
-		assert.False(t, wantJSON)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got := ref.GetOmitReason(); got != orchestratorpb.OmitReason_OMIT_REASON_UNWANTED {
+			t.Errorf("got OmitReason %v, want %v", got, orchestratorpb.OmitReason_OMIT_REASON_UNWANTED)
+		}
+		if wantJSON {
+			t.Errorf("expected wantJSON to be false")
+		}
 
-		assert.Equal(t, "hvSVT6KdvPHO0-h55_J5by3wAe3u5ymMnl0ColX35QkxAQ", ref.GetDigest())
-		assert.False(t, ref.HasInline())
+		if got, want := ref.GetDigest(), "hvSVT6KdvPHO0-h55_J5by3wAe3u5ymMnl0ColX35QkxAQ"; got != want {
+			t.Errorf("got digest %q, want %q", got, want)
+		}
+		if ref.HasInline() {
+			t.Errorf("expected ref.HasInline() to be false")
+		}
 	})
 
 	t.Run(`auth_error`, func(t *testing.T) {
 		ref := makeRef(t, nil, structpb.NewBoolValue(true))
 
 		filter, err := ParseFilter(vf)
-		assert.NoErr(t, err)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
 		_, err = filter.Apply(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, ref, func(realm string) (bool, error) {
 			return false, errors.New("oh no auth exploded")
 		})
-		assert.ErrLike(t, err, "oh no auth exploded")
+		if err == nil || !strings.Contains(err.Error(), "oh no auth exploded") {
+			t.Fatalf("expected error containing %q, got %v", "oh no auth exploded", err)
+		}
 	})
 }
 
@@ -183,10 +264,18 @@ func TestParseFilter_LegacyFields(t *testing.T) {
 		}.Build()
 
 		pf, err := ParseFilter(vf)
-		assert.NoErr(t, err)
-		assert.True(t, pf.needData.HasAll(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_OPTION))
-		assert.True(t, pf.needData.HasAll(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_EDIT_REASON_DETAIL))
-		assert.True(t, pf.needData.HasAll(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_REASON_DETAIL))
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !pf.needData.HasAll(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_OPTION) {
+			t.Errorf("expected needData to have CHECK_OPTION")
+		}
+		if !pf.needData.HasAll(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_EDIT_REASON_DETAIL) {
+			t.Errorf("expected needData to have STAGE_EDIT_REASON_DETAIL")
+		}
+		if !pf.needData.HasAll(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_REASON_DETAIL) {
+			t.Errorf("expected needData to have CHECK_EDIT_REASON_DETAIL")
+		}
 	})
 
 	t.Run("include_data_precedence", func(t *testing.T) {
@@ -196,8 +285,14 @@ func TestParseFilter_LegacyFields(t *testing.T) {
 		}.Build()
 
 		pf, err := ParseFilter(vf)
-		assert.NoErr(t, err)
-		assert.True(t, pf.needData.HasAll(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS))
-		assert.False(t, pf.needData.HasAny(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_OPTION))
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !pf.needData.HasAll(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS) {
+			t.Errorf("expected needData to have STAGE_ARGS")
+		}
+		if pf.needData.HasAny(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_OPTION) {
+			t.Errorf("expected needData not to have CHECK_OPTION")
+		}
 	})
 }

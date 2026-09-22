@@ -8,20 +8,26 @@ import (
 	"testing"
 
 	"google.golang.org/protobuf/types/known/emptypb"
-
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func TestURL(t *testing.T) {
 	t.Parallel()
 
-	assert.Equal(t, TypePrefix+"google.protobuf.Empty", URL[*emptypb.Empty]())
-	assert.Equal(t, TypePrefix+"google.protobuf.Empty", URLMsg((*emptypb.Empty)(nil)))
+	if got, want := URL[*emptypb.Empty](), TypePrefix+"google.protobuf.Empty"; got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+	if got, want := URLMsg((*emptypb.Empty)(nil)), TypePrefix+"google.protobuf.Empty"; got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
 }
 
 func TestURLPatternPackageOf(t *testing.T) {
 	t.Parallel()
 
-	assert.Equal(t, TypePrefix+"google.protobuf.*", URLPatternPackageOf[*emptypb.Empty]())
-	assert.Equal(t, TypePrefix+"google.protobuf.*", URLPatternPackageOfMsg((*emptypb.Empty)(nil)))
+	if got, want := URLPatternPackageOf[*emptypb.Empty](), TypePrefix+"google.protobuf.*"; got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+	if got, want := URLPatternPackageOfMsg((*emptypb.Empty)(nil)), TypePrefix+"google.protobuf.*"; got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
 }

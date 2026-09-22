@@ -8,8 +8,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
+	"google.golang.org/protobuf/testing/protocmp"
+
 	idspb "go.chromium.org/turboci/proto/go/graph/ids/v1"
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func shouldWrap[I Identifier](ident I, err error) (*idspb.Identifier, error) {
@@ -107,14 +109,25 @@ func TestToFromString(t *testing.T) {
 		t.Run(tc.expect, func(t *testing.T) {
 			t.Parallel()
 			id, err := tc.mkIdent()
-			assert.NoErr(t, err)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 
-			assert.Equal(t, tc.expect, ToString(id))
+			if got := ToString(id); got != tc.expect {
+				t.Errorf("ToString(id) = %q, want %q", got, tc.expect)
+			}
 
-			assert.Equal(t, tc.kind, KindOf(id))
+			if got := KindOf(id); got != tc.kind {
+				t.Errorf("KindOf(id) = %v, want %v", got, tc.kind)
+			}
 
 			ident, err := FromString(tc.expect)
-			assert.Match(t, id, ident)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if diff := cmp.Diff(id, ident, protocmp.Transform()); diff != "" {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
 		})
 
 		const wp = "00012345"
@@ -122,18 +135,31 @@ func TestToFromString(t *testing.T) {
 		t.Run(wpExpect, func(t *testing.T) {
 			t.Parallel()
 			id, err := tc.mkIdent()
-			assert.NoErr(t, err)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 			_, err = SetWorkplanErr(id, wp)
-			assert.NoErr(t, err)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 
-			assert.Equal(t, wpExpect, ToString(id))
+			if got := ToString(id); got != wpExpect {
+				t.Errorf("ToString(id) = %q, want %q", got, wpExpect)
+			}
 
 			ident, err := FromString(wpExpect)
-			assert.Match(t, id, ident)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if diff := cmp.Diff(id, ident, protocmp.Transform()); diff != "" {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
 		})
 	}
 }
 
 func TestToString_nil(t *testing.T) {
-	assert.Equal(t, Invalid, ToString[*idspb.Check](nil))
+	if got := ToString[*idspb.Check](nil); got != Invalid {
+		t.Errorf("got %q, want %q", got, Invalid)
+	}
 }

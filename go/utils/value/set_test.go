@@ -7,20 +7,22 @@ package value
 import (
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+	"google.golang.org/protobuf/testing/protocmp"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
-
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func TestSetAddIn(t *testing.T) {
 	t.Parallel()
 
 	s, err := structpb.NewStruct(map[string]any{"hello": "world"})
-	assert.NoErr(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	toSet := []*orchestratorpb.ValueRef{
 		// NOTE: BoolValue and StringValue are the same proto message type.
@@ -37,34 +39,46 @@ func TestSetAddIn(t *testing.T) {
 	for _, ref := range toSet {
 		var realmConflict bool
 		set, realmConflict = SetByTypeIn(set, ref)
-		assert.False(t, realmConflict)
+		if realmConflict {
+			t.Errorf("expected realmConflict to be false")
+		}
 	}
 
-	assert.Match(t, []*orchestratorpb.ValueRef{
+	want := []*orchestratorpb.ValueRef{
 		MustInline(&emptypb.Empty{}, "proj:realm"),
 		MustInline(s, "proj:realm"),
 		MustInline(structpb.NewStringValue("goodbye"), "proj:realm"),
-	}, set)
+	}
+	if diff := cmp.Diff(want, set, protocmp.Transform()); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
 
 	set, realmConflict := SetByTypeIn(set, MustInline(structpb.NewBoolValue(false), "other:realm"))
-	assert.True(t, realmConflict)
+	if !realmConflict {
+		t.Errorf("expected realmConflict to be true")
+	}
 
-	assert.Match(t, []*orchestratorpb.ValueRef{
-		MustInline(&emptypb.Empty{}, "proj:realm"),
-		MustInline(s, "proj:realm"),
-		MustInline(structpb.NewStringValue("goodbye"), "proj:realm"),
-	}, set)
+	if diff := cmp.Diff(want, set, protocmp.Transform()); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
 
 	set, added := AddByTypeIn(set, MustInline(structpb.NewBoolValue(true), "proj:realm"))
-	assert.False(t, added)
+	if added {
+		t.Errorf("expected added to be false")
+	}
 
 	set, added = AddByTypeIn(set, MustInline(&wrapperspb.BoolValue{Value: true}, "proj:realm"))
-	assert.True(t, added)
+	if !added {
+		t.Errorf("expected added to be true")
+	}
 
-	assert.Match(t, []*orchestratorpb.ValueRef{
+	wantAfterAdd := []*orchestratorpb.ValueRef{
 		MustInline(&wrapperspb.BoolValue{Value: true}, "proj:realm"),
 		MustInline(&emptypb.Empty{}, "proj:realm"),
 		MustInline(s, "proj:realm"),
 		MustInline(structpb.NewStringValue("goodbye"), "proj:realm"),
-	}, set)
+	}
+	if diff := cmp.Diff(wantAfterAdd, set, protocmp.Transform()); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
 }

@@ -13,8 +13,6 @@ import (
 
 	commonpb "go.chromium.org/turboci/proto/go/data/common/v1"
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
-
-	"go.chromium.org/turboci/proto/go/utils/internal/test/assert"
 )
 
 func TestMakeTypeMatcher(t *testing.T) {
@@ -153,19 +151,29 @@ func TestMakeTypeMatcher(t *testing.T) {
 				TypeUrls: tc.urls,
 			}.Build())
 			if tc.wantErr != "" {
-				assert.ErrLike(t, err, tc.wantErr)
+				if err == nil || !strings.Contains(err.Error(), tc.wantErr) {
+					t.Fatalf("expected error containing %q, got %v", tc.wantErr, err)
+				}
 				return
 			}
 
-			assert.Len(t, matcher.patterns, tc.wantN)
+			if len(matcher.patterns) != tc.wantN {
+				t.Errorf("expected %d patterns, got %d: %v", tc.wantN, len(matcher.patterns), matcher.patterns)
+			}
 
-			assert.NoErr(t, err)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 
 			for _, matchCandidate := range tc.matches {
-				assert.True(t, matcher.Match(matchCandidate))
+				if !matcher.Match(matchCandidate) {
+					t.Errorf("expected %q to match", matchCandidate)
+				}
 			}
 			for _, rejectCandidate := range tc.rejects {
-				assert.False(t, matcher.Match(rejectCandidate))
+				if matcher.Match(rejectCandidate) {
+					t.Errorf("expected %q to be rejected", rejectCandidate)
+				}
 			}
 		})
 	}
@@ -178,16 +186,24 @@ func TestTypeSetBuilder(t *testing.T) {
 		t.Parallel()
 
 		tb, err := TypeSetBuilder{}.Build()
-		assert.NoErr(t, err)
-		assert.Nil(t, tb)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if tb != nil {
+			t.Errorf("expected nil tb, got %v", tb)
+		}
 	})
 
 	t.Run(`fixed`, func(t *testing.T) {
 		t.Parallel()
 
 		tb, err := TypeSetBuilder{}.WithMessages(&emptypb.Empty{}, &structpb.Struct{}).Build()
-		assert.NoErr(t, err)
-		assert.Len(t, tb.GetTypeUrls(), 2)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(tb.GetTypeUrls()) != 2 {
+			t.Errorf("expected 2 TypeUrls, got %d: %v", len(tb.GetTypeUrls()), tb.GetTypeUrls())
+		}
 	})
 
 	t.Run(`normalized`, func(t *testing.T) {
@@ -197,8 +213,14 @@ func TestTypeSetBuilder(t *testing.T) {
 			WithMessages(&emptypb.Empty{}, &structpb.Struct{}).
 			WithPackagesOf(&structpb.ListValue{}).
 			Build())
-		assert.NoErr(t, err)
-		assert.Len(t, tb.GetTypeUrls(), 1)
-		assert.Equal(t, TypePrefix+"google.protobuf.*", tb.GetTypeUrls()[0])
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(tb.GetTypeUrls()) != 1 {
+			t.Fatalf("expected 1 TypeUrl, got %d: %v", len(tb.GetTypeUrls()), tb.GetTypeUrls())
+		}
+		if got, want := tb.GetTypeUrls()[0], TypePrefix+"google.protobuf.*"; got != want {
+			t.Errorf("got %q, want %q", got, want)
+		}
 	})
 }
