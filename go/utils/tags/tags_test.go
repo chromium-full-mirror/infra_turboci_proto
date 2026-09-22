@@ -13,6 +13,7 @@ import (
 	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
+	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/dynamicpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 
@@ -45,13 +46,15 @@ func TestTagsFor(t *testing.T) {
 	// built-in descriptors, and then we'll be testing something weird, not truly
 	// dynamic descriptor pools.
 	dynreg := &protoregistry.Files{}
-	for _, path := range []string{
+	for _, exemplar := range []proto.Message{
 		// Note: order matters - need to register leafs of the dep graph first.
-		"google/protobuf/descriptor.proto",
-		"google/protobuf/empty.proto",
-		"turboci/tag.proto",
-		"testing/tags/demo.proto",
+		// Also need just one representative message per *.proto file.
+		&descriptorpb.FileDescriptorProto{},
+		&emptypb.Empty{},
+		&tagpb.Tag{},
+		&testingtagspb.MyMessage{},
 	} {
+		path := exemplar.ProtoReflect().Descriptor().ParentFile().Path()
 		fd, err := protoregistry.GlobalFiles.FindFileByPath(path)
 		assert.NoErr(t, err)
 		fdp := protodesc.ToFileDescriptorProto(fd)
