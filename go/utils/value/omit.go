@@ -14,8 +14,8 @@ import (
 //
 // If the ref has inline data, it's converted to a digest and then dropped.
 //
-// Otherwise, if the omit reason is NO_ACCESS, this clears the digest and
-// inline data.
+// Otherwise, if the omit reason is NO_ACCESS, this clears the digest,
+// inline data and tags.
 //
 // Will panic on unknown reasons, including the UNKNOWN (0) value.
 func Omit(ref *orchestratorpb.ValueRef, reason orchestratorpb.OmitReason) {
