@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 """Test for decode/lookup/find/results."""
 
+import operator
 import unittest
 
 from google.protobuf import struct_pb2
@@ -136,36 +137,26 @@ class TestResults(unittest.TestCase):
           wrappers_pb2.StringValue(value=val), realm, omit_reason=omit_reason
       )
 
+    def _mk_result(*items: value_ref_pb2.ValueRef) -> check_pb2.Check.Result:
+      return check_pb2.Check.Result(
+          data=sorted(items, key=operator.attrgetter('type_url'))
+      )
+
     check = check_pb2.Check(
         results=[
-            check_pb2.Check.Result(
-                data=sorted(
-                    [
-                        _mkdat('hi'),
-                        _mkdat(100, omit=True),
-                    ],
-                    key=lambda x: x.type_url,
-                ),
+            _mk_result(
+                _mkdat('hi'),
+                _mkdat(100, omit=True),
             ),
-            check_pb2.Check.Result(
-                data=sorted(
-                    [
-                        _mkdat('no', omit=True),
-                        _mkdat(200, omit=True),
-                        _mkdat(True),
-                    ],
-                    key=lambda x: x.type_url,
-                ),
+            _mk_result(
+                _mkdat('no', omit=True),
+                _mkdat(200, omit=True),
+                _mkdat(True),
             ),
-            check_pb2.Check.Result(
-                data=sorted(
-                    [
-                        _mkdat('whee'),
-                        _mkdat(300),
-                        _mkdat(True),
-                    ],
-                    key=lambda x: x.type_url,
-                ),
+            _mk_result(
+                _mkdat('whee'),
+                _mkdat(300),
+                _mkdat(True),
             ),
         ],
     )
