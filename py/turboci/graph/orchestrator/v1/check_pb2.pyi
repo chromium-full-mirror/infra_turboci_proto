@@ -1,6 +1,7 @@
 from google.api import field_behavior_pb2 as _field_behavior_pb2
 from turboci.graph.ids.v1 import identifier_pb2 as _identifier_pb2
 from turboci.graph.orchestrator.v1 import actor_pb2 as _actor_pb2
+from turboci.graph.orchestrator.v1 import attribute_pb2 as _attribute_pb2
 from turboci.graph.orchestrator.v1 import check_kind_pb2 as _check_kind_pb2
 from turboci.graph.orchestrator.v1 import check_state_pb2 as _check_state_pb2
 from turboci.graph.orchestrator.v1 import dependencies_pb2 as _dependencies_pb2
@@ -18,7 +19,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Check(_message.Message):
-    __slots__ = ("identifier", "display_name", "created_by", "kind", "sub_type", "realm", "version", "state", "state_history", "dependencies", "options", "results", "edits")
+    __slots__ = ("identifier", "display_name", "created_by", "kind", "sub_type", "realm", "version", "state", "state_history", "dependencies", "options", "results", "edits", "attributes")
     class StateHistoryEntry(_message.Message):
         __slots__ = ("state", "version")
         STATE_FIELD_NUMBER: _ClassVar[int]
@@ -54,6 +55,7 @@ class Check(_message.Message):
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
     RESULTS_FIELD_NUMBER: _ClassVar[int]
     EDITS_FIELD_NUMBER: _ClassVar[int]
+    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     identifier: _identifier_pb2.Check
     display_name: str
     created_by: _actor_pb2.Actor
@@ -67,4 +69,5 @@ class Check(_message.Message):
     options: _containers.RepeatedCompositeFieldContainer[_value_ref_pb2.ValueRef]
     results: _containers.RepeatedCompositeFieldContainer[Check.Result]
     edits: _containers.RepeatedCompositeFieldContainer[_edit_pb2.Edit]
-    def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Check, _Mapping]] = ..., display_name: _Optional[str] = ..., created_by: _Optional[_Union[_actor_pb2.Actor, _Mapping]] = ..., kind: _Optional[_Union[_check_kind_pb2.CheckKind, str]] = ..., sub_type: _Optional[str] = ..., realm: _Optional[str] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ..., state_history: _Optional[_Iterable[_Union[Check.StateHistoryEntry, _Mapping]]] = ..., dependencies: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., options: _Optional[_Iterable[_Union[_value_ref_pb2.ValueRef, _Mapping]]] = ..., results: _Optional[_Iterable[_Union[Check.Result, _Mapping]]] = ..., edits: _Optional[_Iterable[_Union[_edit_pb2.Edit, _Mapping]]] = ...) -> None: ...
+    attributes: _containers.RepeatedCompositeFieldContainer[_attribute_pb2.Attribute]
+    def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Check, _Mapping]] = ..., display_name: _Optional[str] = ..., created_by: _Optional[_Union[_actor_pb2.Actor, _Mapping]] = ..., kind: _Optional[_Union[_check_kind_pb2.CheckKind, str]] = ..., sub_type: _Optional[str] = ..., realm: _Optional[str] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ..., state_history: _Optional[_Iterable[_Union[Check.StateHistoryEntry, _Mapping]]] = ..., dependencies: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., options: _Optional[_Iterable[_Union[_value_ref_pb2.ValueRef, _Mapping]]] = ..., results: _Optional[_Iterable[_Union[Check.Result, _Mapping]]] = ..., edits: _Optional[_Iterable[_Union[_edit_pb2.Edit, _Mapping]]] = ..., attributes: _Optional[_Iterable[_Union[_attribute_pb2.Attribute, _Mapping]]] = ...) -> None: ...

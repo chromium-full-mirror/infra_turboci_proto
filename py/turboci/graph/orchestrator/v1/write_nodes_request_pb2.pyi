@@ -2,6 +2,7 @@ import datetime
 
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from turboci.graph.ids.v1 import identifier_pb2 as _identifier_pb2
+from turboci.graph.orchestrator.v1 import attribute_pb2 as _attribute_pb2
 from turboci.graph.orchestrator.v1 import check_kind_pb2 as _check_kind_pb2
 from turboci.graph.orchestrator.v1 import check_state_pb2 as _check_state_pb2
 from turboci.graph.orchestrator.v1 import edge_pb2 as _edge_pb2
@@ -9,6 +10,7 @@ from turboci.graph.orchestrator.v1 import field_options_pb2 as _field_options_pb
 from turboci.graph.orchestrator.v1 import stage_pb2 as _stage_pb2
 from turboci.graph.orchestrator.v1 import stage_attempt_execution_policy_pb2 as _stage_attempt_execution_policy_pb2
 from turboci.graph.orchestrator.v1 import stage_execution_policy_pb2 as _stage_execution_policy_pb2
+from turboci.graph.orchestrator.v1 import stage_state_pb2 as _stage_state_pb2
 from turboci.graph.orchestrator.v1 import transaction_details_pb2 as _transaction_details_pb2
 from turboci.graph.orchestrator.v1 import value_write_pb2 as _value_write_pb2
 from google.protobuf.internal import containers as _containers
@@ -46,8 +48,30 @@ class WriteNodesRequest(_message.Message):
         message: str
         details: _containers.RepeatedCompositeFieldContainer[_value_write_pb2.ValueWrite]
         def __init__(self, message: _Optional[str] = ..., details: _Optional[_Iterable[_Union[_value_write_pb2.ValueWrite, _Mapping]]] = ...) -> None: ...
+    class CheckAttributeWrite(_message.Message):
+        __slots__ = ("name", "expression", "on_state", "attribute_type")
+        NAME_FIELD_NUMBER: _ClassVar[int]
+        EXPRESSION_FIELD_NUMBER: _ClassVar[int]
+        ON_STATE_FIELD_NUMBER: _ClassVar[int]
+        ATTRIBUTE_TYPE_FIELD_NUMBER: _ClassVar[int]
+        name: str
+        expression: str
+        on_state: _check_state_pb2.CheckState
+        attribute_type: _attribute_pb2.AttributeType
+        def __init__(self, name: _Optional[str] = ..., expression: _Optional[str] = ..., on_state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ..., attribute_type: _Optional[_Union[_attribute_pb2.AttributeType, str]] = ...) -> None: ...
+    class StageAttributeWrite(_message.Message):
+        __slots__ = ("name", "expression", "on_state", "attribute_type")
+        NAME_FIELD_NUMBER: _ClassVar[int]
+        EXPRESSION_FIELD_NUMBER: _ClassVar[int]
+        ON_STATE_FIELD_NUMBER: _ClassVar[int]
+        ATTRIBUTE_TYPE_FIELD_NUMBER: _ClassVar[int]
+        name: str
+        expression: str
+        on_state: _stage_state_pb2.StageState
+        attribute_type: _attribute_pb2.AttributeType
+        def __init__(self, name: _Optional[str] = ..., expression: _Optional[str] = ..., on_state: _Optional[_Union[_stage_state_pb2.StageState, str]] = ..., attribute_type: _Optional[_Union[_attribute_pb2.AttributeType, str]] = ...) -> None: ...
     class CheckWrite(_message.Message):
-        __slots__ = ("identifier", "realm", "kind", "sub_type", "display_name", "options", "dependencies", "result_data", "finalize_results", "state")
+        __slots__ = ("identifier", "realm", "kind", "sub_type", "display_name", "options", "dependencies", "result_data", "finalize_results", "state", "attributes")
         IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
         REALM_FIELD_NUMBER: _ClassVar[int]
         KIND_FIELD_NUMBER: _ClassVar[int]
@@ -58,6 +82,7 @@ class WriteNodesRequest(_message.Message):
         RESULT_DATA_FIELD_NUMBER: _ClassVar[int]
         FINALIZE_RESULTS_FIELD_NUMBER: _ClassVar[int]
         STATE_FIELD_NUMBER: _ClassVar[int]
+        ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
         identifier: _identifier_pb2.Check
         realm: str
         kind: _check_kind_pb2.CheckKind
@@ -68,9 +93,10 @@ class WriteNodesRequest(_message.Message):
         result_data: _containers.RepeatedCompositeFieldContainer[_value_write_pb2.ValueWrite]
         finalize_results: bool
         state: _check_state_pb2.CheckState
-        def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Check, _Mapping]] = ..., realm: _Optional[str] = ..., kind: _Optional[_Union[_check_kind_pb2.CheckKind, str]] = ..., sub_type: _Optional[str] = ..., display_name: _Optional[str] = ..., options: _Optional[_Iterable[_Union[_value_write_pb2.ValueWrite, _Mapping]]] = ..., dependencies: _Optional[_Union[WriteNodesRequest.DependencyGroup, _Mapping]] = ..., result_data: _Optional[_Iterable[_Union[_value_write_pb2.ValueWrite, _Mapping]]] = ..., finalize_results: _Optional[bool] = ..., state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ...) -> None: ...
+        attributes: _containers.RepeatedCompositeFieldContainer[WriteNodesRequest.CheckAttributeWrite]
+        def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Check, _Mapping]] = ..., realm: _Optional[str] = ..., kind: _Optional[_Union[_check_kind_pb2.CheckKind, str]] = ..., sub_type: _Optional[str] = ..., display_name: _Optional[str] = ..., options: _Optional[_Iterable[_Union[_value_write_pb2.ValueWrite, _Mapping]]] = ..., dependencies: _Optional[_Union[WriteNodesRequest.DependencyGroup, _Mapping]] = ..., result_data: _Optional[_Iterable[_Union[_value_write_pb2.ValueWrite, _Mapping]]] = ..., finalize_results: _Optional[bool] = ..., state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ..., attributes: _Optional[_Iterable[_Union[WriteNodesRequest.CheckAttributeWrite, _Mapping]]] = ...) -> None: ...
     class StageWrite(_message.Message):
-        __slots__ = ("identifier", "args", "realm", "display_name", "dependencies", "requested_stage_execution_policy", "assignments")
+        __slots__ = ("identifier", "args", "realm", "display_name", "dependencies", "requested_stage_execution_policy", "assignments", "attributes")
         IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
         ARGS_FIELD_NUMBER: _ClassVar[int]
         REALM_FIELD_NUMBER: _ClassVar[int]
@@ -78,6 +104,7 @@ class WriteNodesRequest(_message.Message):
         DEPENDENCIES_FIELD_NUMBER: _ClassVar[int]
         REQUESTED_STAGE_EXECUTION_POLICY_FIELD_NUMBER: _ClassVar[int]
         ASSIGNMENTS_FIELD_NUMBER: _ClassVar[int]
+        ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
         identifier: _identifier_pb2.Stage
         args: _value_write_pb2.ValueWrite
         realm: str
@@ -85,7 +112,8 @@ class WriteNodesRequest(_message.Message):
         dependencies: WriteNodesRequest.DependencyGroup
         requested_stage_execution_policy: _stage_execution_policy_pb2.StageExecutionPolicy
         assignments: _containers.RepeatedCompositeFieldContainer[_stage_pb2.Stage.Assignment]
-        def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Stage, _Mapping]] = ..., args: _Optional[_Union[_value_write_pb2.ValueWrite, _Mapping]] = ..., realm: _Optional[str] = ..., display_name: _Optional[str] = ..., dependencies: _Optional[_Union[WriteNodesRequest.DependencyGroup, _Mapping]] = ..., requested_stage_execution_policy: _Optional[_Union[_stage_execution_policy_pb2.StageExecutionPolicy, _Mapping]] = ..., assignments: _Optional[_Iterable[_Union[_stage_pb2.Stage.Assignment, _Mapping]]] = ...) -> None: ...
+        attributes: _containers.RepeatedCompositeFieldContainer[WriteNodesRequest.StageAttributeWrite]
+        def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Stage, _Mapping]] = ..., args: _Optional[_Union[_value_write_pb2.ValueWrite, _Mapping]] = ..., realm: _Optional[str] = ..., display_name: _Optional[str] = ..., dependencies: _Optional[_Union[WriteNodesRequest.DependencyGroup, _Mapping]] = ..., requested_stage_execution_policy: _Optional[_Union[_stage_execution_policy_pb2.StageExecutionPolicy, _Mapping]] = ..., assignments: _Optional[_Iterable[_Union[_stage_pb2.Stage.Assignment, _Mapping]]] = ..., attributes: _Optional[_Iterable[_Union[WriteNodesRequest.StageAttributeWrite, _Mapping]]] = ...) -> None: ...
     class CurrentAttemptWrite(_message.Message):
         __slots__ = ("details", "progress", "state_transition")
         class StateTransition(_message.Message):

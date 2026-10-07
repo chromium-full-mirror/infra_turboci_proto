@@ -4,6 +4,7 @@ from google.api import field_behavior_pb2 as _field_behavior_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from turboci.graph.ids.v1 import identifier_pb2 as _identifier_pb2
 from turboci.graph.orchestrator.v1 import actor_pb2 as _actor_pb2
+from turboci.graph.orchestrator.v1 import attribute_pb2 as _attribute_pb2
 from turboci.graph.orchestrator.v1 import builtin_executor_pb2 as _builtin_executor_pb2
 from turboci.graph.orchestrator.v1 import check_state_pb2 as _check_state_pb2
 from turboci.graph.orchestrator.v1 import dependencies_pb2 as _dependencies_pb2
@@ -25,7 +26,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Stage(_message.Message):
-    __slots__ = ("identifier", "display_name", "created_by", "realm", "args", "sub_type", "version", "state", "cancelled_by", "cancelled_at", "legacy", "state_history", "dependencies", "execution_policy", "attempts", "assignments", "continuation_group", "concluded_reason", "edits")
+    __slots__ = ("identifier", "display_name", "created_by", "realm", "args", "sub_type", "version", "state", "cancelled_by", "cancelled_at", "legacy", "state_history", "dependencies", "execution_policy", "attempts", "assignments", "continuation_group", "concluded_reason", "edits", "attributes")
     class Legacy(_message.Message):
         __slots__ = ("worknode", "work_executor_type")
         WORKNODE_FIELD_NUMBER: _ClassVar[int]
@@ -118,6 +119,7 @@ class Stage(_message.Message):
     CONTINUATION_GROUP_FIELD_NUMBER: _ClassVar[int]
     CONCLUDED_REASON_FIELD_NUMBER: _ClassVar[int]
     EDITS_FIELD_NUMBER: _ClassVar[int]
+    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     identifier: _identifier_pb2.Stage
     display_name: str
     created_by: _actor_pb2.Actor
@@ -137,7 +139,8 @@ class Stage(_message.Message):
     continuation_group: _dependencies_pb2.Dependencies
     concluded_reason: _stage_concluded_reason_pb2.StageConcludedReason
     edits: _containers.RepeatedCompositeFieldContainer[_edit_pb2.Edit]
-    def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Stage, _Mapping]] = ..., display_name: _Optional[str] = ..., created_by: _Optional[_Union[_actor_pb2.Actor, _Mapping]] = ..., realm: _Optional[str] = ..., args: _Optional[_Union[_value_ref_pb2.ValueRef, _Mapping]] = ..., sub_type: _Optional[str] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., state: _Optional[_Union[_stage_state_pb2.StageState, str]] = ..., cancelled_by: _Optional[_Union[_actor_pb2.Actor, _Mapping]] = ..., cancelled_at: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., legacy: _Optional[_Union[Stage.Legacy, _Mapping]] = ..., state_history: _Optional[_Iterable[_Union[Stage.StateHistoryEntry, _Mapping]]] = ..., dependencies: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., execution_policy: _Optional[_Union[Stage.ExecutionPolicyState, _Mapping]] = ..., attempts: _Optional[_Iterable[_Union[Stage.Attempt, _Mapping]]] = ..., assignments: _Optional[_Iterable[_Union[Stage.Assignment, _Mapping]]] = ..., continuation_group: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., concluded_reason: _Optional[_Union[_stage_concluded_reason_pb2.StageConcludedReason, str]] = ..., edits: _Optional[_Iterable[_Union[_edit_pb2.Edit, _Mapping]]] = ...) -> None: ...
+    attributes: _containers.RepeatedCompositeFieldContainer[_attribute_pb2.Attribute]
+    def __init__(self, identifier: _Optional[_Union[_identifier_pb2.Stage, _Mapping]] = ..., display_name: _Optional[str] = ..., created_by: _Optional[_Union[_actor_pb2.Actor, _Mapping]] = ..., realm: _Optional[str] = ..., args: _Optional[_Union[_value_ref_pb2.ValueRef, _Mapping]] = ..., sub_type: _Optional[str] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., state: _Optional[_Union[_stage_state_pb2.StageState, str]] = ..., cancelled_by: _Optional[_Union[_actor_pb2.Actor, _Mapping]] = ..., cancelled_at: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., legacy: _Optional[_Union[Stage.Legacy, _Mapping]] = ..., state_history: _Optional[_Iterable[_Union[Stage.StateHistoryEntry, _Mapping]]] = ..., dependencies: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., execution_policy: _Optional[_Union[Stage.ExecutionPolicyState, _Mapping]] = ..., attempts: _Optional[_Iterable[_Union[Stage.Attempt, _Mapping]]] = ..., assignments: _Optional[_Iterable[_Union[Stage.Assignment, _Mapping]]] = ..., continuation_group: _Optional[_Union[_dependencies_pb2.Dependencies, _Mapping]] = ..., concluded_reason: _Optional[_Union[_stage_concluded_reason_pb2.StageConcludedReason, str]] = ..., edits: _Optional[_Iterable[_Union[_edit_pb2.Edit, _Mapping]]] = ..., attributes: _Optional[_Iterable[_Union[_attribute_pb2.Attribute, _Mapping]]] = ...) -> None: ...
 
 class StageAttemptClaimedFailure(_message.Message):
     __slots__ = ("claimed_by_process_uid",)
