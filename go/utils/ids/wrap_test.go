@@ -274,6 +274,33 @@ func TestSameRoot(t *testing.T) {
 	if !SameRoot(s1, sa) {
 		t.Errorf("expected SameRoot(s1, sa) to be true")
 	}
+
+	wp1 := Workplan("wp1")
+	wp2 := Workplan("wp2")
+	if SameRoot(c1, wp1) {
+		t.Errorf("expected SameRoot(c1, wp1) to be false")
+	}
+	if SameRoot(wp1, c1) {
+		t.Errorf("expected SameRoot(wp1, c1) to be false")
+	}
+	if SameRoot(s1, wp1) {
+		t.Errorf("expected SameRoot(s1, wp1) to be false")
+	}
+	if SameRoot(wp1, s1) {
+		t.Errorf("expected SameRoot(wp1, s1) to be false")
+	}
+	if SameRoot(wp1, wp2) {
+		t.Errorf("expected SameRoot(wp1, wp2) to be false")
+	}
+	if SameRoot(wp1, wp1) {
+		t.Errorf("expected SameRoot(wp1, wp1) to be false")
+	}
+	if SameRoot(c3, sa) {
+		t.Errorf("expected SameRoot(c3, sa) to be false")
+	}
+	if SameRoot(sa, c3) {
+		t.Errorf("expected SameRoot(sa, c3) to be false")
+	}
 }
 
 func TestSameWorkplan(t *testing.T) {

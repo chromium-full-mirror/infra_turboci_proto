@@ -209,12 +209,15 @@ func SameRoot[A Identifier, B Identifier](a A, b B) bool {
 	if a == nil || b == nil {
 		return false
 	}
-	_, aStage, aCheck := Root(a)
-	_, bStage, bCheck := Root(b)
+	_, aCheck, aStage := Root(a)
+	_, bCheck, bStage := Root(b)
+	if aCheck != nil && bCheck != nil {
+		return proto.Equal(aCheck, bCheck)
+	}
 	if aStage != nil && bStage != nil {
 		return proto.Equal(aStage, bStage)
 	}
-	return proto.Equal(aCheck, bCheck)
+	return false
 }
 
 // SameWorkPlan returns `true` if the two identifiers have the same workplan.
