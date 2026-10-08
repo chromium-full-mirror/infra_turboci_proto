@@ -101,6 +101,8 @@ func EnsureJSONForced(source DataSource, digest Digest, mopt protojson.MarshalOp
 
 // ConvertToJSON returns a ValueData given an Any.
 //
+// Panics if `apb` is nil.
+//
 // If marshaling is possible, the ValueData will contain a JsonAny. If there is
 // an error, the ValueData will contain `apb` as Binary plus a
 // conversion_failure.
@@ -110,6 +112,10 @@ func EnsureJSONForced(source DataSource, digest Digest, mopt protojson.MarshalOp
 // is intended to be used to allow the caller to restrict which proto type(s)
 // are available for this conversion process.
 func ConvertToJSON(apb *anypb.Any, mopt protojson.MarshalOptions) *orchestratorpb.ValueData {
+	if apb == nil {
+		panic("ConvertToJSON: apb cannot be nil")
+	}
+
 	resolver := mopt.Resolver
 	if resolver == nil {
 		resolver = protoregistry.GlobalTypes
@@ -121,7 +127,7 @@ func ConvertToJSON(apb *anypb.Any, mopt protojson.MarshalOptions) *orchestratorp
 	//
 	// Such a mechanism would also let us trivially compute HasUnknownFields
 	// during this transcode.
-	desc, err := resolver.FindMessageByURL(apb.TypeUrl)
+	desc, err := resolver.FindMessageByURL(apb.GetTypeUrl())
 	if err != nil {
 		return orchestratorpb.ValueData_builder{
 			Binary:            apb,
@@ -132,7 +138,7 @@ func ConvertToJSON(apb *anypb.Any, mopt protojson.MarshalOptions) *orchestratorp
 	msg := desc.New().Interface()
 	if err := (proto.UnmarshalOptions{
 		Resolver: resolver,
-	}).Unmarshal(apb.Value, msg); err != nil {
+	}).Unmarshal(apb.GetValue(), msg); err != nil {
 		return orchestratorpb.ValueData_builder{
 			Binary:            apb,
 			ConversionFailure: orchestratorpb.DataConversionFailure_DATA_CONVERSION_FAILURE_ERROR.Enum(),

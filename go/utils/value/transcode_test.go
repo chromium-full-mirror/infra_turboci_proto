@@ -5,7 +5,9 @@
 package value
 
 import (
+	"fmt"
 	"math"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -302,4 +304,17 @@ func TestEnsureJSONInSource(t *testing.T) {
 			t.Errorf("mismatch (-want +got):\n%s", diff)
 		}
 	})
+}
+
+func TestConvertToJSON_nil(t *testing.T) {
+	t.Parallel()
+
+	defer func() {
+		r := recover()
+		if r == nil || !strings.Contains(fmt.Sprint(r), "ConvertToJSON: apb cannot be nil") {
+			t.Errorf("expected panic containing %q, got: %v", "ConvertToJSON: apb cannot be nil", r)
+		}
+	}()
+
+	ConvertToJSON(nil, protojson.MarshalOptions{})
 }
