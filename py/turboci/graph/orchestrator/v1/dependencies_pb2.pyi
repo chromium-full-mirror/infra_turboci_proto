@@ -1,4 +1,5 @@
 from turboci.graph.orchestrator.v1 import edge_pb2 as _edge_pb2
+from turboci.graph.orchestrator.v1 import evaluation_error_pb2 as _evaluation_error_pb2
 from turboci.graph.orchestrator.v1 import revision_pb2 as _revision_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
@@ -20,14 +21,16 @@ class Dependencies(_message.Message):
         threshold: int
         def __init__(self, edges: _Optional[_Iterable[int]] = ..., groups: _Optional[_Iterable[_Union[Dependencies.Group, _Mapping]]] = ..., threshold: _Optional[int] = ...) -> None: ...
     class ResolutionEvent(_message.Message):
-        __slots__ = ("version", "resolution", "condition_version")
+        __slots__ = ("version", "resolution", "condition_version", "error_reason")
         VERSION_FIELD_NUMBER: _ClassVar[int]
         RESOLUTION_FIELD_NUMBER: _ClassVar[int]
         CONDITION_VERSION_FIELD_NUMBER: _ClassVar[int]
+        ERROR_REASON_FIELD_NUMBER: _ClassVar[int]
         version: _revision_pb2.Revision
         resolution: _edge_pb2.Resolution
         condition_version: _revision_pb2.Revision
-        def __init__(self, version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., resolution: _Optional[_Union[_edge_pb2.Resolution, str]] = ..., condition_version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ...) -> None: ...
+        error_reason: _evaluation_error_pb2.EvaluationError
+        def __init__(self, version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., resolution: _Optional[_Union[_edge_pb2.Resolution, str]] = ..., condition_version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., error_reason: _Optional[_Union[_evaluation_error_pb2.EvaluationError, _Mapping]] = ...) -> None: ...
     class ResolutionEventsEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]

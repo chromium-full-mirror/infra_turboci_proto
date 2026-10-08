@@ -421,6 +421,7 @@ type Dependencies_ResolutionEvent struct {
 	xxx_hidden_Version          *Revision              `protobuf:"bytes,1,opt,name=version,proto3,oneof"`
 	xxx_hidden_Resolution       Resolution             `protobuf:"varint,2,opt,name=resolution,proto3,enum=turboci.graph.orchestrator.v1.Resolution,oneof"`
 	xxx_hidden_ConditionVersion *Revision              `protobuf:"bytes,3,opt,name=condition_version,json=conditionVersion,proto3,oneof"`
+	xxx_hidden_ErrorReason      *EvaluationError       `protobuf:"bytes,4,opt,name=error_reason,json=errorReason,proto3,oneof"`
 	XXX_raceDetectHookData      protoimpl.RaceDetectHookData
 	XXX_presence                [1]uint32
 	unknownFields               protoimpl.UnknownFields
@@ -475,17 +476,28 @@ func (x *Dependencies_ResolutionEvent) GetConditionVersion() *Revision {
 	return nil
 }
 
+func (x *Dependencies_ResolutionEvent) GetErrorReason() *EvaluationError {
+	if x != nil {
+		return x.xxx_hidden_ErrorReason
+	}
+	return nil
+}
+
 func (x *Dependencies_ResolutionEvent) SetVersion(v *Revision) {
 	x.xxx_hidden_Version = v
 }
 
 func (x *Dependencies_ResolutionEvent) SetResolution(v Resolution) {
 	x.xxx_hidden_Resolution = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
 }
 
 func (x *Dependencies_ResolutionEvent) SetConditionVersion(v *Revision) {
 	x.xxx_hidden_ConditionVersion = v
+}
+
+func (x *Dependencies_ResolutionEvent) SetErrorReason(v *EvaluationError) {
+	x.xxx_hidden_ErrorReason = v
 }
 
 func (x *Dependencies_ResolutionEvent) HasVersion() bool {
@@ -509,6 +521,13 @@ func (x *Dependencies_ResolutionEvent) HasConditionVersion() bool {
 	return x.xxx_hidden_ConditionVersion != nil
 }
 
+func (x *Dependencies_ResolutionEvent) HasErrorReason() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_ErrorReason != nil
+}
+
 func (x *Dependencies_ResolutionEvent) ClearVersion() {
 	x.xxx_hidden_Version = nil
 }
@@ -520,6 +539,10 @@ func (x *Dependencies_ResolutionEvent) ClearResolution() {
 
 func (x *Dependencies_ResolutionEvent) ClearConditionVersion() {
 	x.xxx_hidden_ConditionVersion = nil
+}
+
+func (x *Dependencies_ResolutionEvent) ClearErrorReason() {
+	x.xxx_hidden_ErrorReason = nil
 }
 
 type Dependencies_ResolutionEvent_builder struct {
@@ -544,6 +567,10 @@ type Dependencies_ResolutionEvent_builder struct {
 	// This MAY be substantially before `version` (even before the
 	// containing node was created).
 	ConditionVersion *Revision
+	// Optional. If defined, it means that the edge condition evaluation or one
+	// of its referenced attributes had an error. In such case, `resolution`
+	// will be UNSATISFIED.
+	ErrorReason *EvaluationError
 }
 
 func (b0 Dependencies_ResolutionEvent_builder) Build() *Dependencies_ResolutionEvent {
@@ -552,10 +579,11 @@ func (b0 Dependencies_ResolutionEvent_builder) Build() *Dependencies_ResolutionE
 	_, _ = b, x
 	x.xxx_hidden_Version = b.Version
 	if b.Resolution != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
 		x.xxx_hidden_Resolution = *b.Resolution
 	}
 	x.xxx_hidden_ConditionVersion = b.ConditionVersion
+	x.xxx_hidden_ErrorReason = b.ErrorReason
 	return m0
 }
 
@@ -563,7 +591,7 @@ var File_turboci_graph_orchestrator_v1_dependencies_proto protoreflect.FileDescr
 
 const file_turboci_graph_orchestrator_v1_dependencies_proto_rawDesc = "" +
 	"\n" +
-	"0turboci/graph/orchestrator/v1/dependencies.proto\x12\x1dturboci.graph.orchestrator.v1\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xd3\a\n" +
+	"0turboci/graph/orchestrator/v1/dependencies.proto\x12\x1dturboci.graph.orchestrator.v1\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a4turboci/graph/orchestrator/v1/evaluation_error.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xbc\b\n" +
 	"\fDependencies\x129\n" +
 	"\x05edges\x18\x01 \x03(\v2#.turboci.graph.orchestrator.v1.EdgeR\x05edges\x12T\n" +
 	"\tpredicate\x18\x02 \x01(\v21.turboci.graph.orchestrator.v1.Dependencies.GroupH\x00R\tpredicate\x88\x01\x01\x12n\n" +
@@ -576,17 +604,19 @@ const file_turboci_graph_orchestrator_v1_dependencies_proto_rawDesc = "" +
 	"\x06groups\x18\x02 \x03(\v21.turboci.graph.orchestrator.v1.Dependencies.GroupR\x06groups\x12!\n" +
 	"\tthreshold\x18\x03 \x01(\x05H\x00R\tthreshold\x88\x01\x01B\f\n" +
 	"\n" +
-	"_threshold\x1a\xb5\x02\n" +
+	"_threshold\x1a\x9e\x03\n" +
 	"\x0fResolutionEvent\x12F\n" +
 	"\aversion\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\aversion\x88\x01\x01\x12N\n" +
 	"\n" +
 	"resolution\x18\x02 \x01(\x0e2).turboci.graph.orchestrator.v1.ResolutionH\x01R\n" +
 	"resolution\x88\x01\x01\x12Y\n" +
-	"\x11condition_version\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\x10conditionVersion\x88\x01\x01B\n" +
+	"\x11condition_version\x18\x03 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\x10conditionVersion\x88\x01\x01\x12V\n" +
+	"\ferror_reason\x18\x04 \x01(\v2..turboci.graph.orchestrator.v1.EvaluationErrorH\x03R\verrorReason\x88\x01\x01B\n" +
 	"\n" +
 	"\b_versionB\r\n" +
 	"\v_resolutionB\x14\n" +
-	"\x12_condition_version\x1a\x80\x01\n" +
+	"\x12_condition_versionB\x0f\n" +
+	"\r_error_reason\x1a\x80\x01\n" +
 	"\x15ResolutionEventsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\x05R\x03key\x12Q\n" +
 	"\x05value\x18\x02 \x01(\v2;.turboci.graph.orchestrator.v1.Dependencies.ResolutionEventR\x05value:\x028\x01B\f\n" +
@@ -603,22 +633,24 @@ var file_turboci_graph_orchestrator_v1_dependencies_proto_goTypes = []any{
 	(*Edge)(nil),                         // 4: turboci.graph.orchestrator.v1.Edge
 	(Resolution)(0),                      // 5: turboci.graph.orchestrator.v1.Resolution
 	(*Revision)(nil),                     // 6: turboci.graph.orchestrator.v1.Revision
+	(*EvaluationError)(nil),              // 7: turboci.graph.orchestrator.v1.EvaluationError
 }
 var file_turboci_graph_orchestrator_v1_dependencies_proto_depIdxs = []int32{
-	4, // 0: turboci.graph.orchestrator.v1.Dependencies.edges:type_name -> turboci.graph.orchestrator.v1.Edge
-	1, // 1: turboci.graph.orchestrator.v1.Dependencies.predicate:type_name -> turboci.graph.orchestrator.v1.Dependencies.Group
-	3, // 2: turboci.graph.orchestrator.v1.Dependencies.resolution_events:type_name -> turboci.graph.orchestrator.v1.Dependencies.ResolutionEventsEntry
-	5, // 3: turboci.graph.orchestrator.v1.Dependencies.resolution:type_name -> turboci.graph.orchestrator.v1.Resolution
-	1, // 4: turboci.graph.orchestrator.v1.Dependencies.Group.groups:type_name -> turboci.graph.orchestrator.v1.Dependencies.Group
-	6, // 5: turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	5, // 6: turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent.resolution:type_name -> turboci.graph.orchestrator.v1.Resolution
-	6, // 7: turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent.condition_version:type_name -> turboci.graph.orchestrator.v1.Revision
-	2, // 8: turboci.graph.orchestrator.v1.Dependencies.ResolutionEventsEntry.value:type_name -> turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	4,  // 0: turboci.graph.orchestrator.v1.Dependencies.edges:type_name -> turboci.graph.orchestrator.v1.Edge
+	1,  // 1: turboci.graph.orchestrator.v1.Dependencies.predicate:type_name -> turboci.graph.orchestrator.v1.Dependencies.Group
+	3,  // 2: turboci.graph.orchestrator.v1.Dependencies.resolution_events:type_name -> turboci.graph.orchestrator.v1.Dependencies.ResolutionEventsEntry
+	5,  // 3: turboci.graph.orchestrator.v1.Dependencies.resolution:type_name -> turboci.graph.orchestrator.v1.Resolution
+	1,  // 4: turboci.graph.orchestrator.v1.Dependencies.Group.groups:type_name -> turboci.graph.orchestrator.v1.Dependencies.Group
+	6,  // 5: turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	5,  // 6: turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent.resolution:type_name -> turboci.graph.orchestrator.v1.Resolution
+	6,  // 7: turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent.condition_version:type_name -> turboci.graph.orchestrator.v1.Revision
+	7,  // 8: turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent.error_reason:type_name -> turboci.graph.orchestrator.v1.EvaluationError
+	2,  // 9: turboci.graph.orchestrator.v1.Dependencies.ResolutionEventsEntry.value:type_name -> turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_dependencies_proto_init() }
@@ -627,6 +659,7 @@ func file_turboci_graph_orchestrator_v1_dependencies_proto_init() {
 		return
 	}
 	file_turboci_graph_orchestrator_v1_edge_proto_init()
+	file_turboci_graph_orchestrator_v1_evaluation_error_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
 	file_turboci_graph_orchestrator_v1_dependencies_proto_msgTypes[0].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_dependencies_proto_msgTypes[1].OneofWrappers = []any{}

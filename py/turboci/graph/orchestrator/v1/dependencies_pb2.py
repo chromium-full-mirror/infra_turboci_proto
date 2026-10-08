@@ -23,10 +23,11 @@ _sym_db = _symbol_database.Default()
 
 
 from turboci.graph.orchestrator.v1 import edge_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_edge__pb2
+from turboci.graph.orchestrator.v1 import evaluation_error_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_evaluation__error__pb2
 from turboci.graph.orchestrator.v1 import revision_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_revision__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n0turboci/graph/orchestrator/v1/dependencies.proto\x12\x1dturboci.graph.orchestrator.v1\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xd4\x06\n\x0c\x44\x65pendencies\x12\x32\n\x05\x65\x64ges\x18\x01 \x03(\x0b\x32#.turboci.graph.orchestrator.v1.Edge\x12I\n\tpredicate\x18\x02 \x01(\x0b\x32\x31.turboci.graph.orchestrator.v1.Dependencies.GroupH\x00\x88\x01\x01\x12\\\n\x11resolution_events\x18\x03 \x03(\x0b\x32\x41.turboci.graph.orchestrator.v1.Dependencies.ResolutionEventsEntry\x12\x42\n\nresolution\x18\x04 \x01(\x0e\x32).turboci.graph.orchestrator.v1.ResolutionH\x01\x88\x01\x01\x1a\x7f\n\x05Group\x12\r\n\x05\x65\x64ges\x18\x01 \x03(\x05\x12\x41\n\x06groups\x18\x02 \x03(\x0b\x32\x31.turboci.graph.orchestrator.v1.Dependencies.Group\x12\x16\n\tthreshold\x18\x03 \x01(\x05H\x00\x88\x01\x01\x42\x0c\n\n_threshold\x1a\x8e\x02\n\x0fResolutionEvent\x12=\n\x07version\x18\x01 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x00\x88\x01\x01\x12\x42\n\nresolution\x18\x02 \x01(\x0e\x32).turboci.graph.orchestrator.v1.ResolutionH\x01\x88\x01\x01\x12G\n\x11\x63ondition_version\x18\x03 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x02\x88\x01\x01\x42\n\n\x08_versionB\r\n\x0b_resolutionB\x14\n\x12_condition_version\x1at\n\x15ResolutionEventsEntry\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12J\n\x05value\x18\x02 \x01(\x0b\x32;.turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent:\x02\x38\x01\x42\x0c\n\n_predicateB\r\n\x0b_resolutionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n0turboci/graph/orchestrator/v1/dependencies.proto\x12\x1dturboci.graph.orchestrator.v1\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a\x34turboci/graph/orchestrator/v1/evaluation_error.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\"\xb0\x07\n\x0c\x44\x65pendencies\x12\x32\n\x05\x65\x64ges\x18\x01 \x03(\x0b\x32#.turboci.graph.orchestrator.v1.Edge\x12I\n\tpredicate\x18\x02 \x01(\x0b\x32\x31.turboci.graph.orchestrator.v1.Dependencies.GroupH\x00\x88\x01\x01\x12\\\n\x11resolution_events\x18\x03 \x03(\x0b\x32\x41.turboci.graph.orchestrator.v1.Dependencies.ResolutionEventsEntry\x12\x42\n\nresolution\x18\x04 \x01(\x0e\x32).turboci.graph.orchestrator.v1.ResolutionH\x01\x88\x01\x01\x1a\x7f\n\x05Group\x12\r\n\x05\x65\x64ges\x18\x01 \x03(\x05\x12\x41\n\x06groups\x18\x02 \x03(\x0b\x32\x31.turboci.graph.orchestrator.v1.Dependencies.Group\x12\x16\n\tthreshold\x18\x03 \x01(\x05H\x00\x88\x01\x01\x42\x0c\n\n_threshold\x1a\xea\x02\n\x0fResolutionEvent\x12=\n\x07version\x18\x01 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x00\x88\x01\x01\x12\x42\n\nresolution\x18\x02 \x01(\x0e\x32).turboci.graph.orchestrator.v1.ResolutionH\x01\x88\x01\x01\x12G\n\x11\x63ondition_version\x18\x03 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x02\x88\x01\x01\x12I\n\x0c\x65rror_reason\x18\x04 \x01(\x0b\x32..turboci.graph.orchestrator.v1.EvaluationErrorH\x03\x88\x01\x01\x42\n\n\x08_versionB\r\n\x0b_resolutionB\x14\n\x12_condition_versionB\x0f\n\r_error_reason\x1at\n\x15ResolutionEventsEntry\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12J\n\x05value\x18\x02 \x01(\x0b\x32;.turboci.graph.orchestrator.v1.Dependencies.ResolutionEvent:\x02\x38\x01\x42\x0c\n\n_predicateB\r\n\x0b_resolutionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -36,12 +37,12 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
   _globals['_DEPENDENCIES_RESOLUTIONEVENTSENTRY']._loaded_options = None
   _globals['_DEPENDENCIES_RESOLUTIONEVENTSENTRY']._serialized_options = b'8\001'
-  _globals['_DEPENDENCIES']._serialized_start=172
-  _globals['_DEPENDENCIES']._serialized_end=1024
-  _globals['_DEPENDENCIES_GROUP']._serialized_start=477
-  _globals['_DEPENDENCIES_GROUP']._serialized_end=604
-  _globals['_DEPENDENCIES_RESOLUTIONEVENT']._serialized_start=607
-  _globals['_DEPENDENCIES_RESOLUTIONEVENT']._serialized_end=877
-  _globals['_DEPENDENCIES_RESOLUTIONEVENTSENTRY']._serialized_start=879
-  _globals['_DEPENDENCIES_RESOLUTIONEVENTSENTRY']._serialized_end=995
+  _globals['_DEPENDENCIES']._serialized_start=226
+  _globals['_DEPENDENCIES']._serialized_end=1170
+  _globals['_DEPENDENCIES_GROUP']._serialized_start=531
+  _globals['_DEPENDENCIES_GROUP']._serialized_end=658
+  _globals['_DEPENDENCIES_RESOLUTIONEVENT']._serialized_start=661
+  _globals['_DEPENDENCIES_RESOLUTIONEVENT']._serialized_end=1023
+  _globals['_DEPENDENCIES_RESOLUTIONEVENTSENTRY']._serialized_start=1025
+  _globals['_DEPENDENCIES_RESOLUTIONEVENTSENTRY']._serialized_end=1141
 # @@protoc_insertion_point(module_scope)
