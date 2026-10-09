@@ -44,7 +44,7 @@ class TestDigest(unittest.TestCase):
 
         anySerialized = apb.SerializeToString(deterministic=True)
         self.assertEqual(
-            value.deterministially_serialize_any(apb), anySerialized
+            value.deterministically_serialize_any(apb), anySerialized
         )
 
         vd = dgst.to_proto()
