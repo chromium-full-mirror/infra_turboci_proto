@@ -21,8 +21,8 @@ from turboci.graph.orchestrator.v1 import value_ref_pb2
 
 
 def find_all(
-    refs: typing.Sequence[value_ref_pb2.ValueRef], type_url: str
-) -> tuple[int, typing.Sequence[value_ref_pb2.ValueRef]]:
+    refs: typing.Sequence[value_ref_pb2.ValueRef],
+    type_url: str) -> tuple[int, typing.Sequence[value_ref_pb2.ValueRef]]:
   """Returns the index of the ref with type_url in a sorted set of refs.
 
   Args:

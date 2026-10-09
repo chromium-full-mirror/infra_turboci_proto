@@ -86,10 +86,8 @@ def from_string(ident_str: str) -> identifier_pb2.Identifier:
       case '?':
         stg.ClearField('is_worknode')
       case _:
-        raise ValueError(
-            'from_string: expected token to start with S, N or ?, '
-            f'got {toks[1][0]!r}'
-        )
+        raise ValueError('from_string: expected token to start with S, N or ?, '
+                         f'got {toks[1][0]!r}')
 
   def parse_vers(v: str, to: timestamp_pb2.Timestamp):
     secs, nanos = v.split('/')
