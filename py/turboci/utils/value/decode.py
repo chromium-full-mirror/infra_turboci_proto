@@ -68,16 +68,25 @@ def decode(
 
   if bin_data:
     ret = msg()
-    assert bin_data.Unpack(ret), f'failed to unpack {ref.type_url!r}'
+    if not bin_data.Unpack(ret):
+      raise message.DecodeError(f'failed to unpack {ref.type_url!r}')
     return ret
 
-  assert json_data
-  assert (
-      json_data.type_url == ref.type_url
-  ), f'BUG: mismatched refs {json_data.type_url!r} vs {ref.type_url!r}'
+  if not json_data:
+    raise ValueError(f'could not find data for ValueRef[{ref.type_url}]')
+
+  if json_data.type_url != ref.type_url:
+    raise message.DecodeError(
+        f'BUG: mismatched refs {json_data.type_url!r} vs {ref.type_url!r}'
+    )
 
   ret = msg()
-  json_format.Parse(json_data.value, ret)
+  try:
+    json_format.Parse(json_data.value, ret, ignore_unknown_fields=True)
+  except json_format.ParseError as ex:
+    raise message.DecodeError(
+        f'failed to parse JSON for {ref.type_url!r}: {ex}'
+    ) from ex
   return ret
 
 

@@ -6,9 +6,11 @@
 import operator
 import unittest
 
+from google.protobuf import message
 from google.protobuf import struct_pb2
 from google.protobuf import wrappers_pb2
 from turboci.graph.orchestrator.v1 import check_pb2
+from turboci.graph.orchestrator.v1 import value_data_pb2
 from turboci.graph.orchestrator.v1 import value_ref_pb2
 from turboci.utils import value
 
@@ -51,6 +53,63 @@ class TestDecode(unittest.TestCase):
     )
     with self.assertRaisesRegex(ValueError, 'could not find data'):
       value.decode({}, ref, wrappers_pb2.StringValue)
+
+  def test_binary_unpack_mismatch(self):
+    ref = value.ref(wrappers_pb2.StringValue(value='norp'), 'project:realm')
+    ref.inline.type_url = value.url(wrappers_pb2.BoolValue)
+    with self.assertRaises(message.DecodeError):
+      value.decode({}, ref, wrappers_pb2.StringValue)
+
+  def test_json_type_url_mismatch(self):
+    ref = value_ref_pb2.ValueRef(
+        realm='project:realm',
+        digest='fake-digest',
+        type_url=value.url(wrappers_pb2.StringValue),
+    )
+    ds = {
+        ref.digest: value_data_pb2.ValueData(
+            json=value_data_pb2.ValueData.JsonAny(
+                type_url=value.url(wrappers_pb2.BoolValue),
+                value=r'{"value": true}',
+            )
+        )
+    }
+    with self.assertRaises(message.DecodeError):
+      value.decode(ds, ref, wrappers_pb2.StringValue)
+
+  def test_json_parse_error(self):
+    ref = value_ref_pb2.ValueRef(
+        realm='project:realm',
+        digest='fake-digest',
+        type_url=value.url(wrappers_pb2.StringValue),
+    )
+    ds = {
+        ref.digest: value_data_pb2.ValueData(
+            json=value_data_pb2.ValueData.JsonAny(
+                type_url=ref.type_url,
+                value=r'not valid json',
+            )
+        )
+    }
+    with self.assertRaises(message.DecodeError):
+      value.decode(ds, ref, wrappers_pb2.StringValue)
+
+  def test_json_ignore_unknown_fields(self):
+    ref = value_ref_pb2.ValueRef(
+        realm='project:realm',
+        digest='fake-digest',
+        type_url=value.url(value_ref_pb2.ValueRef),
+    )
+    ds = {
+        'fake-digest': value_data_pb2.ValueData(
+            json=value_data_pb2.ValueData.JsonAny(
+                type_url=ref.type_url,
+                value=r'{"realm": "proj:realm", "extra_unknown_field": 42}',
+            )
+        )
+    }
+    decoded = value.decode(ds, ref, value_ref_pb2.ValueRef)
+    self.assertEqual(decoded, value_ref_pb2.ValueRef(realm='proj:realm'))
 
 
 class TestLookup(unittest.TestCase):
