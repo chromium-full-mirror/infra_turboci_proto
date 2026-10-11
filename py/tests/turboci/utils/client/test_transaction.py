@@ -172,6 +172,13 @@ class TestObservedNodeSet(unittest.TestCase):
     with self.assertRaises(client.RPCError):
       self.ns._observe_workplan(wp2)
 
+  def test_assert_older_or_same_without_rev_raises(self):
+    check = make_check(self.wpid, 'check1', 50)
+    with self.assertRaisesRegex(
+        ValueError, 'cannot check node version without a snapshot revision'
+    ):
+      self.ns._assert_older_or_same(check)
+
   def test_observe_different_workplan_raises(self):
     with self.assertRaisesRegex(
         ValueError, 'transaction observed multiple workplans'
@@ -352,6 +359,17 @@ class TestTransactionalClient(unittest.TestCase):
     self.assertIn(
         ids.to_string(ids.check('check1')), self.client._observed.nodes
     )
+
+  def test_process_response_query_nodes_with_mismatched_request_raises(self):
+    with self.assertRaisesRegex(
+        TypeError,
+        'expected QueryNodesRequest for QueryNodesResponse, got'
+        ' ReadWorkPlanRequest',
+    ):
+      self.client._process_response_observed_nodes(
+          read_workplan_request_pb2.ReadWorkPlanRequest(),
+          query_nodes_response_pb2.QueryNodesResponse(),
+      )
 
   def test_write_nodes_injects_precondition_and_blocks_subsequent(self):
     self.client._observed.observe_ReadWorkPlan(

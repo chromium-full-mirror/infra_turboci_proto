@@ -152,7 +152,8 @@ class ObservedNodeSet:
           self._observe(attempt.identifier)
 
   def _assert_older_or_same(self, node: ObservableNode):
-    assert self._rev
+    if not self._rev:
+      raise ValueError('cannot check node version without a snapshot revision')
     if self._is_after(node.version, self._rev):
       cvers = self._ts_to_str(node.version.ts)
       wpvers = self._ts_to_str(self._rev.ts)
@@ -312,7 +313,11 @@ class _TransactionalBase(state.State):
         self._observed.observe_ReadWorkPlan(rsp)
 
       case query_nodes_response_pb2.QueryNodesResponse():
-        assert isinstance(req, query_nodes_request_pb2.QueryNodesRequest)
+        if not isinstance(req, query_nodes_request_pb2.QueryNodesRequest):
+          raise TypeError(
+              'expected QueryNodesRequest for QueryNodesResponse, '
+              f'got {type(req).__name__}'
+          )
         if self._node_filter:
           apply_node_predicate(self._node_filter, rsp.workplans, self.data)
         self._observed.observe_QueryNodes(req, rsp)
