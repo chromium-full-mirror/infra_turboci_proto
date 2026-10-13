@@ -120,7 +120,8 @@ class TestErrors(unittest.TestCase):
         "claimed", claimed_process_uid="proc-x"
     )
     self.assertIsInstance(claim_err, errors.StageAttemptAlreadyClaimedError)
-    assert claim_err.status.claim_failure
+    if claim_err.status.claim_failure is None:
+      self.fail("expected claim_failure to not be None")
     self.assertEqual(
         claim_err.status.claim_failure.claimed_by_process_uid, "proc-x"
     )

@@ -69,7 +69,8 @@ class TestRetry(unittest.TestCase):
     # delay should be between 5.0 and 10.0
     attempts = list(r.attempts())
     self.assertEqual(len(attempts), 2)
-    assert attempts[0] is not None
+    if attempts[0] is None:
+      self.fail('expected first attempt delay to not be None')
     self.assertTrue(5.0 <= attempts[0] <= 10.0)
     self.assertIsNone(attempts[1])
 

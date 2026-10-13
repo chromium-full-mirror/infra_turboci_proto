@@ -159,7 +159,8 @@ class TestLifecycle(unittest.TestCase):
     with mock.patch("time.time", return_value=90):
       for _ in range(10):
         delay = opts2.calculate_delay(state)
-        assert delay
+        if delay is None:
+          self.fail("expected delay to not be None")
         self.assertTrue(4.0 <= delay <= 8.0, f"delay {delay} out of bounds")
 
     def mock_write_nodes(*args, **kwargs):
@@ -290,7 +291,8 @@ class TestLifecycle(unittest.TestCase):
         start = time.time()
         while write_nodes_mock.call_count < 3 and time.time() - start < 1.0:
           time.sleep(0.001)
-        assert hb._thread
+        if hb._thread is None:
+          self.fail("expected heartbeat thread to be running")
         self.assertTrue(hb._thread.is_alive())
 
     # Verify logging
@@ -326,7 +328,8 @@ class TestLifecycle(unittest.TestCase):
 
     with mock.patch.object(opts, "calculate_delay", return_value=0.01):
       with hb:
-        assert hb._thread
+        if hb._thread is None:
+          self.fail("expected heartbeat thread to be initialized")
         hb._thread.join(timeout=1.0)
         self.assertFalse(hb._thread.is_alive())
 
@@ -412,7 +415,8 @@ class TestLifecycle(unittest.TestCase):
 
     with mock.patch.object(opts, "calculate_delay", return_value=0.01):
       with hb:
-        assert hb._thread
+        if hb._thread is None:
+          self.fail("expected heartbeat thread to be initialized")
         hb._thread.join(timeout=1.0)
         self.assertFalse(hb._thread.is_alive())
 
@@ -769,7 +773,8 @@ class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
             and asyncio.get_running_loop().time() - start < 1.0
         ):
           await asyncio.sleep(0.001)
-        assert hb._task
+        if hb._task is None:
+          self.fail("expected heartbeat task to be running")
         self.assertFalse(hb._task.done())
 
     # Verify logging
@@ -806,7 +811,8 @@ class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
     with mock.patch.object(opts, "calculate_delay", return_value=0.01):
       async with hb:
         async with asyncio.timeout(1.0):
-          assert hb._task
+          if hb._task is None:
+            self.fail("expected heartbeat task to be initialized")
           await hb._task
         self.assertTrue(hb._task.done())
 
@@ -929,7 +935,8 @@ class TestHeartbeatAsync(unittest.IsolatedAsyncioTestCase):
     with mock.patch.object(opts, "calculate_delay", return_value=0.01):
       async with hb:
         async with asyncio.timeout(1.0):
-          assert hb._task
+          if hb._task is None:
+            self.fail("expected heartbeat task to be initialized")
           await hb._task
         self.assertTrue(hb._task.done())
 

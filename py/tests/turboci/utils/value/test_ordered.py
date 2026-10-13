@@ -153,7 +153,8 @@ class TestAddSetRef(unittest.TestCase):
         self.assertEqual(len(found_all), 4)
 
         found = value.find(refs, value.url(wrappers_pb2.StringValue))
-        assert found
+        if found is None:
+          self.fail('expected to find a StringValue ref')
         decoded = value.decode({}, found, wrappers_pb2.StringValue)
         self.assertEqual(decoded, wrappers_pb2.StringValue(value='cool'))
 
