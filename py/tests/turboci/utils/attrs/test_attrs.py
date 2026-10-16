@@ -28,6 +28,8 @@ _INVALID_NAME_SYNTAX_CASES = (
     ('Foo.bar', 'uppercase start'),
     ('_foo.bar', 'leading underscore in first segment'),
     ('foo._bar', 'leading underscore in second segment'),
+    ('foo_.bar', 'trailing underscore in first segment'),
+    ('foo.bar_', 'trailing underscore in second segment'),
     ('1foo.bar', 'leading digit in first segment'),
     ('foo.1bar', 'leading digit in second segment'),
     ('foo-bar.baz', 'hyphen'),
@@ -39,8 +41,14 @@ _RESERVED_PREFIX_CASES = (
     ('check.foo.bar', r"uses reserved prefix 'check\.'"),
     ('stage.foo', r"uses reserved prefix 'stage\.'"),
     ('stage.result', r"uses reserved prefix 'stage\.'"),
-    ('tags.foo', r"uses reserved prefix 'tags\.'"),
-    ('tags.check.options', r"uses reserved prefix 'tags\.'"),
+    ('work_node.foo', r"uses reserved prefix 'work_node\.'"),
+    ('work_node.foo.bar', r"uses reserved prefix 'work_node\.'"),
+    ('worknode.foo', r"uses reserved prefix 'worknode\.'"),
+    ('worknode.foo.bar', r"uses reserved prefix 'worknode\.'"),
+    ('work_plan.foo', r"uses reserved prefix 'work_plan\.'"),
+    ('work_plan.foo.bar', r"uses reserved prefix 'work_plan\.'"),
+    ('workplan.foo', r"uses reserved prefix 'workplan\.'"),
+    ('workplan.foo.bar', r"uses reserved prefix 'workplan\.'"),
 )
 
 _VALID_ATTRIBUTE_TYPES = (

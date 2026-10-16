@@ -16,8 +16,8 @@ import (
 )
 
 var (
-	attrNameRegex    = regexp.MustCompile(`^([a-z][a-z0-9_]*\.)+[a-z][a-z0-9_]*$`)
-	reservedPrefixes = []string{"check.", "stage.", "tags."}
+	attrNameRegex    = regexp.MustCompile(`^[a-z](?:[a-z0-9_]*[a-z0-9])?(?:\.[a-z](?:[a-z0-9_]*[a-z0-9])?)+$`)
+	reservedPrefixes = []string{"check.", "stage.", "work_node.", "worknode.", "work_plan.", "workplan."}
 )
 
 type stageConfig struct {

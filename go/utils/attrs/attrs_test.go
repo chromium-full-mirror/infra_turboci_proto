@@ -364,6 +364,8 @@ func TestValidateAttributeName(t *testing.T) {
 			{name: "My_team.metric", desc: "uppercase namespace", wantErr: "invalid attribute name"},
 			{name: "_team.metric", desc: "leading underscore in segment", wantErr: "invalid attribute name"},
 			{name: "team._metric", desc: "leading underscore in second segment", wantErr: "invalid attribute name"},
+			{name: "foo_.bar", desc: "trailing underscore in first segment", wantErr: "invalid attribute name"},
+			{name: "foo.bar_", desc: "trailing underscore in second segment", wantErr: "invalid attribute name"},
 			{name: "1team.metric", desc: "leading digit in segment", wantErr: "invalid attribute name"},
 			{name: ".team.metric", desc: "leading dot", wantErr: "invalid attribute name"},
 			{name: "team.metric.", desc: "trailing dot", wantErr: "invalid attribute name"},
@@ -371,7 +373,10 @@ func TestValidateAttributeName(t *testing.T) {
 			{name: "team.metric-name", desc: "hyphen in name", wantErr: "invalid attribute name"},
 			{name: "check.my_attr", desc: "reserved check. prefix", wantErr: "reserved prefix"},
 			{name: "stage.my_attr", desc: "reserved stage. prefix", wantErr: "reserved prefix"},
-			{name: "tags.my_attr", desc: "reserved tags. prefix", wantErr: "reserved prefix"},
+			{name: "work_node.my_attr", desc: "reserved work_node. prefix", wantErr: "reserved prefix"},
+			{name: "worknode.my_attr", desc: "reserved worknode. prefix", wantErr: "reserved prefix"},
+			{name: "work_plan.my_attr", desc: "reserved work_plan. prefix", wantErr: "reserved prefix"},
+			{name: "workplan.my_attr", desc: "reserved workplan. prefix", wantErr: "reserved prefix"},
 		}
 
 		for _, tc := range invalidNames {

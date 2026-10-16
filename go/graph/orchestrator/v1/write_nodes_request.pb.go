@@ -882,14 +882,16 @@ type WriteNodesRequest_CheckAttributeWrite_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// Required non-empty. Unique among Attributes defined for parent Check.
-	// Must match regex: ^([a-z][a-z0-9_]*\.)+[a-z][a-z0-9_]*$
-	// (dot-separated lower_snake_case with at least one dot).
+	// Must match regex:
+	// ^[a-z](?:[a-z0-9_]*[a-z0-9])?(?:\.[a-z](?:[a-z0-9_]*[a-z0-9])?)+$
+	// (dot-separated lower_snake_case with at least one dot; segments cannot
+	// start with numbers or `_`, and must not end in `_`).
 	//
 	// See attribute.proto#Attribute.name for more information on
 	// namespaces for names.
 	//
 	// Valid: `foo.bar`, `my_team.my_component.metric_count`.
-	// Invalid: `foo`, `_foo.bar`, `foo.Bar`.
+	// Invalid: `foo`, `_foo.bar`, `foo_.bar`, `foo.bar_`, `foo.Bar`.
 	Name *string
 	// Required non-empty. The CEL expression evaluated against Check Tags and
 	// check.* properties.
@@ -1080,14 +1082,16 @@ type WriteNodesRequest_StageAttributeWrite_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// Required non-empty. Unique among Attributes defined for parent Stage.
-	// Must match regex: ^([a-z][a-z0-9_]*\.)+[a-z][a-z0-9_]*$
-	// (dot-separated lower_snake_case with at least one dot).
+	// Must match regex:
+	// ^[a-z](?:[a-z0-9_]*[a-z0-9])?(?:\.[a-z](?:[a-z0-9_]*[a-z0-9])?)+$
+	// (dot-separated lower_snake_case with at least one dot; segments cannot
+	// start with numbers or `_`, and must not end in `_`).
 	//
 	// See attribute.proto#Attribute.name for more information on
 	// namespaces for names.
 	//
 	// Valid: `foo.bar`, `my_team.my_component.metric_count`.
-	// Invalid: `foo`, `_foo.bar`, `foo.Bar`.
+	// Invalid: `foo`, `_foo.bar`, `foo_.bar`, `foo.bar_`, `foo.Bar`.
 	Name *string
 	// Required non-empty. The CEL expression evaluated against Stage Tags and
 	// stage.* properties.

@@ -100,7 +100,7 @@ func (x AttributeType) Number() protoreflect.EnumNumber {
 // expressions.
 //
 // TODO(b/528434792): Add more information about the use of reserved
-// attributes and document CEL expression syntax, preferably as a
+// Attributes and document CEL expression syntax, preferably as a
 // markdown file within this directory so that we have better
 // formatting options.
 //
@@ -391,28 +391,27 @@ type Attribute_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// Required non-empty. Unique among Attributes defined for parent node.
-	// Must match regex: ^([a-z][a-z0-9_]*\.)+[a-z][a-z0-9_]*$
-	// (dot-separated lower_snake_case with at least one dot).
-	//
-	// This allows users to define namespaces to organize their Attributes.
-	// check.*, stage.* are restricted namespaces where users are not allowed
-	// to define attributes.
-	//
-	// TODO(b/528434792): Update the paragraph below once we have turboci.*
-	// Attributes defined.
-	//
-	// The namespace turboci.* is special, only certain variables are permitted
-	// to be defined in there and they have a fixed type that cannot be
-	// overridden by users. At the moment of writing, this list is empty so
-	// any Attribute with name turboci.foo_bar will be rejected.
+	// Must match regex:
+	// ^[a-z](?:[a-z0-9_]*[a-z0-9])?(?:\.[a-z](?:[a-z0-9_]*[a-z0-9])?)+$
+	// (dot-separated lower_snake_case with at least one dot; segments cannot
+	// start with numbers or `_`, and must not end in `_`).
 	//
 	// Valid: `foo.bar`, `my_team.my_component.metric_count`.
-	// Invalid: `foo`, `_foo.bar`, `foo.Bar`.
+	// Invalid: `foo`, `_foo.bar`, `foo_.bar`, `foo.bar_`, `foo.Bar`.
+	//
+	// This allows users to define namespaces to organize their Attributes.
+	// `check.*`, `stage.*`, `work_node.*`, `worknode.*`, `work_plan.*`, and
+	// `workplan.*` are reserved namespaces where users are not allowed to define
+	// Attributes.
+	//
+	// TODO(b/528434792): Document this in a markdown document that explains
+	// the how to define Attributes, how to write expressions, what is the syntax
+	// for expressions, the rules of different categories of namespaces,
 	Name *string
 	// Required non-empty. The CEL expression evaluated against Tags and node
 	// properties.
 	Expression *string
-	// State trigger: on what node state this attribute must be evaluated.
+	// State trigger: on what node state this Attribute must be evaluated.
 
 	// Fields of oneof xxx_hidden_OnState:
 	// Evaluated when the Stage enters this StageState.
@@ -420,9 +419,9 @@ type Attribute_builder struct {
 	// Evaluated when the Check enters this CheckState.
 	OnCheckState *CheckState
 	// -- end of xxx_hidden_OnState
-	// Inferred or explicitly supplied attribute result type.
+	// Inferred or explicitly supplied Attribute result type.
 	AttributeType *AttributeType
-	// Revision timestamp when this attribute was evaluated.
+	// Revision timestamp when this Attribute was evaluated.
 	ResolvedAt *Revision
 	// The fields *_results are mutually exclusive. Exactly one of them will be
 	// considered non-trivial. If `error_result` is defined, all repeated

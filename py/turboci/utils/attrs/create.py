@@ -20,8 +20,17 @@ from turboci.graph.orchestrator.v1 import check_state_pb2
 from turboci.graph.orchestrator.v1 import stage_state_pb2
 from turboci.graph.orchestrator.v1 import write_nodes_request_pb2
 
-_ATTR_NAME_REGEX = re.compile(r'^([a-z][a-z0-9_]*\.)+[a-z][a-z0-9_]*$')
-_RESERVED_PREFIXES = ('check.', 'stage.', 'tags.')
+_ATTR_NAME_REGEX = re.compile(
+    r'^[a-z](?:[a-z0-9_]*[a-z0-9])?(?:\.[a-z](?:[a-z0-9_]*[a-z0-9])?)+$'
+)
+_RESERVED_PREFIXES = (
+    'check.',
+    'stage.',
+    'work_node.',
+    'worknode.',
+    'work_plan.',
+    'workplan.',
+)
 _VALID_ATTRIBUTE_TYPES = frozenset(
     v
     for v in attribute_pb2.AttributeType.values()
@@ -33,8 +42,10 @@ def _validate_attribute_name(name: str) -> None:
   """Validates that an attribute name conforms to naming conventions.
 
   Attribute names must be dot-separated lower_snake_case with at least one dot
-  (matching regex ^([a-z][a-z0-9_]*\\.)+[a-z][a-z0-9_]*$) and must not use
-  reserved prefixes ('check.', 'stage.', 'tags.').
+  (matching regex
+  ^[a-z](?:[a-z0-9_]*[a-z0-9])?(?:\\.[a-z](?:[a-z0-9_]*[a-z0-9])?)+$) and must
+  not use reserved prefixes ('check.', 'stage.', 'work_node.', 'worknode.',
+  'work_plan.', 'workplan.').
 
   Args:
     name: The attribute name string to validate.
