@@ -26,6 +26,8 @@ const (
 )
 
 // Encapsulates data changes to a Stage object.
+//
+// Next ID: 5
 type StageDelta struct {
 	state                        protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_State             StageState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
@@ -187,6 +189,8 @@ func (b0 StageDelta_builder) Build() *StageDelta {
 }
 
 // Attempt represents a delta to a given StageAttempt.
+//
+// Next ID: 5
 type StageDelta_Attempt struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Identifier  *v1.StageAttempt       `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`

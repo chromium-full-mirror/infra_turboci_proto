@@ -34,13 +34,19 @@ enum Resolution {
 //
 // Typically Edges must always point to nodes in the same graph, though this may
 // be lifted in the future.
+//
+// Next ID: 3
 message Edge {
   // An edge pointing to a Check.
+  //
+  // Next ID: 3
   message Check {
     // The Check that this edge points to.
     optional ids.v1.Check identifier = 1;
 
     // The condition under which this Edge is satisfied.
+    //
+    // Next ID: 3
     message Condition {
       // Resolve the expression as soon as the target reaches this state.
       //
@@ -72,11 +78,15 @@ message Edge {
   }
 
   // An edge pointing to a Stage.
+  //
+  // Next ID: 3
   message Stage {
     // The Stage that this edge points to.
     optional ids.v1.Stage identifier = 1;
 
     // The condition under which this Edge is satisfied.
+    //
+    // Next ID: 3
     message Condition {
       // Resolve the expression as soon as the target reaches this state.
       //

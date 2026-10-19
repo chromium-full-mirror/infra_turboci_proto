@@ -11,6 +11,8 @@ option java_multiple_files = true;
 // AnalyzeOptions provides inputs to analyze. Analyze is used to reduce the set
 // of compile targets that are built to only those that have a build graph
 // dependency on a file changed by the CL under test.
+//
+// Next ID: 6
 message AnalyzeOptions {
   // The compile targets that are explicitly requested for compilation.
   repeated string compile_targets = 1;

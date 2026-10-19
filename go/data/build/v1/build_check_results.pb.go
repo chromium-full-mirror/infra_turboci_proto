@@ -27,6 +27,8 @@ const (
 
 // BuildCheckResults represent the output of a build. This is mainly centered around the artifacts
 // generated from the build and their locations.
+//
+// Next ID: 7
 type BuildCheckResults struct {
 	state                            protoimpl.MessageState                     `protogen:"opaque.v1"`
 	xxx_hidden_Success               bool                                       `protobuf:"varint,1,opt,name=success,proto3,oneof"`
@@ -242,6 +244,8 @@ func (b0 BuildCheckResults_builder) Build() *BuildCheckResults {
 }
 
 // Build ID, target and attempt which are necessary to query artifacts in ab/ or Android Build API
+//
+// Next ID: 4
 type BuildCheckResults_AndroidBuildArtifacts struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_BuildId      *string                `protobuf:"bytes,1,opt,name=build_id,json=buildId,proto3,oneof"`
@@ -392,6 +396,8 @@ func (b0 BuildCheckResults_AndroidBuildArtifacts_builder) Build() *BuildCheckRes
 // A manifest in proto form containing key (file name) to value (CAS digest) mappings of build
 // artifacts.
 // Eg. http://shortn/_zd9o9GVYT1
+//
+// Next ID: 5
 type BuildCheckResults_CasManifest struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Manifest      map[string]string      `protobuf:"bytes,1,rep,name=manifest,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -563,6 +569,8 @@ func (b0 BuildCheckResults_CasManifest_builder) Build() *BuildCheckResults_CasMa
 // GCS path to bucket/directory containing artifacts
 // This serves as an "implicit" manifest. Clients would be expected to have
 // "well-known" artifact names under this directory
+//
+// Next ID: 3
 type BuildCheckResults_GcsArtifacts struct {
 	state                       protoimpl.MessageState                           `protogen:"opaque.v1"`
 	xxx_hidden_RootDirectoryUri *string                                          `protobuf:"bytes,1,opt,name=root_directory_uri,json=rootDirectoryUri,proto3,oneof"`
@@ -661,6 +669,8 @@ func (b0 BuildCheckResults_GcsArtifacts_builder) Build() *BuildCheckResults_GcsA
 
 // Message wrapper to allow repeated files because repeated fields cannot directly
 // be used as a map value.
+//
+// Next ID: 2
 type BuildCheckResults_GcsArtifacts_Files struct {
 	state            protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Files []string               `protobuf:"bytes,1,rep,name=files,proto3"`

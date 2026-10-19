@@ -13,6 +13,8 @@ option java_multiple_files = true;
 
 // TypeInfo lets the orchestrator know which type(s) the caller wants to see
 // embedded in Value messages within API responses.
+//
+// Next ID: 4
 message TypeInfo {
   // Set of type URLs that the caller wants to see in Value messages in the
   // response. Any Value message whose type URL is not specified here will be

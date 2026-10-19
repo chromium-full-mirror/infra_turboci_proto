@@ -517,6 +517,8 @@ func (b0 Check_builder) Build() *Check {
 
 // StateHistoryEntry records the database revision (commit timestamp) when
 // each time this Check's state changes.
+//
+// Next ID: 3
 type Check_StateHistoryEntry struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_State       CheckState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
@@ -629,6 +631,8 @@ func (b0 Check_StateHistoryEntry_builder) Build() *Check_StateHistoryEntry {
 // A Check may have multiple Results, and each Result may have multiple pieces
 // of result data. This could occur when multiple Stages all contribute
 // results to the same Check (e.g. sharding, multiple executions, etc.).
+//
+// Next ID: 7
 type Check_Result struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Identifier   *v1.CheckResult        `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`

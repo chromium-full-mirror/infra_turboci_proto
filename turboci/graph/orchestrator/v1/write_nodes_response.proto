@@ -13,6 +13,8 @@ option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orch
 option java_multiple_files = true;
 
 // Response message for TurboCIGraphService.WriteNodes.
+//
+// Next ID: 3
 message WriteNodesResponse {
   // The committed revision of this write.
   //

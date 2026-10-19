@@ -27,6 +27,8 @@ option java_multiple_files = true;
 //
 // Allows atomically writing to multiple nodes (Checks, Stages) in a single
 // transaction.
+//
+// Next ID: 9
 message WriteNodesRequest {
   // An in-line representation of Dependencies.Group.
   //
@@ -34,6 +36,8 @@ message WriteNodesRequest {
   // Check or Stage.
   //
   // Otherwise this has the same meaning as Dependencies.Group.
+  //
+  // Next ID: 4
   message DependencyGroup {
     // Singular edges in this group.
     repeated Edge edges = 1;
@@ -51,6 +55,8 @@ message WriteNodesRequest {
   }
 
   // A single Stage.Attempt.Progress write message.
+  //
+  // Next ID: 4
   message StageAttemptProgress {
     // Low-effort/human-readable progress information.
     //
@@ -125,6 +131,8 @@ message WriteNodesRequest {
   //
   // Includes a low-effort English display message plus zero or more detail
   // messages.
+  //
+  // Next ID: 3
   message Reason {
     // A 'low-effort' reason for this write.
     //
@@ -388,6 +396,8 @@ message WriteNodesRequest {
   // All fields annotated as `(turboci).creation_only = true` can be set only
   // once in a sense that if a StageWrite overwrites an existing stage, values
   // of all these fields (if they are set) must match existing stage values.
+  //
+  // Next ID: 10
   message StageWrite {
     reserved 7;
     reserved "cancelled";
@@ -480,6 +490,8 @@ message WriteNodesRequest {
   //
   // These aspects come from either the Executor which owns this Stage Attempt,
   // or the running Stage Attempt process.
+  //
+  // Next ID: 4
   message CurrentAttemptWrite {
     // Sets details in the Stage Attempt.details field.
     //
@@ -495,6 +507,8 @@ message WriteNodesRequest {
     repeated StageAttemptProgress progress = 2;
 
     // Indicate how the Orchestrator should transition to a given state.
+    //
+    // Next ID: 7
     message StateTransition {
       // Throttled indicates that the Executor can run this Attempt, just not
       // right now.
@@ -503,6 +517,8 @@ message WriteNodesRequest {
       // attempt is already running, use Incomplete instead (since some work was
       // done, but it was incomplete) with `throttle_next_attempt_until` field
       // set.
+      //
+      // Next ID: 2
       message Throttled {
         // Specifies that the Stage Attempt should not be made PENDING again
         // (and thus sent to the Executor via RunStage) until this time.
@@ -516,6 +532,8 @@ message WriteNodesRequest {
 
       // Scheduled indicates that the Executor has accepted the Attempt, and
       // will run it at a later time.
+      //
+      // Next ID: 2
       message Scheduled {
         // The execution policy for this Stage Attempt.
         //
@@ -524,6 +542,8 @@ message WriteNodesRequest {
       }
 
       // Running indicates that the Executor is actively running this Attempt.
+      //
+      // Next ID: 3
       message Running {
         // The execution policy for this Stage Attempt.
         //
@@ -579,6 +599,8 @@ message WriteNodesRequest {
       // task (e.g. compiler segfaulted, test harness lost contact with a DUT
       // during test execution (and such a failure may not be due to the test
       // itself), etc.)
+      //
+      // Next ID: 3
       message Incomplete {
         // Controls if this Stage should make another Attempt.
         //
@@ -661,6 +683,8 @@ message WriteNodesRequest {
   optional CurrentAttemptWrite current_attempt = 6;
 
   // Internal writes for the Stage indicated by the token.
+  //
+  // Next ID: 2
   message CurrentStageWrite {
     // Continuation Group predicate for this Stage.
     //
@@ -689,6 +713,8 @@ message WriteNodesRequest {
   // action taken by a different actor (and a StageAttempt cancelling its
   // Stage is equivalent to a Stage cancelling itself). If a Stage wants to
   // terminate itself, it should mark its attempt INCOMPLETE or COMPLETE.
+  //
+  // Next ID: 2
   message StageCancellation {
     // The identifier of the stage to cancel.
     //

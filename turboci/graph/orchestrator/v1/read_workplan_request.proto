@@ -16,6 +16,8 @@ option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orch
 option java_multiple_files = true;
 
 // Request message for TurboCIGraphService.ReadWorkPlan.
+//
+// Next ID: 9
 message ReadWorkPlanRequest {
   // The token which indicates that the request is coming from within a specific
   // WorkPlan.

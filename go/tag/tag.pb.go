@@ -175,6 +175,8 @@ func (x ReadScope) Number() protoreflect.EnumNumber {
 //	  // well as globally for use with QueryWorkPlans.
 //	  optional MyEnum enum_field = 3 [(turboci.tag).key_scope = WORK_PLAN];
 //	}
+//
+// Next ID: 5
 type Tag struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_KeyScope    ReadScope              `protobuf:"varint,1,opt,name=key_scope,json=keyScope,proto3,enum=turboci.ReadScope,oneof"`

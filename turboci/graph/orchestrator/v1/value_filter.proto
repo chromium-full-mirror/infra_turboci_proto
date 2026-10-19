@@ -46,6 +46,8 @@ option java_multiple_files = true;
 //
 // ValueRefs which are unwanted (e.g. don't match `type_info` or `include_data`)
 // will be marked as omitted with the reason UNWANTED.
+//
+// Next ID: 13
 message ValueFilter {
   // How to handle per-type_url decisions about including Values.
   optional TypeInfo type_info = 1;

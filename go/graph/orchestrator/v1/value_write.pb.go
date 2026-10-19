@@ -32,6 +32,8 @@ const (
 // data into a [ValueRef]/[ValueData] pair. It will use heuristics to decide
 // whether to store the [ValueData] separately via `digest`, or inline with
 // the [ValueRef].
+//
+// Next ID: 4
 type ValueWrite struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Data        *anypb.Any             `protobuf:"bytes,1,opt,name=data,proto3,oneof"`

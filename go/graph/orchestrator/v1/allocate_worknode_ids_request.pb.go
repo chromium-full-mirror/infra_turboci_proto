@@ -26,6 +26,8 @@ const (
 )
 
 // Request message for TurboCIOrchestrator.AllocateWorkNodeIDs.
+//
+// Next ID: 4
 type AllocateWorkNodeIDsRequest struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Token       *string                `protobuf:"bytes,1,opt,name=token,proto3,oneof"`

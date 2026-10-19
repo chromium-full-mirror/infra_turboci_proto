@@ -15,6 +15,8 @@ option java_multiple_files = true;
 
 // BuildCheckResults represent the output of a build. This is mainly centered around the artifacts
 // generated from the build and their locations.
+//
+// Next ID: 7
 message BuildCheckResults {
   // Whether the build succeeded or failed. "success = true" means that all required build actions
   // succeeded. Any failed actions result in "success = false". If the build failed, display_message
@@ -26,6 +28,8 @@ message BuildCheckResults {
   optional turboci.data.common.v1.DisplayMessage display_message = 2;
 
   // Build ID, target and attempt which are necessary to query artifacts in ab/ or Android Build API
+  //
+  // Next ID: 4
   message AndroidBuildArtifacts {
     // Android build ID.
     optional string build_id = 1;
@@ -43,6 +47,8 @@ message BuildCheckResults {
   // A manifest in proto form containing key (file name) to value (CAS digest) mappings of build
   // artifacts.
   // Eg. http://shortn/_zd9o9GVYT1
+  //
+  // Next ID: 5
   message CasManifest {
     // Key (filename), value (CAS digest)
     // Eg.
@@ -69,6 +75,8 @@ message BuildCheckResults {
   // GCS path to bucket/directory containing artifacts
   // This serves as an "implicit" manifest. Clients would be expected to have
   // "well-known" artifact names under this directory
+  //
+  // Next ID: 3
   message GcsArtifacts {
     // The path prefix in GS under which artifacts for this build will be stored.
     // Format: "gs://bucket/path/to/root/dir/". Trailing slash is *required*.
@@ -76,6 +84,8 @@ message BuildCheckResults {
 
     // Message wrapper to allow repeated files because repeated fields cannot directly
     // be used as a map value.
+    //
+    // Next ID: 2
     message Files {
       // Paths to files in the GCS bucket, relative to the root_directory_uri.
       repeated string files = 1;

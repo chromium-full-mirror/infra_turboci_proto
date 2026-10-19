@@ -30,6 +30,8 @@ const (
 //
 // Allows atomically writing to multiple nodes (Checks, Stages) in a single
 // transaction.
+//
+// Next ID: 9
 type WriteNodesRequest struct {
 	state                         protoimpl.MessageState                  `protogen:"opaque.v1"`
 	xxx_hidden_Token              *string                                 `protobuf:"bytes,1,opt,name=token,proto3,oneof"`
@@ -315,6 +317,8 @@ func (b0 WriteNodesRequest_builder) Build() *WriteNodesRequest {
 // Check or Stage.
 //
 // Otherwise this has the same meaning as Dependencies.Group.
+//
+// Next ID: 4
 type WriteNodesRequest_DependencyGroup struct {
 	state                  protoimpl.MessageState                `protogen:"opaque.v1"`
 	xxx_hidden_Edges       *[]*Edge                              `protobuf:"bytes,1,rep,name=edges,proto3"`
@@ -431,6 +435,8 @@ func (b0 WriteNodesRequest_DependencyGroup_builder) Build() *WriteNodesRequest_D
 }
 
 // A single Stage.Attempt.Progress write message.
+//
+// Next ID: 4
 type WriteNodesRequest_StageAttemptProgress struct {
 	state                     protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Message        *string                `protobuf:"bytes,1,opt,name=message,proto3,oneof"`
@@ -611,6 +617,8 @@ func (b0 WriteNodesRequest_StageAttemptProgress_builder) Build() *WriteNodesRequ
 //
 // Includes a low-effort English display message plus zero or more detail
 // messages.
+//
+// Next ID: 3
 type WriteNodesRequest_Reason struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Message     *string                `protobuf:"bytes,1,opt,name=message,proto3,oneof"`
@@ -1578,6 +1586,8 @@ func (b0 WriteNodesRequest_CheckWrite_builder) Build() *WriteNodesRequest_CheckW
 // All fields annotated as `(turboci).creation_only = true` can be set only
 // once in a sense that if a StageWrite overwrites an existing stage, values
 // of all these fields (if they are set) must match existing stage values.
+//
+// Next ID: 10
 type WriteNodesRequest_StageWrite struct {
 	state                                    protoimpl.MessageState                    `protogen:"opaque.v1"`
 	xxx_hidden_Identifier                    *v1.Stage                                 `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
@@ -1885,6 +1895,8 @@ func (b0 WriteNodesRequest_StageWrite_builder) Build() *WriteNodesRequest_StageW
 //
 // These aspects come from either the Executor which owns this Stage Attempt,
 // or the running Stage Attempt process.
+//
+// Next ID: 4
 type WriteNodesRequest_CurrentAttemptWrite struct {
 	state                      protoimpl.MessageState                                 `protogen:"opaque.v1"`
 	xxx_hidden_Details         *[]*ValueWrite                                         `protobuf:"bytes,1,rep,name=details,proto3"`
@@ -1996,6 +2008,8 @@ func (b0 WriteNodesRequest_CurrentAttemptWrite_builder) Build() *WriteNodesReque
 }
 
 // Internal writes for the Stage indicated by the token.
+//
+// Next ID: 2
 type WriteNodesRequest_CurrentStageWrite struct {
 	state                        protoimpl.MessageState             `protogen:"opaque.v1"`
 	xxx_hidden_ContinuationGroup *WriteNodesRequest_DependencyGroup `protobuf:"bytes,1,opt,name=continuation_group,json=continuationGroup,proto3,oneof"`
@@ -2081,6 +2095,8 @@ func (b0 WriteNodesRequest_CurrentStageWrite_builder) Build() *WriteNodesRequest
 // action taken by a different actor (and a StageAttempt cancelling its
 // Stage is equivalent to a Stage cancelling itself). If a Stage wants to
 // terminate itself, it should mark its attempt INCOMPLETE or COMPLETE.
+//
+// Next ID: 2
 type WriteNodesRequest_StageCancellation struct {
 	state                 protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Identifier *v1.Stage              `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
@@ -2153,6 +2169,8 @@ func (b0 WriteNodesRequest_StageCancellation_builder) Build() *WriteNodesRequest
 }
 
 // Indicate how the Orchestrator should transition to a given state.
+//
+// Next ID: 7
 type WriteNodesRequest_CurrentAttemptWrite_StateTransition struct {
 	state                   protoimpl.MessageState                                               `protogen:"opaque.v1"`
 	xxx_hidden_DesiredState isWriteNodesRequest_CurrentAttemptWrite_StateTransition_DesiredState `protobuf_oneof:"desired_state"`
@@ -2552,6 +2570,8 @@ func (*writeNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete_) isWrit
 // attempt is already running, use Incomplete instead (since some work was
 // done, but it was incomplete) with `throttle_next_attempt_until` field
 // set.
+//
+// Next ID: 2
 type WriteNodesRequest_CurrentAttemptWrite_StateTransition_Throttled struct {
 	state            protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Until *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=until,proto3,oneof"`
@@ -2629,6 +2649,8 @@ func (b0 WriteNodesRequest_CurrentAttemptWrite_StateTransition_Throttled_builder
 
 // Scheduled indicates that the Executor has accepted the Attempt, and
 // will run it at a later time.
+//
+// Next ID: 2
 type WriteNodesRequest_CurrentAttemptWrite_StateTransition_Scheduled struct {
 	state                             protoimpl.MessageState       `protogen:"opaque.v1"`
 	xxx_hidden_AttemptExecutionPolicy *StageAttemptExecutionPolicy `protobuf:"bytes,1,opt,name=attempt_execution_policy,json=attemptExecutionPolicy,proto3,oneof"`
@@ -2701,6 +2723,8 @@ func (b0 WriteNodesRequest_CurrentAttemptWrite_StateTransition_Scheduled_builder
 }
 
 // Running indicates that the Executor is actively running this Attempt.
+//
+// Next ID: 3
 type WriteNodesRequest_CurrentAttemptWrite_StateTransition_Running struct {
 	state                             protoimpl.MessageState       `protogen:"opaque.v1"`
 	xxx_hidden_AttemptExecutionPolicy *StageAttemptExecutionPolicy `protobuf:"bytes,1,opt,name=attempt_execution_policy,json=attemptExecutionPolicy,proto3,oneof"`
@@ -2931,6 +2955,8 @@ func (b0 WriteNodesRequest_CurrentAttemptWrite_StateTransition_Complete_builder)
 // task (e.g. compiler segfaulted, test harness lost contact with a DUT
 // during test execution (and such a failure may not be due to the test
 // itself), etc.)
+//
+// Next ID: 3
 type WriteNodesRequest_CurrentAttemptWrite_StateTransition_Incomplete struct {
 	state                               protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_BlockNewAttempts         bool                   `protobuf:"varint,1,opt,name=block_new_attempts,json=blockNewAttempts,proto3,oneof"`

@@ -95,6 +95,8 @@ message Check {
 
   // StateHistoryEntry records the database revision (commit timestamp) when
   // each time this Check's state changes.
+  //
+  // Next ID: 3
   message StateHistoryEntry {
     // The changed state.
     optional CheckState state = 1 [(google.api.field_behavior) = IMMUTABLE];
@@ -148,6 +150,8 @@ message Check {
   // A Check may have multiple Results, and each Result may have multiple pieces
   // of result data. This could occur when multiple Stages all contribute
   // results to the same Check (e.g. sharding, multiple executions, etc.).
+  //
+  // Next ID: 7
   message Result {
     // Identifier for this Result.
     optional ids.v1.CheckResult identifier = 1 [(google.api.field_behavior) = IMMUTABLE];

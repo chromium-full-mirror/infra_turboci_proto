@@ -198,6 +198,8 @@ func (x CollectStageAttempts) Number() protoreflect.EnumNumber {
 // Queries that are guaranteed to produce no results (like a query with
 // only `select_stages`, no expansion, and no `collect_stages`) are rejected
 // as invalid, resulting in INVALID_ARGUMENT error from QueryNodes.
+//
+// Next ID: 10
 type Query struct {
 	state                         protoimpl.MessageState    `protogen:"opaque.v1"`
 	xxx_hidden_NodeSet            isQuery_NodeSet           `protobuf_oneof:"node_set"`
@@ -651,6 +653,8 @@ func (b0 Query_NodesAcrossWorkPlans_builder) Build() *Query_NodesAcrossWorkPlans
 }
 
 // Indicates to work only with the given list of nodes.
+//
+// Next ID: 3
 type Query_NodesByID struct {
 	state            protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Nodes *[]*v1.Identifier      `protobuf:"bytes,2,rep,name=nodes,proto3"`
@@ -731,6 +735,8 @@ func (b0 Query_NodesByID_builder) Build() *Query_NodesByID {
 // selection phase (note you still may see Checks in the overall result
 // if `collect_checks` is present and some Checks were discovered during
 // the Expand phase).
+//
+// Next ID: 2
 type Query_SelectChecks struct {
 	state                 protoimpl.MessageState           `protogen:"opaque.v1"`
 	xxx_hidden_Predicates *[]*Query_SelectChecks_Predicate `protobuf:"bytes,1,rep,name=predicates,proto3"`
@@ -803,6 +809,8 @@ func (b0 Query_SelectChecks_builder) Build() *Query_SelectChecks {
 // selection phase (note you still may see Stages in the overall result
 // if `collect_stages` is present and some Stages were discovered during
 // the Expand phase).
+//
+// Next ID: 2
 type Query_SelectStages struct {
 	state                 protoimpl.MessageState           `protogen:"opaque.v1"`
 	xxx_hidden_Predicates *[]*Query_SelectStages_Predicate `protobuf:"bytes,1,rep,name=predicates,proto3"`
@@ -866,6 +874,8 @@ func (b0 Query_SelectStages_builder) Build() *Query_SelectStages {
 }
 
 // How to expand the dependencies for a Check or Stage.
+//
+// Next ID: 2
 type Query_ExpandDependencies struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Mode        QueryExpandDepsMode    `protobuf:"varint,1,opt,name=mode,proto3,enum=turboci.graph.orchestrator.v1.QueryExpandDepsMode,oneof"`
@@ -947,6 +957,8 @@ func (b0 Query_ExpandDependencies_builder) Build() *Query_ExpandDependencies {
 }
 
 // How to expand the dependents for a Check or Stage.
+//
+// Next ID: 2
 type Query_ExpandDependents struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Mode        QueryExpandDepsMode    `protobuf:"varint,1,opt,name=mode,proto3,enum=turboci.graph.orchestrator.v1.QueryExpandDepsMode,oneof"`
@@ -1029,6 +1041,8 @@ func (b0 Query_ExpandDependents_builder) Build() *Query_ExpandDependents {
 
 // Describes what data the caller wants to see for discovered Checks (in
 // addition to core Check properties).
+//
+// Next ID: 4
 type Query_CollectChecks struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Options     bool                   `protobuf:"varint,1,opt,name=options,proto3,oneof"`
@@ -1178,6 +1192,8 @@ func (b0 Query_CollectChecks_builder) Build() *Query_CollectChecks {
 //
 // Value-typed fields inside Stage Attempts (e.g. progress details) and Stage
 // Edits are subject to filtering by QueryNodesRequest.type_info.wanted.
+//
+// Next ID: 3
 type Query_CollectStages struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Attempts    CollectStageAttempts   `protobuf:"varint,1,opt,name=attempts,proto3,enum=turboci.graph.orchestrator.v1.CollectStageAttempts,oneof"`
@@ -1291,6 +1307,8 @@ func (b0 Query_CollectStages_builder) Build() *Query_CollectStages {
 //
 // Individual clauses are ANDed together. An unset field means the
 // corresponding clause is not checked. At least one field must be set.
+//
+// Next ID: 5
 type Query_SelectChecks_Predicate struct {
 	state                         protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Kind               CheckKind              `protobuf:"varint,1,opt,name=kind,proto3,enum=turboci.graph.orchestrator.v1.CheckKind,oneof"`
@@ -1466,6 +1484,8 @@ func (b0 Query_SelectChecks_Predicate_builder) Build() *Query_SelectChecks_Predi
 //
 // Individual clauses are ANDed together. An unset field means the
 // corresponding clause is not checked. At least one field must be set.
+//
+// Next ID: 3
 type Query_SelectStages_Predicate struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_State        StageState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`

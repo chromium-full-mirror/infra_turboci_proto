@@ -81,6 +81,8 @@ func (x DisplayMessage_MessageFormat) Number() protoreflect.EnumNumber {
 }
 
 // A message string and a format-type enum to instruct clients how to render the text.
+//
+// Next ID: 3
 type DisplayMessage struct {
 	state                    protoimpl.MessageState       `protogen:"opaque.v1"`
 	xxx_hidden_Message       *string                      `protobuf:"bytes,1,opt,name=message,proto3,oneof"`

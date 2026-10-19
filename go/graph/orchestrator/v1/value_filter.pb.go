@@ -57,6 +57,8 @@ const (
 //
 // ValueRefs which are unwanted (e.g. don't match `type_info` or `include_data`)
 // will be marked as omitted with the reason UNWANTED.
+//
+// Next ID: 13
 type ValueFilter struct {
 	state                                      protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_TypeInfo                        *TypeInfo              `protobuf:"bytes,1,opt,name=type_info,json=typeInfo,proto3,oneof"`

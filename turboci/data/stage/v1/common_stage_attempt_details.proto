@@ -15,6 +15,8 @@ option java_multiple_files = true;
 // only for the Stage.Attempt.details generic Value field. Common, generic stage attempt
 // details can go in this message. Other stage-specific details should use a separate
 // message.
+//
+// Next ID: 2
 message CommonStageAttemptDetails {
   // A map of URLs to view information about the stage attempt. This might include pages
   // for viewing the actions taken by the stage attempt, results it produced, logs, etc.
@@ -27,6 +29,8 @@ message CommonStageAttemptDetails {
 
   // Details about the URL to link to as well as additional information such as priority
   // ordering in the UI, enums for specific types of URLs etc.
+  //
+  // Next ID: 2
   message UrlDetails {
     // The URL to link to.
     optional string url = 1;

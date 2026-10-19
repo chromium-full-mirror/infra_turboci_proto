@@ -91,6 +91,8 @@ func (x DataConversionFailure) Number() protoreflect.EnumNumber {
 // ValueData is written via [ValueWrite] - the orchestrator service will
 // transform these into [ValueRef] and ValueData, and choose via heruistics to
 // either store the ValueData inline in the [ValueRef] or referenced via digest.
+//
+// Next ID: 4
 type ValueData struct {
 	state                        protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Data              isValueData_Data       `protobuf_oneof:"data"`
@@ -305,6 +307,8 @@ func (*valueData_Binary) isValueData_Data() {}
 func (*valueData_Json) isValueData_Data() {}
 
 // JsonAny is like a `google.protobuf.Any`, except the value is encoded JSON.
+//
+// Next ID: 4
 type ValueData_JsonAny struct {
 	state                       protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_TypeUrl          *string                `protobuf:"bytes,1,opt,name=type_url,json=typeUrl,proto3,oneof"`

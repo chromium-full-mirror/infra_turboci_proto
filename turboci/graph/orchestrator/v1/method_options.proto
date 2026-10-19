@@ -12,6 +12,8 @@ option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orch
 option java_multiple_files = true;
 
 // MethodOptions are method options which apply to RPC method definitions.
+//
+// Next ID: 2
 message MethodOptions {
   reserved 1;
   reserved "permission";

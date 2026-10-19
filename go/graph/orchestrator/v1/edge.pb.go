@@ -82,6 +82,8 @@ func (x Resolution) Number() protoreflect.EnumNumber {
 //
 // Typically Edges must always point to nodes in the same graph, though this may
 // be lifted in the future.
+//
+// Next ID: 3
 type Edge struct {
 	state             protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Target isEdge_Target          `protobuf_oneof:"target"`
@@ -262,6 +264,8 @@ func (*edge_Check_) isEdge_Target() {}
 func (*edge_Stage_) isEdge_Target() {}
 
 // An edge pointing to a Check.
+//
+// Next ID: 3
 type Edge_Check struct {
 	state                 protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Identifier *v1.Check              `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
@@ -365,6 +369,8 @@ func (b0 Edge_Check_builder) Build() *Edge_Check {
 }
 
 // An edge pointing to a Stage.
+//
+// Next ID: 3
 type Edge_Stage struct {
 	state                 protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Identifier *v1.Stage              `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`
@@ -468,6 +474,8 @@ func (b0 Edge_Stage_builder) Build() *Edge_Stage {
 }
 
 // The condition under which this Edge is satisfied.
+//
+// Next ID: 3
 type Edge_Check_Condition struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_OnState     CheckState             `protobuf:"varint,1,opt,name=on_state,json=onState,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
@@ -592,6 +600,8 @@ func (b0 Edge_Check_Condition_builder) Build() *Edge_Check_Condition {
 }
 
 // The condition under which this Edge is satisfied.
+//
+// Next ID: 3
 type Edge_Stage_Condition struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_OnState     StageState             `protobuf:"varint,1,opt,name=on_state,json=onState,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`

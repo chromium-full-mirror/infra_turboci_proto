@@ -12,6 +12,8 @@ option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orch
 option java_multiple_files = true;
 
 // Represents an actor which owns/created/edited a node.
+//
+// Next ID: 6
 message Actor {
   // Placeholder type for when the Orchestrator itself makes this edit.
   message Orchestrator {}

@@ -27,6 +27,8 @@ const (
 // AnalyzeOptions provides inputs to analyze. Analyze is used to reduce the set
 // of compile targets that are built to only those that have a build graph
 // dependency on a file changed by the CL under test.
+//
+// Next ID: 6
 type AnalyzeOptions struct {
 	state                           protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_CompileTargets       []string               `protobuf:"bytes,1,rep,name=compile_targets,json=compileTargets,proto3"`

@@ -109,6 +109,8 @@ func (x ValueHashAlgo) Number() protoreflect.EnumNumber {
 // the ValueDigest as a primary key to avoid hotspotting. For the same reason,
 // the algo is always put at the end because it will have the lowest entropy
 // (almost certainly will always be the value '1').
+//
+// Next ID: 4
 type ValueDigest struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Hash        []byte                 `protobuf:"bytes,1,opt,name=hash,proto3,oneof"`

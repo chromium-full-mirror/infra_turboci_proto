@@ -28,6 +28,8 @@ const (
 //
 // Currently can only create empty work plans that can later be populated via
 // WriteNodes call.
+//
+// Next ID: 4
 type CreateWorkPlanRequest struct {
 	state                     protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Realm          *string                `protobuf:"bytes,1,opt,name=realm,proto3,oneof"`

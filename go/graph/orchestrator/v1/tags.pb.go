@@ -123,6 +123,8 @@ func (x ReadScope) Number() protoreflect.EnumNumber {
 // protobufs with the `turboci.tag` field annotation in order to have the
 // library *automatically* extract tags as a side effect of serializing a proto
 // via ValueWrite.
+//
+// Next ID: 4
 type Tag struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Key         *string                `protobuf:"bytes,1,opt,name=key,proto3,oneof"`
@@ -261,6 +263,8 @@ func (b0 Tag_builder) Build() *Tag {
 }
 
 // A single value associated with a tag.
+//
+// Next ID: 6
 type Tag_Value struct {
 	state                     protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Scope          ReadScope              `protobuf:"varint,1,opt,name=scope,proto3,enum=turboci.graph.orchestrator.v1.ReadScope,oneof"`

@@ -29,6 +29,8 @@ const (
 // ProgressEvolvePending is a Progress detail attached to Stage Attempts
 // by the Orchestrator itself while the StageAttempt is PENDING and something
 // goes wrong while calling Executor's RunStage endpoint.
+//
+// Next ID: 4
 type ProgressEvolvePending struct {
 	state              protoimpl.MessageState        `protogen:"opaque.v1"`
 	xxx_hidden_NextTry *timestamppb.Timestamp        `protobuf:"bytes,1,opt,name=next_try,json=nextTry,proto3,oneof"`
@@ -244,6 +246,8 @@ func (*progressEvolvePending_Rpc) isProgressEvolvePending_Phase() {}
 // ProgressCancelling is a Progress detail attached to Stage Attempts by
 // the Orchestrator itself while the StageAttempt is CANCELLING and something
 // goes wrong while calling Executor's CancelStage endpoint.
+//
+// Next ID: 4
 type ProgressCancelling struct {
 	state              protoimpl.MessageState     `protogen:"opaque.v1"`
 	xxx_hidden_NextTry *timestamppb.Timestamp     `protobuf:"bytes,1,opt,name=next_try,json=nextTry,proto3,oneof"`
@@ -459,6 +463,8 @@ func (*progressCancelling_Rpc) isProgressCancelling_Phase() {}
 // ProgressIgnoredDetail is a Progress detail message attached to Stage Attempts
 // when a CurrentAttemptWrite call writes a Stage Attempt detail whose type is
 // already present, but with a different value.
+//
+// Next ID: 2
 type ProgressIgnoredDetail struct {
 	state              protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_TypeUrl []string               `protobuf:"bytes,1,rep,name=type_url,json=typeUrl,proto3"`

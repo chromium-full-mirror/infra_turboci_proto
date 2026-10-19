@@ -26,6 +26,8 @@ const (
 
 // TypeInfo lets the orchestrator know which type(s) the caller wants to see
 // embedded in Value messages within API responses.
+//
+// Next ID: 4
 type TypeInfo struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Wanted        *TypeSet               `protobuf:"bytes,1,opt,name=wanted,proto3,oneof"`

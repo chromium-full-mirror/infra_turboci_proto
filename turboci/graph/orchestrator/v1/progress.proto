@@ -15,6 +15,8 @@ option java_multiple_files = true;
 // ProgressEvolvePending is a Progress detail attached to Stage Attempts
 // by the Orchestrator itself while the StageAttempt is PENDING and something
 // goes wrong while calling Executor's RunStage endpoint.
+//
+// Next ID: 4
 message ProgressEvolvePending {
   // The target time when the Orchestrator will call RunStage RPC again.
   optional google.protobuf.Timestamp next_try = 1;
@@ -37,6 +39,8 @@ message ProgressEvolvePending {
 // ProgressCancelling is a Progress detail attached to Stage Attempts by
 // the Orchestrator itself while the StageAttempt is CANCELLING and something
 // goes wrong while calling Executor's CancelStage endpoint.
+//
+// Next ID: 4
 message ProgressCancelling {
   // The target time when the Orchestrator will call CancelStage RPC again.
   optional google.protobuf.Timestamp next_try = 1;
@@ -59,6 +63,8 @@ message ProgressCancelling {
 // ProgressIgnoredDetail is a Progress detail message attached to Stage Attempts
 // when a CurrentAttemptWrite call writes a Stage Attempt detail whose type is
 // already present, but with a different value.
+//
+// Next ID: 2
 message ProgressIgnoredDetail {
   // The type_url(s) of the detail(s) which had an overwrite attempt.
   repeated string type_url = 1;

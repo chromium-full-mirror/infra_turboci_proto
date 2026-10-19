@@ -27,6 +27,8 @@ const (
 // GobSourceCheckResults provide expanded details about the CLs relevant to this CI run.
 // In the future, this may also contain expanded checkout details such as the commit IDs of
 // each mount but we are not aware of any need for this today.
+//
+// Next ID: 2
 type GobSourceCheckResults struct {
 	state              protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Changes *[]*GerritChangeInfo   `protobuf:"bytes,1,rep,name=changes,proto3"`

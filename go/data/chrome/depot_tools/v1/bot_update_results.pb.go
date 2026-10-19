@@ -29,6 +29,8 @@ const (
 // directory, each of which can have have additional repos checked out either
 // via DEPS files or submodules and so on recursively. Any repo in the tree can
 // have its revision overridden.
+//
+// Next ID: 2
 type BotUpdateResults struct {
 	state               protoimpl.MessageState                 `protogen:"opaque.v1"`
 	xxx_hidden_Manifest map[string]*BotUpdateResults_GitCommit `protobuf:"bytes,1,rep,name=manifest,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -92,6 +94,8 @@ func (b0 BotUpdateResults_builder) Build() *BotUpdateResults {
 
 // Information about the commit checked out for a repo (ignoring any patch
 // applied).
+//
+// Next ID: 4
 type BotUpdateResults_GitCommit struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Host        *string                `protobuf:"bytes,1,opt,name=host,proto3,oneof"`

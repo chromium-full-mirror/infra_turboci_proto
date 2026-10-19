@@ -12,6 +12,8 @@ option go_package = "go.chromium.org/turboci/proto/go/data/common/v1;commonpb";
 option java_multiple_files = true;
 
 // A message string and a format-type enum to instruct clients how to render the text.
+//
+// Next ID: 3
 message DisplayMessage {
   // The message string.
   optional string message = 1;

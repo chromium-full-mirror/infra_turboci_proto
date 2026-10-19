@@ -25,6 +25,8 @@ const (
 )
 
 // Request message for TurboCIGraphService.QueryNodes.
+//
+// Next ID: 5
 type QueryNodesRequest struct {
 	state                  protoimpl.MessageState                `protogen:"opaque.v1"`
 	xxx_hidden_Token       *string                               `protobuf:"bytes,1,opt,name=token,proto3,oneof"`
@@ -193,6 +195,8 @@ func (b0 QueryNodesRequest_builder) Build() *QueryNodesRequest {
 
 // VersionRestriction describes how this query can be constrained by database
 // version.
+//
+// Next ID: 3
 type QueryNodesRequest_VersionRestriction struct {
 	state                  protoimpl.MessageState                             `protogen:"opaque.v1"`
 	xxx_hidden_Restriction isQueryNodesRequest_VersionRestriction_Restriction `protobuf_oneof:"restriction"`

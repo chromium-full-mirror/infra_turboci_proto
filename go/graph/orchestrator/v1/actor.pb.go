@@ -26,6 +26,8 @@ const (
 )
 
 // Represents an actor which owns/created/edited a node.
+//
+// Next ID: 6
 type Actor struct {
 	state           protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Kind isActor_Kind           `protobuf_oneof:"kind"`

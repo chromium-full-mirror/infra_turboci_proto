@@ -19,6 +19,8 @@ option java_multiple_files = true;
 // data into a [ValueRef]/[ValueData] pair. It will use heuristics to decide
 // whether to store the [ValueData] separately via `digest`, or inline with
 // the [ValueRef].
+//
+// Next ID: 4
 message ValueWrite {
   // The actual data to write.
   optional google.protobuf.Any data = 1;

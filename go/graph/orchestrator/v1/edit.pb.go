@@ -461,6 +461,8 @@ func (*edit_Stage) isEdit_Delta() {}
 
 // Human and machine-readable reason for this Edit (provided as part of
 // WriteNodes).
+//
+// Next ID: 3
 type Edit_Reason struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Message     *string                `protobuf:"bytes,1,opt,name=message,proto3,oneof"`

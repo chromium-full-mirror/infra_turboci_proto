@@ -26,6 +26,8 @@ const (
 
 // Options providing the compile targets that should be provided to the
 // toolchain to compile.
+//
+// Next ID: 2
 type CompileTargetsOptions struct {
 	state                     protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_CompileTargets []string               `protobuf:"bytes,1,rep,name=compile_targets,json=compileTargets,proto3"`

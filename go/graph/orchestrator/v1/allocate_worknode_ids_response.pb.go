@@ -26,6 +26,8 @@ const (
 )
 
 // Response message for TurboCIOrchestrator.AllocateWorkNodeIDs.
+//
+// Next ID: 2
 type AllocateWorkNodeIDsResponse struct {
 	state          protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Ids *[]*v1.Stage           `protobuf:"bytes,1,rep,name=ids,proto3"`

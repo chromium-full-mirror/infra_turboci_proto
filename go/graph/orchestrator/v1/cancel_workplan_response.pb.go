@@ -25,6 +25,8 @@ const (
 )
 
 // Response message for TurboCIOrchestrator.CancelWorkPlan.
+//
+// Next ID: 2
 type CancelWorkPlanResponse struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_CancelledAt *Revision              `protobuf:"bytes,1,opt,name=cancelled_at,json=cancelledAt,proto3,oneof"`

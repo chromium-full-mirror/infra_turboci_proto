@@ -53,6 +53,8 @@ option java_multiple_files = true;
 //
 // Note that go.chromium.org/luci/turboci will provide a helper to manage
 // transactions on the client side.
+//
+// Next ID: 3
 message TransactionDetails {
   // A list of all nodes observed which lead to this write.
   //

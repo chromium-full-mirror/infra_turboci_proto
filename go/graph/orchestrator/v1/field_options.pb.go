@@ -27,6 +27,8 @@ const (
 )
 
 // FieldOptions are field options which apply to TurboCI message fields.
+//
+// Next ID: 5
 type FieldOptions struct {
 	state                          protoimpl.MessageState          `protogen:"opaque.v1"`
 	xxx_hidden_Check               *FieldOptions_CheckFieldOptions `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
@@ -192,6 +194,8 @@ func (b0 FieldOptions_builder) Build() *FieldOptions {
 }
 
 // CheckFieldOptions are field options which apply to Check messages.
+//
+// Next ID: 2
 type FieldOptions_CheckFieldOptions struct {
 	state               protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Editable []CheckState           `protobuf:"varint,1,rep,packed,name=editable,proto3,enum=turboci.graph.orchestrator.v1.CheckState"`
@@ -264,6 +268,8 @@ func (b0 FieldOptions_CheckFieldOptions_builder) Build() *FieldOptions_CheckFiel
 
 // IdentifierOptions are field options which apply to message containing
 // Identifiers.
+//
+// Next ID: 2
 type FieldOptions_IdentifierOptions struct {
 	state              protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Allowed []v1.IdentifierKind    `protobuf:"varint,1,rep,packed,name=allowed,proto3,enum=turboci.graph.ids.v1.IdentifierKind"`

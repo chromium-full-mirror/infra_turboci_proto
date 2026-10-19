@@ -42,6 +42,8 @@ option java_multiple_files = true;
 //     its attempts.
 //  - `Check.dependencies` starts tracking once the check switches into
 //    PLANNED state by a WriteNodes call.
+//
+// Next ID: 5
 message Dependencies {
   // A group of dependencies, containing edges and/or other groups, plus
   // a minimum threshold to meet to consider this Group satisfied.
@@ -50,6 +52,8 @@ message Dependencies {
   // && B) || C`). In the basic case with `threshold` unset, a Group is an `AND`
   // of all contained edges/groups. With threshold == 1, a Group is an `OR` of
   // all contained edges/groups.
+  //
+  // Next ID: 4
   message Group {
     // Singular edges in this group.
     //
@@ -131,6 +135,8 @@ message Dependencies {
   //
   // This MAY include non-zero propagation time from the time that the target of
   // Edge entered a satisfying state for this Edge.
+  //
+  // Next ID: 5
   message ResolutionEvent {
     // The version of the containing node (e.g. Stage or Check) which included
     // this event.

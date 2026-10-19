@@ -27,6 +27,8 @@ const (
 )
 
 // Request to cancel an asynchronous stage attempt.
+//
+// Next ID: 5
 type CancelStageRequest struct {
 	state                        protoimpl.MessageState   `protogen:"opaque.v1"`
 	xxx_hidden_Stage             *v1.Stage                `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`

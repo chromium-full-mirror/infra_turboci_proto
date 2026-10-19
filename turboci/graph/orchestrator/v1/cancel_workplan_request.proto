@@ -13,6 +13,8 @@ option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orch
 option java_multiple_files = true;
 
 // Request message for TurboCIOrchestrator.CancelWorkPlan.
+//
+// Next ID: 4
 message CancelWorkPlanRequest {
   // The token which constrains this request to a specific Workplan.
   //
@@ -30,6 +32,8 @@ message CancelWorkPlanRequest {
   optional ids.v1.WorkPlan workplan_id = 2;
 
   // The reason that the caller is cancelling the plan.
+  //
+  // Next ID: 3
   message Reason {
     // A human-readable reason. Required.
     optional string message = 1;

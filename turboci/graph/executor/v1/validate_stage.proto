@@ -15,6 +15,8 @@ option go_package = "go.chromium.org/turboci/proto/go/graph/executor/v1;executor
 option java_multiple_files = true;
 
 // Request to validate a stage before it is inserted into the graph.
+//
+// Next ID: 6
 message ValidateStageRequest {
   // Stage to validate.
   optional orchestrator.v1.Stage stage = 1;
@@ -31,6 +33,8 @@ message ValidateStageRequest {
 }
 
 // Response to a stage validation request.
+//
+// Next ID: 4
 message ValidateStageResponse {
   // Validated execution policy for the stage.
   //

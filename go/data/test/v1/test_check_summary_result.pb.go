@@ -28,6 +28,8 @@ const (
 // TestCheckSummaryResult represents a high-level summary of the result of one or more tests. It does
 // not (currently) include results for specific tests, just a count of the successes and failures
 // across all tests represented by the containing test check.
+//
+// Next ID: 8
 type TestCheckSummaryResult struct {
 	state                     protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Success        bool                   `protobuf:"varint,1,opt,name=success,proto3,oneof"`

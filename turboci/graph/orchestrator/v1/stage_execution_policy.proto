@@ -15,8 +15,12 @@ option java_multiple_files = true;
 
 // StageExecutionPolicy describes constraints on how a Stage may be executed
 // by the Orchestrator.
+//
+// Next ID: 6
 message StageExecutionPolicy {
   // Retry describes the policy for retrying a Stage across multiple Attempts.
+  //
+  // Next ID: 2
   message Retry {
     // The maximum number of retries (apart from the first attempt) that will be
     // made for this Stage.

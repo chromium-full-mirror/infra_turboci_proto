@@ -26,6 +26,8 @@ const (
 )
 
 // Response message for TurboCIGraphService.QueryNodes.
+//
+// Next ID: 6
 type QueryNodesResponse struct {
 	state                          protoimpl.MessageState    `protogen:"opaque.v1"`
 	xxx_hidden_Workplans           *[]*WorkPlan              `protobuf:"bytes,1,rep,name=workplans,proto3"`

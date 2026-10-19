@@ -41,8 +41,12 @@ enum DataConversionFailure {
 // ValueData is written via [ValueWrite] - the orchestrator service will
 // transform these into [ValueRef] and ValueData, and choose via heruistics to
 // either store the ValueData inline in the [ValueRef] or referenced via digest.
+//
+// Next ID: 4
 message ValueData {
   // JsonAny is like a `google.protobuf.Any`, except the value is encoded JSON.
+  //
+  // Next ID: 4
   message JsonAny {
     // The type_url of this data. Exactly the same form as
     // google.protobuf.Any.type_url.

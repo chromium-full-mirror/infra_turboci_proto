@@ -22,6 +22,8 @@ option java_multiple_files = true;
 // response, and to ensure the same fields available in legacy CI systems are also available here, even if
 // some fields may not have an immediate use for CI purposes. Therefore the fields in this message and its
 // sub-messages are expected to be populated from the Gerrit API response rather than directly by workflows.
+//
+// Next ID: 22
 message GerritChangeInfo {
   // Which Gerrit instance this change is hosted on. This should not include the
   // ".googlesource.com" hostname suffix as the suffix may be different depending on how it's
@@ -138,11 +140,11 @@ message GerritChangeInfo {
   // their own protos for this today. We may converge this in the future once it becomes
   // clear how each product defines "non-trivial".
   // For reference, how Android does it today: http://shortn/_nRwyXPcucE
-
-  // Next field number to use: 22
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-accounts.html#account-info
+//
+// Next ID: 11
 message AccountInfo {
   // The numeric ID of the account.
   optional int64 account_id = 1;
@@ -176,12 +178,16 @@ message AccountInfo {
 }
 
 // Wrapper for repeated AccountInfo
+//
+// Next ID: 2
 message AccountInfos {
   // Multiple AccountInfos.
   repeated AccountInfo accounts = 1;
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#approval-info
+//
+// Next ID: 6
 message ApprovalInfo {
   // The account info of the user who made the approval.
   optional AccountInfo user = 1;
@@ -202,6 +208,8 @@ message ApprovalInfo {
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#change-message-info
+//
+// Next ID: 9
 message ChangeMessageInfo {
   // The ID of the message.
   optional string id = 1;
@@ -232,6 +240,8 @@ message ChangeMessageInfo {
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#commit-info
+//
+// Next ID: 11
 message CommitInfo {
   // The commit ID.
   optional string commit_id = 1;
@@ -285,6 +295,8 @@ message CommitInfo {
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#file-info
+//
+// Next ID: 5
 message FileInfo {
   // The old file path. Only set if the file was renamed or copied.
   optional string old_path = 1;
@@ -318,6 +330,8 @@ message FileInfo {
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#label-info
+//
+// Next ID: 6
 message LabelInfo {
   // The description of the label.
   optional string description = 1;
@@ -338,6 +352,8 @@ message LabelInfo {
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#revision-info
+//
+// Next ID: 8
 message RevisionInfo {
   // Possible kinds of changes.
   // See https://gerrit-review.googlesource.com/Documentation/config-labels.html for more detailed

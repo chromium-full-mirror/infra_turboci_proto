@@ -33,6 +33,8 @@ const (
 // This common Check result is mainly for Chronical UI. If you have some other
 // machine readabale structured reasons for skipping the check, Please use
 // another CheckResult to capture that.
+//
+// Next ID: 2
 type SkippedCheckResult struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Message     *string                `protobuf:"bytes,1,opt,name=message,proto3,oneof"`

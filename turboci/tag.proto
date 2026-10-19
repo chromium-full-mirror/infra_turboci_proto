@@ -124,6 +124,8 @@ enum ReadScope {
 //     // well as globally for use with QueryWorkPlans.
 //     optional MyEnum enum_field = 3 [(turboci.tag).key_scope = WORK_PLAN];
 //   }
+//
+// Next ID: 5
 message Tag {
   // The scope at which to index this tag's key.
   //

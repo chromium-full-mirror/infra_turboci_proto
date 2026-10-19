@@ -25,6 +25,8 @@ const (
 )
 
 // Response message for TurboCIGraphService.WriteNodes.
+//
+// Next ID: 3
 type WriteNodesResponse struct {
 	state                          protoimpl.MessageState    `protogen:"opaque.v1"`
 	xxx_hidden_WrittenVersion      *Revision                 `protobuf:"bytes,1,opt,name=written_version,json=writtenVersion,proto3,oneof"`

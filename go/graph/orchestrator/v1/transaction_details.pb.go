@@ -66,6 +66,8 @@ const (
 //
 // Note that go.chromium.org/luci/turboci will provide a helper to manage
 // transactions on the client side.
+//
+// Next ID: 3
 type TransactionDetails struct {
 	state                      protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_NodesObserved   *[]*v1.Identifier      `protobuf:"bytes,1,rep,name=nodes_observed,json=nodesObserved,proto3"`

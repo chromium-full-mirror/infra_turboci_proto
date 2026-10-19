@@ -28,6 +28,8 @@ const (
 
 // StageExecutionPolicy describes constraints on how a Stage may be executed
 // by the Orchestrator.
+//
+// Next ID: 6
 type StageExecutionPolicy struct {
 	state                                     protoimpl.MessageState       `protogen:"opaque.v1"`
 	xxx_hidden_Retry                          *StageExecutionPolicy_Retry  `protobuf:"bytes,1,opt,name=retry,proto3,oneof"`
@@ -259,6 +261,8 @@ func (b0 StageExecutionPolicy_builder) Build() *StageExecutionPolicy {
 }
 
 // Retry describes the policy for retrying a Stage across multiple Attempts.
+//
+// Next ID: 2
 type StageExecutionPolicy_Retry struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_MaxRetries  int32                  `protobuf:"varint,1,opt,name=max_retries,json=maxRetries,proto3,oneof"`

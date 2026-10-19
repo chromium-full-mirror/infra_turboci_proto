@@ -14,6 +14,8 @@ option java_multiple_files = true;
 // RevisionRange represents a range of revisions.
 //
 // This range is half-open: `[start, end)`.
+//
+// Next ID: 3
 message RevisionRange {
   // The first revision in the range.
   //

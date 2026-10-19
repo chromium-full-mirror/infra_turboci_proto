@@ -94,6 +94,8 @@ message Edit {
 
   // Human and machine-readable reason for this Edit (provided as part of
   // WriteNodes).
+  //
+  // Next ID: 3
   message Reason {
     // A 'low effort' reason for this edit.
     //

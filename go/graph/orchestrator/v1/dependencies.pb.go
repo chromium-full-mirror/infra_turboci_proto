@@ -53,6 +53,8 @@ const (
 //     its attempts.
 //   - `Check.dependencies` starts tracking once the check switches into
 //     PLANNED state by a WriteNodes call.
+//
+// Next ID: 5
 type Dependencies struct {
 	state                       protoimpl.MessageState                  `protogen:"opaque.v1"`
 	xxx_hidden_Edges            *[]*Edge                                `protobuf:"bytes,1,rep,name=edges,proto3"`
@@ -256,6 +258,8 @@ func (b0 Dependencies_builder) Build() *Dependencies {
 // && B) || C`). In the basic case with `threshold` unset, a Group is an `AND`
 // of all contained edges/groups. With threshold == 1, a Group is an `OR` of
 // all contained edges/groups.
+//
+// Next ID: 4
 type Dependencies_Group struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Edges       []int32                `protobuf:"varint,1,rep,packed,name=edges,proto3"`
@@ -416,6 +420,8 @@ func (b0 Dependencies_Group_builder) Build() *Dependencies_Group {
 //
 // This MAY include non-zero propagation time from the time that the target of
 // Edge entered a satisfying state for this Edge.
+//
+// Next ID: 5
 type Dependencies_ResolutionEvent struct {
 	state                       protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Version          *Revision              `protobuf:"bytes,1,opt,name=version,proto3,oneof"`

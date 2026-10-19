@@ -14,6 +14,8 @@ option go_package = "go.chromium.org/turboci/proto/go/graph/executor/v1;executor
 option java_multiple_files = true;
 
 // Request to cancel an asynchronous stage attempt.
+//
+// Next ID: 5
 message CancelStageRequest {
   // Stage with the attempt being cancelled.
   optional orchestrator.v1.Stage stage = 1;

@@ -25,6 +25,8 @@ const (
 )
 
 // Response message for TurboCIGraphService.ReadWorkPlan.
+//
+// Next ID: 7
 type ReadWorkPlanResponse struct {
 	state                          protoimpl.MessageState    `protogen:"opaque.v1"`
 	xxx_hidden_Workplan            *WorkPlan                 `protobuf:"bytes,1,opt,name=workplan,proto3,oneof"`

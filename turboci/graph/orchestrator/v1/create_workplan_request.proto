@@ -13,6 +13,8 @@ option java_multiple_files = true;
 //
 // Currently can only create empty work plans that can later be populated via
 // WriteNodes call.
+//
+// Next ID: 4
 message CreateWorkPlanRequest {
   // The security realm for this WorkPlan.
   //

@@ -26,6 +26,8 @@ const (
 )
 
 // Request message for TurboCIOrchestrator.CancelWorkPlan.
+//
+// Next ID: 4
 type CancelWorkPlanRequest struct {
 	state                  protoimpl.MessageState        `protogen:"opaque.v1"`
 	xxx_hidden_Token       *string                       `protobuf:"bytes,1,opt,name=token,proto3,oneof"`
@@ -167,6 +169,8 @@ func (b0 CancelWorkPlanRequest_builder) Build() *CancelWorkPlanRequest {
 }
 
 // The reason that the caller is cancelling the plan.
+//
+// Next ID: 3
 type CancelWorkPlanRequest_Reason struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Message     *string                `protobuf:"bytes,1,opt,name=message,proto3,oneof"`

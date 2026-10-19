@@ -26,6 +26,8 @@ const (
 )
 
 // Request message for TurboCIOrchestrator.CreateWorkPlan.
+//
+// Next ID: 3
 type CreateWorkPlanResponse struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Identifier   *v1.WorkPlan           `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`

@@ -29,6 +29,8 @@ const (
 //  2. Apply zero or more repo-level (mount) overrides to checkout revisions different from
 //     the pinned manifest if needed.
 //  3. Apply zero or more CLs on top of the base.
+//
+// Next ID: 5
 type GobSourceCheckOptions struct {
 	state                      protoimpl.MessageState                  `protogen:"opaque.v1"`
 	xxx_hidden_GerritChanges   *[]*GobSourceCheckOptions_GerritChange  `protobuf:"bytes,1,rep,name=gerrit_changes,json=gerritChanges,proto3"`
@@ -138,6 +140,8 @@ func (b0 GobSourceCheckOptions_builder) Build() *GobSourceCheckOptions {
 }
 
 // Information to reference a Gerrit change at a specific patchset.
+//
+// Next ID: 6
 type GobSourceCheckOptions_GerritChange struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Hostname      *string                `protobuf:"bytes,1,opt,name=hostname,proto3,oneof"`
@@ -310,6 +314,8 @@ func (b0 GobSourceCheckOptions_GerritChange_builder) Build() *GobSourceCheckOpti
 // You can also specify per-mount commits that override those in the commit via either inline
 // overrides or a reference to pinned manifest metadata stored in Android's manifest
 // store service.
+//
+// Next ID: 4
 type GobSourceCheckOptions_PinnedRepoMounts struct {
 	state                     protoimpl.MessageState                                   `protogen:"opaque.v1"`
 	xxx_hidden_PinnedRepos    isGobSourceCheckOptions_PinnedRepoMounts_PinnedRepos     `protobuf_oneof:"pinned_repos"`
@@ -531,6 +537,8 @@ func (*gobSourceCheckOptions_PinnedRepoMounts_ManifestCommit_) isGobSourceCheckO
 }
 
 // References a landed Git commit.
+//
+// Next ID: 5
 type GobSourceCheckOptions_PinnedRepoMounts_GitCommit struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Host        *string                `protobuf:"bytes,1,opt,name=host,proto3,oneof"`
@@ -724,6 +732,8 @@ func (b0 GobSourceCheckOptions_PinnedRepoMounts_GitCommit_builder) Build() *GobS
 // pinned (all mounts referencing a fixed commit), or it may be unpinned (some mounts
 // referencing a branch ref) in which case the per-repo commits need to be provided
 // via mount_overrides.
+//
+// Next ID: 3
 type GobSourceCheckOptions_PinnedRepoMounts_ManifestCommit struct {
 	state                  protoimpl.MessageState                            `protogen:"opaque.v1"`
 	xxx_hidden_Commit      *GobSourceCheckOptions_PinnedRepoMounts_GitCommit `protobuf:"bytes,1,opt,name=commit,proto3,oneof"`
@@ -830,6 +840,8 @@ func (b0 GobSourceCheckOptions_PinnedRepoMounts_ManifestCommit_builder) Build() 
 }
 
 // Used to override a repo checkout on disk (mount) to a specific commit ID.
+//
+// Next ID: 3
 type GobSourceCheckOptions_PinnedRepoMounts_MountOverride struct {
 	state                  protoimpl.MessageState                            `protogen:"opaque.v1"`
 	xxx_hidden_Override    *GobSourceCheckOptions_PinnedRepoMounts_GitCommit `protobuf:"bytes,1,opt,name=override,proto3,oneof"`

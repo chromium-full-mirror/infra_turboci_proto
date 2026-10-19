@@ -34,6 +34,8 @@ enum Product {
 // Check specified. For situations where multiple Source Checks are needed, stage maintainers
 // are encouraged to create a custom message that maps Source Check identifiers to the purpose
 // they'll be used for.
+//
+// Next ID: 2
 message BuildCheckOptions {
   // A "build target" represents a particular configuration for a build action that will create
   // a set of binaries. Typically the build target, and therefore the binaries produced, will
@@ -48,6 +50,8 @@ message BuildCheckOptions {
   // to build many targets, and that accepts the build target name as an input, for example).
   // When builders build only a single build target, often the builder name and the build target
   // name will be the same.
+  //
+  // Next ID: 6
   message BuildTarget {
     // The name for this build target. The exact meaning and format of this value will vary between
     // products, but examples include:

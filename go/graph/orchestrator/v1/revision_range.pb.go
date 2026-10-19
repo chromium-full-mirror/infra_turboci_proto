@@ -28,6 +28,8 @@ const (
 // RevisionRange represents a range of revisions.
 //
 // This range is half-open: `[start, end)`.
+//
+// Next ID: 3
 type RevisionRange struct {
 	state            protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Start *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=start,proto3,oneof"`

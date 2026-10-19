@@ -17,6 +17,8 @@ option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orch
 option java_multiple_files = true;
 
 // Encapsulates data changes to a Stage object.
+//
+// Next ID: 5
 message StageDelta {
   // If set, the new Stage state that was set as part of this edit.
   optional StageState state = 1;
@@ -28,6 +30,8 @@ message StageDelta {
   // included here.
 
   // Attempt represents a delta to a given StageAttempt.
+  //
+  // Next ID: 5
   message Attempt {
     // The identifier of the StageAttempt which was edited.
     optional ids.v1.StageAttempt identifier = 1;

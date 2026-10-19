@@ -87,6 +87,8 @@ func (x Product) Number() protoreflect.EnumNumber {
 // Check specified. For situations where multiple Source Checks are needed, stage maintainers
 // are encouraged to create a custom message that maps Source Check identifiers to the purpose
 // they'll be used for.
+//
+// Next ID: 2
 type BuildCheckOptions struct {
 	state             protoimpl.MessageState         `protogen:"opaque.v1"`
 	xxx_hidden_Target *BuildCheckOptions_BuildTarget `protobuf:"bytes,1,opt,name=target,proto3,oneof"`
@@ -172,6 +174,8 @@ func (b0 BuildCheckOptions_builder) Build() *BuildCheckOptions {
 // to build many targets, and that accepts the build target name as an input, for example).
 // When builders build only a single build target, often the builder name and the build target
 // name will be the same.
+//
+// Next ID: 6
 type BuildCheckOptions_BuildTarget struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Name        *string                `protobuf:"bytes,1,opt,name=name,proto3,oneof"`

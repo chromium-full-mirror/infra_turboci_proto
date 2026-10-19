@@ -16,6 +16,8 @@ option java_multiple_files = true;
 // We use this instead of raw Timestamp messages to allow for future
 // evolution of the revision type as well as to distinguish against regular
 // Timestamps used elsewhere in the schema.
+//
+// Next ID: 2
 message Revision {
   // The spanner commit timestamp which represents this revision.
   //

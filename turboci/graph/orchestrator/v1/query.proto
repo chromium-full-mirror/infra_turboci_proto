@@ -118,6 +118,8 @@ enum CollectStageAttempts {
 // Queries that are guaranteed to produce no results (like a query with
 // only `select_stages`, no expansion, and no `collect_stages`) are rejected
 // as invalid, resulting in INVALID_ARGUMENT error from QueryNodes.
+//
+// Next ID: 10
 message Query {
   // Indicates to work with all nodes in the matching set of work plans.
   message NodesAcrossWorkPlans {
@@ -130,6 +132,8 @@ message Query {
   }
 
   // Indicates to work only with the given list of nodes.
+  //
+  // Next ID: 3
   message NodesByID {
     // The identifiers of specific nodes to select.
     //
@@ -169,11 +173,15 @@ message Query {
   // selection phase (note you still may see Checks in the overall result
   // if `collect_checks` is present and some Checks were discovered during
   // the Expand phase).
+  //
+  // Next ID: 2
   message SelectChecks {
     // Only pick Checks which match this predicate.
     //
     // Individual clauses are ANDed together. An unset field means the
     // corresponding clause is not checked. At least one field must be set.
+    //
+    // Next ID: 5
     message Predicate {
       // Pick Checks of this kind.
       optional CheckKind kind = 1;
@@ -217,11 +225,15 @@ message Query {
   // selection phase (note you still may see Stages in the overall result
   // if `collect_stages` is present and some Stages were discovered during
   // the Expand phase).
+  //
+  // Next ID: 2
   message SelectStages {
     // Only pick Stages which match this predicate.
     //
     // Individual clauses are ANDed together. An unset field means the
     // corresponding clause is not checked. At least one field must be set.
+    //
+    // Next ID: 3
     message Predicate {
       // Pick Stages in this state.
       optional StageState state = 1;
@@ -242,6 +254,8 @@ message Query {
   optional SelectStages select_stages = 5;
 
   // How to expand the dependencies for a Check or Stage.
+  //
+  // Next ID: 2
   message ExpandDependencies {
     // How to expand dependencies.
     //
@@ -260,6 +274,8 @@ message Query {
   optional ExpandDependencies expand_dependencies = 6;
 
   // How to expand the dependents for a Check or Stage.
+  //
+  // Next ID: 2
   message ExpandDependents {
     // How to expand dependents.
     //
@@ -285,6 +301,8 @@ message Query {
 
   // Describes what data the caller wants to see for discovered Checks (in
   // addition to core Check properties).
+  //
+  // Next ID: 4
   message CollectChecks {
     // Include CheckOptions for any discovered Checks.
     //
@@ -321,6 +339,8 @@ message Query {
   //
   // Value-typed fields inside Stage Attempts (e.g. progress details) and Stage
   // Edits are subject to filtering by QueryNodesRequest.type_info.wanted.
+  //
+  // Next ID: 3
   message CollectStages {
     // What subset of Stage Attempts to include.
     //

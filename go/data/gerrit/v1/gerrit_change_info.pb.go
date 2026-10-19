@@ -220,6 +220,8 @@ func (x RevisionInfo_Kind) Number() protoreflect.EnumNumber {
 // response, and to ensure the same fields available in legacy CI systems are also available here, even if
 // some fields may not have an immediate use for CI purposes. Therefore the fields in this message and its
 // sub-messages are expected to be populated from the Gerrit API response rather than directly by workflows.
+//
+// Next ID: 22
 type GerritChangeInfo struct {
 	state                           protoimpl.MessageState   `protogen:"opaque.v1"`
 	xxx_hidden_Host                 *string                  `protobuf:"bytes,1,opt,name=host,proto3,oneof"`
@@ -896,6 +898,8 @@ func (b0 GerritChangeInfo_builder) Build() *GerritChangeInfo {
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-accounts.html#account-info
+//
+// Next ID: 11
 type AccountInfo struct {
 	state                      protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_AccountId       int64                  `protobuf:"varint,1,opt,name=account_id,json=accountId,proto3,oneof"`
@@ -1235,6 +1239,8 @@ func (b0 AccountInfo_builder) Build() *AccountInfo {
 }
 
 // Wrapper for repeated AccountInfo
+//
+// Next ID: 2
 type AccountInfos struct {
 	state               protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Accounts *[]*AccountInfo        `protobuf:"bytes,1,rep,name=accounts,proto3"`
@@ -1296,6 +1302,8 @@ func (b0 AccountInfos_builder) Build() *AccountInfos {
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#approval-info
+//
+// Next ID: 6
 type ApprovalInfo struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_User        *AccountInfo           `protobuf:"bytes,1,opt,name=user,proto3,oneof"`
@@ -1492,6 +1500,8 @@ func (b0 ApprovalInfo_builder) Build() *ApprovalInfo {
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#change-message-info
+//
+// Next ID: 9
 type ChangeMessageInfo struct {
 	state                        protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Id                *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof"`
@@ -1769,6 +1779,8 @@ func (b0 ChangeMessageInfo_builder) Build() *ChangeMessageInfo {
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#commit-info
+//
+// Next ID: 11
 type CommitInfo struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_CommitId      *string                `protobuf:"bytes,1,opt,name=commit_id,json=commitId,proto3,oneof"`
@@ -2109,6 +2121,8 @@ func (b0 CommitInfo_builder) Build() *CommitInfo {
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#file-info
+//
+// Next ID: 5
 type FileInfo struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_OldPath       *string                `protobuf:"bytes,1,opt,name=old_path,json=oldPath,proto3,oneof"`
@@ -2284,6 +2298,8 @@ func (b0 FileInfo_builder) Build() *FileInfo {
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#label-info
+//
+// Next ID: 6
 type LabelInfo struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Description  *string                `protobuf:"bytes,1,opt,name=description,proto3,oneof"`
@@ -2460,6 +2476,8 @@ func (b0 LabelInfo_builder) Build() *LabelInfo {
 }
 
 // Sourced from https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#revision-info
+//
+// Next ID: 8
 type RevisionInfo struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Kind        RevisionInfo_Kind      `protobuf:"varint,1,opt,name=kind,proto3,enum=turboci.data.gerrit.v1.RevisionInfo_Kind,oneof"`

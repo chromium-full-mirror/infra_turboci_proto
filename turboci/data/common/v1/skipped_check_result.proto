@@ -18,6 +18,8 @@ option java_multiple_files = true;
 // This common Check result is mainly for Chronical UI. If you have some other
 // machine readabale structured reasons for skipping the check, Please use
 // another CheckResult to capture that.
+//
+// Next ID: 2
 message SkippedCheckResult {
   // Human readable string message on why the check was skipped.
   optional string message = 1;

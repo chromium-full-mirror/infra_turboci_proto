@@ -72,6 +72,8 @@ enum ReadScope {
 // protobufs with the `turboci.tag` field annotation in order to have the
 // library *automatically* extract tags as a side effect of serializing a proto
 // via ValueWrite.
+//
+// Next ID: 4
 message Tag {
   // Key should be the protobuf 'full name' of the proto field from which
   // this tag originated.
@@ -83,6 +85,8 @@ message Tag {
   optional ReadScope scope = 2;
 
   // A single value associated with a tag.
+  //
+  // Next ID: 6
   message Value {
     // Scope indicates the level at which this *value* can be read.
     //

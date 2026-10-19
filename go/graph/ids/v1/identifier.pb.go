@@ -33,6 +33,8 @@ const (
 // can refer to multiple kinds of nodes in different contexts.
 //
 // No string identifiers here may contain a colon.
+//
+// Next ID: 11
 type Identifier struct {
 	state           protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Type isIdentifier_Type      `protobuf_oneof:"type"`
@@ -445,6 +447,8 @@ func (*identifier_StageEdit) isIdentifier_Type() {}
 // Identifies an entire TurboCI WorkPlan.
 //
 // Serialized as "L<id>".
+//
+// Next ID: 2
 type WorkPlan struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Id          *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof"`
@@ -531,6 +535,8 @@ func (b0 WorkPlan_builder) Build() *WorkPlan {
 // Serialized as "<work_plan>:C<id>".
 //
 // E.g. "L<work_plan.id>:C<id>"
+//
+// Next ID: 3
 type Check struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_WorkPlan    *WorkPlan              `protobuf:"bytes,1,opt,name=work_plan,json=workPlan,proto3,oneof"`
@@ -649,6 +655,8 @@ func (b0 Check_builder) Build() *Check {
 //
 // This is separate from `Check` because it may reside in a different realm
 // than the Check itself.
+//
+// Next ID: 3
 type CheckResult struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Check       *Check                 `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
@@ -759,6 +767,8 @@ func (b0 CheckResult_builder) Build() *CheckResult {
 //
 // E.g.
 // "L<check.work_plan.id>:C<check.id>:V<version.seconds>/<version.nanos>"
+//
+// Next ID: 3
 type CheckEdit struct {
 	state              protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Check   *Check                 `protobuf:"bytes,1,opt,name=check,proto3,oneof"`
@@ -870,6 +880,8 @@ func (b0 CheckEdit_builder) Build() *CheckEdit {
 // S for non-WorkNode Stages.
 //
 // E.g. "L<work_plan.id>:S<id>" or "L<work_plan.id>:N<id>".
+//
+// Next ID: 4
 type Stage struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_WorkPlan    *WorkPlan              `protobuf:"bytes,1,opt,name=work_plan,json=workPlan,proto3,oneof"`
@@ -1020,6 +1032,8 @@ func (b0 Stage_builder) Build() *Stage {
 // Serialized as "<stage>:A<attempts_idx>".
 //
 // E.g. "L<stage.work_plan.id>:S<stage.id>:A<idx>"
+//
+// Next ID: 3
 type StageAttempt struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Stage       *Stage                 `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`
@@ -1130,6 +1144,8 @@ func (b0 StageAttempt_builder) Build() *StageAttempt {
 //
 // E.g.
 // "L<stage.work_plan.id>:S<stage.id>:V<version.seconds>/<version.nanos>"
+//
+// Next ID: 3
 type StageEdit struct {
 	state              protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Stage   *Stage                 `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`

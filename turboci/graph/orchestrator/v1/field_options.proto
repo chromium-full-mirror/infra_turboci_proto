@@ -14,8 +14,12 @@ option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orch
 option java_multiple_files = true;
 
 // FieldOptions are field options which apply to TurboCI message fields.
+//
+// Next ID: 5
 message FieldOptions {
   // CheckFieldOptions are field options which apply to Check messages.
+  //
+  // Next ID: 2
   message CheckFieldOptions {
     // Indicates that this field is mutable at this CheckState or earlier.
     //
@@ -37,6 +41,8 @@ message FieldOptions {
 
   // IdentifierOptions are field options which apply to message containing
   // Identifiers.
+  //
+  // Next ID: 2
   message IdentifierOptions {
     // Indicates a list of allowed target types for Identifiers within this
     // field. Commonly used with Edge messages, but may also directly annotate

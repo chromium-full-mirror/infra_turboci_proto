@@ -27,6 +27,8 @@ const (
 
 // TestCheckDescriptionOption stores descriptive information about its containing test check. This
 // information will be used for display in places like the Chronicle UI.
+//
+// Next ID: 3
 type TestCheckDescriptionOption struct {
 	state                     protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Title          *string                `protobuf:"bytes,1,opt,name=title,proto3,oneof"`

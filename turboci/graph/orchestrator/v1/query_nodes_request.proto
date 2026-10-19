@@ -14,6 +14,8 @@ option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orch
 option java_multiple_files = true;
 
 // Request message for TurboCIGraphService.QueryNodes.
+//
+// Next ID: 5
 message QueryNodesRequest {
   // The token which indicates that the query is coming from within a specific
   // WorkPlan.
@@ -37,6 +39,8 @@ message QueryNodesRequest {
 
   // VersionRestriction describes how this query can be constrained by database
   // version.
+  //
+  // Next ID: 3
   message VersionRestriction {
     // What type of restriction to apply.
     oneof restriction {

@@ -19,6 +19,8 @@ option java_multiple_files = true;
 // can refer to multiple kinds of nodes in different contexts.
 //
 // No string identifiers here may contain a colon.
+//
+// Next ID: 11
 message Identifier {
   reserved "check_option";
   reserved 3;
@@ -59,6 +61,8 @@ message Identifier {
 // Identifies an entire TurboCI WorkPlan.
 //
 // Serialized as "L<id>".
+//
+// Next ID: 2
 message WorkPlan {
   // Globally unique identifier for this WorkPlan.
   //
@@ -71,6 +75,8 @@ message WorkPlan {
 // Serialized as "<work_plan>:C<id>".
 //
 // E.g. "L<work_plan.id>:C<id>"
+//
+// Next ID: 3
 message Check {
   // The WorkPlan this check is scoped to.
   optional WorkPlan work_plan = 1;
@@ -92,6 +98,8 @@ message Check {
 //
 // This is separate from `Check` because it may reside in a different realm
 // than the Check itself.
+//
+// Next ID: 3
 message CheckResult {
   // The check that this result belongs to.
   optional Check check = 1;
@@ -108,6 +116,8 @@ message CheckResult {
 //
 // E.g.
 // "L<check.work_plan.id>:C<check.id>:V<version.seconds>/<version.nanos>"
+//
+// Next ID: 3
 message CheckEdit {
   // The check that this edit belongs to.
   optional Check check = 1;
@@ -132,6 +142,8 @@ message CheckEdit {
 // S for non-WorkNode Stages.
 //
 // E.g. "L<work_plan.id>:S<id>" or "L<work_plan.id>:N<id>".
+//
+// Next ID: 4
 message Stage {
   // The WorkPlan that this Stage belongs to.
   optional WorkPlan work_plan = 1;
@@ -157,6 +169,8 @@ message Stage {
 // Serialized as "<stage>:A<attempts_idx>".
 //
 // E.g. "L<stage.work_plan.id>:S<stage.id>:A<idx>"
+//
+// Next ID: 3
 message StageAttempt {
   // The Stage that this Stage Attempt belongs to.
   optional Stage stage = 1;
@@ -173,6 +187,8 @@ message StageAttempt {
 //
 // E.g.
 // "L<stage.work_plan.id>:S<stage.id>:V<version.seconds>/<version.nanos>"
+//
+// Next ID: 3
 message StageEdit {
   // The stage that this edit belongs to.
   optional Stage stage = 1;

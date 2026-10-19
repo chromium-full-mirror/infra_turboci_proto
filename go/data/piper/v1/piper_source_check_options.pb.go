@@ -26,6 +26,8 @@ const (
 
 // PiperSourceCheckOptions provide the information necessary for the Build stage to retrieve the Piper source code
 // by providing a list of files in Piper and/or list of build targets.
+//
+// Next ID: 4
 type PiperSourceCheckOptions struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Files       []string               `protobuf:"bytes,1,rep,name=files,proto3"`

@@ -13,6 +13,8 @@ option java_multiple_files = true;
 
 // StageAttemptExecutionPolicy describes constraints on how a StageAttempt
 // may be executed by the Orchestrator.
+//
+// Next ID: 3
 message StageAttemptExecutionPolicy {
   // Heartbeat indicates the minimum heartbeat interval for Stage Attempts in
   // a given state.
@@ -54,6 +56,8 @@ message StageAttemptExecutionPolicy {
   // It is TYPICAL to only define a heartbeat for `running`.
   //
   // Heartbeat intervals, if set, currently cannot exceed 30 minutes.
+  //
+  // Next ID: 4
   message Heartbeat {
     // No pending heartbeat because this is before TurboCI has sent the
     // Stage Attempt to the Executor.
@@ -107,6 +111,8 @@ message StageAttemptExecutionPolicy {
   // constraints on top of what the executor returns, since stage attempts
   // in PENDING/THROTTLED state are primarily handled by the orchestrator
   // itself.
+  //
+  // Next ID: 6
   message Timeout {
     // The maximum amount of time a Stage Attempt can be PENDING/THROTTLED.
     //

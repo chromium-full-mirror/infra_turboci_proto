@@ -25,6 +25,8 @@ const (
 )
 
 // TypeSet represents a set of possible type_urls of Values.
+//
+// Next ID: 2
 type TypeSet struct {
 	state               protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_TypeUrls []string               `protobuf:"bytes,1,rep,name=type_urls,json=typeUrls,proto3"`

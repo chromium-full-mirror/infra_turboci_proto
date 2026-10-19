@@ -16,6 +16,8 @@ option java_multiple_files = true;
 // TestCheckSummaryResult represents a high-level summary of the result of one or more tests. It does
 // not (currently) include results for specific tests, just a count of the successes and failures
 // across all tests represented by the containing test check.
+//
+// Next ID: 8
 message TestCheckSummaryResult {
   // Whether the test check succeeded or failed. "success = true" means that all tests succeeded.
   // Any failed tests result in "success = false". If the test failed, display_message will contain

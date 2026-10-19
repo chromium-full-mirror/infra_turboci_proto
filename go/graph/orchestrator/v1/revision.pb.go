@@ -30,6 +30,8 @@ const (
 // We use this instead of raw Timestamp messages to allow for future
 // evolution of the revision type as well as to distinguish against regular
 // Timestamps used elsewhere in the schema.
+//
+// Next ID: 2
 type Revision struct {
 	state         protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Ts *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=ts,proto3,oneof"`

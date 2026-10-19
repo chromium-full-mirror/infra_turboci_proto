@@ -704,6 +704,8 @@ func (b0 Stage_builder) Build() *Stage {
 // If your client receives an rpc status with this message in it, it means that
 // another process already claimed this Stage Attempt, and you should stop
 // attempting to execute this Stage Attempt.
+//
+// Next ID: 2
 type StageAttemptClaimedFailure struct {
 	state                          protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_ClaimedByProcessUid *string                `protobuf:"bytes,1,opt,name=claimed_by_process_uid,json=claimedByProcessUid,proto3,oneof"`
@@ -791,6 +793,8 @@ func (b0 StageAttemptClaimedFailure_builder) Build() *StageAttemptClaimedFailure
 // This will always be present when a properly encoded Stage Attempt token is
 // used with those RPCs (even when that token refers to a now-final Stage
 // Attempt).
+//
+// Next ID: 6
 type StageAttemptCurrentState struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_State         StageAttemptState      `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
@@ -982,6 +986,8 @@ func (b0 StageAttemptCurrentState_builder) Build() *StageAttemptCurrentState {
 }
 
 // Set for stages that represent legacy WorkNodes.
+//
+// Next ID: 3
 type Stage_Legacy struct {
 	state                       protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Worknode         *ValueRef              `protobuf:"bytes,1,opt,name=worknode,proto3,oneof"`
@@ -1098,6 +1104,8 @@ func (b0 Stage_Legacy_builder) Build() *Stage_Legacy {
 
 // StateHistoryEntry records the database revision (commit timestamp) when
 // each time this Stage's state changes.
+//
+// Next ID: 3
 type Stage_StateHistoryEntry struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_State       StageState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
@@ -1207,6 +1215,8 @@ func (b0 Stage_StateHistoryEntry_builder) Build() *Stage_StateHistoryEntry {
 //
 // `requested` is set by the stage creator. This is validated and augmented by
 // the Executor to become the `validated` policy.
+//
+// Next ID: 4
 type Stage_ExecutionPolicyState struct {
 	state                      protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Requested       *StageExecutionPolicy  `protobuf:"bytes,1,opt,name=requested,proto3,oneof"`
@@ -1737,6 +1747,8 @@ func (b0 Stage_Attempt_builder) Build() *Stage_Attempt {
 
 // Assignment describes the workflow's intent that this Stage will handle one
 // or more Checks in some fashion.
+//
+// Next ID: 3
 type Stage_Assignment struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Target      *v1.Check              `protobuf:"bytes,1,opt,name=target,proto3,oneof"`
@@ -1867,6 +1879,8 @@ func (b0 Stage_Assignment_builder) Build() *Stage_Assignment {
 
 // StateHistoryEntry records the database revision (commit timestamp) when
 // each time this Attempt's state changes.
+//
+// Next ID: 3
 type Stage_Attempt_StateHistoryEntry struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_State       StageAttemptState      `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.StageAttemptState,oneof"`
@@ -1977,6 +1991,8 @@ func (b0 Stage_Attempt_StateHistoryEntry_builder) Build() *Stage_Attempt_StateHi
 // Progress message should be used when the Executor wants e.g. the UI to be
 // able to load just the current state of a Stage and display this
 // information in a time-oriented way.
+//
+// Next ID: 6
 type Stage_Attempt_Progress struct {
 	state                     protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Message        *string                `protobuf:"bytes,1,opt,name=message,proto3,oneof"`

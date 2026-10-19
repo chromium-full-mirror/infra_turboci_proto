@@ -12,6 +12,8 @@ option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orch
 option java_multiple_files = true;
 
 // Response message for TurboCIOrchestrator.CancelWorkPlan.
+//
+// Next ID: 2
 message CancelWorkPlanResponse {
   // The revision at which the work plan was cancelled.
   //

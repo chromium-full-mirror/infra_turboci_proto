@@ -26,6 +26,8 @@ const (
 )
 
 // MethodOptions are method options which apply to RPC method definitions.
+//
+// Next ID: 2
 type MethodOptions struct {
 	state         protoimpl.MessageState `protogen:"opaque.v1"`
 	unknownFields protoimpl.UnknownFields

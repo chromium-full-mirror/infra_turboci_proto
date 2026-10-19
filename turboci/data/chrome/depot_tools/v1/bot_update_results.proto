@@ -13,9 +13,13 @@ option java_multiple_files = true;
 // directory, each of which can have have additional repos checked out either
 // via DEPS files or submodules and so on recursively. Any repo in the tree can
 // have its revision overridden.
+//
+// Next ID: 2
 message BotUpdateResults {
   // Information about the commit checked out for a repo (ignoring any patch
   // applied).
+  //
+  // Next ID: 4
   message GitCommit {
     // GoB host without the ".googlesource.com" hostname suffix as the
     // suffix may be different depending on how it's accessed (eg.

@@ -124,6 +124,8 @@ message Stage {
   optional Revision cancelled_at = 17;
 
   // Set for stages that represent legacy WorkNodes.
+  //
+  // Next ID: 3
   message Legacy {
     // Fully populated encoded WorkNode proto.
     //
@@ -154,6 +156,8 @@ message Stage {
 
   // StateHistoryEntry records the database revision (commit timestamp) when
   // each time this Stage's state changes.
+  //
+  // Next ID: 3
   message StateHistoryEntry {
     // The changed state.
     optional StageState state = 1 [(google.api.field_behavior) = IMMUTABLE];
@@ -187,6 +191,8 @@ message Stage {
   //
   // `requested` is set by the stage creator. This is validated and augmented by
   // the Executor to become the `validated` policy.
+  //
+  // Next ID: 4
   message ExecutionPolicyState {
     // Requested execution policy is the policy which is set by the creator of
     // this Stage.
@@ -249,6 +255,8 @@ message Stage {
 
     // StateHistoryEntry records the database revision (commit timestamp) when
     // each time this Attempt's state changes.
+    //
+    // Next ID: 3
     message StateHistoryEntry {
       // The changed state.
       optional StageAttemptState state = 1 [(google.api.field_behavior) = IMMUTABLE];
@@ -339,6 +347,8 @@ message Stage {
     // Progress message should be used when the Executor wants e.g. the UI to be
     // able to load just the current state of a Stage and display this
     // information in a time-oriented way.
+    //
+    // Next ID: 6
     message Progress {
       // Low-effort/human-readable progress information.
       optional string message = 1;
@@ -396,6 +406,8 @@ message Stage {
 
   // Assignment describes the workflow's intent that this Stage will handle one
   // or more Checks in some fashion.
+  //
+  // Next ID: 3
   message Assignment {
     // The Check that this Stage should handle.
     optional ids.v1.Check target = 1;
@@ -472,6 +484,8 @@ message Stage {
 // If your client receives an rpc status with this message in it, it means that
 // another process already claimed this Stage Attempt, and you should stop
 // attempting to execute this Stage Attempt.
+//
+// Next ID: 2
 message StageAttemptClaimedFailure {
   // The recorded Stage Attempt process_uid - this should only be used for
   // logging/reporting purposes (typically to help wayward developers see which
@@ -485,6 +499,8 @@ message StageAttemptClaimedFailure {
 // This will always be present when a properly encoded Stage Attempt token is
 // used with those RPCs (even when that token refers to a now-final Stage
 // Attempt).
+//
+// Next ID: 6
 message StageAttemptCurrentState {
   // The state of the stage attempt which corresponds to the token provided
   // in the WriteNodesRequest.

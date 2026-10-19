@@ -27,6 +27,8 @@ const (
 
 // StageAttemptExecutionPolicy describes constraints on how a StageAttempt
 // may be executed by the Orchestrator.
+//
+// Next ID: 3
 type StageAttemptExecutionPolicy struct {
 	state                protoimpl.MessageState                 `protogen:"opaque.v1"`
 	xxx_hidden_Heartbeat *StageAttemptExecutionPolicy_Heartbeat `protobuf:"bytes,1,opt,name=heartbeat,proto3,oneof"`
@@ -162,6 +164,8 @@ func (b0 StageAttemptExecutionPolicy_builder) Build() *StageAttemptExecutionPoli
 // It is TYPICAL to only define a heartbeat for `running`.
 //
 // Heartbeat intervals, if set, currently cannot exceed 30 minutes.
+//
+// Next ID: 4
 type StageAttemptExecutionPolicy_Heartbeat struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Scheduled   *durationpb.Duration   `protobuf:"bytes,1,opt,name=scheduled,proto3,oneof"`
@@ -319,6 +323,8 @@ func (b0 StageAttemptExecutionPolicy_Heartbeat_builder) Build() *StageAttemptExe
 // constraints on top of what the executor returns, since stage attempts
 // in PENDING/THROTTLED state are primarily handled by the orchestrator
 // itself.
+//
+// Next ID: 6
 type StageAttemptExecutionPolicy_Timeout struct {
 	state                       protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_PendingThrottled *durationpb.Duration   `protobuf:"bytes,1,opt,name=pending_throttled,json=pendingThrottled,proto3,oneof"`

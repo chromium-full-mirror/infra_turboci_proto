@@ -28,6 +28,8 @@ const (
 // Encapsulates data changes to a Check object.
 //
 // Fields are unset when the edit did not change that aspect of the Check.
+//
+// Next ID: 6
 type CheckDelta struct {
 	state                   protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_State        CheckState             `protobuf:"varint,1,opt,name=state,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
@@ -216,6 +218,8 @@ func (b0 CheckDelta_builder) Build() *CheckDelta {
 }
 
 // Information about a single Check.Result written as part of this edit.
+//
+// Next ID: 5
 type CheckDelta_Result struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Identifier  *v1.CheckResult        `protobuf:"bytes,1,opt,name=identifier,proto3,oneof"`

@@ -18,6 +18,8 @@ option java_multiple_files = true;
 // Encapsulates data changes to a Check object.
 //
 // Fields are unset when the edit did not change that aspect of the Check.
+//
+// Next ID: 6
 message CheckDelta {
   // If set, the new state that was set as part of this edit.
   optional CheckState state = 1;
@@ -50,6 +52,8 @@ message CheckDelta {
   repeated ValueRef options = 3;
 
   // Information about a single Check.Result written as part of this edit.
+  //
+  // Next ID: 5
   message Result {
     // The identifier of this Check.Result.
     optional ids.v1.CheckResult identifier = 1;

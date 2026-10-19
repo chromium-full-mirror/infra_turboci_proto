@@ -26,6 +26,8 @@ const (
 )
 
 // Request to validate a stage before it is inserted into the graph.
+//
+// Next ID: 6
 type ValidateStageRequest struct {
 	state                protoimpl.MessageState   `protogen:"opaque.v1"`
 	xxx_hidden_Stage     *v1.Stage                `protobuf:"bytes,1,opt,name=stage,proto3,oneof"`
@@ -141,6 +143,8 @@ func (b0 ValidateStageRequest_builder) Build() *ValidateStageRequest {
 }
 
 // Response to a stage validation request.
+//
+// Next ID: 4
 type ValidateStageResponse struct {
 	state                           protoimpl.MessageState   `protogen:"opaque.v1"`
 	xxx_hidden_StageExecutionPolicy *v1.StageExecutionPolicy `protobuf:"bytes,1,opt,name=stage_execution_policy,json=stageExecutionPolicy,proto3,oneof"`

@@ -16,8 +16,12 @@ option java_multiple_files = true;
 // 2. Apply zero or more repo-level (mount) overrides to checkout revisions different from
 //    the pinned manifest if needed.
 // 3. Apply zero or more CLs on top of the base.
+//
+// Next ID: 5
 message GobSourceCheckOptions {
   // Information to reference a Gerrit change at a specific patchset.
+  //
+  // Next ID: 6
   message GerritChange {
     // Which Gerrit instance this change is hosted on. This should not include suffixes or prefixes
     // outside of the actual "host" name.
@@ -67,8 +71,12 @@ message GobSourceCheckOptions {
   // You can also specify per-mount commits that override those in the commit via either inline
   // overrides or a reference to pinned manifest metadata stored in Android's manifest
   // store service.
+  //
+  // Next ID: 4
   message PinnedRepoMounts {
     // References a landed Git commit.
+    //
+    // Next ID: 5
     message GitCommit {
       // GoB host without the ".googlesource.com" hostname suffix as the suffix may
       // be different depending on how it's accessed (eg. ".git.corp.google.com")
@@ -92,6 +100,8 @@ message GobSourceCheckOptions {
     // pinned (all mounts referencing a fixed commit), or it may be unpinned (some mounts
     // referencing a branch ref) in which case the per-repo commits need to be provided
     // via mount_overrides.
+    //
+    // Next ID: 3
     message ManifestCommit {
       // The git commit for the manifest.
       optional GitCommit commit = 1;
@@ -114,6 +124,8 @@ message GobSourceCheckOptions {
     }
 
     // Used to override a repo checkout on disk (mount) to a specific commit ID.
+    //
+    // Next ID: 3
     message MountOverride {
       // This should point to the commit ID you want to override with.
       optional GitCommit override = 1;
