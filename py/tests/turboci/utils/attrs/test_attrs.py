@@ -180,6 +180,38 @@ class TestForStage(unittest.TestCase):
         )
         self.assertEqual(attr.on_state, expected_state)
 
+  def test_on_state_accepts_multiple_types(self):
+    # Arrange
+    expected = stage_state_pb2.STAGE_STATE_PLANNED
+
+    # Act
+    from_enum = attrs.for_stage(
+        name='my_team.attr',
+        expression='true',
+        on_state=stage_state_pb2.STAGE_STATE_PLANNED,
+    )
+    from_str = attrs.for_stage(
+        name='my_team.attr',
+        expression='true',
+        on_state='STAGE_STATE_PLANNED',
+    )
+    from_int = attrs.for_stage(
+        name='my_team.attr',
+        expression='true',
+        on_state=int(stage_state_pb2.STAGE_STATE_PLANNED),
+    )
+    from_none = attrs.for_stage(
+        name='my_team.attr',
+        expression='true',
+        on_state=None,
+    )
+
+    # Assert
+    self.assertEqual(from_enum.on_state, expected)
+    self.assertEqual(from_str.on_state, expected)
+    self.assertEqual(from_int.on_state, expected)
+    self.assertFalse(from_none.HasField('on_state'))
+
   def test_valid_attribute_types_set_type_field(self):
     # Arrange & Act & Assert
     for enum_val, str_name in _VALID_ATTRIBUTE_TYPES:
@@ -386,6 +418,38 @@ class TestForCheck(unittest.TestCase):
             on_state=state_input,
         )
         self.assertEqual(attr.on_state, expected_state)
+
+  def test_on_state_accepts_multiple_types(self):
+    # Arrange
+    expected = check_state_pb2.CHECK_STATE_PLANNED
+
+    # Act
+    from_enum = attrs.for_check(
+        name='my_team.attr',
+        expression='true',
+        on_state=check_state_pb2.CHECK_STATE_PLANNED,
+    )
+    from_str = attrs.for_check(
+        name='my_team.attr',
+        expression='true',
+        on_state='CHECK_STATE_PLANNED',
+    )
+    from_int = attrs.for_check(
+        name='my_team.attr',
+        expression='true',
+        on_state=int(check_state_pb2.CHECK_STATE_PLANNED),
+    )
+    from_none = attrs.for_check(
+        name='my_team.attr',
+        expression='true',
+        on_state=None,
+    )
+
+    # Assert
+    self.assertEqual(from_enum.on_state, expected)
+    self.assertEqual(from_str.on_state, expected)
+    self.assertEqual(from_int.on_state, expected)
+    self.assertFalse(from_none.HasField('on_state'))
 
   def test_valid_attribute_types_set_type_field(self):
     # Arrange & Act & Assert

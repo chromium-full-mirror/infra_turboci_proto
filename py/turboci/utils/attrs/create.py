@@ -13,6 +13,7 @@ __all__ = [
 ]
 
 import re
+from typing import cast
 from typing import Sequence
 
 from turboci.graph.orchestrator.v1 import attribute_pb2
@@ -67,7 +68,7 @@ def _validate_attribute_name(name: str) -> None:
 
 def _resolve_attribute_type(
     attribute_type: attribute_pb2.AttributeType | str | int | None,
-) -> int | None:
+) -> attribute_pb2.AttributeType | None:
   """Normalizes and validates an attribute_type parameter."""
   if attribute_type is None:
     return None
@@ -79,11 +80,11 @@ def _resolve_attribute_type(
     if attribute_type in attribute_pb2.AttributeType.keys():
       val = attribute_pb2.AttributeType.Value(attribute_type)
       if val != attribute_pb2.ATTRIBUTE_TYPE_UNKNOWN:
-        return val
+        return cast(attribute_pb2.AttributeType, val)
     raise ValueError(f'invalid attribute type: {attribute_type!r}')
   if isinstance(attribute_type, int):
     if attribute_type in _VALID_ATTRIBUTE_TYPES:
-      return attribute_type
+      return cast(attribute_pb2.AttributeType, attribute_type)
     raise ValueError(f'invalid attribute type: {attribute_type!r}')
   raise TypeError(
       f'unexpected type for attribute_type: {type(attribute_type)!r}'
@@ -91,8 +92,8 @@ def _resolve_attribute_type(
 
 
 def _resolve_stage_state(
-    on_state: stage_state_pb2.StageState | str | None,
-) -> int | None:
+    on_state: stage_state_pb2.StageState | str | int | None,
+) -> stage_state_pb2.StageState | None:
   """Normalizes and validates a StageState on_state parameter."""
   if on_state is None:
     return None
@@ -107,12 +108,12 @@ def _resolve_stage_state(
     raise ValueError('cannot use STAGE_STATE_UNKNOWN as on_state')
   if on_state not in stage_state_pb2.StageState.values():
     raise ValueError(f'unknown stage state value: {on_state!r}')
-  return on_state
+  return cast(stage_state_pb2.StageState, on_state)
 
 
 def _resolve_check_state(
-    on_state: check_state_pb2.CheckState | str | None,
-) -> int | None:
+    on_state: check_state_pb2.CheckState | str | int | None,
+) -> check_state_pb2.CheckState | None:
   """Normalizes and validates a CheckState on_state parameter."""
   if on_state is None:
     return None
@@ -127,15 +128,13 @@ def _resolve_check_state(
     raise ValueError('cannot use CHECK_STATE_UNKNOWN as on_state')
   if on_state not in check_state_pb2.CheckState.values():
     raise ValueError(f'unknown check state value: {on_state!r}')
-  return on_state
+  return cast(check_state_pb2.CheckState, on_state)
 
 
 def for_stage(
     name: str,
     expression: str,
-    on_state: (
-        stage_state_pb2.StageState | str | None
-    ) = None,
+    on_state: stage_state_pb2.StageState | str | int | None = None,
     attribute_type: attribute_pb2.AttributeType | str | int | None = None,
 ) -> write_nodes_request_pb2.WriteNodesRequest.StageAttributeWrite:
   """Creates a StageAttributeWrite for a Stage node.
@@ -160,24 +159,18 @@ def for_stage(
   resolved_state = _resolve_stage_state(on_state)
   resolved_attr_type = _resolve_attribute_type(attribute_type)
 
-  kwargs = {
-      'name': name,
-      'expression': expression,
-  }
-  if resolved_state is not None:
-    kwargs['on_state'] = resolved_state
-  if resolved_attr_type is not None:
-    kwargs['attribute_type'] = resolved_attr_type
-
-  return write_nodes_request_pb2.WriteNodesRequest.StageAttributeWrite(**kwargs)
+  return write_nodes_request_pb2.WriteNodesRequest.StageAttributeWrite(
+      name=name,
+      expression=expression,
+      on_state=resolved_state,
+      attribute_type=resolved_attr_type,
+  )
 
 
 def for_check(
     name: str,
     expression: str,
-    on_state: (
-        check_state_pb2.CheckState | str | None
-    ) = None,
+    on_state: check_state_pb2.CheckState | str | int | None = None,
     attribute_type: attribute_pb2.AttributeType | str | int | None = None,
 ) -> write_nodes_request_pb2.WriteNodesRequest.CheckAttributeWrite:
   """Creates a CheckAttributeWrite for a Check node.
@@ -202,16 +195,12 @@ def for_check(
   resolved_state = _resolve_check_state(on_state)
   resolved_attr_type = _resolve_attribute_type(attribute_type)
 
-  kwargs = {
-      'name': name,
-      'expression': expression,
-  }
-  if resolved_state is not None:
-    kwargs['on_state'] = resolved_state
-  if resolved_attr_type is not None:
-    kwargs['attribute_type'] = resolved_attr_type
-
-  return write_nodes_request_pb2.WriteNodesRequest.CheckAttributeWrite(**kwargs)
+  return write_nodes_request_pb2.WriteNodesRequest.CheckAttributeWrite(
+      name=name,
+      expression=expression,
+      on_state=resolved_state,
+      attribute_type=resolved_attr_type,
+  )
 
 
 def add_stage_attributes(
