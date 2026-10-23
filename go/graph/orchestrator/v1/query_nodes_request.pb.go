@@ -26,13 +26,15 @@ const (
 
 // Request message for TurboCIGraphService.QueryNodes.
 //
-// Next ID: 5
+// Next ID: 7
 type QueryNodesRequest struct {
 	state                  protoimpl.MessageState                `protogen:"opaque.v1"`
 	xxx_hidden_Token       *string                               `protobuf:"bytes,1,opt,name=token,proto3,oneof"`
 	xxx_hidden_TypeInfo    *TypeInfo                             `protobuf:"bytes,2,opt,name=type_info,json=typeInfo,proto3,oneof"`
 	xxx_hidden_Version     *QueryNodesRequest_VersionRestriction `protobuf:"bytes,3,opt,name=version,proto3,oneof"`
 	xxx_hidden_Query       *[]*Query                             `protobuf:"bytes,4,rep,name=query,proto3"`
+	xxx_hidden_PageSize    int32                                 `protobuf:"varint,5,opt,name=page_size,json=pageSize,proto3,oneof"`
+	xxx_hidden_PageToken   *string                               `protobuf:"bytes,6,opt,name=page_token,json=pageToken,proto3,oneof"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -97,9 +99,26 @@ func (x *QueryNodesRequest) GetQuery() []*Query {
 	return nil
 }
 
+func (x *QueryNodesRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.xxx_hidden_PageSize
+	}
+	return 0
+}
+
+func (x *QueryNodesRequest) GetPageToken() string {
+	if x != nil {
+		if x.xxx_hidden_PageToken != nil {
+			return *x.xxx_hidden_PageToken
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *QueryNodesRequest) SetToken(v string) {
 	x.xxx_hidden_Token = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 6)
 }
 
 func (x *QueryNodesRequest) SetTypeInfo(v *TypeInfo) {
@@ -112,6 +131,16 @@ func (x *QueryNodesRequest) SetVersion(v *QueryNodesRequest_VersionRestriction) 
 
 func (x *QueryNodesRequest) SetQuery(v []*Query) {
 	x.xxx_hidden_Query = &v
+}
+
+func (x *QueryNodesRequest) SetPageSize(v int32) {
+	x.xxx_hidden_PageSize = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 6)
+}
+
+func (x *QueryNodesRequest) SetPageToken(v string) {
+	x.xxx_hidden_PageToken = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 6)
 }
 
 func (x *QueryNodesRequest) HasToken() bool {
@@ -135,6 +164,20 @@ func (x *QueryNodesRequest) HasVersion() bool {
 	return x.xxx_hidden_Version != nil
 }
 
+func (x *QueryNodesRequest) HasPageSize() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+}
+
+func (x *QueryNodesRequest) HasPageToken() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
+}
+
 func (x *QueryNodesRequest) ClearToken() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Token = nil
@@ -146,6 +189,16 @@ func (x *QueryNodesRequest) ClearTypeInfo() {
 
 func (x *QueryNodesRequest) ClearVersion() {
 	x.xxx_hidden_Version = nil
+}
+
+func (x *QueryNodesRequest) ClearPageSize() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	x.xxx_hidden_PageSize = 0
+}
+
+func (x *QueryNodesRequest) ClearPageToken() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	x.xxx_hidden_PageToken = nil
 }
 
 type QueryNodesRequest_builder struct {
@@ -177,6 +230,27 @@ type QueryNodesRequest_builder struct {
 	Version *QueryNodesRequest_VersionRestriction
 	// One or more Queries to select nodes to return.
 	Query []*Query
+	// Maximum page size in ***bytes**.
+	//
+	//   - If unspecified, at most 10MB will be returned.
+	//   - If specified with a value greater than 10MB, it will be coerced to 10MB.
+	//   - If specified with a value that's too small to fit even one piece of data
+	//     (stage, check, value, etc), we would return a larger page size to fit one
+	//     piece of data.
+	PageSize *int32
+	// Pagination token, so this query can resume consuming nodes with the next
+	// node in the stream. If omitted, returns nodes beginning with the first node
+	// in the stream.
+	//
+	// This is obtained from `QueryNodesResponse.next_page_token`. Issue the first
+	// request without it, and subsequent requests with the token returned in the
+	// previous response.
+	//
+	// If provided, the other fields of the QueryNodesRequest need to match
+	// their values from the first page of this request. Attempting to use a
+	// pagination token while changing any other attributes of the request may
+	// result in unexpected or inconsistent results.
+	PageToken *string
 }
 
 func (b0 QueryNodesRequest_builder) Build() *QueryNodesRequest {
@@ -184,12 +258,20 @@ func (b0 QueryNodesRequest_builder) Build() *QueryNodesRequest {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Token != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 6)
 		x.xxx_hidden_Token = b.Token
 	}
 	x.xxx_hidden_TypeInfo = b.TypeInfo
 	x.xxx_hidden_Version = b.Version
 	x.xxx_hidden_Query = &b.Query
+	if b.PageSize != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 6)
+		x.xxx_hidden_PageSize = *b.PageSize
+	}
+	if b.PageToken != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 6)
+		x.xxx_hidden_PageToken = b.PageToken
+	}
 	return m0
 }
 
@@ -418,12 +500,15 @@ var File_turboci_graph_orchestrator_v1_query_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/query_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/query.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a-turboci/graph/orchestrator/v1/type_info.proto\"\xef\x03\n" +
+	"7turboci/graph/orchestrator/v1/query_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/query.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a-turboci/graph/orchestrator/v1/type_info.proto\"\xd2\x04\n" +
 	"\x11QueryNodesRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12I\n" +
 	"\ttype_info\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.TypeInfoH\x01R\btypeInfo\x88\x01\x01\x12b\n" +
 	"\aversion\x18\x03 \x01(\v2C.turboci.graph.orchestrator.v1.QueryNodesRequest.VersionRestrictionH\x02R\aversion\x88\x01\x01\x12:\n" +
-	"\x05query\x18\x04 \x03(\v2$.turboci.graph.orchestrator.v1.QueryR\x05query\x1a\xaf\x01\n" +
+	"\x05query\x18\x04 \x03(\v2$.turboci.graph.orchestrator.v1.QueryR\x05query\x12 \n" +
+	"\tpage_size\x18\x05 \x01(\x05H\x03R\bpageSize\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"page_token\x18\x06 \x01(\tH\x04R\tpageToken\x88\x01\x01\x1a\xaf\x01\n" +
 	"\x12VersionRestriction\x12C\n" +
 	"\arequire\x18\x01 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\arequire\x12E\n" +
 	"\bsnapshot\x18\x02 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x00R\bsnapshotB\r\n" +
@@ -432,7 +517,10 @@ const file_turboci_graph_orchestrator_v1_query_nodes_request_proto_rawDesc = "" 
 	"\n" +
 	"_type_infoB\n" +
 	"\n" +
-	"\b_versionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\b_versionB\f\n" +
+	"\n" +
+	"_page_sizeB\r\n" +
+	"\v_page_tokenBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_query_nodes_request_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_query_nodes_request_proto_goTypes = []any{

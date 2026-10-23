@@ -17,17 +17,24 @@ option java_multiple_files = true;
 
 // Response message for TurboCIGraphService.QueryNodes.
 //
-// Next ID: 6
+// Next ID: 7
 message QueryNodesResponse {
   // The WorkPlan(s) containing nodes matching the request.
+  //
+  // When resuming the query using `next_page_token`, the value of this field
+  // will need to be recursively merged into previous responses to collect
+  // the full result.
   repeated WorkPlan workplans = 1;
 
-  // A map containing requested [ValueData] for nodes in `workplans`.
+  // A map containing requested [ValueData] for nodes in `workplans` (or in a
+  // prior response page, when a node's [ValueData] don't all fit in the page).
   //
-  // This is key'd by [ValueRef].digest.
+  // This is keyed by [ValueRef].digest.
   map<string, ValueData> value_data = 5;
 
   // A list of explicitly-selected nodes which were not found in the graph.
+  //
+  // Populated only in the first response page.
   repeated ids.v1.Identifier absent = 2;
 
   // State of the current stage attempt.
@@ -38,23 +45,15 @@ message QueryNodesResponse {
   // The Spanner snapshot version used when executing all queries.
   optional Revision version = 4;
 
-  // TBD: A field to indicate which permissions were checked that the caller
-  // didn't have access to.
+  // Opaque pagination token, so follow-on queries can resume consuming nodes
+  // with the next node in the stream. Callers looking to retrieve additional
+  // pages of results can do so by providing this token. If omitted, there are
+  // no further pages of results so no further queries are needed.
   //
-  // Populating this field would require an extra permission, but would be
-  // useful for e.g. service owners or generally-privileged users to be able to
-  // see what permissions are missing.
-  //
-  // // (realm, permission, nodes)
-  // message MissingPermissions {
-  //   // the realm in which the permission is missing
-  //   string realm = 1;
-  //
-  //   // the permission which is missing
-  //   string permission = 2;
-  //
-  //   // the nodes where we were missing this permission
-  //   repeated Identifier nodes = 3;
-  // }
-  // repeated MissingPermission missing_permissions = 2;
+  // It is possible for QueryNodesResponse to return a completely empty page
+  // (with empty `workplans`), but with populated `next_page_token`. The caller
+  // should resume the query as usual. The server can return such response if
+  // it has to filter out a lot of nodes and it runs out of allotted request
+  // time to do that.
+  optional string next_page_token = 6;
 }

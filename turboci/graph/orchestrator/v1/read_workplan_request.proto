@@ -101,6 +101,10 @@ message ReadWorkPlanRequest {
   // node in the stream. If omitted, returns nodes beginning with the first node
   // in the stream.
   //
+  // This is obtained from `ReadWorkPlanResponse.next_page_token`. Issue the
+  // first request without it, and subsequent requests with the token returned
+  // in the previous response.
+  //
   // If provided, the other fields of the ReadWorkPlanRequest need to match
   // their values from the first page of this request. Attempting to use a
   // pagination token while changing any other attributes of the request may

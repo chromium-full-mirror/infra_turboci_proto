@@ -29,7 +29,7 @@ from turboci.graph.orchestrator.v1 import value_data_pb2 as turboci_dot_graph_do
 from turboci.graph.orchestrator.v1 import workplan_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_workplan__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a.turboci/graph/orchestrator/v1/value_data.proto\x1a,turboci/graph/orchestrator/v1/workplan.proto\"\xf6\x03\n\x12QueryNodesResponse\x12:\n\tworkplans\x18\x01 \x03(\x0b\x32\'.turboci.graph.orchestrator.v1.WorkPlan\x12T\n\nvalue_data\x18\x05 \x03(\x0b\x32@.turboci.graph.orchestrator.v1.QueryNodesResponse.ValueDataEntry\x12\x30\n\x06\x61\x62sent\x18\x02 \x03(\x0b\x32 .turboci.graph.ids.v1.Identifier\x12[\n\x15\x63urrent_attempt_state\x18\x03 \x01(\x0b\x32\x37.turboci.graph.orchestrator.v1.StageAttemptCurrentStateH\x00\x88\x01\x01\x12=\n\x07version\x18\x04 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x01\x88\x01\x01\x1aZ\n\x0eValueDataEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x37\n\x05value\x18\x02 \x01(\x0b\x32(.turboci.graph.orchestrator.v1.ValueData:\x02\x38\x01\x42\x18\n\x16_current_attempt_stateB\n\n\x08_versionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a.turboci/graph/orchestrator/v1/value_data.proto\x1a,turboci/graph/orchestrator/v1/workplan.proto\"\xa8\x04\n\x12QueryNodesResponse\x12:\n\tworkplans\x18\x01 \x03(\x0b\x32\'.turboci.graph.orchestrator.v1.WorkPlan\x12T\n\nvalue_data\x18\x05 \x03(\x0b\x32@.turboci.graph.orchestrator.v1.QueryNodesResponse.ValueDataEntry\x12\x30\n\x06\x61\x62sent\x18\x02 \x03(\x0b\x32 .turboci.graph.ids.v1.Identifier\x12[\n\x15\x63urrent_attempt_state\x18\x03 \x01(\x0b\x32\x37.turboci.graph.orchestrator.v1.StageAttemptCurrentStateH\x00\x88\x01\x01\x12=\n\x07version\x18\x04 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x01\x88\x01\x01\x12\x1c\n\x0fnext_page_token\x18\x06 \x01(\tH\x02\x88\x01\x01\x1aZ\n\x0eValueDataEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x37\n\x05value\x18\x02 \x01(\x0b\x32(.turboci.graph.orchestrator.v1.ValueData:\x02\x38\x01\x42\x18\n\x16_current_attempt_stateB\n\n\x08_versionB\x12\n\x10_next_page_tokenBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -40,7 +40,7 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_QUERYNODESRESPONSE_VALUEDATAENTRY']._loaded_options = None
   _globals['_QUERYNODESRESPONSE_VALUEDATAENTRY']._serialized_options = b'8\001'
   _globals['_QUERYNODESRESPONSE']._serialized_start=314
-  _globals['_QUERYNODESRESPONSE']._serialized_end=816
-  _globals['_QUERYNODESRESPONSE_VALUEDATAENTRY']._serialized_start=688
-  _globals['_QUERYNODESRESPONSE_VALUEDATAENTRY']._serialized_end=778
+  _globals['_QUERYNODESRESPONSE']._serialized_end=866
+  _globals['_QUERYNODESRESPONSE_VALUEDATAENTRY']._serialized_start=718
+  _globals['_QUERYNODESRESPONSE_VALUEDATAENTRY']._serialized_end=808
 # @@protoc_insertion_point(module_scope)

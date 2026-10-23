@@ -27,7 +27,7 @@ from turboci.graph.orchestrator.v1 import revision_pb2 as turboci_dot_graph_dot_
 from turboci.graph.orchestrator.v1 import type_info_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_type__info__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n7turboci/graph/orchestrator/v1/query_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/query.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a-turboci/graph/orchestrator/v1/type_info.proto\"\xbb\x03\n\x11QueryNodesRequest\x12\x12\n\x05token\x18\x01 \x01(\tH\x00\x88\x01\x01\x12?\n\ttype_info\x18\x02 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.TypeInfoH\x01\x88\x01\x01\x12Y\n\x07version\x18\x03 \x01(\x0b\x32\x43.turboci.graph.orchestrator.v1.QueryNodesRequest.VersionRestrictionH\x02\x88\x01\x01\x12\x33\n\x05query\x18\x04 \x03(\x0b\x32$.turboci.graph.orchestrator.v1.Query\x1a\x9c\x01\n\x12VersionRestriction\x12:\n\x07require\x18\x01 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x00\x12;\n\x08snapshot\x18\x02 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x00\x42\r\n\x0brestrictionB\x08\n\x06_tokenB\x0c\n\n_type_infoB\n\n\x08_versionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n7turboci/graph/orchestrator/v1/query_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a)turboci/graph/orchestrator/v1/query.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a-turboci/graph/orchestrator/v1/type_info.proto\"\x89\x04\n\x11QueryNodesRequest\x12\x12\n\x05token\x18\x01 \x01(\tH\x00\x88\x01\x01\x12?\n\ttype_info\x18\x02 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.TypeInfoH\x01\x88\x01\x01\x12Y\n\x07version\x18\x03 \x01(\x0b\x32\x43.turboci.graph.orchestrator.v1.QueryNodesRequest.VersionRestrictionH\x02\x88\x01\x01\x12\x33\n\x05query\x18\x04 \x03(\x0b\x32$.turboci.graph.orchestrator.v1.Query\x12\x16\n\tpage_size\x18\x05 \x01(\x05H\x03\x88\x01\x01\x12\x17\n\npage_token\x18\x06 \x01(\tH\x04\x88\x01\x01\x1a\x9c\x01\n\x12VersionRestriction\x12:\n\x07require\x18\x01 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x00\x12;\n\x08snapshot\x18\x02 \x01(\x0b\x32\'.turboci.graph.orchestrator.v1.RevisionH\x00\x42\r\n\x0brestrictionB\x08\n\x06_tokenB\x0c\n\n_type_infoB\n\n\x08_versionB\x0c\n\n_page_sizeB\r\n\x0b_page_tokenBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -36,7 +36,7 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
   _globals['_QUERYNODESREQUEST']._serialized_start=227
-  _globals['_QUERYNODESREQUEST']._serialized_end=670
-  _globals['_QUERYNODESREQUEST_VERSIONRESTRICTION']._serialized_start=478
-  _globals['_QUERYNODESREQUEST_VERSIONRESTRICTION']._serialized_end=634
+  _globals['_QUERYNODESREQUEST']._serialized_end=748
+  _globals['_QUERYNODESREQUEST_VERSIONRESTRICTION']._serialized_start=527
+  _globals['_QUERYNODESREQUEST_VERSIONRESTRICTION']._serialized_end=683
 # @@protoc_insertion_point(module_scope)

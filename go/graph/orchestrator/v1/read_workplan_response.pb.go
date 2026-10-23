@@ -215,8 +215,8 @@ type ReadWorkPlanResponse_builder struct {
 	//   - Stages are fully populated except for their Edit and Attempt lists.
 	//   - WorkPlans are fully populated except for their Check and Stage lists.
 	Workplan *WorkPlan
-	// A map containing requested [ValueData] for nodes in `workplan` (or in a prior
-	// response page, when a node's [ValueData] don't all fit in the page).
+	// A map containing requested [ValueData] for nodes in `workplan` (or in a
+	// prior response page, when a node's [ValueData] don't all fit in the page).
 	//
 	// This is keyed by [ValueRef].digest.
 	ValueData map[string]*ValueData

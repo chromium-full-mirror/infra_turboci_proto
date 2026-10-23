@@ -27,7 +27,7 @@ const (
 
 // Response message for TurboCIGraphService.QueryNodes.
 //
-// Next ID: 6
+// Next ID: 7
 type QueryNodesResponse struct {
 	state                          protoimpl.MessageState    `protogen:"opaque.v1"`
 	xxx_hidden_Workplans           *[]*WorkPlan              `protobuf:"bytes,1,rep,name=workplans,proto3"`
@@ -35,6 +35,9 @@ type QueryNodesResponse struct {
 	xxx_hidden_Absent              *[]*v1.Identifier         `protobuf:"bytes,2,rep,name=absent,proto3"`
 	xxx_hidden_CurrentAttemptState *StageAttemptCurrentState `protobuf:"bytes,3,opt,name=current_attempt_state,json=currentAttemptState,proto3,oneof"`
 	xxx_hidden_Version             *Revision                 `protobuf:"bytes,4,opt,name=version,proto3,oneof"`
+	xxx_hidden_NextPageToken       *string                   `protobuf:"bytes,6,opt,name=next_page_token,json=nextPageToken,proto3,oneof"`
+	XXX_raceDetectHookData         protoimpl.RaceDetectHookData
+	XXX_presence                   [1]uint32
 	unknownFields                  protoimpl.UnknownFields
 	sizeCache                      protoimpl.SizeCache
 }
@@ -103,6 +106,16 @@ func (x *QueryNodesResponse) GetVersion() *Revision {
 	return nil
 }
 
+func (x *QueryNodesResponse) GetNextPageToken() string {
+	if x != nil {
+		if x.xxx_hidden_NextPageToken != nil {
+			return *x.xxx_hidden_NextPageToken
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *QueryNodesResponse) SetWorkplans(v []*WorkPlan) {
 	x.xxx_hidden_Workplans = &v
 }
@@ -123,6 +136,11 @@ func (x *QueryNodesResponse) SetVersion(v *Revision) {
 	x.xxx_hidden_Version = v
 }
 
+func (x *QueryNodesResponse) SetNextPageToken(v string) {
+	x.xxx_hidden_NextPageToken = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 6)
+}
+
 func (x *QueryNodesResponse) HasCurrentAttemptState() bool {
 	if x == nil {
 		return false
@@ -137,6 +155,13 @@ func (x *QueryNodesResponse) HasVersion() bool {
 	return x.xxx_hidden_Version != nil
 }
 
+func (x *QueryNodesResponse) HasNextPageToken() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
+}
+
 func (x *QueryNodesResponse) ClearCurrentAttemptState() {
 	x.xxx_hidden_CurrentAttemptState = nil
 }
@@ -145,16 +170,28 @@ func (x *QueryNodesResponse) ClearVersion() {
 	x.xxx_hidden_Version = nil
 }
 
+func (x *QueryNodesResponse) ClearNextPageToken() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	x.xxx_hidden_NextPageToken = nil
+}
+
 type QueryNodesResponse_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// The WorkPlan(s) containing nodes matching the request.
-	Workplans []*WorkPlan
-	// A map containing requested [ValueData] for nodes in `workplans`.
 	//
-	// This is key'd by [ValueRef].digest.
+	// When resuming the query using `next_page_token`, the value of this field
+	// will need to be recursively merged into previous responses to collect
+	// the full result.
+	Workplans []*WorkPlan
+	// A map containing requested [ValueData] for nodes in `workplans` (or in a
+	// prior response page, when a node's [ValueData] don't all fit in the page).
+	//
+	// This is keyed by [ValueRef].digest.
 	ValueData map[string]*ValueData
 	// A list of explicitly-selected nodes which were not found in the graph.
+	//
+	// Populated only in the first response page.
 	Absent []*v1.Identifier
 	// State of the current stage attempt.
 	//
@@ -162,6 +199,17 @@ type QueryNodesResponse_builder struct {
 	CurrentAttemptState *StageAttemptCurrentState
 	// The Spanner snapshot version used when executing all queries.
 	Version *Revision
+	// Opaque pagination token, so follow-on queries can resume consuming nodes
+	// with the next node in the stream. Callers looking to retrieve additional
+	// pages of results can do so by providing this token. If omitted, there are
+	// no further pages of results so no further queries are needed.
+	//
+	// It is possible for QueryNodesResponse to return a completely empty page
+	// (with empty `workplans`), but with populated `next_page_token`. The caller
+	// should resume the query as usual. The server can return such response if
+	// it has to filter out a lot of nodes and it runs out of allotted request
+	// time to do that.
+	NextPageToken *string
 }
 
 func (b0 QueryNodesResponse_builder) Build() *QueryNodesResponse {
@@ -173,6 +221,10 @@ func (b0 QueryNodesResponse_builder) Build() *QueryNodesResponse {
 	x.xxx_hidden_Absent = &b.Absent
 	x.xxx_hidden_CurrentAttemptState = b.CurrentAttemptState
 	x.xxx_hidden_Version = b.Version
+	if b.NextPageToken != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 6)
+		x.xxx_hidden_NextPageToken = b.NextPageToken
+	}
 	return m0
 }
 
@@ -180,20 +232,22 @@ var File_turboci_graph_orchestrator_v1_query_nodes_response_proto protoreflect.F
 
 const file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDesc = "" +
 	"\n" +
-	"8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a.turboci/graph/orchestrator/v1/value_data.proto\x1a,turboci/graph/orchestrator/v1/workplan.proto\"\xbe\x04\n" +
+	"8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a.turboci/graph/orchestrator/v1/value_data.proto\x1a,turboci/graph/orchestrator/v1/workplan.proto\"\xff\x04\n" +
 	"\x12QueryNodesResponse\x12E\n" +
 	"\tworkplans\x18\x01 \x03(\v2'.turboci.graph.orchestrator.v1.WorkPlanR\tworkplans\x12_\n" +
 	"\n" +
 	"value_data\x18\x05 \x03(\v2@.turboci.graph.orchestrator.v1.QueryNodesResponse.ValueDataEntryR\tvalueData\x128\n" +
 	"\x06absent\x18\x02 \x03(\v2 .turboci.graph.ids.v1.IdentifierR\x06absent\x12p\n" +
 	"\x15current_attempt_state\x18\x03 \x01(\v27.turboci.graph.orchestrator.v1.StageAttemptCurrentStateH\x00R\x13currentAttemptState\x88\x01\x01\x12F\n" +
-	"\aversion\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01\x1af\n" +
+	"\aversion\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01\x12+\n" +
+	"\x0fnext_page_token\x18\x06 \x01(\tH\x02R\rnextPageToken\x88\x01\x01\x1af\n" +
 	"\x0eValueDataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12>\n" +
 	"\x05value\x18\x02 \x01(\v2(.turboci.graph.orchestrator.v1.ValueDataR\x05value:\x028\x01B\x18\n" +
 	"\x16_current_attempt_stateB\n" +
 	"\n" +
-	"\b_versionBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\b_versionB\x12\n" +
+	"\x10_next_page_tokenBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_goTypes = []any{

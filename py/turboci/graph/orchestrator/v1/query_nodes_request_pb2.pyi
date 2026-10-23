@@ -10,7 +10,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class QueryNodesRequest(_message.Message):
-    __slots__ = ("token", "type_info", "version", "query")
+    __slots__ = ("token", "type_info", "version", "query", "page_size", "page_token")
     class VersionRestriction(_message.Message):
         __slots__ = ("require", "snapshot")
         REQUIRE_FIELD_NUMBER: _ClassVar[int]
@@ -22,8 +22,12 @@ class QueryNodesRequest(_message.Message):
     TYPE_INFO_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     QUERY_FIELD_NUMBER: _ClassVar[int]
+    PAGE_SIZE_FIELD_NUMBER: _ClassVar[int]
+    PAGE_TOKEN_FIELD_NUMBER: _ClassVar[int]
     token: str
     type_info: _type_info_pb2.TypeInfo
     version: QueryNodesRequest.VersionRestriction
     query: _containers.RepeatedCompositeFieldContainer[_query_pb2.Query]
-    def __init__(self, token: _Optional[str] = ..., type_info: _Optional[_Union[_type_info_pb2.TypeInfo, _Mapping]] = ..., version: _Optional[_Union[QueryNodesRequest.VersionRestriction, _Mapping]] = ..., query: _Optional[_Iterable[_Union[_query_pb2.Query, _Mapping]]] = ...) -> None: ...
+    page_size: int
+    page_token: str
+    def __init__(self, token: _Optional[str] = ..., type_info: _Optional[_Union[_type_info_pb2.TypeInfo, _Mapping]] = ..., version: _Optional[_Union[QueryNodesRequest.VersionRestriction, _Mapping]] = ..., query: _Optional[_Iterable[_Union[_query_pb2.Query, _Mapping]]] = ..., page_size: _Optional[int] = ..., page_token: _Optional[str] = ...) -> None: ...

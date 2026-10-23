@@ -12,7 +12,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class QueryNodesResponse(_message.Message):
-    __slots__ = ("workplans", "value_data", "absent", "current_attempt_state", "version")
+    __slots__ = ("workplans", "value_data", "absent", "current_attempt_state", "version", "next_page_token")
     class ValueDataEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -25,9 +25,11 @@ class QueryNodesResponse(_message.Message):
     ABSENT_FIELD_NUMBER: _ClassVar[int]
     CURRENT_ATTEMPT_STATE_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
+    NEXT_PAGE_TOKEN_FIELD_NUMBER: _ClassVar[int]
     workplans: _containers.RepeatedCompositeFieldContainer[_workplan_pb2.WorkPlan]
     value_data: _containers.MessageMap[str, _value_data_pb2.ValueData]
     absent: _containers.RepeatedCompositeFieldContainer[_identifier_pb2.Identifier]
     current_attempt_state: _stage_pb2.StageAttemptCurrentState
     version: _revision_pb2.Revision
-    def __init__(self, workplans: _Optional[_Iterable[_Union[_workplan_pb2.WorkPlan, _Mapping]]] = ..., value_data: _Optional[_Mapping[str, _value_data_pb2.ValueData]] = ..., absent: _Optional[_Iterable[_Union[_identifier_pb2.Identifier, _Mapping]]] = ..., current_attempt_state: _Optional[_Union[_stage_pb2.StageAttemptCurrentState, _Mapping]] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ...) -> None: ...
+    next_page_token: str
+    def __init__(self, workplans: _Optional[_Iterable[_Union[_workplan_pb2.WorkPlan, _Mapping]]] = ..., value_data: _Optional[_Mapping[str, _value_data_pb2.ValueData]] = ..., absent: _Optional[_Iterable[_Union[_identifier_pb2.Identifier, _Mapping]]] = ..., current_attempt_state: _Optional[_Union[_stage_pb2.StageAttemptCurrentState, _Mapping]] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., next_page_token: _Optional[str] = ...) -> None: ...

@@ -30,8 +30,8 @@ message ReadWorkPlanResponse {
   // * WorkPlans are fully populated except for their Check and Stage lists.
   optional WorkPlan workplan = 1;
 
-  // A map containing requested [ValueData] for nodes in `workplan` (or in a prior
-  // response page, when a node's [ValueData] don't all fit in the page).
+  // A map containing requested [ValueData] for nodes in `workplan` (or in a
+  // prior response page, when a node's [ValueData] don't all fit in the page).
   //
   // This is keyed by [ValueRef].digest.
   map<string, ValueData> value_data = 2;

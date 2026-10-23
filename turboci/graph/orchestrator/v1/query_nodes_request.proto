@@ -15,7 +15,7 @@ option java_multiple_files = true;
 
 // Request message for TurboCIGraphService.QueryNodes.
 //
-// Next ID: 5
+// Next ID: 7
 message QueryNodesRequest {
   // The token which indicates that the query is coming from within a specific
   // WorkPlan.
@@ -80,4 +80,27 @@ message QueryNodesRequest {
 
   // One or more Queries to select nodes to return.
   repeated Query query = 4;
+
+  // Maximum page size in ***bytes**.
+  //
+  // * If unspecified, at most 10MB will be returned.
+  // * If specified with a value greater than 10MB, it will be coerced to 10MB.
+  // * If specified with a value that's too small to fit even one piece of data
+  //   (stage, check, value, etc), we would return a larger page size to fit one
+  //   piece of data.
+  optional int32 page_size = 5;
+
+  // Pagination token, so this query can resume consuming nodes with the next
+  // node in the stream. If omitted, returns nodes beginning with the first node
+  // in the stream.
+  //
+  // This is obtained from `QueryNodesResponse.next_page_token`. Issue the first
+  // request without it, and subsequent requests with the token returned in the
+  // previous response.
+  //
+  // If provided, the other fields of the QueryNodesRequest need to match
+  // their values from the first page of this request. Attempting to use a
+  // pagination token while changing any other attributes of the request may
+  // result in unexpected or inconsistent results.
+  optional string page_token = 6;
 }
