@@ -184,7 +184,6 @@ type ComplexMessage struct {
 	state                           protoimpl.MessageState                `protogen:"opaque.v1"`
 	xxx_hidden_LocalStr             *string                               `protobuf:"bytes,1,opt,name=local_str,json=localStr,proto3,oneof"`
 	xxx_hidden_WorkplanStr          *string                               `protobuf:"bytes,2,opt,name=workplan_str,json=workplanStr,proto3,oneof"`
-	xxx_hidden_GlobalStr            *string                               `protobuf:"bytes,3,opt,name=global_str,json=globalStr,proto3,oneof"`
 	xxx_hidden_LocalBool            bool                                  `protobuf:"varint,4,opt,name=local_bool,json=localBool,proto3,oneof"`
 	xxx_hidden_LocalEnum            TestEnum                              `protobuf:"varint,5,opt,name=local_enum,json=localEnum,proto3,enum=testing.tags.TestEnum,oneof"`
 	xxx_hidden_RepStr               []string                              `protobuf:"bytes,6,rep,name=rep_str,json=repStr,proto3"`
@@ -244,16 +243,6 @@ func (x *ComplexMessage) GetWorkplanStr() string {
 	return ""
 }
 
-func (x *ComplexMessage) GetGlobalStr() string {
-	if x != nil {
-		if x.xxx_hidden_GlobalStr != nil {
-			return *x.xxx_hidden_GlobalStr
-		}
-		return ""
-	}
-	return ""
-}
-
 func (x *ComplexMessage) GetLocalBool() bool {
 	if x != nil {
 		return x.xxx_hidden_LocalBool
@@ -263,7 +252,7 @@ func (x *ComplexMessage) GetLocalBool() bool {
 
 func (x *ComplexMessage) GetLocalEnum() TestEnum {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 4) {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 3) {
 			return x.xxx_hidden_LocalEnum
 		}
 	}
@@ -316,27 +305,22 @@ func (x *ComplexMessage) GetExplicitPresenceBool() bool {
 
 func (x *ComplexMessage) SetLocalStr(v string) {
 	x.xxx_hidden_LocalStr = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 10)
 }
 
 func (x *ComplexMessage) SetWorkplanStr(v string) {
 	x.xxx_hidden_WorkplanStr = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 11)
-}
-
-func (x *ComplexMessage) SetGlobalStr(v string) {
-	x.xxx_hidden_GlobalStr = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 10)
 }
 
 func (x *ComplexMessage) SetLocalBool(v bool) {
 	x.xxx_hidden_LocalBool = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 10)
 }
 
 func (x *ComplexMessage) SetLocalEnum(v TestEnum) {
 	x.xxx_hidden_LocalEnum = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 10)
 }
 
 func (x *ComplexMessage) SetRepStr(v []string) {
@@ -357,12 +341,12 @@ func (x *ComplexMessage) SetSub(v *ComplexMessage_SubMessage) {
 
 func (x *ComplexMessage) SetSplitIndex(v int64) {
 	x.xxx_hidden_SplitIndex = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 9, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 8, 10)
 }
 
 func (x *ComplexMessage) SetExplicitPresenceBool(v bool) {
 	x.xxx_hidden_ExplicitPresenceBool = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 10, 11)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 9, 10)
 }
 
 func (x *ComplexMessage) HasLocalStr() bool {
@@ -379,25 +363,18 @@ func (x *ComplexMessage) HasWorkplanStr() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *ComplexMessage) HasGlobalStr() bool {
+func (x *ComplexMessage) HasLocalBool() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
 }
 
-func (x *ComplexMessage) HasLocalBool() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
-}
-
 func (x *ComplexMessage) HasLocalEnum() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
 func (x *ComplexMessage) HasSub() bool {
@@ -411,14 +388,14 @@ func (x *ComplexMessage) HasSplitIndex() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 9)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 8)
 }
 
 func (x *ComplexMessage) HasExplicitPresenceBool() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 10)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 9)
 }
 
 func (x *ComplexMessage) ClearLocalStr() {
@@ -431,18 +408,13 @@ func (x *ComplexMessage) ClearWorkplanStr() {
 	x.xxx_hidden_WorkplanStr = nil
 }
 
-func (x *ComplexMessage) ClearGlobalStr() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
-	x.xxx_hidden_GlobalStr = nil
-}
-
 func (x *ComplexMessage) ClearLocalBool() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
 	x.xxx_hidden_LocalBool = false
 }
 
 func (x *ComplexMessage) ClearLocalEnum() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
 	x.xxx_hidden_LocalEnum = TestEnum_TEST_ENUM_UNKNOWN
 }
 
@@ -451,12 +423,12 @@ func (x *ComplexMessage) ClearSub() {
 }
 
 func (x *ComplexMessage) ClearSplitIndex() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 9)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 8)
 	x.xxx_hidden_SplitIndex = 0
 }
 
 func (x *ComplexMessage) ClearExplicitPresenceBool() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 10)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 9)
 	x.xxx_hidden_ExplicitPresenceBool = false
 }
 
@@ -465,7 +437,6 @@ type ComplexMessage_builder struct {
 
 	LocalStr    *string
 	WorkplanStr *string
-	GlobalStr   *string
 	LocalBool   *bool
 	LocalEnum   *TestEnum
 	RepStr      []string
@@ -485,23 +456,19 @@ func (b0 ComplexMessage_builder) Build() *ComplexMessage {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.LocalStr != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 10)
 		x.xxx_hidden_LocalStr = b.LocalStr
 	}
 	if b.WorkplanStr != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 10)
 		x.xxx_hidden_WorkplanStr = b.WorkplanStr
 	}
-	if b.GlobalStr != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 11)
-		x.xxx_hidden_GlobalStr = b.GlobalStr
-	}
 	if b.LocalBool != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 10)
 		x.xxx_hidden_LocalBool = *b.LocalBool
 	}
 	if b.LocalEnum != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 10)
 		x.xxx_hidden_LocalEnum = *b.LocalEnum
 	}
 	x.xxx_hidden_RepStr = b.RepStr
@@ -509,11 +476,11 @@ func (b0 ComplexMessage_builder) Build() *ComplexMessage {
 	x.xxx_hidden_RepSub = &b.RepSub
 	x.xxx_hidden_Sub = b.Sub
 	if b.SplitIndex != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 9, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 8, 10)
 		x.xxx_hidden_SplitIndex = *b.SplitIndex
 	}
 	if b.ExplicitPresenceBool != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 10, 11)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 9, 10)
 		x.xxx_hidden_ExplicitPresenceBool = *b.ExplicitPresenceBool
 	}
 	return m0
@@ -1539,25 +1506,23 @@ const file_testing_tags_demo_proto_rawDesc = "" +
 	"\ftagged_field\x18\x01 \x01(\tB\x06ʅ\xf6\xfb\x0f\x00H\x00R\vtaggedField\x88\x01\x01\x12*\n" +
 	"\x0euntagged_field\x18\x02 \x01(\tH\x01R\runtaggedField\x88\x01\x01B\x0f\n" +
 	"\r_tagged_fieldB\x11\n" +
-	"\x0f_untagged_field\"\xc0\a\n" +
+	"\x0f_untagged_field\"\x83\a\n" +
 	"\x0eComplexMessage\x12*\n" +
 	"\tlocal_str\x18\x01 \x01(\tB\bʅ\xf6\xfb\x0f\x02\b\x00H\x00R\blocalStr\x88\x01\x01\x120\n" +
 	"\fworkplan_str\x18\x02 \x01(\tB\bʅ\xf6\xfb\x0f\x02\x10\x01H\x01R\vworkplanStr\x88\x01\x01\x12,\n" +
 	"\n" +
-	"global_str\x18\x03 \x01(\tB\bʅ\xf6\xfb\x0f\x02\x10\x02H\x02R\tglobalStr\x88\x01\x01\x12,\n" +
+	"local_bool\x18\x04 \x01(\bB\bʅ\xf6\xfb\x0f\x02\b\x00H\x02R\tlocalBool\x88\x01\x01\x12D\n" +
 	"\n" +
-	"local_bool\x18\x04 \x01(\bB\bʅ\xf6\xfb\x0f\x02\b\x00H\x03R\tlocalBool\x88\x01\x01\x12D\n" +
-	"\n" +
-	"local_enum\x18\x05 \x01(\x0e2\x16.testing.tags.TestEnumB\bʅ\xf6\xfb\x0f\x02\b\x00H\x04R\tlocalEnum\x88\x01\x01\x12!\n" +
+	"local_enum\x18\x05 \x01(\x0e2\x16.testing.tags.TestEnumB\bʅ\xf6\xfb\x0f\x02\b\x00H\x03R\tlocalEnum\x88\x01\x01\x12!\n" +
 	"\arep_str\x18\x06 \x03(\tB\bʅ\xf6\xfb\x0f\x02\b\x00R\x06repStr\x12A\n" +
 	"\amap_sub\x18\a \x03(\v2(.testing.tags.ComplexMessage.MapSubEntryR\x06mapSub\x12@\n" +
 	"\arep_sub\x18\b \x03(\v2'.testing.tags.ComplexMessage.SubMessageR\x06repSub\x12>\n" +
-	"\x03sub\x18\t \x01(\v2'.testing.tags.ComplexMessage.SubMessageH\x05R\x03sub\x88\x01\x01\x120\n" +
+	"\x03sub\x18\t \x01(\v2'.testing.tags.ComplexMessage.SubMessageH\x04R\x03sub\x88\x01\x01\x120\n" +
 	"\vsplit_index\x18\n" +
 	" \x01(\x03B\n" +
-	"ʅ\xf6\xfb\x0f\x04\b\x02\x10\x01H\x06R\n" +
+	"ʅ\xf6\xfb\x0f\x04\b\x01\x10\x00H\x05R\n" +
 	"splitIndex\x88\x01\x01\x12C\n" +
-	"\x16explicit_presence_bool\x18\v \x01(\bB\bʅ\xf6\xfb\x0f\x02 \x00H\aR\x14explicitPresenceBool\x88\x01\x01\x1al\n" +
+	"\x16explicit_presence_bool\x18\v \x01(\bB\bʅ\xf6\xfb\x0f\x02 \x00H\x06R\x14explicitPresenceBool\x88\x01\x01\x1al\n" +
 	"\n" +
 	"SubMessage\x12O\n" +
 	"\n" +
@@ -1569,7 +1534,6 @@ const file_testing_tags_demo_proto_rawDesc = "" +
 	"\n" +
 	"_local_strB\x0f\n" +
 	"\r_workplan_strB\r\n" +
-	"\v_global_strB\r\n" +
 	"\v_local_boolB\r\n" +
 	"\v_local_enumB\x06\n" +
 	"\x04_subB\x0e\n" +

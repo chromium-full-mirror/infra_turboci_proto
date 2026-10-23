@@ -28,22 +28,20 @@ message ComplexMessage {
     optional string sub_tagged = 1 [(turboci.tag).alt_key = "previous.package.name.Message.field"];
   }
 
-  optional string local_str = 1 [(turboci.tag).key_scope = VALUE_REF];
-  optional string workplan_str = 2 [(turboci.tag).value_scope = NODE];
-  optional string global_str = 3 [(turboci.tag).value_scope = WORK_PLAN];
+  optional string local_str = 1 [(turboci.tag).key_scope = NODE];
+  optional string workplan_str = 2 [(turboci.tag).value_scope = WORKPLAN];
 
-  optional bool local_bool = 4 [(turboci.tag).key_scope = VALUE_REF];
-  optional TestEnum local_enum = 5 [(turboci.tag).key_scope = VALUE_REF];
-  repeated string rep_str = 6 [(turboci.tag).key_scope = VALUE_REF];
+  optional bool local_bool = 4 [(turboci.tag).key_scope = NODE];
+  optional TestEnum local_enum = 5 [(turboci.tag).key_scope = NODE];
+  repeated string rep_str = 6 [(turboci.tag).key_scope = NODE];
   map<string, SubMessage> map_sub = 7;
   repeated SubMessage rep_sub = 8;
   optional SubMessage sub = 9;
 
   optional int64 split_index = 10 [
-    // allows us to QueryWorkPlans for WorkPlans with a split_index tag, but
-    // not filter on value.
-    (turboci.tag).key_scope = WORK_PLAN,
-    // allows us to QueryNodes on the value though.
+    // Allows us to search based on tag's presence.
+    (turboci.tag).key_scope = WORKPLAN,
+    // But not based on tag's value.
     (turboci.tag).value_scope = NODE
   ];
 
@@ -55,7 +53,7 @@ message ComplexMessage {
 }
 
 message UnsupportedKindMessage {
-  optional bytes bad_field = 1 [(turboci.tag).key_scope = VALUE_REF];
+  optional bytes bad_field = 1 [(turboci.tag).key_scope = NODE];
 }
 
 message RecursiveMessage {

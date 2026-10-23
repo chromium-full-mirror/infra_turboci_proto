@@ -10,12 +10,10 @@ DESCRIPTOR: _descriptor.FileDescriptor
 
 class ReadScope(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
-    VALUE_REF: _ClassVar[ReadScope]
     NODE: _ClassVar[ReadScope]
-    WORK_PLAN: _ClassVar[ReadScope]
-VALUE_REF: ReadScope
+    WORKPLAN: _ClassVar[ReadScope]
 NODE: ReadScope
-WORK_PLAN: ReadScope
+WORKPLAN: ReadScope
 TAG_FIELD_NUMBER: _ClassVar[int]
 tag: _descriptor.FieldDescriptor
 

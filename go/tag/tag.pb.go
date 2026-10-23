@@ -45,32 +45,38 @@ const (
 type ReadScope int32
 
 const (
-	// VALUE_REF means this aspect of the tag will be available to read on the
-	// ValueRef itself.
-	ReadScope_VALUE_REF ReadScope = 0
-	// NODE means this aspect of the tag will be indexed at the Node level for
-	// finding Nodes in the WorkPlan via QueryNodes.
+	// Field's value and/or presence will be readable only from node-level CEL
+	// expressions.
 	//
-	// Also implies VALUE_REF.
-	ReadScope_NODE ReadScope = 1
-	// WORK_PLAN means this aspect of the tag will be indexed at the WorkPlan
-	// level for finding WorkPlans via QueryWorkPlans.
+	// Use this if you only want to access the field presence and/or values in CEL
+	// expressions, but don't need to filter by it in search queries.
 	//
-	// Also implies NODE and VALUE_REF.
-	ReadScope_WORK_PLAN ReadScope = 2
+	// This mode has almost zero overhead, which is why it is the default.
+	ReadScope_NODE ReadScope = 0
+	// Field's value and/or presence will be exposed to workplan-level searches.
+	//
+	// Use this is you want to filter by this field value and/or presence in
+	// search queries.
+	//
+	// This implies NODE as well. Values of fields with this read scope are
+	// indexed in the workplan search index.
+	//
+	// This mode has overhead, in particular when applied to array-valued fields
+	// with high-cardinality of possible values or to scalar fields that are
+	// inside repeated messages. This can result in a lot of additions to the
+	// search index.
+	ReadScope_WORKPLAN ReadScope = 1
 )
 
 // Enum value maps for ReadScope.
 var (
 	ReadScope_name = map[int32]string{
-		0: "VALUE_REF",
-		1: "NODE",
-		2: "WORK_PLAN",
+		0: "NODE",
+		1: "WORKPLAN",
 	}
 	ReadScope_value = map[string]int32{
-		"VALUE_REF": 0,
-		"NODE":      1,
-		"WORK_PLAN": 2,
+		"NODE":     0,
+		"WORKPLAN": 1,
 	}
 )
 
@@ -96,13 +102,14 @@ func (x ReadScope) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Indicates that the annotated field and its value should be exported when
-// generating a ValueWrite using the Turbo CI client libraries.
+// Indicates that the annotated field presence and optionally its value should
+// be exported as a Tag when generating a ValueWrite using the Turbo CI client
+// libraries.
 //
 // The tag key is the field's fully qualified name.
 //
-// Can only be applied to scalar (possibly repeated) fields of the following
-// types:
+// Can only be applied to non-message singular and repeated fields of the
+// following types:
 //   - string
 //   - uint32, fixed32, int32, int64, sint32, sint64, sfixed32, sfixed64 -
 //     captured as int64.
@@ -115,17 +122,18 @@ func (x ReadScope) Number() protoreflect.EnumNumber {
 //   - enums - captured as both int64 and the string representation of the
 //     enum.
 //
-// Tags may OPTIONALLY also be indexed at the WorkPlan or globally.
+// When a field is annotated with this option its matching Tag will be populated
+// in the ValueWrite as long as the field has a value. The field is considered
+// as having a value in accordance with the behavior of the annotated proto
+// (e.g. `proto3` without the `optional` keyword does not track field presence,
+// and so the zero value counts as 'not set').
 //
-// When a field is annotated with this option it will be populated in the
-// ValueWrite as long as the field has a value. The field is considered as
-// having a value in accordance with the behaviour of the annotated proto (e.g.
-// `proto3` without the `optional` keyword does not track field presence, and so
-// the zero value counts as 'not set').
+// In other words, if the generated code has msg.HasField() and it returns true,
+// the field's value will be captured; if the generated code does not have
+// msg.HasField(), the field's value will be captured only if it is non-zero.
 //
-// In other words, if the generated code has msg.HasField() and it this is true,
-// its value will be captured; if the generated code does not have
-// msg.HasField(), it will be captured only if it is a non-zero value.
+// Individual fields can also tweak this behavior by setting `index_unset` to
+// true.
 //
 // More on field presence:
 // https://protobuf.dev/programming-guides/field_presence
@@ -142,27 +150,37 @@ func (x ReadScope) Number() protoreflect.EnumNumber {
 //	  // This will export the key 'my.cool.package.v1.MyMessage.my_field' if
 //	  // `my_field` has a non-zero value.
 //	  //
-//	  // The tag *key* will be visible for WORK_PLAN queries, queries within
-//	  the
-//	  // WorkPlan, and directly visible in the ValueRef itself.
+//	  // The tag presence will be indexed within the workplan, i.e. one would
+//	  // be able to find nodes that have this field set somewhere among their
+//	  // ValueRefs.
 //	  //
-//	  // The tag *value* will be retained only on the ValueRef itself.
-//	  string my_field = 1 [(turboci.tag).key_scope = WORK_PLAN];
+//	  // The tag *value* will not be indexed, i.e. one will *not* be able to
+//	  // filter nodes by a particular value of this field.
+//	  //
+//	  // Node-level CEL expressions (like attribute CEL expressions) will be
+//	  // able to read values of this field. It will also be returned whenever
+//	  // the ValueRef itself is read.
+//	  string my_field = 1 [(turboci.tag).key_scope = WORKPLAN];
 //
 //	  // This will export the key 'my.cool.package.v1.MyMessage.other_field'
 //	  // if `other_field` has any value explicitly set (including "").
 //	  //
 //	  // Additionally, the tag key and value will both be available on the
-//	  // ValueRef as well to search via QueryNodes and QueryWorkPlans.
-//	  optional string other_field = 2 [(turboci.tag).value_scope = WORK_PLAN];
+//	  // ValueRef as well as indexed for searching within the workplan.
+//	  optional string other_field = 2 [(turboci.tag).value_scope = WORKPLAN];
 //
 //	  // This will export the key 'my.cool.package.v1.MyMessage.local_field'
 //	  // if `local_field` has any non-zero value.
 //	  //
-//	  // The tag key and value will both be available on the ValueRef only.
+//	  // The tag key and value will be available only to node-level CEL
+//	  // expressions (like attribute CEL expressions) or when reading the
+//	  // ValueRef.
+//	  //
+//	  // It will not be possible to search the workplan for nodes that have
+//	  // this field.
 //	  //
 //	  // This can also be spelled as `[(turboci.tag) = {}]`.
-//	  int local_field = 3 [(turboci.tag).key_scope = VALUE_REF];
+//	  int local_field = 3 [(turboci.tag).key_scope = NODE];
 //
 //	  // This will export the key 'my.cool.package.v1.MyMessage.enum_field'
 //	  // if `enum_field` has any value explicit set (including 0).
@@ -170,10 +188,9 @@ func (x ReadScope) Number() protoreflect.EnumNumber {
 //	  // The value will be captured both as the enum string name as well as
 //	  // its integer value (e.g. "MY_ENUM_VALUE1" and 1).
 //	  //
-//	  // The tag key and value will both be available on the ValueRef. The key
-//	  // will also be indexed within the WorkPlan for use with QueryNodes as
-//	  // well as globally for use with QueryWorkPlans.
-//	  optional MyEnum enum_field = 3 [(turboci.tag).key_scope = WORK_PLAN];
+//	  // The tag key and both variants on its value will be available on the
+//	  // ValueRef as well as indexed for searching within the workplan.
+//	  optional MyEnum enum_field = 3 [(turboci.tag).key_scope = WORKPLAN];
 //	}
 //
 // Next ID: 5
@@ -220,7 +237,7 @@ func (x *Tag) GetKeyScope() ReadScope {
 			return x.xxx_hidden_KeyScope
 		}
 	}
-	return ReadScope_VALUE_REF
+	return ReadScope_NODE
 }
 
 func (x *Tag) GetValueScope() ReadScope {
@@ -229,7 +246,7 @@ func (x *Tag) GetValueScope() ReadScope {
 			return x.xxx_hidden_ValueScope
 		}
 	}
-	return ReadScope_VALUE_REF
+	return ReadScope_NODE
 }
 
 func (x *Tag) GetAltKey() []string {
@@ -288,12 +305,12 @@ func (x *Tag) HasIndexUnset() bool {
 
 func (x *Tag) ClearKeyScope() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_KeyScope = ReadScope_VALUE_REF
+	x.xxx_hidden_KeyScope = ReadScope_NODE
 }
 
 func (x *Tag) ClearValueScope() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_ValueScope = ReadScope_VALUE_REF
+	x.xxx_hidden_ValueScope = ReadScope_NODE
 }
 
 func (x *Tag) ClearIndexUnset() {
@@ -304,16 +321,22 @@ func (x *Tag) ClearIndexUnset() {
 type Tag_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The scope at which to index this tag's key.
+	// The scope at which to expose this tag's key.
 	//
-	// Defaults to VALUE_REF.
+	// This can be different from `value_scope` in scenarios where one would like
+	// to expose the field's presence for searching (by setting `key_scope` to
+	// WORKPLAN), but keep its values outside the search index (by setting
+	// `value_scope` to NODE) for performance reasons. In this scenarios values
+	// still can be accessed by CEL expressions over node.
+	//
+	// Defaults to NODE.
 	KeyScope *ReadScope
-	// The scope at which to index this tag's value.
+	// The scope at which to expose this tag's value.
 	//
-	// If this is greater than `key_scope`, then key_scope will be increased to
+	// If this is greater than `key_scope`, then `key_scope` will be increased to
 	// match this.
 	//
-	// Defaults to VALUE_REF.
+	// Defaults to NODE.
 	ValueScope *ReadScope
 	// Alternate keys for this tag.
 	//
@@ -322,11 +345,10 @@ type Tag_builder struct {
 	// The tag will be recorded under both the alt key(s) and also the canonical
 	// key.
 	AltKey []string
-	// If `true` will index the field even when unset in the surrounding message
-	// using the default value for the field as the captured value.
+	// If `true` will treat the field as if it is set to its default value when
+	// it is actually unset in the parent message.
 	//
-	// This defaults to `true` for bool fields, and `false` for all other field
-	// types.
+	// This defaults to `true` for bool fields, and `false` for all other fields.
 	IndexUnset *bool
 }
 
@@ -387,11 +409,10 @@ const file_turboci_tag_proto_rawDesc = "" +
 	"\n" +
 	"_key_scopeB\x0e\n" +
 	"\f_value_scopeB\x0e\n" +
-	"\f_index_unset*3\n" +
-	"\tReadScope\x12\r\n" +
-	"\tVALUE_REF\x10\x00\x12\b\n" +
-	"\x04NODE\x10\x01\x12\r\n" +
-	"\tWORK_PLAN\x10\x02:D\n" +
+	"\f_index_unset*#\n" +
+	"\tReadScope\x12\b\n" +
+	"\x04NODE\x10\x00\x12\f\n" +
+	"\bWORKPLAN\x10\x01:D\n" +
 	"\x03tag\x12\x1d.google.protobuf.FieldOptions\x18\xd9\xe0\xbe\xff\x01 \x01(\v2\f.turboci.TagR\x03tag\x88\x01\x01B.P\x01Z*go.chromium.org/turboci/proto/go/tag;tagpbb\x06proto3"
 
 var file_turboci_tag_proto_enumTypes = make([]protoimpl.EnumInfo, 1)

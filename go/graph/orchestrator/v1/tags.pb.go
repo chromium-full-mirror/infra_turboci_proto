@@ -24,7 +24,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// ReadScope indicates where something (Tag key or value) is readable.
+// ReadScope indicates where a piece of data is readable.
 //
 // The zero value is meaningful (and default); Suffixing it with UNKNOWN does
 // not improve anything.
@@ -33,45 +33,36 @@ const (
 type ReadScope int32
 
 const (
-	// The default value; Item will be readable on the ValueRef which contains it
-	// (e.g. usable for Edge conditions).
-	ReadScope_READ_SCOPE_VALUE_REF ReadScope = 0
-	// Readable at the Node level (allowing search for tagged nodes within a
-	// WorkPlan via QueryNodes).
+	// Data will be readable only from node-level CEL expressions.
 	//
-	// Also stored in the ValueRef itself (see READ_SCOPE_VALUE_REF).
+	// Use this if you only want to access the data in CEL expressions, but don't
+	// need to filter by this data in search queries.
 	//
-	// Writing a tag via a Check Option, and then later removing it by
-	// overwriting the Option without that tag (e.g. while the Check is still
-	// PLANNING) will make it so that searching for this Tag will no longer yield
-	// that Check.
-	ReadScope_READ_SCOPE_NODE ReadScope = 1
-	// Readable at the WorkPlan level (allowing search for tagged WorkPlans via
-	// QueryWorkPlans).
+	// This mode has almost zero overhead, which is why it is the default.
+	ReadScope_READ_SCOPE_NODE ReadScope = 0
+	// Data will be discoverable when searching within a workplan.
 	//
-	// Also readable at the Node level and the ValueRef itself
-	// (READ_SCOPE_NODE and READ_SCOPE_VALUE_REF respectively).
+	// Use this if you want to filter by this data in search queries.
 	//
-	// These tags will only be searchable at the WorkPlan level once they belong
-	// to some *immutable* piece of the WorkPlan (e.g. ValueWrites in a Stage
-	// Attempt, Check Options for a Check in the PLANNED state or later, etc.)
+	// This implies READ_SCOPE_NODE as well. Data with this read scope are
+	// indexed in the workplan search index.
 	//
-	// WorkPlan-scoped tags should be used sparingly, as they are more costly
-	// to write performance than Node or ValueRef-scoped tags.
-	ReadScope_READ_SCOPE_WORK_PLAN ReadScope = 2
+	// This mode has overhead, in particular when applied to array-valued fields
+	// with high-cardinality of possible values or to scalar fields that are
+	// inside repeated messages. This can result in a lot of additions to the
+	// search index.
+	ReadScope_READ_SCOPE_WORKPLAN ReadScope = 1
 )
 
 // Enum value maps for ReadScope.
 var (
 	ReadScope_name = map[int32]string{
-		0: "READ_SCOPE_VALUE_REF",
-		1: "READ_SCOPE_NODE",
-		2: "READ_SCOPE_WORK_PLAN",
+		0: "READ_SCOPE_NODE",
+		1: "READ_SCOPE_WORKPLAN",
 	}
 	ReadScope_value = map[string]int32{
-		"READ_SCOPE_VALUE_REF": 0,
-		"READ_SCOPE_NODE":      1,
-		"READ_SCOPE_WORK_PLAN": 2,
+		"READ_SCOPE_NODE":     0,
+		"READ_SCOPE_WORKPLAN": 1,
 	}
 )
 
@@ -97,27 +88,33 @@ func (x ReadScope) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Tags allow WorkPlans to export queryable data from a ValueWrite.
+// Tags allow to export structured readable data from a ValueWrite.
+//
+// A ValueWrite carries an opaque google.protobuf.Any payload. Tags are strongly
+// typed bits of data extracted from opaque Any payloads (usually by the client
+// libraries based on `turboci.tag` proto field annotations, see below).
+//
+// They allow the Orchestrator to look inside the values, in particular when:
+//   - Evaluating CEL expressions over node's data.
+//   - Exposing the node for search queries.
 //
 // A given ValueWrite can export zero or more tags.
 //
 // Tags are multi-valued (i.e. it is allowed to have multiple values all with
-// the same key, even on the same ValueWrite).
+// the same key, even on the same ValueWrite). They can also have no values
+// (this is useful for indexing presence of a field, but not its actual value).
 //
 // A Tag has a key which should be the protobuf 'full name' of the field from
 // which it originated. This will be some path like
 // `full.proto.package.MessageName.field_name`.
 //
-// In addition to the key, a Tag has one or more values.
-//
-// These Tags and their Values are retained on the ValueRef which results from
+// Tags and their Values are retained on the ValueRef which results from
 // the ValueWrite, and are visible as long as you have read access to that
-// ValueRef. Edge conditions which point to a node may use these tags and
-// their values as filtering criteria.
+// ValueRef.
 //
-// Tags and their values *may* additionally be indexed to allow using them as
-// filter criteria in QueryWorkPlans or QueryNodes. It's recommended to keep
-// index scopes as narrow as possible.
+// Tag keys and values with ReadScope larger than READ_SCOPE_NODE are also
+// exposed in more places (see the ReadScope enum), but this can have
+// performance penalty and should be used cautiously.
 //
 // If using one of the TurboCI client libraries, you may annotate your value
 // protobufs with the `turboci.tag` field annotation in order to have the
@@ -177,7 +174,7 @@ func (x *Tag) GetScope() ReadScope {
 			return x.xxx_hidden_Scope
 		}
 	}
-	return ReadScope_READ_SCOPE_VALUE_REF
+	return ReadScope_READ_SCOPE_NODE
 }
 
 func (x *Tag) GetValues() []*Tag_Value {
@@ -224,7 +221,7 @@ func (x *Tag) ClearKey() {
 
 func (x *Tag) ClearScope() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_VALUE_REF
+	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_NODE
 }
 
 type Tag_builder struct {
@@ -233,11 +230,17 @@ type Tag_builder struct {
 	// Key should be the protobuf 'full name' of the proto field from which
 	// this tag originated.
 	Key *string
-	// Scope indicates the level at which the tag *key* can be read.
+	// Scope indicates the level at which the tag *key* presence can be read.
 	//
-	// Defaults to READ_SCOPE_VALUE_REF.
+	// This can be different from Value's scope in scenarios where one would like
+	// to expose the key's presence for searching (by setting key's scope to
+	// READ_SCOPE_WORKPLAN), but keep tag values outside the search index (by
+	// setting their scope to READ_SCOPE_NODE) for performance reasons. In this
+	// scenarios values still can be accessed by CEL expressions over node.
+	//
+	// Defaults to READ_SCOPE_NODE.
 	Scope *ReadScope
-	// One or more values to associate with this tag.
+	// One or more values associated with this tag.
 	//
 	// Must be sorted and unique on `data`.
 	//
@@ -307,7 +310,7 @@ func (x *Tag_Value) GetScope() ReadScope {
 			return x.xxx_hidden_Scope
 		}
 	}
-	return ReadScope_READ_SCOPE_VALUE_REF
+	return ReadScope_READ_SCOPE_NODE
 }
 
 func (x *Tag_Value) GetDuplicateCount() uint32 {
@@ -413,7 +416,7 @@ func (x *Tag_Value) HasIntValue() bool {
 
 func (x *Tag_Value) ClearScope() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_VALUE_REF
+	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_NODE
 }
 
 func (x *Tag_Value) ClearDuplicateCount() {
@@ -469,39 +472,34 @@ type Tag_Value_builder struct {
 
 	// Scope indicates the level at which this *value* can be read.
 	//
-	// If unset, the value will be retained on the ValueRef, but will not be
-	// indexed.
+	// Must be <= `Tag.scope` (i.e. can't index the tag's value without indexing
+	// the tag's key presence as well).
 	//
-	// Must be <= `Tag.scope`.
-	//
-	// Defaults to READ_SCOPE_VALUE_REF.
+	// Defaults to READ_SCOPE_NODE.
 	Scope *ReadScope
-	// Indicates how many times this value was duplicated.
+	// Indicates how many times this value was duplicated within the parent
+	// ValueWrite.
 	//
-	// Unset/0 indicates that this value is unique.
+	// Unset or 0 indicates that this value is unique.
 	// Values > 0 indicate how many duplications occurred.
 	//
-	// e.g. if this tag had values like ["a", "b", "a"], the "a" Value would set
-	// duplicate_count to `1` and the "b" Value would have `duplicate_count`
+	// E.g. if this tag had values like ["a", "b", "a"], the "a" Value will have
+	// duplicate_count set to `1` and the "b" Value will have `duplicate_count`
 	// unset.
+	//
+	// This information is never indexed, but it is available for node-level
+	// CEL expressions, which makes it read scope be READ_SCOPE_NODE.
 	DuplicateCount *uint32
 	// Data for this value.
 	//
 	// Must be set.
 
 	// Fields of oneof xxx_hidden_Data:
-	// A string value. Indexed verbatim and supports equality searches.
+	// A string value.
 	StrValue *string
-	// A boolean value. Indexed verbatim and supports equality searches.
+	// A boolean value.
 	BoolValue *bool
-	// A numeric (integer) value. Indexed both for equality and inequality.
-	//
-	// NOTE: Numeric tags are not summed. If you have multiple tags:
-	//   - failure_count=10
-	//   - failure_count=8
-	//   - failure_count=2
-	//
-	// And then query for failure_count>10, it will NOT be a match.
+	// A numeric (integer) value.
 	IntValue *int64
 	// -- end of xxx_hidden_Data
 }
@@ -545,24 +543,17 @@ type isTag_Value_Data interface {
 }
 
 type tag_Value_StrValue struct {
-	// A string value. Indexed verbatim and supports equality searches.
+	// A string value.
 	StrValue string `protobuf:"bytes,3,opt,name=str_value,json=strValue,proto3,oneof"`
 }
 
 type tag_Value_BoolValue struct {
-	// A boolean value. Indexed verbatim and supports equality searches.
+	// A boolean value.
 	BoolValue bool `protobuf:"varint,4,opt,name=bool_value,json=boolValue,proto3,oneof"`
 }
 
 type tag_Value_IntValue struct {
-	// A numeric (integer) value. Indexed both for equality and inequality.
-	//
-	// NOTE: Numeric tags are not summed. If you have multiple tags:
-	//   - failure_count=10
-	//   - failure_count=8
-	//   - failure_count=2
-	//
-	// And then query for failure_count>10, it will NOT be a match.
+	// A numeric (integer) value.
 	IntValue int64 `protobuf:"varint,5,opt,name=int_value,json=intValue,proto3,oneof"`
 }
 
@@ -592,11 +583,10 @@ const file_turboci_graph_orchestrator_v1_tags_proto_rawDesc = "" +
 	"\x06_scopeB\x12\n" +
 	"\x10_duplicate_countB\x06\n" +
 	"\x04_keyB\b\n" +
-	"\x06_scope*T\n" +
-	"\tReadScope\x12\x18\n" +
-	"\x14READ_SCOPE_VALUE_REF\x10\x00\x12\x13\n" +
-	"\x0fREAD_SCOPE_NODE\x10\x01\x12\x18\n" +
-	"\x14READ_SCOPE_WORK_PLAN\x10\x02BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x06_scope*9\n" +
+	"\tReadScope\x12\x13\n" +
+	"\x0fREAD_SCOPE_NODE\x10\x00\x12\x17\n" +
+	"\x13READ_SCOPE_WORKPLAN\x10\x01BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_tags_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_tags_proto_msgTypes = make([]protoimpl.MessageInfo, 2)

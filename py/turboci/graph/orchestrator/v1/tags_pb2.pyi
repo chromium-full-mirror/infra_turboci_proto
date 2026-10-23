@@ -9,12 +9,10 @@ DESCRIPTOR: _descriptor.FileDescriptor
 
 class ReadScope(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
-    READ_SCOPE_VALUE_REF: _ClassVar[ReadScope]
     READ_SCOPE_NODE: _ClassVar[ReadScope]
-    READ_SCOPE_WORK_PLAN: _ClassVar[ReadScope]
-READ_SCOPE_VALUE_REF: ReadScope
+    READ_SCOPE_WORKPLAN: _ClassVar[ReadScope]
 READ_SCOPE_NODE: ReadScope
-READ_SCOPE_WORK_PLAN: ReadScope
+READ_SCOPE_WORKPLAN: ReadScope
 
 class Tag(_message.Message):
     __slots__ = ("key", "scope", "values")

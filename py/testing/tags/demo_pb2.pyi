@@ -26,7 +26,7 @@ class MyMessage(_message.Message):
     def __init__(self, tagged_field: _Optional[str] = ..., untagged_field: _Optional[str] = ...) -> None: ...
 
 class ComplexMessage(_message.Message):
-    __slots__ = ("local_str", "workplan_str", "global_str", "local_bool", "local_enum", "rep_str", "map_sub", "rep_sub", "sub", "split_index", "explicit_presence_bool")
+    __slots__ = ("local_str", "workplan_str", "local_bool", "local_enum", "rep_str", "map_sub", "rep_sub", "sub", "split_index", "explicit_presence_bool")
     class SubMessage(_message.Message):
         __slots__ = ("sub_tagged",)
         SUB_TAGGED_FIELD_NUMBER: _ClassVar[int]
@@ -41,7 +41,6 @@ class ComplexMessage(_message.Message):
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[ComplexMessage.SubMessage, _Mapping]] = ...) -> None: ...
     LOCAL_STR_FIELD_NUMBER: _ClassVar[int]
     WORKPLAN_STR_FIELD_NUMBER: _ClassVar[int]
-    GLOBAL_STR_FIELD_NUMBER: _ClassVar[int]
     LOCAL_BOOL_FIELD_NUMBER: _ClassVar[int]
     LOCAL_ENUM_FIELD_NUMBER: _ClassVar[int]
     REP_STR_FIELD_NUMBER: _ClassVar[int]
@@ -52,7 +51,6 @@ class ComplexMessage(_message.Message):
     EXPLICIT_PRESENCE_BOOL_FIELD_NUMBER: _ClassVar[int]
     local_str: str
     workplan_str: str
-    global_str: str
     local_bool: bool
     local_enum: TestEnum
     rep_str: _containers.RepeatedScalarFieldContainer[str]
@@ -61,7 +59,7 @@ class ComplexMessage(_message.Message):
     sub: ComplexMessage.SubMessage
     split_index: int
     explicit_presence_bool: bool
-    def __init__(self, local_str: _Optional[str] = ..., workplan_str: _Optional[str] = ..., global_str: _Optional[str] = ..., local_bool: _Optional[bool] = ..., local_enum: _Optional[_Union[TestEnum, str]] = ..., rep_str: _Optional[_Iterable[str]] = ..., map_sub: _Optional[_Mapping[str, ComplexMessage.SubMessage]] = ..., rep_sub: _Optional[_Iterable[_Union[ComplexMessage.SubMessage, _Mapping]]] = ..., sub: _Optional[_Union[ComplexMessage.SubMessage, _Mapping]] = ..., split_index: _Optional[int] = ..., explicit_presence_bool: _Optional[bool] = ...) -> None: ...
+    def __init__(self, local_str: _Optional[str] = ..., workplan_str: _Optional[str] = ..., local_bool: _Optional[bool] = ..., local_enum: _Optional[_Union[TestEnum, str]] = ..., rep_str: _Optional[_Iterable[str]] = ..., map_sub: _Optional[_Mapping[str, ComplexMessage.SubMessage]] = ..., rep_sub: _Optional[_Iterable[_Union[ComplexMessage.SubMessage, _Mapping]]] = ..., sub: _Optional[_Union[ComplexMessage.SubMessage, _Mapping]] = ..., split_index: _Optional[int] = ..., explicit_presence_bool: _Optional[bool] = ...) -> None: ...
 
 class UnsupportedKindMessage(_message.Message):
     __slots__ = ("bad_field",)

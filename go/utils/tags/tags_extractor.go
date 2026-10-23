@@ -237,10 +237,12 @@ func toReadScope(in tagpb.ReadScope) orchestratorpb.ReadScope {
 	switch in {
 	case tagpb.ReadScope_NODE:
 		return orchestratorpb.ReadScope_READ_SCOPE_NODE
-	case tagpb.ReadScope_WORK_PLAN:
-		return orchestratorpb.ReadScope_READ_SCOPE_WORK_PLAN
+	case tagpb.ReadScope_WORKPLAN:
+		return orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN
+	default:
+		// Something weird and unknown, default to the safest scope.
+		return orchestratorpb.ReadScope_READ_SCOPE_NODE
 	}
-	return orchestratorpb.ReadScope_READ_SCOPE_VALUE_REF
 }
 
 // normalizeTag normalizes `tag`:
