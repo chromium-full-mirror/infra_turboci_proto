@@ -6,37 +6,10 @@ syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
+import "turboci/graph/orchestrator/v1/read_scope.proto";
+
 option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
 option java_multiple_files = true;
-
-// ReadScope indicates where a piece of data is readable.
-//
-// The zero value is meaningful (and default); Suffixing it with UNKNOWN does
-// not improve anything.
-//
-// buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX
-enum ReadScope {
-  // Data will be readable only from node-level CEL expressions.
-  //
-  // Use this if you only want to access the data in CEL expressions, but don't
-  // need to filter by this data in search queries.
-  //
-  // This mode has almost zero overhead, which is why it is the default.
-  READ_SCOPE_NODE = 0;
-
-  // Data will be discoverable when searching within a workplan.
-  //
-  // Use this if you want to filter by this data in search queries.
-  //
-  // This implies READ_SCOPE_NODE as well. Data with this read scope are
-  // indexed in the workplan search index.
-  //
-  // This mode has overhead, in particular when applied to array-valued fields
-  // with high-cardinality of possible values or to scalar fields that are
-  // inside repeated messages. This can result in a lot of additions to the
-  // search index.
-  READ_SCOPE_WORKPLAN = 1;
-}
 
 // Tags allow to export structured readable data from a ValueWrite.
 //

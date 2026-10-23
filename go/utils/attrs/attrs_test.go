@@ -114,6 +114,25 @@ func TestStageAttribute(t *testing.T) {
 		}
 	})
 
+	t.Run("sets_optional_read_scope", func(t *testing.T) {
+		t.Parallel()
+
+		scopes := []orchestratorpb.ReadScope{
+			orchestratorpb.ReadScope_READ_SCOPE_NODE,
+			orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
+		}
+
+		for _, rs := range scopes {
+			attr, err := StageAttribute("my_team.metric", "true", WithReadScope(rs))
+			if err != nil {
+				t.Fatalf("unexpected error for scope %v: %v", rs, err)
+			}
+			if attr.GetReadScope() != rs {
+				t.Errorf("got read_scope %v, want %v", attr.GetReadScope(), rs)
+			}
+		}
+	})
+
 	t.Run("applies_multiple_valid_args", func(t *testing.T) {
 		t.Parallel()
 
@@ -260,6 +279,25 @@ func TestCheckAttribute(t *testing.T) {
 			}
 			if attr.GetOnState() != state {
 				t.Errorf("got on_state %v, want %v", attr.GetOnState(), state)
+			}
+		}
+	})
+
+	t.Run("sets_optional_read_scope", func(t *testing.T) {
+		t.Parallel()
+
+		scopes := []orchestratorpb.ReadScope{
+			orchestratorpb.ReadScope_READ_SCOPE_NODE,
+			orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
+		}
+
+		for _, rs := range scopes {
+			attr, err := CheckAttribute("my_team.metric", "true", WithReadScope(rs))
+			if err != nil {
+				t.Fatalf("unexpected error for scope %v: %v", rs, err)
+			}
+			if attr.GetReadScope() != rs {
+				t.Errorf("got read_scope %v, want %v", attr.GetReadScope(), rs)
 			}
 		}
 	})

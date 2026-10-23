@@ -1,0 +1,39 @@
+// Copyright 2026 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+syntax = "proto3";
+
+package turboci.graph.orchestrator.v1;
+
+option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
+option java_multiple_files = true;
+
+// ReadScope indicates where a piece of data is readable.
+//
+// This is purely about the level at which it is indexed/accessible. ReadScope
+// is unrelated to ACLs.
+//
+// buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX
+enum ReadScope {
+  // Data will be readable only from node-level CEL expressions.
+  //
+  // Use this if you only want to access the data in CEL expressions, but don't
+  // need to filter by this data in search queries.
+  //
+  // This mode has almost zero overhead, which is why it is the default.
+  READ_SCOPE_NODE = 0;
+
+  // Data will be discoverable when searching within a workplan.
+  //
+  // Use this if you want to filter by this data in search queries.
+  //
+  // This implies READ_SCOPE_NODE as well. Data with this read scope is
+  // indexed in the workplan search index.
+  //
+  // This mode has overhead, in particular when applied to array-valued fields
+  // with high-cardinality of possible values or to scalar fields that are
+  // inside repeated messages. This can result in a lot of additions to the
+  // search index.
+  READ_SCOPE_WORKPLAN = 1;
+}

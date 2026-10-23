@@ -8,6 +8,7 @@ package turboci.graph.orchestrator.v1;
 
 import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/evaluation_error.proto";
+import "turboci/graph/orchestrator/v1/read_scope.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 import "turboci/graph/orchestrator/v1/stage_state.proto";
 
@@ -54,7 +55,7 @@ enum AttributeType {
 // markdown file within this directory so that we have better
 // formatting options.
 //
-// Next ID: 11
+// Next ID: 12
 message Attribute {
   // Required non-empty. Unique among Attributes defined for parent node.
   // Must match regex:
@@ -90,6 +91,9 @@ message Attribute {
 
   // Inferred or explicitly supplied Attribute result type.
   optional AttributeType attribute_type = 5;
+
+  // The level at which this attribute (both key and values) can be read.
+  optional ReadScope read_scope = 11;
 
   // Revision timestamp when this Attribute was evaluated.
   optional Revision resolved_at = 6;

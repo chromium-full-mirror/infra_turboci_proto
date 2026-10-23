@@ -24,70 +24,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// ReadScope indicates where a piece of data is readable.
-//
-// The zero value is meaningful (and default); Suffixing it with UNKNOWN does
-// not improve anything.
-//
-// buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX
-type ReadScope int32
-
-const (
-	// Data will be readable only from node-level CEL expressions.
-	//
-	// Use this if you only want to access the data in CEL expressions, but don't
-	// need to filter by this data in search queries.
-	//
-	// This mode has almost zero overhead, which is why it is the default.
-	ReadScope_READ_SCOPE_NODE ReadScope = 0
-	// Data will be discoverable when searching within a workplan.
-	//
-	// Use this if you want to filter by this data in search queries.
-	//
-	// This implies READ_SCOPE_NODE as well. Data with this read scope are
-	// indexed in the workplan search index.
-	//
-	// This mode has overhead, in particular when applied to array-valued fields
-	// with high-cardinality of possible values or to scalar fields that are
-	// inside repeated messages. This can result in a lot of additions to the
-	// search index.
-	ReadScope_READ_SCOPE_WORKPLAN ReadScope = 1
-)
-
-// Enum value maps for ReadScope.
-var (
-	ReadScope_name = map[int32]string{
-		0: "READ_SCOPE_NODE",
-		1: "READ_SCOPE_WORKPLAN",
-	}
-	ReadScope_value = map[string]int32{
-		"READ_SCOPE_NODE":     0,
-		"READ_SCOPE_WORKPLAN": 1,
-	}
-)
-
-func (x ReadScope) Enum() *ReadScope {
-	p := new(ReadScope)
-	*p = x
-	return p
-}
-
-func (x ReadScope) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ReadScope) Descriptor() protoreflect.EnumDescriptor {
-	return file_turboci_graph_orchestrator_v1_tags_proto_enumTypes[0].Descriptor()
-}
-
-func (ReadScope) Type() protoreflect.EnumType {
-	return &file_turboci_graph_orchestrator_v1_tags_proto_enumTypes[0]
-}
-
-func (x ReadScope) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
 // Tags allow to export structured readable data from a ValueWrite.
 //
 // A ValueWrite carries an opaque google.protobuf.Any payload. Tags are strongly
@@ -567,7 +503,7 @@ var File_turboci_graph_orchestrator_v1_tags_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_tags_proto_rawDesc = "" +
 	"\n" +
-	"(turboci/graph/orchestrator/v1/tags.proto\x12\x1dturboci.graph.orchestrator.v1\"\xb7\x03\n" +
+	"(turboci/graph/orchestrator/v1/tags.proto\x12\x1dturboci.graph.orchestrator.v1\x1a.turboci/graph/orchestrator/v1/read_scope.proto\"\xb7\x03\n" +
 	"\x03Tag\x12\x15\n" +
 	"\x03key\x18\x01 \x01(\tH\x00R\x03key\x88\x01\x01\x12C\n" +
 	"\x05scope\x18\x02 \x01(\x0e2(.turboci.graph.orchestrator.v1.ReadScopeH\x01R\x05scope\x88\x01\x01\x12@\n" +
@@ -583,22 +519,18 @@ const file_turboci_graph_orchestrator_v1_tags_proto_rawDesc = "" +
 	"\x06_scopeB\x12\n" +
 	"\x10_duplicate_countB\x06\n" +
 	"\x04_keyB\b\n" +
-	"\x06_scope*9\n" +
-	"\tReadScope\x12\x13\n" +
-	"\x0fREAD_SCOPE_NODE\x10\x00\x12\x17\n" +
-	"\x13READ_SCOPE_WORKPLAN\x10\x01BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x06_scopeBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_tags_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_tags_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_tags_proto_goTypes = []any{
-	(ReadScope)(0),    // 0: turboci.graph.orchestrator.v1.ReadScope
-	(*Tag)(nil),       // 1: turboci.graph.orchestrator.v1.Tag
-	(*Tag_Value)(nil), // 2: turboci.graph.orchestrator.v1.Tag.Value
+	(*Tag)(nil),       // 0: turboci.graph.orchestrator.v1.Tag
+	(*Tag_Value)(nil), // 1: turboci.graph.orchestrator.v1.Tag.Value
+	(ReadScope)(0),    // 2: turboci.graph.orchestrator.v1.ReadScope
 }
 var file_turboci_graph_orchestrator_v1_tags_proto_depIdxs = []int32{
-	0, // 0: turboci.graph.orchestrator.v1.Tag.scope:type_name -> turboci.graph.orchestrator.v1.ReadScope
-	2, // 1: turboci.graph.orchestrator.v1.Tag.values:type_name -> turboci.graph.orchestrator.v1.Tag.Value
-	0, // 2: turboci.graph.orchestrator.v1.Tag.Value.scope:type_name -> turboci.graph.orchestrator.v1.ReadScope
+	2, // 0: turboci.graph.orchestrator.v1.Tag.scope:type_name -> turboci.graph.orchestrator.v1.ReadScope
+	1, // 1: turboci.graph.orchestrator.v1.Tag.values:type_name -> turboci.graph.orchestrator.v1.Tag.Value
+	2, // 2: turboci.graph.orchestrator.v1.Tag.Value.scope:type_name -> turboci.graph.orchestrator.v1.ReadScope
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
@@ -611,6 +543,7 @@ func file_turboci_graph_orchestrator_v1_tags_proto_init() {
 	if File_turboci_graph_orchestrator_v1_tags_proto != nil {
 		return
 	}
+	file_turboci_graph_orchestrator_v1_read_scope_proto_init()
 	file_turboci_graph_orchestrator_v1_tags_proto_msgTypes[0].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_tags_proto_msgTypes[1].OneofWrappers = []any{
 		(*tag_Value_StrValue)(nil),
@@ -622,14 +555,13 @@ func file_turboci_graph_orchestrator_v1_tags_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_tags_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_tags_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_turboci_graph_orchestrator_v1_tags_proto_goTypes,
 		DependencyIndexes: file_turboci_graph_orchestrator_v1_tags_proto_depIdxs,
-		EnumInfos:         file_turboci_graph_orchestrator_v1_tags_proto_enumTypes,
 		MessageInfos:      file_turboci_graph_orchestrator_v1_tags_proto_msgTypes,
 	}.Build()
 	File_turboci_graph_orchestrator_v1_tags_proto = out.File

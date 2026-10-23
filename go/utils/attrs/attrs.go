@@ -20,24 +20,14 @@ var (
 	reservedPrefixes = []string{"check.", "stage.", "work_node.", "worknode.", "work_plan.", "workplan."}
 )
 
-type stageConfig struct {
-	onState       *orchestratorpb.StageState
-	attributeType *orchestratorpb.AttributeType
-}
-
-type checkConfig struct {
-	onState       *orchestratorpb.CheckState
-	attributeType *orchestratorpb.AttributeType
-}
-
 // StageAttributeArg configures a StageAttributeWrite.
 type StageAttributeArg interface {
-	applyStage(*stageConfig) error
+	applyStage(*orchestratorpb.WriteNodesRequest_StageAttributeWrite) error
 }
 
 // CheckAttributeArg configures a CheckAttributeWrite.
 type CheckAttributeArg interface {
-	applyCheck(*checkConfig) error
+	applyCheck(*orchestratorpb.WriteNodesRequest_CheckAttributeWrite) error
 }
 
 // AttributeArg configures an attribute on either a Stage or Check node.
@@ -48,9 +38,9 @@ type AttributeArg interface {
 
 type stageStateArg orchestratorpb.StageState
 
-func (s stageStateArg) applyStage(cfg *stageConfig) error {
-	if cfg.onState != nil {
-		return fmt.Errorf("attrs: cannot overwrite stage state %v with %v", *cfg.onState, orchestratorpb.StageState(s))
+func (s stageStateArg) applyStage(w *orchestratorpb.WriteNodesRequest_StageAttributeWrite) error {
+	if w.HasOnState() {
+		return fmt.Errorf("attrs: cannot overwrite stage state %v with %v", w.GetOnState(), orchestratorpb.StageState(s))
 	}
 	state := orchestratorpb.StageState(s)
 	switch state {
@@ -58,7 +48,7 @@ func (s stageStateArg) applyStage(cfg *stageConfig) error {
 		orchestratorpb.StageState_STAGE_STATE_ATTEMPTING,
 		orchestratorpb.StageState_STAGE_STATE_AWAITING_GROUP,
 		orchestratorpb.StageState_STAGE_STATE_FINAL:
-		cfg.onState = &state
+		w.SetOnState(state)
 		return nil
 	default:
 		return fmt.Errorf("attrs: invalid stage state: %v", state)
@@ -72,9 +62,9 @@ func WithStageOnState(state orchestratorpb.StageState) StageAttributeArg {
 
 type checkStateArg orchestratorpb.CheckState
 
-func (c checkStateArg) applyCheck(cfg *checkConfig) error {
-	if cfg.onState != nil {
-		return fmt.Errorf("attrs: cannot overwrite check state %v with %v", *cfg.onState, orchestratorpb.CheckState(c))
+func (c checkStateArg) applyCheck(w *orchestratorpb.WriteNodesRequest_CheckAttributeWrite) error {
+	if w.HasOnState() {
+		return fmt.Errorf("attrs: cannot overwrite check state %v with %v", w.GetOnState(), orchestratorpb.CheckState(c))
 	}
 	state := orchestratorpb.CheckState(c)
 	switch state {
@@ -82,7 +72,7 @@ func (c checkStateArg) applyCheck(cfg *checkConfig) error {
 		orchestratorpb.CheckState_CHECK_STATE_PLANNED,
 		orchestratorpb.CheckState_CHECK_STATE_WAITING,
 		orchestratorpb.CheckState_CHECK_STATE_FINAL:
-		cfg.onState = &state
+		w.SetOnState(state)
 		return nil
 	default:
 		return fmt.Errorf("attrs: invalid check state: %v", state)
@@ -96,39 +86,84 @@ func WithCheckOnState(state orchestratorpb.CheckState) CheckAttributeArg {
 
 type attrTypeArg orchestratorpb.AttributeType
 
-func (a attrTypeArg) apply(cur *orchestratorpb.AttributeType) (*orchestratorpb.AttributeType, error) {
-	if cur != nil {
-		return nil, fmt.Errorf("attrs: cannot overwrite attribute type %v with %v", *cur, orchestratorpb.AttributeType(a))
+func (a attrTypeArg) verify(has bool, cur orchestratorpb.AttributeType) (orchestratorpb.AttributeType, error) {
+	typ := orchestratorpb.AttributeType(a)
+	if has {
+		return 0, fmt.Errorf("attrs: cannot overwrite attribute type %v with %v", cur, typ)
 	}
-	switch orchestratorpb.AttributeType(a) {
+	switch typ {
 	case orchestratorpb.AttributeType_ATTRIBUTE_TYPE_BOOL,
 		orchestratorpb.AttributeType_ATTRIBUTE_TYPE_BOOL_LIST,
 		orchestratorpb.AttributeType_ATTRIBUTE_TYPE_INT64,
 		orchestratorpb.AttributeType_ATTRIBUTE_TYPE_INT64_LIST,
 		orchestratorpb.AttributeType_ATTRIBUTE_TYPE_STRING,
 		orchestratorpb.AttributeType_ATTRIBUTE_TYPE_STRING_LIST:
-		t := orchestratorpb.AttributeType(a)
-		return &t, nil
+		return typ, nil
 	default:
-		return nil, fmt.Errorf("attrs: invalid attribute type: %v", orchestratorpb.AttributeType(a))
+		return 0, fmt.Errorf("attrs: invalid attribute type: %v", typ)
 	}
 }
 
-func (a attrTypeArg) applyStage(cfg *stageConfig) error {
-	var err error
-	cfg.attributeType, err = a.apply(cfg.attributeType)
-	return err
+func (a attrTypeArg) applyStage(w *orchestratorpb.WriteNodesRequest_StageAttributeWrite) error {
+	typ, err := a.verify(w.HasAttributeType(), w.GetAttributeType())
+	if err != nil {
+		return err
+	}
+	w.SetAttributeType(typ)
+	return nil
 }
 
-func (a attrTypeArg) applyCheck(cfg *checkConfig) error {
-	var err error
-	cfg.attributeType, err = a.apply(cfg.attributeType)
-	return err
+func (a attrTypeArg) applyCheck(w *orchestratorpb.WriteNodesRequest_CheckAttributeWrite) error {
+	typ, err := a.verify(w.HasAttributeType(), w.GetAttributeType())
+	if err != nil {
+		return err
+	}
+	w.SetAttributeType(typ)
+	return nil
 }
 
 // WithAttributeType sets the expected result AttributeType.
 func WithAttributeType(attrType orchestratorpb.AttributeType) AttributeArg {
 	return attrTypeArg(attrType)
+}
+
+type readScopeArg orchestratorpb.ReadScope
+
+func (a readScopeArg) verify(has bool, cur orchestratorpb.ReadScope) (orchestratorpb.ReadScope, error) {
+	rs := orchestratorpb.ReadScope(a)
+	if has {
+		return 0, fmt.Errorf("attrs: cannot overwrite read scope %v with %v", cur, rs)
+	}
+	switch rs {
+	case orchestratorpb.ReadScope_READ_SCOPE_NODE,
+		orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN:
+		return rs, nil
+	default:
+		return 0, fmt.Errorf("attrs: invalid read scope: %v", rs)
+	}
+}
+
+func (a readScopeArg) applyStage(w *orchestratorpb.WriteNodesRequest_StageAttributeWrite) error {
+	rs, err := a.verify(w.HasReadScope(), w.GetReadScope())
+	if err != nil {
+		return err
+	}
+	w.SetReadScope(rs)
+	return nil
+}
+
+func (a readScopeArg) applyCheck(w *orchestratorpb.WriteNodesRequest_CheckAttributeWrite) error {
+	rs, err := a.verify(w.HasReadScope(), w.GetReadScope())
+	if err != nil {
+		return err
+	}
+	w.SetReadScope(rs)
+	return nil
+}
+
+// WithReadScope sets the scope at which attribute will be readable at.
+func WithReadScope(rs orchestratorpb.ReadScope) AttributeArg {
+	return readScopeArg(rs)
 }
 
 func validateAttributeName(name string) error {
@@ -168,21 +203,16 @@ func StageAttribute(name, expression string, args ...StageAttributeArg) (*orches
 	if expression == "" {
 		return nil, errors.New("attrs: expression cannot be empty")
 	}
-
-	cfg := stageConfig{}
+	w := orchestratorpb.WriteNodesRequest_StageAttributeWrite_builder{
+		Name:       &name,
+		Expression: &expression,
+	}.Build()
 	for _, arg := range args {
-		if err := arg.applyStage(&cfg); err != nil {
+		if err := arg.applyStage(w); err != nil {
 			return nil, err
 		}
 	}
-
-	b := orchestratorpb.WriteNodesRequest_StageAttributeWrite_builder{
-		Name:          &name,
-		Expression:    &expression,
-		OnState:       cfg.onState,
-		AttributeType: cfg.attributeType,
-	}
-	return b.Build(), nil
+	return w, nil
 }
 
 // CheckAttribute creates a CheckAttributeWrite for a Check node.
@@ -210,21 +240,16 @@ func CheckAttribute(name, expression string, args ...CheckAttributeArg) (*orches
 	if expression == "" {
 		return nil, errors.New("attrs: expression cannot be empty")
 	}
-
-	cfg := checkConfig{}
+	w := orchestratorpb.WriteNodesRequest_CheckAttributeWrite_builder{
+		Name:       &name,
+		Expression: &expression,
+	}.Build()
 	for _, arg := range args {
-		if err := arg.applyCheck(&cfg); err != nil {
+		if err := arg.applyCheck(w); err != nil {
 			return nil, err
 		}
 	}
-
-	b := orchestratorpb.WriteNodesRequest_CheckAttributeWrite_builder{
-		Name:          &name,
-		Expression:    &expression,
-		OnState:       cfg.onState,
-		AttributeType: cfg.attributeType,
-	}
-	return b.Build(), nil
+	return w, nil
 }
 
 // AddStageAttributes appends attributes to a StageWrite message.

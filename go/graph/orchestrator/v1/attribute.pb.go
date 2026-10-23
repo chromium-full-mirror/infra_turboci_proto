@@ -104,13 +104,14 @@ func (x AttributeType) Number() protoreflect.EnumNumber {
 // markdown file within this directory so that we have better
 // formatting options.
 //
-// Next ID: 11
+// Next ID: 12
 type Attribute struct {
 	state                    protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Name          *string                `protobuf:"bytes,1,opt,name=name,proto3,oneof"`
 	xxx_hidden_Expression    *string                `protobuf:"bytes,2,opt,name=expression,proto3,oneof"`
 	xxx_hidden_OnState       isAttribute_OnState    `protobuf_oneof:"on_state"`
 	xxx_hidden_AttributeType AttributeType          `protobuf:"varint,5,opt,name=attribute_type,json=attributeType,proto3,enum=turboci.graph.orchestrator.v1.AttributeType,oneof"`
+	xxx_hidden_ReadScope     ReadScope              `protobuf:"varint,11,opt,name=read_scope,json=readScope,proto3,enum=turboci.graph.orchestrator.v1.ReadScope,oneof"`
 	xxx_hidden_ResolvedAt    *Revision              `protobuf:"bytes,6,opt,name=resolved_at,json=resolvedAt,proto3,oneof"`
 	xxx_hidden_ErrorResult   *EvaluationError       `protobuf:"bytes,7,opt,name=error_result,json=errorResult,proto3,oneof"`
 	xxx_hidden_IntResults    []int64                `protobuf:"varint,8,rep,packed,name=int_results,json=intResults,proto3"`
@@ -194,6 +195,15 @@ func (x *Attribute) GetAttributeType() AttributeType {
 	return AttributeType_ATTRIBUTE_TYPE_UNKNOWN
 }
 
+func (x *Attribute) GetReadScope() ReadScope {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 4) {
+			return x.xxx_hidden_ReadScope
+		}
+	}
+	return ReadScope_READ_SCOPE_NODE
+}
+
 func (x *Attribute) GetResolvedAt() *Revision {
 	if x != nil {
 		return x.xxx_hidden_ResolvedAt
@@ -231,12 +241,12 @@ func (x *Attribute) GetBoolResults() []bool {
 
 func (x *Attribute) SetName(v string) {
 	x.xxx_hidden_Name = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 9)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 10)
 }
 
 func (x *Attribute) SetExpression(v string) {
 	x.xxx_hidden_Expression = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 9)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 10)
 }
 
 func (x *Attribute) SetOnStageState(v StageState) {
@@ -249,7 +259,12 @@ func (x *Attribute) SetOnCheckState(v CheckState) {
 
 func (x *Attribute) SetAttributeType(v AttributeType) {
 	x.xxx_hidden_AttributeType = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 9)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 10)
+}
+
+func (x *Attribute) SetReadScope(v ReadScope) {
+	x.xxx_hidden_ReadScope = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 10)
 }
 
 func (x *Attribute) SetResolvedAt(v *Revision) {
@@ -316,6 +331,13 @@ func (x *Attribute) HasAttributeType() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
+func (x *Attribute) HasReadScope() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+}
+
 func (x *Attribute) HasResolvedAt() bool {
 	if x == nil {
 		return false
@@ -359,6 +381,11 @@ func (x *Attribute) ClearOnCheckState() {
 func (x *Attribute) ClearAttributeType() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
 	x.xxx_hidden_AttributeType = AttributeType_ATTRIBUTE_TYPE_UNKNOWN
+}
+
+func (x *Attribute) ClearReadScope() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	x.xxx_hidden_ReadScope = ReadScope_READ_SCOPE_NODE
 }
 
 func (x *Attribute) ClearResolvedAt() {
@@ -421,6 +448,8 @@ type Attribute_builder struct {
 	// -- end of xxx_hidden_OnState
 	// Inferred or explicitly supplied Attribute result type.
 	AttributeType *AttributeType
+	// The level at which this attribute (both key and values) can be read.
+	ReadScope *ReadScope
 	// Revision timestamp when this Attribute was evaluated.
 	ResolvedAt *Revision
 	// The fields *_results are mutually exclusive. Exactly one of them will be
@@ -447,11 +476,11 @@ func (b0 Attribute_builder) Build() *Attribute {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Name != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 9)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 10)
 		x.xxx_hidden_Name = b.Name
 	}
 	if b.Expression != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 9)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 10)
 		x.xxx_hidden_Expression = b.Expression
 	}
 	if b.OnStageState != nil {
@@ -461,8 +490,12 @@ func (b0 Attribute_builder) Build() *Attribute {
 		x.xxx_hidden_OnState = &attribute_OnCheckState{*b.OnCheckState}
 	}
 	if b.AttributeType != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 9)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 10)
 		x.xxx_hidden_AttributeType = *b.AttributeType
+	}
+	if b.ReadScope != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 10)
+		x.xxx_hidden_ReadScope = *b.ReadScope
 	}
 	x.xxx_hidden_ResolvedAt = b.ResolvedAt
 	x.xxx_hidden_ErrorResult = b.ErrorResult
@@ -504,7 +537,7 @@ var File_turboci_graph_orchestrator_v1_attribute_proto protoreflect.FileDescript
 
 const file_turboci_graph_orchestrator_v1_attribute_proto_rawDesc = "" +
 	"\n" +
-	"-turboci/graph/orchestrator/v1/attribute.proto\x12\x1dturboci.graph.orchestrator.v1\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a4turboci/graph/orchestrator/v1/evaluation_error.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\"\xad\x05\n" +
+	"-turboci/graph/orchestrator/v1/attribute.proto\x12\x1dturboci.graph.orchestrator.v1\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a4turboci/graph/orchestrator/v1/evaluation_error.proto\x1a.turboci/graph/orchestrator/v1/read_scope.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\"\x8a\x06\n" +
 	"\tAttribute\x12\x17\n" +
 	"\x04name\x18\x01 \x01(\tH\x01R\x04name\x88\x01\x01\x12#\n" +
 	"\n" +
@@ -512,10 +545,12 @@ const file_turboci_graph_orchestrator_v1_attribute_proto_rawDesc = "" +
 	"expression\x88\x01\x01\x12Q\n" +
 	"\x0eon_stage_state\x18\x03 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x00R\fonStageState\x12Q\n" +
 	"\x0eon_check_state\x18\x04 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\fonCheckState\x12X\n" +
-	"\x0eattribute_type\x18\x05 \x01(\x0e2,.turboci.graph.orchestrator.v1.AttributeTypeH\x03R\rattributeType\x88\x01\x01\x12M\n" +
-	"\vresolved_at\x18\x06 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x04R\n" +
+	"\x0eattribute_type\x18\x05 \x01(\x0e2,.turboci.graph.orchestrator.v1.AttributeTypeH\x03R\rattributeType\x88\x01\x01\x12L\n" +
+	"\n" +
+	"read_scope\x18\v \x01(\x0e2(.turboci.graph.orchestrator.v1.ReadScopeH\x04R\treadScope\x88\x01\x01\x12M\n" +
+	"\vresolved_at\x18\x06 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x05R\n" +
 	"resolvedAt\x88\x01\x01\x12V\n" +
-	"\ferror_result\x18\a \x01(\v2..turboci.graph.orchestrator.v1.EvaluationErrorH\x05R\verrorResult\x88\x01\x01\x12\x1f\n" +
+	"\ferror_result\x18\a \x01(\v2..turboci.graph.orchestrator.v1.EvaluationErrorH\x06R\verrorResult\x88\x01\x01\x12\x1f\n" +
 	"\vint_results\x18\b \x03(\x03R\n" +
 	"intResults\x12\x1f\n" +
 	"\vstr_results\x18\t \x03(\tR\n" +
@@ -526,7 +561,8 @@ const file_turboci_graph_orchestrator_v1_attribute_proto_rawDesc = "" +
 	"\bon_stateB\a\n" +
 	"\x05_nameB\r\n" +
 	"\v_expressionB\x11\n" +
-	"\x0f_attribute_typeB\x0e\n" +
+	"\x0f_attribute_typeB\r\n" +
+	"\v_read_scopeB\x0e\n" +
 	"\f_resolved_atB\x0f\n" +
 	"\r_error_result*\xd6\x01\n" +
 	"\rAttributeType\x12\x1a\n" +
@@ -546,20 +582,22 @@ var file_turboci_graph_orchestrator_v1_attribute_proto_goTypes = []any{
 	(*Attribute)(nil),       // 1: turboci.graph.orchestrator.v1.Attribute
 	(StageState)(0),         // 2: turboci.graph.orchestrator.v1.StageState
 	(CheckState)(0),         // 3: turboci.graph.orchestrator.v1.CheckState
-	(*Revision)(nil),        // 4: turboci.graph.orchestrator.v1.Revision
-	(*EvaluationError)(nil), // 5: turboci.graph.orchestrator.v1.EvaluationError
+	(ReadScope)(0),          // 4: turboci.graph.orchestrator.v1.ReadScope
+	(*Revision)(nil),        // 5: turboci.graph.orchestrator.v1.Revision
+	(*EvaluationError)(nil), // 6: turboci.graph.orchestrator.v1.EvaluationError
 }
 var file_turboci_graph_orchestrator_v1_attribute_proto_depIdxs = []int32{
 	2, // 0: turboci.graph.orchestrator.v1.Attribute.on_stage_state:type_name -> turboci.graph.orchestrator.v1.StageState
 	3, // 1: turboci.graph.orchestrator.v1.Attribute.on_check_state:type_name -> turboci.graph.orchestrator.v1.CheckState
 	0, // 2: turboci.graph.orchestrator.v1.Attribute.attribute_type:type_name -> turboci.graph.orchestrator.v1.AttributeType
-	4, // 3: turboci.graph.orchestrator.v1.Attribute.resolved_at:type_name -> turboci.graph.orchestrator.v1.Revision
-	5, // 4: turboci.graph.orchestrator.v1.Attribute.error_result:type_name -> turboci.graph.orchestrator.v1.EvaluationError
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	4, // 3: turboci.graph.orchestrator.v1.Attribute.read_scope:type_name -> turboci.graph.orchestrator.v1.ReadScope
+	5, // 4: turboci.graph.orchestrator.v1.Attribute.resolved_at:type_name -> turboci.graph.orchestrator.v1.Revision
+	6, // 5: turboci.graph.orchestrator.v1.Attribute.error_result:type_name -> turboci.graph.orchestrator.v1.EvaluationError
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_attribute_proto_init() }
@@ -569,6 +607,7 @@ func file_turboci_graph_orchestrator_v1_attribute_proto_init() {
 	}
 	file_turboci_graph_orchestrator_v1_check_state_proto_init()
 	file_turboci_graph_orchestrator_v1_evaluation_error_proto_init()
+	file_turboci_graph_orchestrator_v1_read_scope_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_state_proto_init()
 	file_turboci_graph_orchestrator_v1_attribute_proto_msgTypes[0].OneofWrappers = []any{

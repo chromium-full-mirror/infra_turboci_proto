@@ -13,6 +13,7 @@ import "turboci/graph/orchestrator/v1/check_kind.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/edge.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
+import "turboci/graph/orchestrator/v1/read_scope.proto";
 import "turboci/graph/orchestrator/v1/stage.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto";
 import "turboci/graph/orchestrator/v1/stage_execution_policy.proto";
@@ -188,7 +189,7 @@ message WriteNodesRequest {
 
   // An Attribute declaration on CheckWrite.
   //
-  // Next ID: 5
+  // Next ID: 6
   message CheckAttributeWrite {
     // Required non-empty. Unique among Attributes defined for parent Check.
     // Must match regex:
@@ -219,11 +220,16 @@ message WriteNodesRequest {
     // If set, must match the type inferred from expression.
     // If not set, the inferred expression's type will be used.
     optional AttributeType attribute_type = 4;
+
+    // The level at which this attribute (both key and values) can be read.
+    //
+    // Defaults to READ_SCOPE_NODE.
+    optional ReadScope read_scope = 5;
   }
 
   // An Attribute declaration on StageWrite.
   //
-  // Next ID: 5
+  // Next ID: 6
   message StageAttributeWrite {
     // Required non-empty. Unique among Attributes defined for parent Stage.
     // Must match regex:
@@ -254,6 +260,11 @@ message WriteNodesRequest {
     // If set, must match the type inferred from expression.
     // If not set, the inferred expression's type will be used.
     optional AttributeType attribute_type = 4;
+
+    // The level at which this attribute (both key and values) can be read.
+    //
+    // Defaults to READ_SCOPE_NODE.
+    optional ReadScope read_scope = 5;
   }
 
   // A description of modifications to make to a single Check.
