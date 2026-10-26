@@ -224,7 +224,7 @@ message WriteNodesRequest {
     // The level at which this attribute (both key and values) can be read.
     //
     // Defaults to READ_SCOPE_NODE.
-    optional ReadScope read_scope = 5;
+    optional ReadScope scope = 5;
   }
 
   // An Attribute declaration on StageWrite.
@@ -264,7 +264,7 @@ message WriteNodesRequest {
     // The level at which this attribute (both key and values) can be read.
     //
     // Defaults to READ_SCOPE_NODE.
-    optional ReadScope read_scope = 5;
+    optional ReadScope scope = 5;
   }
 
   // A description of modifications to make to a single Check.

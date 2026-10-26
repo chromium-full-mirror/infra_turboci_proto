@@ -123,12 +123,12 @@ func TestStageAttribute(t *testing.T) {
 		}
 
 		for _, rs := range scopes {
-			attr, err := StageAttribute("my_team.metric", "true", WithReadScope(rs))
+			attr, err := StageAttribute("my_team.metric", "true", WithScope(rs))
 			if err != nil {
 				t.Fatalf("unexpected error for scope %v: %v", rs, err)
 			}
-			if attr.GetReadScope() != rs {
-				t.Errorf("got read_scope %v, want %v", attr.GetReadScope(), rs)
+			if attr.GetScope() != rs {
+				t.Errorf("got scope %v, want %v", attr.GetScope(), rs)
 			}
 		}
 	})
@@ -292,12 +292,12 @@ func TestCheckAttribute(t *testing.T) {
 		}
 
 		for _, rs := range scopes {
-			attr, err := CheckAttribute("my_team.metric", "true", WithReadScope(rs))
+			attr, err := CheckAttribute("my_team.metric", "true", WithScope(rs))
 			if err != nil {
 				t.Fatalf("unexpected error for scope %v: %v", rs, err)
 			}
-			if attr.GetReadScope() != rs {
-				t.Errorf("got read_scope %v, want %v", attr.GetReadScope(), rs)
+			if attr.GetScope() != rs {
+				t.Errorf("got scope %v, want %v", attr.GetScope(), rs)
 			}
 		}
 	})

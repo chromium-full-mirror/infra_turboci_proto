@@ -127,43 +127,43 @@ func WithAttributeType(attrType orchestratorpb.AttributeType) AttributeArg {
 	return attrTypeArg(attrType)
 }
 
-type readScopeArg orchestratorpb.ReadScope
+type scopeArg orchestratorpb.ReadScope
 
-func (a readScopeArg) verify(has bool, cur orchestratorpb.ReadScope) (orchestratorpb.ReadScope, error) {
+func (a scopeArg) verify(has bool, cur orchestratorpb.ReadScope) (orchestratorpb.ReadScope, error) {
 	rs := orchestratorpb.ReadScope(a)
 	if has {
-		return 0, fmt.Errorf("attrs: cannot overwrite read scope %v with %v", cur, rs)
+		return 0, fmt.Errorf("attrs: cannot overwrite scope %v with %v", cur, rs)
 	}
 	switch rs {
 	case orchestratorpb.ReadScope_READ_SCOPE_NODE,
 		orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN:
 		return rs, nil
 	default:
-		return 0, fmt.Errorf("attrs: invalid read scope: %v", rs)
+		return 0, fmt.Errorf("attrs: invalid scope: %v", rs)
 	}
 }
 
-func (a readScopeArg) applyStage(w *orchestratorpb.WriteNodesRequest_StageAttributeWrite) error {
-	rs, err := a.verify(w.HasReadScope(), w.GetReadScope())
+func (a scopeArg) applyStage(w *orchestratorpb.WriteNodesRequest_StageAttributeWrite) error {
+	rs, err := a.verify(w.HasScope(), w.GetScope())
 	if err != nil {
 		return err
 	}
-	w.SetReadScope(rs)
+	w.SetScope(rs)
 	return nil
 }
 
-func (a readScopeArg) applyCheck(w *orchestratorpb.WriteNodesRequest_CheckAttributeWrite) error {
-	rs, err := a.verify(w.HasReadScope(), w.GetReadScope())
+func (a scopeArg) applyCheck(w *orchestratorpb.WriteNodesRequest_CheckAttributeWrite) error {
+	rs, err := a.verify(w.HasScope(), w.GetScope())
 	if err != nil {
 		return err
 	}
-	w.SetReadScope(rs)
+	w.SetScope(rs)
 	return nil
 }
 
-// WithReadScope sets the scope at which attribute will be readable at.
-func WithReadScope(rs orchestratorpb.ReadScope) AttributeArg {
-	return readScopeArg(rs)
+// WithScope sets the scope at which attribute will be readable at.
+func WithScope(rs orchestratorpb.ReadScope) AttributeArg {
+	return scopeArg(rs)
 }
 
 func validateAttributeName(name string) error {

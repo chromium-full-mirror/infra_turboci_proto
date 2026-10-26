@@ -749,7 +749,7 @@ type WriteNodesRequest_CheckAttributeWrite struct {
 	xxx_hidden_Expression    *string                `protobuf:"bytes,2,opt,name=expression,proto3,oneof"`
 	xxx_hidden_OnState       CheckState             `protobuf:"varint,3,opt,name=on_state,json=onState,proto3,enum=turboci.graph.orchestrator.v1.CheckState,oneof"`
 	xxx_hidden_AttributeType AttributeType          `protobuf:"varint,4,opt,name=attribute_type,json=attributeType,proto3,enum=turboci.graph.orchestrator.v1.AttributeType,oneof"`
-	xxx_hidden_ReadScope     ReadScope              `protobuf:"varint,5,opt,name=read_scope,json=readScope,proto3,enum=turboci.graph.orchestrator.v1.ReadScope,oneof"`
+	xxx_hidden_Scope         ReadScope              `protobuf:"varint,5,opt,name=scope,proto3,enum=turboci.graph.orchestrator.v1.ReadScope,oneof"`
 	XXX_raceDetectHookData   protoimpl.RaceDetectHookData
 	XXX_presence             [1]uint32
 	unknownFields            protoimpl.UnknownFields
@@ -819,10 +819,10 @@ func (x *WriteNodesRequest_CheckAttributeWrite) GetAttributeType() AttributeType
 	return AttributeType_ATTRIBUTE_TYPE_UNKNOWN
 }
 
-func (x *WriteNodesRequest_CheckAttributeWrite) GetReadScope() ReadScope {
+func (x *WriteNodesRequest_CheckAttributeWrite) GetScope() ReadScope {
 	if x != nil {
 		if protoimpl.X.Present(&(x.XXX_presence[0]), 4) {
-			return x.xxx_hidden_ReadScope
+			return x.xxx_hidden_Scope
 		}
 	}
 	return ReadScope_READ_SCOPE_NODE
@@ -848,8 +848,8 @@ func (x *WriteNodesRequest_CheckAttributeWrite) SetAttributeType(v AttributeType
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 5)
 }
 
-func (x *WriteNodesRequest_CheckAttributeWrite) SetReadScope(v ReadScope) {
-	x.xxx_hidden_ReadScope = v
+func (x *WriteNodesRequest_CheckAttributeWrite) SetScope(v ReadScope) {
+	x.xxx_hidden_Scope = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 5)
 }
 
@@ -881,7 +881,7 @@ func (x *WriteNodesRequest_CheckAttributeWrite) HasAttributeType() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
-func (x *WriteNodesRequest_CheckAttributeWrite) HasReadScope() bool {
+func (x *WriteNodesRequest_CheckAttributeWrite) HasScope() bool {
 	if x == nil {
 		return false
 	}
@@ -908,9 +908,9 @@ func (x *WriteNodesRequest_CheckAttributeWrite) ClearAttributeType() {
 	x.xxx_hidden_AttributeType = AttributeType_ATTRIBUTE_TYPE_UNKNOWN
 }
 
-func (x *WriteNodesRequest_CheckAttributeWrite) ClearReadScope() {
+func (x *WriteNodesRequest_CheckAttributeWrite) ClearScope() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
-	x.xxx_hidden_ReadScope = ReadScope_READ_SCOPE_NODE
+	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_NODE
 }
 
 type WriteNodesRequest_CheckAttributeWrite_builder struct {
@@ -945,7 +945,7 @@ type WriteNodesRequest_CheckAttributeWrite_builder struct {
 	// The level at which this attribute (both key and values) can be read.
 	//
 	// Defaults to READ_SCOPE_NODE.
-	ReadScope *ReadScope
+	Scope *ReadScope
 }
 
 func (b0 WriteNodesRequest_CheckAttributeWrite_builder) Build() *WriteNodesRequest_CheckAttributeWrite {
@@ -968,9 +968,9 @@ func (b0 WriteNodesRequest_CheckAttributeWrite_builder) Build() *WriteNodesReque
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 5)
 		x.xxx_hidden_AttributeType = *b.AttributeType
 	}
-	if b.ReadScope != nil {
+	if b.Scope != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 5)
-		x.xxx_hidden_ReadScope = *b.ReadScope
+		x.xxx_hidden_Scope = *b.Scope
 	}
 	return m0
 }
@@ -984,7 +984,7 @@ type WriteNodesRequest_StageAttributeWrite struct {
 	xxx_hidden_Expression    *string                `protobuf:"bytes,2,opt,name=expression,proto3,oneof"`
 	xxx_hidden_OnState       StageState             `protobuf:"varint,3,opt,name=on_state,json=onState,proto3,enum=turboci.graph.orchestrator.v1.StageState,oneof"`
 	xxx_hidden_AttributeType AttributeType          `protobuf:"varint,4,opt,name=attribute_type,json=attributeType,proto3,enum=turboci.graph.orchestrator.v1.AttributeType,oneof"`
-	xxx_hidden_ReadScope     ReadScope              `protobuf:"varint,5,opt,name=read_scope,json=readScope,proto3,enum=turboci.graph.orchestrator.v1.ReadScope,oneof"`
+	xxx_hidden_Scope         ReadScope              `protobuf:"varint,5,opt,name=scope,proto3,enum=turboci.graph.orchestrator.v1.ReadScope,oneof"`
 	XXX_raceDetectHookData   protoimpl.RaceDetectHookData
 	XXX_presence             [1]uint32
 	unknownFields            protoimpl.UnknownFields
@@ -1054,10 +1054,10 @@ func (x *WriteNodesRequest_StageAttributeWrite) GetAttributeType() AttributeType
 	return AttributeType_ATTRIBUTE_TYPE_UNKNOWN
 }
 
-func (x *WriteNodesRequest_StageAttributeWrite) GetReadScope() ReadScope {
+func (x *WriteNodesRequest_StageAttributeWrite) GetScope() ReadScope {
 	if x != nil {
 		if protoimpl.X.Present(&(x.XXX_presence[0]), 4) {
-			return x.xxx_hidden_ReadScope
+			return x.xxx_hidden_Scope
 		}
 	}
 	return ReadScope_READ_SCOPE_NODE
@@ -1083,8 +1083,8 @@ func (x *WriteNodesRequest_StageAttributeWrite) SetAttributeType(v AttributeType
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 5)
 }
 
-func (x *WriteNodesRequest_StageAttributeWrite) SetReadScope(v ReadScope) {
-	x.xxx_hidden_ReadScope = v
+func (x *WriteNodesRequest_StageAttributeWrite) SetScope(v ReadScope) {
+	x.xxx_hidden_Scope = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 5)
 }
 
@@ -1116,7 +1116,7 @@ func (x *WriteNodesRequest_StageAttributeWrite) HasAttributeType() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
-func (x *WriteNodesRequest_StageAttributeWrite) HasReadScope() bool {
+func (x *WriteNodesRequest_StageAttributeWrite) HasScope() bool {
 	if x == nil {
 		return false
 	}
@@ -1143,9 +1143,9 @@ func (x *WriteNodesRequest_StageAttributeWrite) ClearAttributeType() {
 	x.xxx_hidden_AttributeType = AttributeType_ATTRIBUTE_TYPE_UNKNOWN
 }
 
-func (x *WriteNodesRequest_StageAttributeWrite) ClearReadScope() {
+func (x *WriteNodesRequest_StageAttributeWrite) ClearScope() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
-	x.xxx_hidden_ReadScope = ReadScope_READ_SCOPE_NODE
+	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_NODE
 }
 
 type WriteNodesRequest_StageAttributeWrite_builder struct {
@@ -1180,7 +1180,7 @@ type WriteNodesRequest_StageAttributeWrite_builder struct {
 	// The level at which this attribute (both key and values) can be read.
 	//
 	// Defaults to READ_SCOPE_NODE.
-	ReadScope *ReadScope
+	Scope *ReadScope
 }
 
 func (b0 WriteNodesRequest_StageAttributeWrite_builder) Build() *WriteNodesRequest_StageAttributeWrite {
@@ -1203,9 +1203,9 @@ func (b0 WriteNodesRequest_StageAttributeWrite_builder) Build() *WriteNodesReque
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 5)
 		x.xxx_hidden_AttributeType = *b.AttributeType
 	}
-	if b.ReadScope != nil {
+	if b.Scope != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 5)
-		x.xxx_hidden_ReadScope = *b.ReadScope
+		x.xxx_hidden_Scope = *b.Scope
 	}
 	return m0
 }
@@ -3147,7 +3147,7 @@ var File_turboci_graph_orchestrator_v1_write_nodes_request_proto protoreflect.Fi
 
 const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" +
 	"\n" +
-	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a-turboci/graph/orchestrator/v1/attribute.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a.turboci/graph/orchestrator/v1/read_scope.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a7turboci/graph/orchestrator/v1/transaction_details.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\xa2/\n" +
+	"7turboci/graph/orchestrator/v1/write_nodes_request.proto\x12\x1dturboci.graph.orchestrator.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a%turboci/graph/ids/v1/identifier.proto\x1a-turboci/graph/orchestrator/v1/attribute.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a(turboci/graph/orchestrator/v1/edge.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a.turboci/graph/orchestrator/v1/read_scope.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1aBturboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto\x1a:turboci/graph/orchestrator/v1/stage_execution_policy.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a7turboci/graph/orchestrator/v1/transaction_details.proto\x1a/turboci/graph/orchestrator/v1/value_write.proto\"\x86/\n" +
 	"\x11WriteNodesRequest\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tH\x00R\x05token\x88\x01\x01\x12T\n" +
 	"\x06reason\x18\x02 \x01(\v27.turboci.graph.orchestrator.v1.WriteNodesRequest.ReasonH\x01R\x06reason\x88\x01\x01\x12H\n" +
@@ -3174,35 +3174,33 @@ const file_turboci_graph_orchestrator_v1_write_nodes_request_proto_rawDesc = "" 
 	"\amessage\x18\x01 \x01(\tH\x00R\amessage\x88\x01\x01\x12C\n" +
 	"\adetails\x18\x02 \x03(\v2).turboci.graph.orchestrator.v1.ValueWriteR\adetailsB\n" +
 	"\n" +
-	"\b_message\x1a\x8d\x03\n" +
+	"\b_message\x1a\xff\x02\n" +
 	"\x13CheckAttributeWrite\x12\x17\n" +
 	"\x04name\x18\x01 \x01(\tH\x00R\x04name\x88\x01\x01\x12#\n" +
 	"\n" +
 	"expression\x18\x02 \x01(\tH\x01R\n" +
 	"expression\x88\x01\x01\x12I\n" +
 	"\bon_state\x18\x03 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x02R\aonState\x88\x01\x01\x12X\n" +
-	"\x0eattribute_type\x18\x04 \x01(\x0e2,.turboci.graph.orchestrator.v1.AttributeTypeH\x03R\rattributeType\x88\x01\x01\x12L\n" +
-	"\n" +
-	"read_scope\x18\x05 \x01(\x0e2(.turboci.graph.orchestrator.v1.ReadScopeH\x04R\treadScope\x88\x01\x01B\a\n" +
+	"\x0eattribute_type\x18\x04 \x01(\x0e2,.turboci.graph.orchestrator.v1.AttributeTypeH\x03R\rattributeType\x88\x01\x01\x12C\n" +
+	"\x05scope\x18\x05 \x01(\x0e2(.turboci.graph.orchestrator.v1.ReadScopeH\x04R\x05scope\x88\x01\x01B\a\n" +
 	"\x05_nameB\r\n" +
 	"\v_expressionB\v\n" +
 	"\t_on_stateB\x11\n" +
-	"\x0f_attribute_typeB\r\n" +
-	"\v_read_scope\x1a\x8d\x03\n" +
+	"\x0f_attribute_typeB\b\n" +
+	"\x06_scope\x1a\xff\x02\n" +
 	"\x13StageAttributeWrite\x12\x17\n" +
 	"\x04name\x18\x01 \x01(\tH\x00R\x04name\x88\x01\x01\x12#\n" +
 	"\n" +
 	"expression\x18\x02 \x01(\tH\x01R\n" +
 	"expression\x88\x01\x01\x12I\n" +
 	"\bon_state\x18\x03 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x02R\aonState\x88\x01\x01\x12X\n" +
-	"\x0eattribute_type\x18\x04 \x01(\x0e2,.turboci.graph.orchestrator.v1.AttributeTypeH\x03R\rattributeType\x88\x01\x01\x12L\n" +
-	"\n" +
-	"read_scope\x18\x05 \x01(\x0e2(.turboci.graph.orchestrator.v1.ReadScopeH\x04R\treadScope\x88\x01\x01B\a\n" +
+	"\x0eattribute_type\x18\x04 \x01(\x0e2,.turboci.graph.orchestrator.v1.AttributeTypeH\x03R\rattributeType\x88\x01\x01\x12C\n" +
+	"\x05scope\x18\x05 \x01(\x0e2(.turboci.graph.orchestrator.v1.ReadScopeH\x04R\x05scope\x88\x01\x01B\a\n" +
 	"\x05_nameB\r\n" +
 	"\v_expressionB\v\n" +
 	"\t_on_stateB\x11\n" +
-	"\x0f_attribute_typeB\r\n" +
-	"\v_read_scope\x1a\xab\a\n" +
+	"\x0f_attribute_typeB\b\n" +
+	"\x06_scope\x1a\xab\a\n" +
 	"\n" +
 	"CheckWrite\x12@\n" +
 	"\n" +
@@ -3366,10 +3364,10 @@ var file_turboci_graph_orchestrator_v1_write_nodes_request_proto_depIdxs = []int
 	20, // 10: turboci.graph.orchestrator.v1.WriteNodesRequest.Reason.details:type_name -> turboci.graph.orchestrator.v1.ValueWrite
 	21, // 11: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckAttributeWrite.on_state:type_name -> turboci.graph.orchestrator.v1.CheckState
 	22, // 12: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckAttributeWrite.attribute_type:type_name -> turboci.graph.orchestrator.v1.AttributeType
-	23, // 13: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckAttributeWrite.read_scope:type_name -> turboci.graph.orchestrator.v1.ReadScope
+	23, // 13: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckAttributeWrite.scope:type_name -> turboci.graph.orchestrator.v1.ReadScope
 	24, // 14: turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttributeWrite.on_state:type_name -> turboci.graph.orchestrator.v1.StageState
 	22, // 15: turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttributeWrite.attribute_type:type_name -> turboci.graph.orchestrator.v1.AttributeType
-	23, // 16: turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttributeWrite.read_scope:type_name -> turboci.graph.orchestrator.v1.ReadScope
+	23, // 16: turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttributeWrite.scope:type_name -> turboci.graph.orchestrator.v1.ReadScope
 	25, // 17: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.identifier:type_name -> turboci.graph.ids.v1.Check
 	26, // 18: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.kind:type_name -> turboci.graph.orchestrator.v1.CheckKind
 	20, // 19: turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite.options:type_name -> turboci.graph.orchestrator.v1.ValueWrite

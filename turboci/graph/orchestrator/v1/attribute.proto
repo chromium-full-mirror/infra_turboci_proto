@@ -93,7 +93,7 @@ message Attribute {
   optional AttributeType attribute_type = 5;
 
   // The level at which this attribute (both key and values) can be read.
-  optional ReadScope read_scope = 11;
+  optional ReadScope scope = 11;
 
   // Revision timestamp when this Attribute was evaluated.
   optional Revision resolved_at = 6;

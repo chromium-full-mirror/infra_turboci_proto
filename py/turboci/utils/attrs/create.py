@@ -92,22 +92,22 @@ def _resolve_attribute_type(
   )
 
 
-def _resolve_read_scope(
-    read_scope: read_scope_pb2.ReadScope | str | int | None,
+def _resolve_scope(
+    scope: read_scope_pb2.ReadScope | str | int | None,
 ) -> read_scope_pb2.ReadScope | None:
   """Normalizes and validates a ReadScope parameter."""
-  if read_scope is None:
+  if scope is None:
     return None
-  if isinstance(read_scope, str):
-    if read_scope in read_scope_pb2.ReadScope.keys():
-      read_scope = read_scope_pb2.ReadScope.Value(read_scope)
+  if isinstance(scope, str):
+    if scope in read_scope_pb2.ReadScope.keys():
+      scope = read_scope_pb2.ReadScope.Value(scope)
     else:
-      raise ValueError(f'unknown read_scope name: {read_scope!r}')
-  if isinstance(read_scope, bool) or not isinstance(read_scope, int):
-    raise TypeError(f'unexpected type for read_scope: {type(read_scope)!r}')
-  if read_scope not in read_scope_pb2.ReadScope.values():
-    raise ValueError(f'unknown read_scope value: {read_scope!r}')
-  return cast(read_scope_pb2.ReadScope, read_scope)
+      raise ValueError(f'unknown scope name: {scope!r}')
+  if isinstance(scope, bool) or not isinstance(scope, int):
+    raise TypeError(f'unexpected type for scope: {type(scope)!r}')
+  if scope not in read_scope_pb2.ReadScope.values():
+    raise ValueError(f'unknown scope value: {scope!r}')
+  return cast(read_scope_pb2.ReadScope, scope)
 
 
 def _resolve_stage_state(
@@ -155,7 +155,7 @@ def for_stage(
     expression: str,
     on_state: stage_state_pb2.StageState | str | int | None = None,
     attribute_type: attribute_pb2.AttributeType | str | int | None = None,
-    read_scope: read_scope_pb2.ReadScope | str | int | None = None,
+    scope: read_scope_pb2.ReadScope | str | int | None = None,
 ) -> write_nodes_request_pb2.WriteNodesRequest.StageAttributeWrite:
   """Creates a StageAttributeWrite for a Stage node.
 
@@ -165,7 +165,7 @@ def for_stage(
     on_state: Optional StageState on which this attribute is evaluated.
       When omitted, left unset so the server applies STAGE_STATE_FINAL.
     attribute_type: Optional expected attribute result type.
-    read_scope: Optional ReadScope the attribute will be visible at.
+    scope: Optional ReadScope the attribute will be visible at.
 
   Returns:
     StageAttributeWrite configured with on_state.
@@ -179,14 +179,14 @@ def for_stage(
     raise ValueError('expression cannot be empty')
   resolved_state = _resolve_stage_state(on_state)
   resolved_attr_type = _resolve_attribute_type(attribute_type)
-  resolved_read_scope = _resolve_read_scope(read_scope)
+  resolved_scope = _resolve_scope(scope)
 
   return write_nodes_request_pb2.WriteNodesRequest.StageAttributeWrite(
       name=name,
       expression=expression,
       on_state=resolved_state,
       attribute_type=resolved_attr_type,
-      read_scope=resolved_read_scope,
+      scope=resolved_scope,
   )
 
 
@@ -195,7 +195,7 @@ def for_check(
     expression: str,
     on_state: check_state_pb2.CheckState | str | int | None = None,
     attribute_type: attribute_pb2.AttributeType | str | int | None = None,
-    read_scope: read_scope_pb2.ReadScope | str | int | None = None,
+    scope: read_scope_pb2.ReadScope | str | int | None = None,
 ) -> write_nodes_request_pb2.WriteNodesRequest.CheckAttributeWrite:
   """Creates a CheckAttributeWrite for a Check node.
 
@@ -205,7 +205,7 @@ def for_check(
     on_state: Optional CheckState on which this attribute is evaluated.
       When omitted, left unset so the server applies CHECK_STATE_FINAL.
     attribute_type: Optional expected attribute result type.
-    read_scope: Optional ReadScope the attribute will be visible at.
+    scope: Optional ReadScope the attribute will be visible at.
 
   Returns:
     CheckAttributeWrite configured with on_state.
@@ -219,14 +219,14 @@ def for_check(
     raise ValueError('expression cannot be empty')
   resolved_state = _resolve_check_state(on_state)
   resolved_attr_type = _resolve_attribute_type(attribute_type)
-  resolved_read_scope = _resolve_read_scope(read_scope)
+  resolved_scope = _resolve_scope(scope)
 
   return write_nodes_request_pb2.WriteNodesRequest.CheckAttributeWrite(
       name=name,
       expression=expression,
       on_state=resolved_state,
       attribute_type=resolved_attr_type,
-      read_scope=resolved_read_scope,
+      scope=resolved_scope,
   )
 
 

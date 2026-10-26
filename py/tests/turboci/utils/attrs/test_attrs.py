@@ -278,7 +278,7 @@ class TestForStage(unittest.TestCase):
     with self.assertRaisesRegex(ValueError, 'expression cannot be empty'):
       attrs.for_stage(name='my_team.attr', expression='')
 
-  def test_explicit_valid_read_scope_accepted(self):
+  def test_explicit_valid_scope_accepted(self):
     # Arrange
     cases = (
         (
@@ -309,9 +309,9 @@ class TestForStage(unittest.TestCase):
         attr = attrs.for_stage(
             name='my_team.attr',
             expression='true',
-            read_scope=scope_input,
+            scope=scope_input,
         )
-        self.assertEqual(attr.read_scope, expected_scope)
+        self.assertEqual(attr.scope, expected_scope)
 
   def test_invalid_stage_state_value_raises_value_error(self):
     # Arrange
@@ -375,17 +375,17 @@ class TestForStage(unittest.TestCase):
               attribute_type=invalid_val,  # type: ignore
           )
 
-  def test_invalid_read_scope_python_type_raises_type_error(self):
+  def test_invalid_scope_python_type_raises_type_error(self):
     # Arrange & Act & Assert
     for invalid_val in (True, False, 3.14, [1]):
       with self.subTest(val=invalid_val):
         with self.assertRaisesRegex(
-            TypeError, r'unexpected type for read_scope:'
+            TypeError, r'unexpected type for scope:'
         ):
           attrs.for_stage(
               name='my_team.attr',
               expression='true',
-              read_scope=invalid_val,  # type: ignore
+              scope=invalid_val,  # type: ignore
           )
 
 
@@ -565,7 +565,7 @@ class TestForCheck(unittest.TestCase):
     with self.assertRaisesRegex(ValueError, 'expression cannot be empty'):
       attrs.for_check(name='my_team.attr', expression='')
 
-  def test_explicit_valid_read_scope_accepted(self):
+  def test_explicit_valid_scope_accepted(self):
     # Arrange
     cases = (
         (
@@ -596,9 +596,9 @@ class TestForCheck(unittest.TestCase):
         attr = attrs.for_check(
             name='my_team.attr',
             expression='true',
-            read_scope=scope_input,
+            scope=scope_input,
         )
-        self.assertEqual(attr.read_scope, expected_scope)
+        self.assertEqual(attr.scope, expected_scope)
 
   def test_invalid_check_state_value_raises_value_error(self):
     # Arrange
@@ -662,17 +662,17 @@ class TestForCheck(unittest.TestCase):
               attribute_type=invalid_val,  # type: ignore
           )
 
-  def test_invalid_read_scope_python_type_raises_type_error(self):
+  def test_invalid_scope_python_type_raises_type_error(self):
     # Arrange & Act & Assert
     for invalid_val in (True, False, 3.14, [1]):
       with self.subTest(val=invalid_val):
         with self.assertRaisesRegex(
-            TypeError, r'unexpected type for read_scope:'
+            TypeError, r'unexpected type for scope:'
         ):
           attrs.for_check(
               name='my_team.attr',
               expression='true',
-              read_scope=invalid_val,  # type: ignore
+              scope=invalid_val,  # type: ignore
           )
 
 

@@ -30,13 +30,13 @@ ATTRIBUTE_TYPE_STRING: AttributeType
 ATTRIBUTE_TYPE_STRING_LIST: AttributeType
 
 class Attribute(_message.Message):
-    __slots__ = ("name", "expression", "on_stage_state", "on_check_state", "attribute_type", "read_scope", "resolved_at", "error_result", "int_results", "str_results", "bool_results")
+    __slots__ = ("name", "expression", "on_stage_state", "on_check_state", "attribute_type", "scope", "resolved_at", "error_result", "int_results", "str_results", "bool_results")
     NAME_FIELD_NUMBER: _ClassVar[int]
     EXPRESSION_FIELD_NUMBER: _ClassVar[int]
     ON_STAGE_STATE_FIELD_NUMBER: _ClassVar[int]
     ON_CHECK_STATE_FIELD_NUMBER: _ClassVar[int]
     ATTRIBUTE_TYPE_FIELD_NUMBER: _ClassVar[int]
-    READ_SCOPE_FIELD_NUMBER: _ClassVar[int]
+    SCOPE_FIELD_NUMBER: _ClassVar[int]
     RESOLVED_AT_FIELD_NUMBER: _ClassVar[int]
     ERROR_RESULT_FIELD_NUMBER: _ClassVar[int]
     INT_RESULTS_FIELD_NUMBER: _ClassVar[int]
@@ -47,10 +47,10 @@ class Attribute(_message.Message):
     on_stage_state: _stage_state_pb2.StageState
     on_check_state: _check_state_pb2.CheckState
     attribute_type: AttributeType
-    read_scope: _read_scope_pb2.ReadScope
+    scope: _read_scope_pb2.ReadScope
     resolved_at: _revision_pb2.Revision
     error_result: _evaluation_error_pb2.EvaluationError
     int_results: _containers.RepeatedScalarFieldContainer[int]
     str_results: _containers.RepeatedScalarFieldContainer[str]
     bool_results: _containers.RepeatedScalarFieldContainer[bool]
-    def __init__(self, name: _Optional[str] = ..., expression: _Optional[str] = ..., on_stage_state: _Optional[_Union[_stage_state_pb2.StageState, str]] = ..., on_check_state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ..., attribute_type: _Optional[_Union[AttributeType, str]] = ..., read_scope: _Optional[_Union[_read_scope_pb2.ReadScope, str]] = ..., resolved_at: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., error_result: _Optional[_Union[_evaluation_error_pb2.EvaluationError, _Mapping]] = ..., int_results: _Optional[_Iterable[int]] = ..., str_results: _Optional[_Iterable[str]] = ..., bool_results: _Optional[_Iterable[bool]] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., expression: _Optional[str] = ..., on_stage_state: _Optional[_Union[_stage_state_pb2.StageState, str]] = ..., on_check_state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ..., attribute_type: _Optional[_Union[AttributeType, str]] = ..., scope: _Optional[_Union[_read_scope_pb2.ReadScope, str]] = ..., resolved_at: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., error_result: _Optional[_Union[_evaluation_error_pb2.EvaluationError, _Mapping]] = ..., int_results: _Optional[_Iterable[int]] = ..., str_results: _Optional[_Iterable[str]] = ..., bool_results: _Optional[_Iterable[bool]] = ...) -> None: ...
