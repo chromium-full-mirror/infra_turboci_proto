@@ -81,64 +81,6 @@ func (x QueryExpandDepsMode) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Defines what subset of Stage Attempts to include when returning a Stage.
-type CollectStageAttempts int32
-
-const (
-	// UNKNOWN is the default value.
-	//
-	// Equivalent to COLLECT_STAGE_ATTEMPTS_NONE.
-	CollectStageAttempts_COLLECT_STAGE_ATTEMPTS_UNKNOWN CollectStageAttempts = 0
-	// No stage attempts will be returned, this is default.
-	CollectStageAttempts_COLLECT_STAGE_ATTEMPTS_NONE CollectStageAttempts = 1
-	// All stage attempts will be returned.
-	CollectStageAttempts_COLLECT_STAGE_ATTEMPTS_ALL CollectStageAttempts = 2
-	// Only the latest stage attempt will be returned.
-	//
-	// All non-latest attempts will be represented by shallow entries just
-	// containing their ID (to preserve the invariant that Stage.attempt[x] has
-	// ID with Idx `x+1`).
-	CollectStageAttempts_COLLECT_STAGE_ATTEMPTS_LATEST CollectStageAttempts = 3
-)
-
-// Enum value maps for CollectStageAttempts.
-var (
-	CollectStageAttempts_name = map[int32]string{
-		0: "COLLECT_STAGE_ATTEMPTS_UNKNOWN",
-		1: "COLLECT_STAGE_ATTEMPTS_NONE",
-		2: "COLLECT_STAGE_ATTEMPTS_ALL",
-		3: "COLLECT_STAGE_ATTEMPTS_LATEST",
-	}
-	CollectStageAttempts_value = map[string]int32{
-		"COLLECT_STAGE_ATTEMPTS_UNKNOWN": 0,
-		"COLLECT_STAGE_ATTEMPTS_NONE":    1,
-		"COLLECT_STAGE_ATTEMPTS_ALL":     2,
-		"COLLECT_STAGE_ATTEMPTS_LATEST":  3,
-	}
-)
-
-func (x CollectStageAttempts) Enum() *CollectStageAttempts {
-	p := new(CollectStageAttempts)
-	*p = x
-	return p
-}
-
-func (x CollectStageAttempts) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (CollectStageAttempts) Descriptor() protoreflect.EnumDescriptor {
-	return file_turboci_graph_orchestrator_v1_query_proto_enumTypes[1].Descriptor()
-}
-
-func (CollectStageAttempts) Type() protoreflect.EnumType {
-	return &file_turboci_graph_orchestrator_v1_query_proto_enumTypes[1]
-}
-
-func (x CollectStageAttempts) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
 // Query describes a single graph query.
 //
 // This is composed of 3 phases: selection with filtering, expansion and
@@ -1594,7 +1536,7 @@ var File_turboci_graph_orchestrator_v1_query_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_query_proto_rawDesc = "" +
 	"\n" +
-	")turboci/graph/orchestrator/v1/query.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a2turboci/graph/orchestrator/v1/revision_range.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a,turboci/graph/orchestrator/v1/type_set.proto\"\xef\x13\n" +
+	")turboci/graph/orchestrator/v1/query.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a:turboci/graph/orchestrator/v1/collect_stage_attempts.proto\x1a1turboci/graph/orchestrator/v1/field_options.proto\x1a2turboci/graph/orchestrator/v1/revision_range.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a,turboci/graph/orchestrator/v1/type_set.proto\"\xef\x13\n" +
 	"\x05Query\x12L\n" +
 	"\x11nodes_in_workplan\x18\x01 \x01(\v2\x1e.turboci.graph.ids.v1.WorkPlanH\x00R\x0fnodesInWorkplan\x12q\n" +
 	"\x16nodes_across_workplans\x18\x02 \x01(\v29.turboci.graph.orchestrator.v1.Query.NodesAcrossWorkPlansH\x00R\x14nodesAcrossWorkplans\x12P\n" +
@@ -1662,55 +1604,50 @@ const file_turboci_graph_orchestrator_v1_query_proto_rawDesc = "" +
 	"\x13QueryExpandDepsMode\x12\"\n" +
 	"\x1eQUERY_EXPAND_DEPS_MODE_UNKNOWN\x10\x00\x12 \n" +
 	"\x1cQUERY_EXPAND_DEPS_MODE_EDGES\x10\x01\x12$\n" +
-	" QUERY_EXPAND_DEPS_MODE_SATISFIED\x10\x02*\x9e\x01\n" +
-	"\x14CollectStageAttempts\x12\"\n" +
-	"\x1eCOLLECT_STAGE_ATTEMPTS_UNKNOWN\x10\x00\x12\x1f\n" +
-	"\x1bCOLLECT_STAGE_ATTEMPTS_NONE\x10\x01\x12\x1e\n" +
-	"\x1aCOLLECT_STAGE_ATTEMPTS_ALL\x10\x02\x12!\n" +
-	"\x1dCOLLECT_STAGE_ATTEMPTS_LATEST\x10\x03BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	" QUERY_EXPAND_DEPS_MODE_SATISFIED\x10\x02BIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_query_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_turboci_graph_orchestrator_v1_query_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_graph_orchestrator_v1_query_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_turboci_graph_orchestrator_v1_query_proto_goTypes = []any{
 	(QueryExpandDepsMode)(0),             // 0: turboci.graph.orchestrator.v1.QueryExpandDepsMode
-	(CollectStageAttempts)(0),            // 1: turboci.graph.orchestrator.v1.CollectStageAttempts
-	(*Query)(nil),                        // 2: turboci.graph.orchestrator.v1.Query
-	(*Query_NodesAcrossWorkPlans)(nil),   // 3: turboci.graph.orchestrator.v1.Query.NodesAcrossWorkPlans
-	(*Query_NodesByID)(nil),              // 4: turboci.graph.orchestrator.v1.Query.NodesByID
-	(*Query_SelectChecks)(nil),           // 5: turboci.graph.orchestrator.v1.Query.SelectChecks
-	(*Query_SelectStages)(nil),           // 6: turboci.graph.orchestrator.v1.Query.SelectStages
-	(*Query_ExpandDependencies)(nil),     // 7: turboci.graph.orchestrator.v1.Query.ExpandDependencies
-	(*Query_ExpandDependents)(nil),       // 8: turboci.graph.orchestrator.v1.Query.ExpandDependents
-	(*Query_CollectChecks)(nil),          // 9: turboci.graph.orchestrator.v1.Query.CollectChecks
-	(*Query_CollectStages)(nil),          // 10: turboci.graph.orchestrator.v1.Query.CollectStages
-	(*Query_SelectChecks_Predicate)(nil), // 11: turboci.graph.orchestrator.v1.Query.SelectChecks.Predicate
-	(*Query_SelectStages_Predicate)(nil), // 12: turboci.graph.orchestrator.v1.Query.SelectStages.Predicate
-	(*v1.WorkPlan)(nil),                  // 13: turboci.graph.ids.v1.WorkPlan
-	(*v1.Identifier)(nil),                // 14: turboci.graph.ids.v1.Identifier
-	(*RevisionRange)(nil),                // 15: turboci.graph.orchestrator.v1.RevisionRange
+	(*Query)(nil),                        // 1: turboci.graph.orchestrator.v1.Query
+	(*Query_NodesAcrossWorkPlans)(nil),   // 2: turboci.graph.orchestrator.v1.Query.NodesAcrossWorkPlans
+	(*Query_NodesByID)(nil),              // 3: turboci.graph.orchestrator.v1.Query.NodesByID
+	(*Query_SelectChecks)(nil),           // 4: turboci.graph.orchestrator.v1.Query.SelectChecks
+	(*Query_SelectStages)(nil),           // 5: turboci.graph.orchestrator.v1.Query.SelectStages
+	(*Query_ExpandDependencies)(nil),     // 6: turboci.graph.orchestrator.v1.Query.ExpandDependencies
+	(*Query_ExpandDependents)(nil),       // 7: turboci.graph.orchestrator.v1.Query.ExpandDependents
+	(*Query_CollectChecks)(nil),          // 8: turboci.graph.orchestrator.v1.Query.CollectChecks
+	(*Query_CollectStages)(nil),          // 9: turboci.graph.orchestrator.v1.Query.CollectStages
+	(*Query_SelectChecks_Predicate)(nil), // 10: turboci.graph.orchestrator.v1.Query.SelectChecks.Predicate
+	(*Query_SelectStages_Predicate)(nil), // 11: turboci.graph.orchestrator.v1.Query.SelectStages.Predicate
+	(*v1.WorkPlan)(nil),                  // 12: turboci.graph.ids.v1.WorkPlan
+	(*v1.Identifier)(nil),                // 13: turboci.graph.ids.v1.Identifier
+	(*RevisionRange)(nil),                // 14: turboci.graph.orchestrator.v1.RevisionRange
+	(CollectStageAttempts)(0),            // 15: turboci.graph.orchestrator.v1.CollectStageAttempts
 	(CheckKind)(0),                       // 16: turboci.graph.orchestrator.v1.CheckKind
 	(CheckState)(0),                      // 17: turboci.graph.orchestrator.v1.CheckState
 	(*TypeSet)(nil),                      // 18: turboci.graph.orchestrator.v1.TypeSet
 	(StageState)(0),                      // 19: turboci.graph.orchestrator.v1.StageState
 }
 var file_turboci_graph_orchestrator_v1_query_proto_depIdxs = []int32{
-	13, // 0: turboci.graph.orchestrator.v1.Query.nodes_in_workplan:type_name -> turboci.graph.ids.v1.WorkPlan
-	3,  // 1: turboci.graph.orchestrator.v1.Query.nodes_across_workplans:type_name -> turboci.graph.orchestrator.v1.Query.NodesAcrossWorkPlans
-	4,  // 2: turboci.graph.orchestrator.v1.Query.nodes_by_id:type_name -> turboci.graph.orchestrator.v1.Query.NodesByID
-	5,  // 3: turboci.graph.orchestrator.v1.Query.select_checks:type_name -> turboci.graph.orchestrator.v1.Query.SelectChecks
-	6,  // 4: turboci.graph.orchestrator.v1.Query.select_stages:type_name -> turboci.graph.orchestrator.v1.Query.SelectStages
-	7,  // 5: turboci.graph.orchestrator.v1.Query.expand_dependencies:type_name -> turboci.graph.orchestrator.v1.Query.ExpandDependencies
-	8,  // 6: turboci.graph.orchestrator.v1.Query.expand_dependents:type_name -> turboci.graph.orchestrator.v1.Query.ExpandDependents
-	9,  // 7: turboci.graph.orchestrator.v1.Query.collect_checks:type_name -> turboci.graph.orchestrator.v1.Query.CollectChecks
-	10, // 8: turboci.graph.orchestrator.v1.Query.collect_stages:type_name -> turboci.graph.orchestrator.v1.Query.CollectStages
-	14, // 9: turboci.graph.orchestrator.v1.Query.NodesByID.nodes:type_name -> turboci.graph.ids.v1.Identifier
-	11, // 10: turboci.graph.orchestrator.v1.Query.SelectChecks.predicates:type_name -> turboci.graph.orchestrator.v1.Query.SelectChecks.Predicate
-	12, // 11: turboci.graph.orchestrator.v1.Query.SelectStages.predicates:type_name -> turboci.graph.orchestrator.v1.Query.SelectStages.Predicate
+	12, // 0: turboci.graph.orchestrator.v1.Query.nodes_in_workplan:type_name -> turboci.graph.ids.v1.WorkPlan
+	2,  // 1: turboci.graph.orchestrator.v1.Query.nodes_across_workplans:type_name -> turboci.graph.orchestrator.v1.Query.NodesAcrossWorkPlans
+	3,  // 2: turboci.graph.orchestrator.v1.Query.nodes_by_id:type_name -> turboci.graph.orchestrator.v1.Query.NodesByID
+	4,  // 3: turboci.graph.orchestrator.v1.Query.select_checks:type_name -> turboci.graph.orchestrator.v1.Query.SelectChecks
+	5,  // 4: turboci.graph.orchestrator.v1.Query.select_stages:type_name -> turboci.graph.orchestrator.v1.Query.SelectStages
+	6,  // 5: turboci.graph.orchestrator.v1.Query.expand_dependencies:type_name -> turboci.graph.orchestrator.v1.Query.ExpandDependencies
+	7,  // 6: turboci.graph.orchestrator.v1.Query.expand_dependents:type_name -> turboci.graph.orchestrator.v1.Query.ExpandDependents
+	8,  // 7: turboci.graph.orchestrator.v1.Query.collect_checks:type_name -> turboci.graph.orchestrator.v1.Query.CollectChecks
+	9,  // 8: turboci.graph.orchestrator.v1.Query.collect_stages:type_name -> turboci.graph.orchestrator.v1.Query.CollectStages
+	13, // 9: turboci.graph.orchestrator.v1.Query.NodesByID.nodes:type_name -> turboci.graph.ids.v1.Identifier
+	10, // 10: turboci.graph.orchestrator.v1.Query.SelectChecks.predicates:type_name -> turboci.graph.orchestrator.v1.Query.SelectChecks.Predicate
+	11, // 11: turboci.graph.orchestrator.v1.Query.SelectStages.predicates:type_name -> turboci.graph.orchestrator.v1.Query.SelectStages.Predicate
 	0,  // 12: turboci.graph.orchestrator.v1.Query.ExpandDependencies.mode:type_name -> turboci.graph.orchestrator.v1.QueryExpandDepsMode
 	0,  // 13: turboci.graph.orchestrator.v1.Query.ExpandDependents.mode:type_name -> turboci.graph.orchestrator.v1.QueryExpandDepsMode
-	15, // 14: turboci.graph.orchestrator.v1.Query.CollectChecks.edits:type_name -> turboci.graph.orchestrator.v1.RevisionRange
-	1,  // 15: turboci.graph.orchestrator.v1.Query.CollectStages.attempts:type_name -> turboci.graph.orchestrator.v1.CollectStageAttempts
-	15, // 16: turboci.graph.orchestrator.v1.Query.CollectStages.edits:type_name -> turboci.graph.orchestrator.v1.RevisionRange
+	14, // 14: turboci.graph.orchestrator.v1.Query.CollectChecks.edits:type_name -> turboci.graph.orchestrator.v1.RevisionRange
+	15, // 15: turboci.graph.orchestrator.v1.Query.CollectStages.attempts:type_name -> turboci.graph.orchestrator.v1.CollectStageAttempts
+	14, // 16: turboci.graph.orchestrator.v1.Query.CollectStages.edits:type_name -> turboci.graph.orchestrator.v1.RevisionRange
 	16, // 17: turboci.graph.orchestrator.v1.Query.SelectChecks.Predicate.kind:type_name -> turboci.graph.orchestrator.v1.CheckKind
 	17, // 18: turboci.graph.orchestrator.v1.Query.SelectChecks.Predicate.state:type_name -> turboci.graph.orchestrator.v1.CheckState
 	18, // 19: turboci.graph.orchestrator.v1.Query.SelectChecks.Predicate.with_option_type:type_name -> turboci.graph.orchestrator.v1.TypeSet
@@ -1731,6 +1668,7 @@ func file_turboci_graph_orchestrator_v1_query_proto_init() {
 	}
 	file_turboci_graph_orchestrator_v1_check_kind_proto_init()
 	file_turboci_graph_orchestrator_v1_check_state_proto_init()
+	file_turboci_graph_orchestrator_v1_collect_stage_attempts_proto_init()
 	file_turboci_graph_orchestrator_v1_field_options_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_range_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_state_proto_init()
@@ -1751,7 +1689,7 @@ func file_turboci_graph_orchestrator_v1_query_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_query_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_query_proto_rawDesc)),
-			NumEnums:      2,
+			NumEnums:      1,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,

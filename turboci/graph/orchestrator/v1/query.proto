@@ -9,6 +9,7 @@ package turboci.graph.orchestrator.v1;
 import "turboci/graph/ids/v1/identifier.proto";
 import "turboci/graph/orchestrator/v1/check_kind.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
+import "turboci/graph/orchestrator/v1/collect_stage_attempts.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
 import "turboci/graph/orchestrator/v1/revision_range.proto";
 import "turboci/graph/orchestrator/v1/stage_state.proto";
@@ -16,6 +17,8 @@ import "turboci/graph/orchestrator/v1/type_set.proto";
 
 option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
 option java_multiple_files = true;
+
+// DO NOT USE. This file will be deleted once no longer used.
 
 // When expanding a query selection set with Query.ExpandDependencies or
 // Query.ExpandDependents, how should we actually expand that set?
@@ -35,27 +38,6 @@ enum QueryExpandDepsMode {
   // the PLANNED state, and for nodes which have RESOLUTION_UNSATISFIED
   // dependencies.
   QUERY_EXPAND_DEPS_MODE_SATISFIED = 2;
-}
-
-// Defines what subset of Stage Attempts to include when returning a Stage.
-enum CollectStageAttempts {
-  // UNKNOWN is the default value.
-  //
-  // Equivalent to COLLECT_STAGE_ATTEMPTS_NONE.
-  COLLECT_STAGE_ATTEMPTS_UNKNOWN = 0;
-
-  // No stage attempts will be returned, this is default.
-  COLLECT_STAGE_ATTEMPTS_NONE = 1;
-
-  // All stage attempts will be returned.
-  COLLECT_STAGE_ATTEMPTS_ALL = 2;
-
-  // Only the latest stage attempt will be returned.
-  //
-  // All non-latest attempts will be represented by shallow entries just
-  // containing their ID (to preserve the invariant that Stage.attempt[x] has
-  // ID with Idx `x+1`).
-  COLLECT_STAGE_ATTEMPTS_LATEST = 3;
 }
 
 // Query describes a single graph query.

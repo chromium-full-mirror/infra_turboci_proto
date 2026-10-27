@@ -267,9 +267,13 @@ type ReadWorkPlanRequest_builder struct {
 	//
 	// This is in addition to regular RPC authorization.
 	Token *string
-	// The ID of the workplan from which to select nodes to return. If not
-	// provided and `token` is provided, the workplan ID from the token will be
-	// used. If not provided and not inferable, the request will be rejected.
+	// The ID of the workplan from which to select nodes to return.
+	//
+	// Can be omitted if `token` is set (in which case it will default to the
+	// workplan ID encoded in the token). Required if `token` is not set.
+	//
+	// If the workplan ID encoded in the token doesn't match the ID of the
+	// workplan being read, the request will be authorized as an external read.
 	WorkplanId *v1.WorkPlan
 	// The set of node types for which we should return nodes. If none are
 	// provided, the request will be rejected with INVALID_ARGUMENT.
@@ -299,6 +303,7 @@ type ReadWorkPlanRequest_builder struct {
 	//   - type_url
 	//   - realm
 	//   - digest (unless you do not have read permission)
+	//   - tags (unless you do not have read permission)
 	//   - omit_reason (if the data is omitted from the `value_data` map)
 	//
 	// The data for the ValueRef will be included in the response in the

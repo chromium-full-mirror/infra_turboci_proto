@@ -1,0 +1,31 @@
+// Copyright 2026 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+syntax = "proto3";
+
+package turboci.graph.orchestrator.v1;
+
+option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
+option java_multiple_files = true;
+
+// Defines what subset of Stage Attempts to include when returning a Stage.
+enum CollectStageAttempts {
+  // UNKNOWN is the default value.
+  //
+  // Equivalent to COLLECT_STAGE_ATTEMPTS_NONE.
+  COLLECT_STAGE_ATTEMPTS_UNKNOWN = 0;
+
+  // No stage attempts will be returned, this is default.
+  COLLECT_STAGE_ATTEMPTS_NONE = 1;
+
+  // All stage attempts will be returned.
+  COLLECT_STAGE_ATTEMPTS_ALL = 2;
+
+  // Only the latest stage attempt will be returned.
+  //
+  // All non-latest attempts will be represented by shallow entries just
+  // containing their ID (to preserve the invariant that Stage.attempt[x] has
+  // ID with Idx `x+1`).
+  COLLECT_STAGE_ATTEMPTS_LATEST = 3;
+}

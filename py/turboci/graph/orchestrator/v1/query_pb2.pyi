@@ -1,6 +1,7 @@
 from turboci.graph.ids.v1 import identifier_pb2 as _identifier_pb2
 from turboci.graph.orchestrator.v1 import check_kind_pb2 as _check_kind_pb2
 from turboci.graph.orchestrator.v1 import check_state_pb2 as _check_state_pb2
+from turboci.graph.orchestrator.v1 import collect_stage_attempts_pb2 as _collect_stage_attempts_pb2
 from turboci.graph.orchestrator.v1 import field_options_pb2 as _field_options_pb2
 from turboci.graph.orchestrator.v1 import revision_range_pb2 as _revision_range_pb2
 from turboci.graph.orchestrator.v1 import stage_state_pb2 as _stage_state_pb2
@@ -19,20 +20,9 @@ class QueryExpandDepsMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     QUERY_EXPAND_DEPS_MODE_UNKNOWN: _ClassVar[QueryExpandDepsMode]
     QUERY_EXPAND_DEPS_MODE_EDGES: _ClassVar[QueryExpandDepsMode]
     QUERY_EXPAND_DEPS_MODE_SATISFIED: _ClassVar[QueryExpandDepsMode]
-
-class CollectStageAttempts(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = ()
-    COLLECT_STAGE_ATTEMPTS_UNKNOWN: _ClassVar[CollectStageAttempts]
-    COLLECT_STAGE_ATTEMPTS_NONE: _ClassVar[CollectStageAttempts]
-    COLLECT_STAGE_ATTEMPTS_ALL: _ClassVar[CollectStageAttempts]
-    COLLECT_STAGE_ATTEMPTS_LATEST: _ClassVar[CollectStageAttempts]
 QUERY_EXPAND_DEPS_MODE_UNKNOWN: QueryExpandDepsMode
 QUERY_EXPAND_DEPS_MODE_EDGES: QueryExpandDepsMode
 QUERY_EXPAND_DEPS_MODE_SATISFIED: QueryExpandDepsMode
-COLLECT_STAGE_ATTEMPTS_UNKNOWN: CollectStageAttempts
-COLLECT_STAGE_ATTEMPTS_NONE: CollectStageAttempts
-COLLECT_STAGE_ATTEMPTS_ALL: CollectStageAttempts
-COLLECT_STAGE_ATTEMPTS_LATEST: CollectStageAttempts
 
 class Query(_message.Message):
     __slots__ = ("nodes_in_workplan", "nodes_across_workplans", "nodes_by_id", "select_checks", "select_stages", "expand_dependencies", "expand_dependents", "collect_checks", "collect_stages")
@@ -95,9 +85,9 @@ class Query(_message.Message):
         __slots__ = ("attempts", "edits")
         ATTEMPTS_FIELD_NUMBER: _ClassVar[int]
         EDITS_FIELD_NUMBER: _ClassVar[int]
-        attempts: CollectStageAttempts
+        attempts: _collect_stage_attempts_pb2.CollectStageAttempts
         edits: _revision_range_pb2.RevisionRange
-        def __init__(self, attempts: _Optional[_Union[CollectStageAttempts, str]] = ..., edits: _Optional[_Union[_revision_range_pb2.RevisionRange, _Mapping]] = ...) -> None: ...
+        def __init__(self, attempts: _Optional[_Union[_collect_stage_attempts_pb2.CollectStageAttempts, str]] = ..., edits: _Optional[_Union[_revision_range_pb2.RevisionRange, _Mapping]] = ...) -> None: ...
     NODES_IN_WORKPLAN_FIELD_NUMBER: _ClassVar[int]
     NODES_ACROSS_WORKPLANS_FIELD_NUMBER: _ClassVar[int]
     NODES_BY_ID_FIELD_NUMBER: _ClassVar[int]

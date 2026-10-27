@@ -77,26 +77,20 @@ type TurboCIOrchestratorClient interface {
 	// NOTE: Simple workflows can have all Checks, Check options and Stages in the
 	// same realm, minimizing the number of required bindings.
 	//
-	// If a correctly encoded Stage Attempt token is used for
-	// WriteNodesRequest.token, then a
-	// turboci.graph.orchestrator.v1.StageAttemptCurrentState will be embedded as
-	// an error detail, and the client is expected to respect the indicated
-	// state.
+	// If the request includes a stage attempt token in `token` field, then
+	// the response will have StageAttemptCurrentState populated (either in the
+	// corresponding response field or as an error detail).
 	WriteNodes(ctx context.Context, in *v1.WriteNodesRequest, opts ...grpc.CallOption) (*v1.WriteNodesResponse, error)
-	// QueryNodes allows querying nodes in a fairly simple way. It allows
-	// selecting a subset of the nodes within the workplan, as well as expansion
-	// to include related/nearby nodes if desired, allowing callers to get limited
-	// subsets of the workplan. If retrieving all nodes of one or more types, call
+	// QueryNodes allows querying nodes that belong to a single workplan.
+	//
+	// It allows selecting a subset of the nodes within the workplan, optionally
+	// expanding it by executing zero or more graph traversal steps to include
+	// related/nearby nodes. If retrieving **all** nodes of one or more types, use
 	// ReadWorkPlan instead.
 	//
-	// In the future we may add a more advanced API to open up more of GQL's
-	// underlying expressiveness.
-	//
-	// If a correctly encoded Stage Attempt token is used for
-	// QueryNodesRequest.token, then a
-	// turboci.graph.orchestrator.v1.StageAttemptCurrentState will be embedded as
-	// an error detail, and the client is expected to respect the indicated
-	// state.
+	// If the request includes a stage attempt token in `token` field, then
+	// the response will have StageAttemptCurrentState populated (either in the
+	// corresponding response field or as an error detail).
 	QueryNodes(ctx context.Context, in *v1.QueryNodesRequest, opts ...grpc.CallOption) (*v1.QueryNodesResponse, error)
 	// ReadWorkPlan retrieves a single WorkPlan plus its component nodes of the
 	// specified types, whose revision is >= the revision value in the request.
@@ -271,26 +265,20 @@ type TurboCIOrchestratorServer interface {
 	// NOTE: Simple workflows can have all Checks, Check options and Stages in the
 	// same realm, minimizing the number of required bindings.
 	//
-	// If a correctly encoded Stage Attempt token is used for
-	// WriteNodesRequest.token, then a
-	// turboci.graph.orchestrator.v1.StageAttemptCurrentState will be embedded as
-	// an error detail, and the client is expected to respect the indicated
-	// state.
+	// If the request includes a stage attempt token in `token` field, then
+	// the response will have StageAttemptCurrentState populated (either in the
+	// corresponding response field or as an error detail).
 	WriteNodes(context.Context, *v1.WriteNodesRequest) (*v1.WriteNodesResponse, error)
-	// QueryNodes allows querying nodes in a fairly simple way. It allows
-	// selecting a subset of the nodes within the workplan, as well as expansion
-	// to include related/nearby nodes if desired, allowing callers to get limited
-	// subsets of the workplan. If retrieving all nodes of one or more types, call
+	// QueryNodes allows querying nodes that belong to a single workplan.
+	//
+	// It allows selecting a subset of the nodes within the workplan, optionally
+	// expanding it by executing zero or more graph traversal steps to include
+	// related/nearby nodes. If retrieving **all** nodes of one or more types, use
 	// ReadWorkPlan instead.
 	//
-	// In the future we may add a more advanced API to open up more of GQL's
-	// underlying expressiveness.
-	//
-	// If a correctly encoded Stage Attempt token is used for
-	// QueryNodesRequest.token, then a
-	// turboci.graph.orchestrator.v1.StageAttemptCurrentState will be embedded as
-	// an error detail, and the client is expected to respect the indicated
-	// state.
+	// If the request includes a stage attempt token in `token` field, then
+	// the response will have StageAttemptCurrentState populated (either in the
+	// corresponding response field or as an error detail).
 	QueryNodes(context.Context, *v1.QueryNodesRequest) (*v1.QueryNodesResponse, error)
 	// ReadWorkPlan retrieves a single WorkPlan plus its component nodes of the
 	// specified types, whose revision is >= the revision value in the request.

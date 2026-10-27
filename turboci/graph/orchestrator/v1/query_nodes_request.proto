@@ -6,16 +6,21 @@ syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
+import "turboci/graph/ids/v1/identifier.proto";
+import "turboci/graph/orchestrator/v1/collect_stage_attempts.proto";
+import "turboci/graph/orchestrator/v1/field_options.proto";
+import "turboci/graph/orchestrator/v1/node_predicate.proto";
 import "turboci/graph/orchestrator/v1/query.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 import "turboci/graph/orchestrator/v1/type_info.proto";
+import "turboci/graph/orchestrator/v1/value_filter.proto";
 
 option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
 option java_multiple_files = true;
 
 // Request message for TurboCIGraphService.QueryNodes.
 //
-// Next ID: 7
+// Next ID: 12
 message QueryNodesRequest {
   // The token which indicates that the query is coming from within a specific
   // WorkPlan.
@@ -26,6 +31,82 @@ message QueryNodesRequest {
   // This is in addition to regular RPC authorization.
   optional string token = 1;
 
+  // Indicates to query all nodes in the given workplan.
+  message NodeSetWorkplan {
+    // The ID of the workplan from which to select nodes to return.
+    //
+    // Can be omitted if `token` is set (in which case it will default to the
+    // workplan ID encoded in the token). Required if `token` is not set.
+    //
+    // If the workplan ID encoded in the token doesn't match the ID of the
+    // workplan being read, the request will be authorized as an external read.
+    optional ids.v1.WorkPlan workplan_id = 1;
+  }
+
+  // Indicates to query an explicitly selected set of nodes.
+  message NodeSetSelected {
+    // Nodes to start the query from.
+    //
+    // Must be non-empty. All nodes must belong to the same workplan.
+    //
+    // All nodes in this set will have a corresponding SelectedNode populated in
+    // QueryNodesResponse.selected.
+    //
+    // If the workplan ID encoded in the token doesn't match the ID of the
+    // workplan being read, the request will be authorized as an external read.
+    repeated ids.v1.Identifier nodes = 1 [
+      (turboci).id.allowed = IDENTIFIER_KIND_CHECK,
+      (turboci).id.allowed = IDENTIFIER_KIND_STAGE
+    ];
+  }
+
+  // Defines the initial set of nodes to query.
+  //
+  // These nodes will be filtered according to the `filter` predicate to
+  // get the initial set of nodes to start traversals from (or just return as
+  // the final query result if traversals are not requested).
+  oneof node_set {
+    // Indicates to query all nodes in the given workplan.
+    NodeSetWorkplan workplan = 7;
+    // Indicates to query an explicitly selected set of nodes.
+    NodeSetSelected selected = 8;
+  }
+
+  // The expression to filter queried nodes by.
+  //
+  // Applies to nodes defined by the `node_set` oneof. These nodes will be
+  // filtered according to this predicate to get the initial set of nodes to
+  // start traversals from (or just return as the final query result if
+  // traversals are not requested).
+  optional NodePredicate filter = 9;
+
+  // Describes how ValueData messages within the query result should be filtered
+  // in/out of the response.
+  //
+  // ValueRefs for included nodes will always be included in the response (even
+  // if the data is not being returned) and will contain:
+  //   * type_url
+  //   * realm
+  //   * digest (unless you do not have read permission)
+  //   * tags (unless you do not have read permission)
+  //   * omit_reason (if the data is omitted from the `value_data` map)
+  //
+  // The data for the ValueRef will be included in the response in the
+  // `value_data` map if the ValueRef matches this filter and is not omitted.
+  optional ValueFilter value_filter = 10;
+
+  // Defines what StageAttempts to return for stages in the result.
+  //
+  // By default returned stages will not have their StageAttempts populated
+  // (proto messages will be present, but only with their `id` populated and
+  // nothing else, not even `state`).
+  //
+  // This field allows to request fully populating either only the latest
+  // attempt or all attempts.
+  optional CollectStageAttempts collect_stage_attempts = 11;
+
+  // TODO: Define traversals.
+
   // Describes which types of `Value` messages should be included in the
   // response, and how to encode them. Has no effect on whether "core" message
   // types within type.googleapis.com/turboci.graph.* such as Check or Stage
@@ -35,6 +116,9 @@ message QueryNodesRequest {
   // listed in this TypeInfo's `wanted` list will have their data omitted and
   // their OMIT_REASON_UNWANTED value set. See TypeInfo for a restrictions on
   // the patterns we support filtering on.
+  //
+  // DO NOT USE. Will be deleted once no longer used. Will be marked deprecated
+  // as soon as replacement functionality is implemented.
   optional TypeInfo type_info = 2;
 
   // VersionRestriction describes how this query can be constrained by database
@@ -79,6 +163,9 @@ message QueryNodesRequest {
   optional VersionRestriction version = 3;
 
   // One or more Queries to select nodes to return.
+  //
+  // DO NOT USE. Will be deleted once no longer used. Will be marked deprecated
+  // as soon as replacement functionality is implemented.
   repeated Query query = 4;
 
   // Maximum page size in ***bytes**.

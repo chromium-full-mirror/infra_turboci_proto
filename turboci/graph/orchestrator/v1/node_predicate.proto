@@ -1,0 +1,182 @@
+// Copyright 2026 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+syntax = "proto3";
+
+package turboci.graph.orchestrator.v1;
+
+import "turboci/graph/orchestrator/v1/check_kind.proto";
+import "turboci/graph/orchestrator/v1/check_state.proto";
+import "turboci/graph/orchestrator/v1/stage_concluded_reason.proto";
+import "turboci/graph/orchestrator/v1/stage_state.proto";
+import "turboci/graph/orchestrator/v1/value_slot.proto";
+
+option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
+option java_multiple_files = true;
+
+// NodePredicate represents a boolean expression over node's data.
+//
+// Logically, one can take a Stage or a Check, pass it to such predicate, and
+// get back true or false. The predicate can be sensitive to node kind (e.g.
+// always return false when given a check), but it can also apply to both node
+// kinds if necessary (e.g. when it just examines node tags or attributes: they
+// are present in both stages and checks).
+//
+// Next ID: 4
+message NodePredicate {
+  // A boolean condition over node's data.
+  //
+  // Each field defines a boolean condition over some aspect of the node. All
+  // fields are logically AND-ed together to define the final condition (as a
+  // shortcut for writing simple predicates without resorting to bulky All/Any
+  // expression constructs).
+  //
+  // Next ID: 6
+  message Condition {
+    // Stage-specific conditions.
+    //
+    // Can be empty to indicate "any Stage node".
+    //
+    // Next ID: 6
+    message StageCondition {
+      // Match stages in any of these states.
+      repeated StageState state = 1;
+      // Match stages that have any of these args type_url.
+      repeated string args_type_url = 2;
+      // Match stages that have any of these sub_types.
+      repeated string sub_type = 3;
+      // Match stages that have any of these concluded_reasons.
+      repeated StageConcludedReason concluded_reason = 4;
+      // Match stages representing legacy worknodes of any of these types.
+      repeated int32 work_executor_type = 5;
+    }
+
+    // Check-specific conditions.
+    //
+    // Can be empty to indicate "any Check node".
+    //
+    // Next ID: 4
+    message CheckCondition {
+      // Match checks in any of these states.
+      repeated CheckState state = 1;
+      // Match checks that have any of these kinds.
+      repeated CheckKind kind = 2;
+      // Match checks that have any of these sub_types.
+      repeated string sub_type = 3;
+    }
+
+    // Optional conditions that apply either to stages or checks.
+    //
+    // Setting a oneof variant will restrict the condition only to nodes of
+    // the particular kind (i.e. the condition will always evaluate to false for
+    // nodes of the other kind).
+    //
+    // If left unset, the condition will apply to both Stages and Checks
+    // (based on data common to them, like ValueRefs and Attributes, see below).
+    oneof kind {
+      // Stage-specific conditions.
+      StageCondition stage = 1;
+      // Check-specific conditions.
+      CheckCondition check = 2;
+    }
+
+    // A condition over types of ValueRefs that belong to the node.
+    //
+    // It evaluates to true if there's a value with the given type_url in
+    // any of the given slots.
+    //
+    // Next ID: 3
+    message ValueTypeCondition {
+      // A type URL of the ValueRef to examine. Required.
+      optional string type_url = 1;
+      // The slots it must be in one of, or empty to indicate any slot.
+      repeated ValueSlot slot = 2;
+    }
+    // Match nodes that have any of these value types.
+    repeated ValueTypeCondition value_type = 3;
+
+    // A condition over tags in ValueRefs that belong to the node.
+    //
+    // Only tag keys and values with READ_SCOPE_WORKPLAN or above are subjected
+    // to this condition. Data in READ_SCOPE_NODE is not filterable by (but
+    // it still can be used in node-level CEL expressions).
+    //
+    // If only key is given, the condition will evaluate to true if there's
+    // a tag with such key (regardless of its value). If the value is given
+    // as well, the condition will evaluate to true if there's such "tag:value"
+    // pair. A tag with multiple values is interpreted as multiple "tag:value"
+    // pairs for the purpose of this condition.
+    //
+    // Next ID: 5
+    message TagCondition {
+      // The tag key to lookup. Required.
+      optional string key = 1;
+      // The value to lookup. If omitted, the condition will evaluate to true
+      // if this tag is present (regardless of its value).
+      oneof value {
+        // A string value.
+        string str_value = 2;
+        // A boolean value.
+        bool bool_value = 3;
+        // A numeric (integer) value.
+        int64 int_value = 4;
+      }
+    }
+    // Match nodes that have any of these tags in ValueRefs.
+    repeated TagCondition tag = 4;
+
+    // A condition over value of a successfully resolved node Attribute.
+    //
+    // Only attributes with READ_SCOPE_WORKPLAN or above are subjected to this
+    // condition. Data in READ_SCOPE_NODE is not filterable by (but it still can
+    // be used in node-level CEL expressions).
+    //
+    // The condition will evaluate to true if the resolved attribute value is
+    // equal to the value in the condition (for scalar-valued attributes) or
+    // contains it (for list-valued attributes).
+    //
+    // Note that attribute's presence, its type and CEL evaluation state are not
+    // considered here at all. If an attribute is undefined, has mismatching
+    // type, is unresolved or failed to be resolved, its set of values is
+    // simply considered to be empty and a condition over it silently evaluates
+    // to false.
+    //
+    // Next ID: 5
+    message AttributeCondition {
+      // The attribute name to lookup. Required.
+      optional string name = 1;
+      // The resolved attribute value to match on. Required.
+      oneof value {
+        // A string value.
+        string str_value = 2;
+        // A boolean value.
+        bool bool_value = 3;
+        // A numeric (integer) value.
+        int64 int_value = 4;
+      }
+    }
+    // Match nodes that have any of these resolved attributes.
+    optional AttributeCondition attribute = 5;
+  }
+
+  // A collection of NodePredicates for using in All/Any boolean expressions.
+  message Terms {
+    // All sub-predicates. Must not be empty.
+    repeated NodePredicate terms = 2;
+  }
+
+  // A boolean expression kind. Required.
+  //
+  // Note that internally predicates are converted into a normalized form and it
+  // doesn't matter how individual terms are split among condition/all/any
+  // fields as long as the final boolean expression is the same.
+  oneof expr {
+    // Evaluate to true when this condition is true.
+    Condition condition = 1;
+    // Evaluate to true when all given predicates evaluate to true.
+    Terms all = 2;
+    // Evaluate to true when any of given predicates evaluate to true.
+    Terms any = 3;
+  }
+}

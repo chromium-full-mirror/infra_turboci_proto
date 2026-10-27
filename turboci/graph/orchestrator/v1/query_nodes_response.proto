@@ -17,25 +17,53 @@ option java_multiple_files = true;
 
 // Response message for TurboCIGraphService.QueryNodes.
 //
-// Next ID: 7
+// Next ID: 9
 message QueryNodesResponse {
   // The WorkPlan(s) containing nodes matching the request.
   //
   // When resuming the query using `next_page_token`, the value of this field
   // will need to be recursively merged into previous responses to collect
   // the full result.
+  //
+  // DO NOT USE. Will be deleted once no longer used. Will be marked deprecated
+  // as soon as replacement functionality is implemented.
   repeated WorkPlan workplans = 1;
 
-  // A map containing requested [ValueData] for nodes in `workplans` (or in a
+  // The workplan for which this query is retrieving data.
+  //
+  // Callers may need to merge workplans across pages.
+  optional WorkPlan workplan = 7;
+
+  // A map containing requested [ValueData] for nodes in the `workplan` (or in a
   // prior response page, when a node's [ValueData] don't all fit in the page).
   //
   // This is keyed by [ValueRef].digest.
   map<string, ValueData> value_data = 5;
 
-  // A list of explicitly-selected nodes which were not found in the graph.
+  // Describes what QueryNodes did to an explicitly selected node.
+  message SelectedNode {
+    // Describes whether the node was found and was readable.
+    enum Disposition {
+      // Unpopulated Disposition. Will never show up in responses.
+      DISPOSITION_UNKNOWN = 0;
+      // The node was found and it is visible to the caller.
+      DISPOSITION_FOUND = 1;
+      // The node doesn't exist in the workplan.
+      DISPOSITION_NOT_FOUND = 2;
+      // The node exists, but the caller is not allowed to read it.
+      DISPOSITION_PERMISSION_DENIED = 3;
+    }
+    // ID of a node as passed in QueryNodesRequest.selected.
+    optional ids.v1.Identifier node = 1;
+    // Whether this node exists and is visible.
+    optional Disposition disposition = 2;
+    // Set to true if the node was found and kept by the `filter` predicate.
+    optional bool matched_filter = 3;
+  }
+  // Describes what QueryNodes did to explicitly selected nodes.
   //
-  // Populated only in the first response page.
-  repeated ids.v1.Identifier absent = 2;
+  // Populated only when `QueryNodesRequest.selected` was used.
+  repeated SelectedNode selected = 8;
 
   // State of the current stage attempt.
   //

@@ -25,17 +25,70 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Describes whether the node was found and was readable.
+type QueryNodesResponse_SelectedNode_Disposition int32
+
+const (
+	// Unpopulated Disposition. Will never show up in responses.
+	QueryNodesResponse_SelectedNode_DISPOSITION_UNKNOWN QueryNodesResponse_SelectedNode_Disposition = 0
+	// The node was found and it is visible to the caller.
+	QueryNodesResponse_SelectedNode_DISPOSITION_FOUND QueryNodesResponse_SelectedNode_Disposition = 1
+	// The node doesn't exist in the workplan.
+	QueryNodesResponse_SelectedNode_DISPOSITION_NOT_FOUND QueryNodesResponse_SelectedNode_Disposition = 2
+	// The node exists, but the caller is not allowed to read it.
+	QueryNodesResponse_SelectedNode_DISPOSITION_PERMISSION_DENIED QueryNodesResponse_SelectedNode_Disposition = 3
+)
+
+// Enum value maps for QueryNodesResponse_SelectedNode_Disposition.
+var (
+	QueryNodesResponse_SelectedNode_Disposition_name = map[int32]string{
+		0: "DISPOSITION_UNKNOWN",
+		1: "DISPOSITION_FOUND",
+		2: "DISPOSITION_NOT_FOUND",
+		3: "DISPOSITION_PERMISSION_DENIED",
+	}
+	QueryNodesResponse_SelectedNode_Disposition_value = map[string]int32{
+		"DISPOSITION_UNKNOWN":           0,
+		"DISPOSITION_FOUND":             1,
+		"DISPOSITION_NOT_FOUND":         2,
+		"DISPOSITION_PERMISSION_DENIED": 3,
+	}
+)
+
+func (x QueryNodesResponse_SelectedNode_Disposition) Enum() *QueryNodesResponse_SelectedNode_Disposition {
+	p := new(QueryNodesResponse_SelectedNode_Disposition)
+	*p = x
+	return p
+}
+
+func (x QueryNodesResponse_SelectedNode_Disposition) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (QueryNodesResponse_SelectedNode_Disposition) Descriptor() protoreflect.EnumDescriptor {
+	return file_turboci_graph_orchestrator_v1_query_nodes_response_proto_enumTypes[0].Descriptor()
+}
+
+func (QueryNodesResponse_SelectedNode_Disposition) Type() protoreflect.EnumType {
+	return &file_turboci_graph_orchestrator_v1_query_nodes_response_proto_enumTypes[0]
+}
+
+func (x QueryNodesResponse_SelectedNode_Disposition) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
 // Response message for TurboCIGraphService.QueryNodes.
 //
-// Next ID: 7
+// Next ID: 9
 type QueryNodesResponse struct {
-	state                          protoimpl.MessageState    `protogen:"opaque.v1"`
-	xxx_hidden_Workplans           *[]*WorkPlan              `protobuf:"bytes,1,rep,name=workplans,proto3"`
-	xxx_hidden_ValueData           map[string]*ValueData     `protobuf:"bytes,5,rep,name=value_data,json=valueData,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	xxx_hidden_Absent              *[]*v1.Identifier         `protobuf:"bytes,2,rep,name=absent,proto3"`
-	xxx_hidden_CurrentAttemptState *StageAttemptCurrentState `protobuf:"bytes,3,opt,name=current_attempt_state,json=currentAttemptState,proto3,oneof"`
-	xxx_hidden_Version             *Revision                 `protobuf:"bytes,4,opt,name=version,proto3,oneof"`
-	xxx_hidden_NextPageToken       *string                   `protobuf:"bytes,6,opt,name=next_page_token,json=nextPageToken,proto3,oneof"`
+	state                          protoimpl.MessageState              `protogen:"opaque.v1"`
+	xxx_hidden_Workplans           *[]*WorkPlan                        `protobuf:"bytes,1,rep,name=workplans,proto3"`
+	xxx_hidden_Workplan            *WorkPlan                           `protobuf:"bytes,7,opt,name=workplan,proto3,oneof"`
+	xxx_hidden_ValueData           map[string]*ValueData               `protobuf:"bytes,5,rep,name=value_data,json=valueData,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	xxx_hidden_Selected            *[]*QueryNodesResponse_SelectedNode `protobuf:"bytes,8,rep,name=selected,proto3"`
+	xxx_hidden_CurrentAttemptState *StageAttemptCurrentState           `protobuf:"bytes,3,opt,name=current_attempt_state,json=currentAttemptState,proto3,oneof"`
+	xxx_hidden_Version             *Revision                           `protobuf:"bytes,4,opt,name=version,proto3,oneof"`
+	xxx_hidden_NextPageToken       *string                             `protobuf:"bytes,6,opt,name=next_page_token,json=nextPageToken,proto3,oneof"`
 	XXX_raceDetectHookData         protoimpl.RaceDetectHookData
 	XXX_presence                   [1]uint32
 	unknownFields                  protoimpl.UnknownFields
@@ -76,6 +129,13 @@ func (x *QueryNodesResponse) GetWorkplans() []*WorkPlan {
 	return nil
 }
 
+func (x *QueryNodesResponse) GetWorkplan() *WorkPlan {
+	if x != nil {
+		return x.xxx_hidden_Workplan
+	}
+	return nil
+}
+
 func (x *QueryNodesResponse) GetValueData() map[string]*ValueData {
 	if x != nil {
 		return x.xxx_hidden_ValueData
@@ -83,10 +143,10 @@ func (x *QueryNodesResponse) GetValueData() map[string]*ValueData {
 	return nil
 }
 
-func (x *QueryNodesResponse) GetAbsent() []*v1.Identifier {
+func (x *QueryNodesResponse) GetSelected() []*QueryNodesResponse_SelectedNode {
 	if x != nil {
-		if x.xxx_hidden_Absent != nil {
-			return *x.xxx_hidden_Absent
+		if x.xxx_hidden_Selected != nil {
+			return *x.xxx_hidden_Selected
 		}
 	}
 	return nil
@@ -120,12 +180,16 @@ func (x *QueryNodesResponse) SetWorkplans(v []*WorkPlan) {
 	x.xxx_hidden_Workplans = &v
 }
 
+func (x *QueryNodesResponse) SetWorkplan(v *WorkPlan) {
+	x.xxx_hidden_Workplan = v
+}
+
 func (x *QueryNodesResponse) SetValueData(v map[string]*ValueData) {
 	x.xxx_hidden_ValueData = v
 }
 
-func (x *QueryNodesResponse) SetAbsent(v []*v1.Identifier) {
-	x.xxx_hidden_Absent = &v
+func (x *QueryNodesResponse) SetSelected(v []*QueryNodesResponse_SelectedNode) {
+	x.xxx_hidden_Selected = &v
 }
 
 func (x *QueryNodesResponse) SetCurrentAttemptState(v *StageAttemptCurrentState) {
@@ -138,7 +202,14 @@ func (x *QueryNodesResponse) SetVersion(v *Revision) {
 
 func (x *QueryNodesResponse) SetNextPageToken(v string) {
 	x.xxx_hidden_NextPageToken = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 6)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 7)
+}
+
+func (x *QueryNodesResponse) HasWorkplan() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Workplan != nil
 }
 
 func (x *QueryNodesResponse) HasCurrentAttemptState() bool {
@@ -159,7 +230,11 @@ func (x *QueryNodesResponse) HasNextPageToken() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
+}
+
+func (x *QueryNodesResponse) ClearWorkplan() {
+	x.xxx_hidden_Workplan = nil
 }
 
 func (x *QueryNodesResponse) ClearCurrentAttemptState() {
@@ -171,7 +246,7 @@ func (x *QueryNodesResponse) ClearVersion() {
 }
 
 func (x *QueryNodesResponse) ClearNextPageToken() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
 	x.xxx_hidden_NextPageToken = nil
 }
 
@@ -183,16 +258,23 @@ type QueryNodesResponse_builder struct {
 	// When resuming the query using `next_page_token`, the value of this field
 	// will need to be recursively merged into previous responses to collect
 	// the full result.
+	//
+	// DO NOT USE. Will be deleted once no longer used. Will be marked deprecated
+	// as soon as replacement functionality is implemented.
 	Workplans []*WorkPlan
-	// A map containing requested [ValueData] for nodes in `workplans` (or in a
+	// The workplan for which this query is retrieving data.
+	//
+	// Callers may need to merge workplans across pages.
+	Workplan *WorkPlan
+	// A map containing requested [ValueData] for nodes in the `workplan` (or in a
 	// prior response page, when a node's [ValueData] don't all fit in the page).
 	//
 	// This is keyed by [ValueRef].digest.
 	ValueData map[string]*ValueData
-	// A list of explicitly-selected nodes which were not found in the graph.
+	// Describes what QueryNodes did to explicitly selected nodes.
 	//
-	// Populated only in the first response page.
-	Absent []*v1.Identifier
+	// Populated only when `QueryNodesRequest.selected` was used.
+	Selected []*QueryNodesResponse_SelectedNode
 	// State of the current stage attempt.
 	//
 	// Only set if the `token` was for a stage attempt.
@@ -217,13 +299,150 @@ func (b0 QueryNodesResponse_builder) Build() *QueryNodesResponse {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Workplans = &b.Workplans
+	x.xxx_hidden_Workplan = b.Workplan
 	x.xxx_hidden_ValueData = b.ValueData
-	x.xxx_hidden_Absent = &b.Absent
+	x.xxx_hidden_Selected = &b.Selected
 	x.xxx_hidden_CurrentAttemptState = b.CurrentAttemptState
 	x.xxx_hidden_Version = b.Version
 	if b.NextPageToken != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 6)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 7)
 		x.xxx_hidden_NextPageToken = b.NextPageToken
+	}
+	return m0
+}
+
+// Describes what QueryNodes did to an explicitly selected node.
+type QueryNodesResponse_SelectedNode struct {
+	state                    protoimpl.MessageState                      `protogen:"opaque.v1"`
+	xxx_hidden_Node          *v1.Identifier                              `protobuf:"bytes,1,opt,name=node,proto3,oneof"`
+	xxx_hidden_Disposition   QueryNodesResponse_SelectedNode_Disposition `protobuf:"varint,2,opt,name=disposition,proto3,enum=turboci.graph.orchestrator.v1.QueryNodesResponse_SelectedNode_Disposition,oneof"`
+	xxx_hidden_MatchedFilter bool                                        `protobuf:"varint,3,opt,name=matched_filter,json=matchedFilter,proto3,oneof"`
+	XXX_raceDetectHookData   protoimpl.RaceDetectHookData
+	XXX_presence             [1]uint32
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
+}
+
+func (x *QueryNodesResponse_SelectedNode) Reset() {
+	*x = QueryNodesResponse_SelectedNode{}
+	mi := &file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *QueryNodesResponse_SelectedNode) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryNodesResponse_SelectedNode) ProtoMessage() {}
+
+func (x *QueryNodesResponse_SelectedNode) ProtoReflect() protoreflect.Message {
+	mi := &file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *QueryNodesResponse_SelectedNode) GetNode() *v1.Identifier {
+	if x != nil {
+		return x.xxx_hidden_Node
+	}
+	return nil
+}
+
+func (x *QueryNodesResponse_SelectedNode) GetDisposition() QueryNodesResponse_SelectedNode_Disposition {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
+			return x.xxx_hidden_Disposition
+		}
+	}
+	return QueryNodesResponse_SelectedNode_DISPOSITION_UNKNOWN
+}
+
+func (x *QueryNodesResponse_SelectedNode) GetMatchedFilter() bool {
+	if x != nil {
+		return x.xxx_hidden_MatchedFilter
+	}
+	return false
+}
+
+func (x *QueryNodesResponse_SelectedNode) SetNode(v *v1.Identifier) {
+	x.xxx_hidden_Node = v
+}
+
+func (x *QueryNodesResponse_SelectedNode) SetDisposition(v QueryNodesResponse_SelectedNode_Disposition) {
+	x.xxx_hidden_Disposition = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+}
+
+func (x *QueryNodesResponse_SelectedNode) SetMatchedFilter(v bool) {
+	x.xxx_hidden_MatchedFilter = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
+}
+
+func (x *QueryNodesResponse_SelectedNode) HasNode() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Node != nil
+}
+
+func (x *QueryNodesResponse_SelectedNode) HasDisposition() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *QueryNodesResponse_SelectedNode) HasMatchedFilter() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *QueryNodesResponse_SelectedNode) ClearNode() {
+	x.xxx_hidden_Node = nil
+}
+
+func (x *QueryNodesResponse_SelectedNode) ClearDisposition() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Disposition = QueryNodesResponse_SelectedNode_DISPOSITION_UNKNOWN
+}
+
+func (x *QueryNodesResponse_SelectedNode) ClearMatchedFilter() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_MatchedFilter = false
+}
+
+type QueryNodesResponse_SelectedNode_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// ID of a node as passed in QueryNodesRequest.selected.
+	Node *v1.Identifier
+	// Whether this node exists and is visible.
+	Disposition *QueryNodesResponse_SelectedNode_Disposition
+	// Set to true if the node was found and kept by the `filter` predicate.
+	MatchedFilter *bool
+}
+
+func (b0 QueryNodesResponse_SelectedNode_builder) Build() *QueryNodesResponse_SelectedNode {
+	m0 := &QueryNodesResponse_SelectedNode{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Node = b.Node
+	if b.Disposition != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		x.xxx_hidden_Disposition = *b.Disposition
+	}
+	if b.MatchedFilter != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		x.xxx_hidden_MatchedFilter = *b.MatchedFilter
 	}
 	return m0
 }
@@ -232,45 +451,65 @@ var File_turboci_graph_orchestrator_v1_query_nodes_response_proto protoreflect.F
 
 const file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDesc = "" +
 	"\n" +
-	"8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a.turboci/graph/orchestrator/v1/value_data.proto\x1a,turboci/graph/orchestrator/v1/workplan.proto\"\xff\x04\n" +
+	"8turboci/graph/orchestrator/v1/query_nodes_response.proto\x12\x1dturboci.graph.orchestrator.v1\x1a%turboci/graph/ids/v1/identifier.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a)turboci/graph/orchestrator/v1/stage.proto\x1a.turboci/graph/orchestrator/v1/value_data.proto\x1a,turboci/graph/orchestrator/v1/workplan.proto\"\x8c\t\n" +
 	"\x12QueryNodesResponse\x12E\n" +
-	"\tworkplans\x18\x01 \x03(\v2'.turboci.graph.orchestrator.v1.WorkPlanR\tworkplans\x12_\n" +
+	"\tworkplans\x18\x01 \x03(\v2'.turboci.graph.orchestrator.v1.WorkPlanR\tworkplans\x12H\n" +
+	"\bworkplan\x18\a \x01(\v2'.turboci.graph.orchestrator.v1.WorkPlanH\x00R\bworkplan\x88\x01\x01\x12_\n" +
 	"\n" +
-	"value_data\x18\x05 \x03(\v2@.turboci.graph.orchestrator.v1.QueryNodesResponse.ValueDataEntryR\tvalueData\x128\n" +
-	"\x06absent\x18\x02 \x03(\v2 .turboci.graph.ids.v1.IdentifierR\x06absent\x12p\n" +
-	"\x15current_attempt_state\x18\x03 \x01(\v27.turboci.graph.orchestrator.v1.StageAttemptCurrentStateH\x00R\x13currentAttemptState\x88\x01\x01\x12F\n" +
-	"\aversion\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x01R\aversion\x88\x01\x01\x12+\n" +
-	"\x0fnext_page_token\x18\x06 \x01(\tH\x02R\rnextPageToken\x88\x01\x01\x1af\n" +
+	"value_data\x18\x05 \x03(\v2@.turboci.graph.orchestrator.v1.QueryNodesResponse.ValueDataEntryR\tvalueData\x12Z\n" +
+	"\bselected\x18\b \x03(\v2>.turboci.graph.orchestrator.v1.QueryNodesResponse.SelectedNodeR\bselected\x12p\n" +
+	"\x15current_attempt_state\x18\x03 \x01(\v27.turboci.graph.orchestrator.v1.StageAttemptCurrentStateH\x01R\x13currentAttemptState\x88\x01\x01\x12F\n" +
+	"\aversion\x18\x04 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x02R\aversion\x88\x01\x01\x12+\n" +
+	"\x0fnext_page_token\x18\x06 \x01(\tH\x03R\rnextPageToken\x88\x01\x01\x1af\n" +
 	"\x0eValueDataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12>\n" +
-	"\x05value\x18\x02 \x01(\v2(.turboci.graph.orchestrator.v1.ValueDataR\x05value:\x028\x01B\x18\n" +
+	"\x05value\x18\x02 \x01(\v2(.turboci.graph.orchestrator.v1.ValueDataR\x05value:\x028\x01\x1a\x91\x03\n" +
+	"\fSelectedNode\x129\n" +
+	"\x04node\x18\x01 \x01(\v2 .turboci.graph.ids.v1.IdentifierH\x00R\x04node\x88\x01\x01\x12q\n" +
+	"\vdisposition\x18\x02 \x01(\x0e2J.turboci.graph.orchestrator.v1.QueryNodesResponse.SelectedNode.DispositionH\x01R\vdisposition\x88\x01\x01\x12*\n" +
+	"\x0ematched_filter\x18\x03 \x01(\bH\x02R\rmatchedFilter\x88\x01\x01\"{\n" +
+	"\vDisposition\x12\x17\n" +
+	"\x13DISPOSITION_UNKNOWN\x10\x00\x12\x15\n" +
+	"\x11DISPOSITION_FOUND\x10\x01\x12\x19\n" +
+	"\x15DISPOSITION_NOT_FOUND\x10\x02\x12!\n" +
+	"\x1dDISPOSITION_PERMISSION_DENIED\x10\x03B\a\n" +
+	"\x05_nodeB\x0e\n" +
+	"\f_dispositionB\x11\n" +
+	"\x0f_matched_filterB\v\n" +
+	"\t_workplanB\x18\n" +
 	"\x16_current_attempt_stateB\n" +
 	"\n" +
 	"\b_versionB\x12\n" +
 	"\x10_next_page_tokenBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
-var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_goTypes = []any{
-	(*QueryNodesResponse)(nil),       // 0: turboci.graph.orchestrator.v1.QueryNodesResponse
-	nil,                              // 1: turboci.graph.orchestrator.v1.QueryNodesResponse.ValueDataEntry
-	(*WorkPlan)(nil),                 // 2: turboci.graph.orchestrator.v1.WorkPlan
-	(*v1.Identifier)(nil),            // 3: turboci.graph.ids.v1.Identifier
-	(*StageAttemptCurrentState)(nil), // 4: turboci.graph.orchestrator.v1.StageAttemptCurrentState
-	(*Revision)(nil),                 // 5: turboci.graph.orchestrator.v1.Revision
-	(*ValueData)(nil),                // 6: turboci.graph.orchestrator.v1.ValueData
+	(QueryNodesResponse_SelectedNode_Disposition)(0), // 0: turboci.graph.orchestrator.v1.QueryNodesResponse.SelectedNode.Disposition
+	(*QueryNodesResponse)(nil),                       // 1: turboci.graph.orchestrator.v1.QueryNodesResponse
+	nil,                                              // 2: turboci.graph.orchestrator.v1.QueryNodesResponse.ValueDataEntry
+	(*QueryNodesResponse_SelectedNode)(nil),          // 3: turboci.graph.orchestrator.v1.QueryNodesResponse.SelectedNode
+	(*WorkPlan)(nil),                                 // 4: turboci.graph.orchestrator.v1.WorkPlan
+	(*StageAttemptCurrentState)(nil),                 // 5: turboci.graph.orchestrator.v1.StageAttemptCurrentState
+	(*Revision)(nil),                                 // 6: turboci.graph.orchestrator.v1.Revision
+	(*ValueData)(nil),                                // 7: turboci.graph.orchestrator.v1.ValueData
+	(*v1.Identifier)(nil),                            // 8: turboci.graph.ids.v1.Identifier
 }
 var file_turboci_graph_orchestrator_v1_query_nodes_response_proto_depIdxs = []int32{
-	2, // 0: turboci.graph.orchestrator.v1.QueryNodesResponse.workplans:type_name -> turboci.graph.orchestrator.v1.WorkPlan
-	1, // 1: turboci.graph.orchestrator.v1.QueryNodesResponse.value_data:type_name -> turboci.graph.orchestrator.v1.QueryNodesResponse.ValueDataEntry
-	3, // 2: turboci.graph.orchestrator.v1.QueryNodesResponse.absent:type_name -> turboci.graph.ids.v1.Identifier
-	4, // 3: turboci.graph.orchestrator.v1.QueryNodesResponse.current_attempt_state:type_name -> turboci.graph.orchestrator.v1.StageAttemptCurrentState
-	5, // 4: turboci.graph.orchestrator.v1.QueryNodesResponse.version:type_name -> turboci.graph.orchestrator.v1.Revision
-	6, // 5: turboci.graph.orchestrator.v1.QueryNodesResponse.ValueDataEntry.value:type_name -> turboci.graph.orchestrator.v1.ValueData
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	4, // 0: turboci.graph.orchestrator.v1.QueryNodesResponse.workplans:type_name -> turboci.graph.orchestrator.v1.WorkPlan
+	4, // 1: turboci.graph.orchestrator.v1.QueryNodesResponse.workplan:type_name -> turboci.graph.orchestrator.v1.WorkPlan
+	2, // 2: turboci.graph.orchestrator.v1.QueryNodesResponse.value_data:type_name -> turboci.graph.orchestrator.v1.QueryNodesResponse.ValueDataEntry
+	3, // 3: turboci.graph.orchestrator.v1.QueryNodesResponse.selected:type_name -> turboci.graph.orchestrator.v1.QueryNodesResponse.SelectedNode
+	5, // 4: turboci.graph.orchestrator.v1.QueryNodesResponse.current_attempt_state:type_name -> turboci.graph.orchestrator.v1.StageAttemptCurrentState
+	6, // 5: turboci.graph.orchestrator.v1.QueryNodesResponse.version:type_name -> turboci.graph.orchestrator.v1.Revision
+	7, // 6: turboci.graph.orchestrator.v1.QueryNodesResponse.ValueDataEntry.value:type_name -> turboci.graph.orchestrator.v1.ValueData
+	8, // 7: turboci.graph.orchestrator.v1.QueryNodesResponse.SelectedNode.node:type_name -> turboci.graph.ids.v1.Identifier
+	0, // 8: turboci.graph.orchestrator.v1.QueryNodesResponse.SelectedNode.disposition:type_name -> turboci.graph.orchestrator.v1.QueryNodesResponse.SelectedNode.Disposition
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_query_nodes_response_proto_init() }
@@ -283,18 +522,20 @@ func file_turboci_graph_orchestrator_v1_query_nodes_response_proto_init() {
 	file_turboci_graph_orchestrator_v1_value_data_proto_init()
 	file_turboci_graph_orchestrator_v1_workplan_proto_init()
 	file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes[0].OneofWrappers = []any{}
+	file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes[2].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDesc), len(file_turboci_graph_orchestrator_v1_query_nodes_response_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   2,
+			NumEnums:      1,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_turboci_graph_orchestrator_v1_query_nodes_response_proto_goTypes,
 		DependencyIndexes: file_turboci_graph_orchestrator_v1_query_nodes_response_proto_depIdxs,
+		EnumInfos:         file_turboci_graph_orchestrator_v1_query_nodes_response_proto_enumTypes,
 		MessageInfos:      file_turboci_graph_orchestrator_v1_query_nodes_response_proto_msgTypes,
 	}.Build()
 	File_turboci_graph_orchestrator_v1_query_nodes_response_proto = out.File
