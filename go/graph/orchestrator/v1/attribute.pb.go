@@ -111,7 +111,7 @@ type Attribute struct {
 	xxx_hidden_Expression    *string                `protobuf:"bytes,2,opt,name=expression,proto3,oneof"`
 	xxx_hidden_OnState       isAttribute_OnState    `protobuf_oneof:"on_state"`
 	xxx_hidden_AttributeType AttributeType          `protobuf:"varint,5,opt,name=attribute_type,json=attributeType,proto3,enum=turboci.graph.orchestrator.v1.AttributeType,oneof"`
-	xxx_hidden_Scope         ReadScope              `protobuf:"varint,11,opt,name=scope,proto3,enum=turboci.graph.orchestrator.v1.ReadScope,oneof"`
+	xxx_hidden_Indexed       bool                   `protobuf:"varint,11,opt,name=indexed,proto3,oneof"`
 	xxx_hidden_ResolvedAt    *Revision              `protobuf:"bytes,6,opt,name=resolved_at,json=resolvedAt,proto3,oneof"`
 	xxx_hidden_ErrorResult   *EvaluationError       `protobuf:"bytes,7,opt,name=error_result,json=errorResult,proto3,oneof"`
 	xxx_hidden_IntResults    []int64                `protobuf:"varint,8,rep,packed,name=int_results,json=intResults,proto3"`
@@ -195,13 +195,11 @@ func (x *Attribute) GetAttributeType() AttributeType {
 	return AttributeType_ATTRIBUTE_TYPE_UNKNOWN
 }
 
-func (x *Attribute) GetScope() ReadScope {
+func (x *Attribute) GetIndexed() bool {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 4) {
-			return x.xxx_hidden_Scope
-		}
+		return x.xxx_hidden_Indexed
 	}
-	return ReadScope_READ_SCOPE_NODE
+	return false
 }
 
 func (x *Attribute) GetResolvedAt() *Revision {
@@ -262,8 +260,8 @@ func (x *Attribute) SetAttributeType(v AttributeType) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 10)
 }
 
-func (x *Attribute) SetScope(v ReadScope) {
-	x.xxx_hidden_Scope = v
+func (x *Attribute) SetIndexed(v bool) {
+	x.xxx_hidden_Indexed = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 10)
 }
 
@@ -331,7 +329,7 @@ func (x *Attribute) HasAttributeType() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
-func (x *Attribute) HasScope() bool {
+func (x *Attribute) HasIndexed() bool {
 	if x == nil {
 		return false
 	}
@@ -383,9 +381,9 @@ func (x *Attribute) ClearAttributeType() {
 	x.xxx_hidden_AttributeType = AttributeType_ATTRIBUTE_TYPE_UNKNOWN
 }
 
-func (x *Attribute) ClearScope() {
+func (x *Attribute) ClearIndexed() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
-	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_NODE
+	x.xxx_hidden_Indexed = false
 }
 
 func (x *Attribute) ClearResolvedAt() {
@@ -448,8 +446,8 @@ type Attribute_builder struct {
 	// -- end of xxx_hidden_OnState
 	// Inferred or explicitly supplied Attribute result type.
 	AttributeType *AttributeType
-	// The level at which this attribute (both key and values) can be read.
-	Scope *ReadScope
+	// Whether this attribute is exposed in search indexes.
+	Indexed *bool
 	// Revision timestamp when this Attribute was evaluated.
 	ResolvedAt *Revision
 	// The fields *_results are mutually exclusive. Exactly one of them will be
@@ -493,9 +491,9 @@ func (b0 Attribute_builder) Build() *Attribute {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 10)
 		x.xxx_hidden_AttributeType = *b.AttributeType
 	}
-	if b.Scope != nil {
+	if b.Indexed != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 10)
-		x.xxx_hidden_Scope = *b.Scope
+		x.xxx_hidden_Indexed = *b.Indexed
 	}
 	x.xxx_hidden_ResolvedAt = b.ResolvedAt
 	x.xxx_hidden_ErrorResult = b.ErrorResult
@@ -537,7 +535,7 @@ var File_turboci_graph_orchestrator_v1_attribute_proto protoreflect.FileDescript
 
 const file_turboci_graph_orchestrator_v1_attribute_proto_rawDesc = "" +
 	"\n" +
-	"-turboci/graph/orchestrator/v1/attribute.proto\x12\x1dturboci.graph.orchestrator.v1\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a4turboci/graph/orchestrator/v1/evaluation_error.proto\x1a.turboci/graph/orchestrator/v1/read_scope.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\"\xfc\x05\n" +
+	"-turboci/graph/orchestrator/v1/attribute.proto\x12\x1dturboci.graph.orchestrator.v1\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a4turboci/graph/orchestrator/v1/evaluation_error.proto\x1a,turboci/graph/orchestrator/v1/revision.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\"\xd8\x05\n" +
 	"\tAttribute\x12\x17\n" +
 	"\x04name\x18\x01 \x01(\tH\x01R\x04name\x88\x01\x01\x12#\n" +
 	"\n" +
@@ -545,8 +543,8 @@ const file_turboci_graph_orchestrator_v1_attribute_proto_rawDesc = "" +
 	"expression\x88\x01\x01\x12Q\n" +
 	"\x0eon_stage_state\x18\x03 \x01(\x0e2).turboci.graph.orchestrator.v1.StageStateH\x00R\fonStageState\x12Q\n" +
 	"\x0eon_check_state\x18\x04 \x01(\x0e2).turboci.graph.orchestrator.v1.CheckStateH\x00R\fonCheckState\x12X\n" +
-	"\x0eattribute_type\x18\x05 \x01(\x0e2,.turboci.graph.orchestrator.v1.AttributeTypeH\x03R\rattributeType\x88\x01\x01\x12C\n" +
-	"\x05scope\x18\v \x01(\x0e2(.turboci.graph.orchestrator.v1.ReadScopeH\x04R\x05scope\x88\x01\x01\x12M\n" +
+	"\x0eattribute_type\x18\x05 \x01(\x0e2,.turboci.graph.orchestrator.v1.AttributeTypeH\x03R\rattributeType\x88\x01\x01\x12\x1d\n" +
+	"\aindexed\x18\v \x01(\bH\x04R\aindexed\x88\x01\x01\x12M\n" +
 	"\vresolved_at\x18\x06 \x01(\v2'.turboci.graph.orchestrator.v1.RevisionH\x05R\n" +
 	"resolvedAt\x88\x01\x01\x12V\n" +
 	"\ferror_result\x18\a \x01(\v2..turboci.graph.orchestrator.v1.EvaluationErrorH\x06R\verrorResult\x88\x01\x01\x12\x1f\n" +
@@ -560,8 +558,9 @@ const file_turboci_graph_orchestrator_v1_attribute_proto_rawDesc = "" +
 	"\bon_stateB\a\n" +
 	"\x05_nameB\r\n" +
 	"\v_expressionB\x11\n" +
-	"\x0f_attribute_typeB\b\n" +
-	"\x06_scopeB\x0e\n" +
+	"\x0f_attribute_typeB\n" +
+	"\n" +
+	"\b_indexedB\x0e\n" +
 	"\f_resolved_atB\x0f\n" +
 	"\r_error_result*\xd6\x01\n" +
 	"\rAttributeType\x12\x1a\n" +
@@ -581,22 +580,20 @@ var file_turboci_graph_orchestrator_v1_attribute_proto_goTypes = []any{
 	(*Attribute)(nil),       // 1: turboci.graph.orchestrator.v1.Attribute
 	(StageState)(0),         // 2: turboci.graph.orchestrator.v1.StageState
 	(CheckState)(0),         // 3: turboci.graph.orchestrator.v1.CheckState
-	(ReadScope)(0),          // 4: turboci.graph.orchestrator.v1.ReadScope
-	(*Revision)(nil),        // 5: turboci.graph.orchestrator.v1.Revision
-	(*EvaluationError)(nil), // 6: turboci.graph.orchestrator.v1.EvaluationError
+	(*Revision)(nil),        // 4: turboci.graph.orchestrator.v1.Revision
+	(*EvaluationError)(nil), // 5: turboci.graph.orchestrator.v1.EvaluationError
 }
 var file_turboci_graph_orchestrator_v1_attribute_proto_depIdxs = []int32{
 	2, // 0: turboci.graph.orchestrator.v1.Attribute.on_stage_state:type_name -> turboci.graph.orchestrator.v1.StageState
 	3, // 1: turboci.graph.orchestrator.v1.Attribute.on_check_state:type_name -> turboci.graph.orchestrator.v1.CheckState
 	0, // 2: turboci.graph.orchestrator.v1.Attribute.attribute_type:type_name -> turboci.graph.orchestrator.v1.AttributeType
-	4, // 3: turboci.graph.orchestrator.v1.Attribute.scope:type_name -> turboci.graph.orchestrator.v1.ReadScope
-	5, // 4: turboci.graph.orchestrator.v1.Attribute.resolved_at:type_name -> turboci.graph.orchestrator.v1.Revision
-	6, // 5: turboci.graph.orchestrator.v1.Attribute.error_result:type_name -> turboci.graph.orchestrator.v1.EvaluationError
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	4, // 3: turboci.graph.orchestrator.v1.Attribute.resolved_at:type_name -> turboci.graph.orchestrator.v1.Revision
+	5, // 4: turboci.graph.orchestrator.v1.Attribute.error_result:type_name -> turboci.graph.orchestrator.v1.EvaluationError
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_attribute_proto_init() }
@@ -606,7 +603,6 @@ func file_turboci_graph_orchestrator_v1_attribute_proto_init() {
 	}
 	file_turboci_graph_orchestrator_v1_check_state_proto_init()
 	file_turboci_graph_orchestrator_v1_evaluation_error_proto_init()
-	file_turboci_graph_orchestrator_v1_read_scope_proto_init()
 	file_turboci_graph_orchestrator_v1_revision_proto_init()
 	file_turboci_graph_orchestrator_v1_stage_state_proto_init()
 	file_turboci_graph_orchestrator_v1_attribute_proto_msgTypes[0].OneofWrappers = []any{

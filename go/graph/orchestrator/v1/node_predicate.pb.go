@@ -891,9 +891,9 @@ func (b0 NodePredicate_Condition_ValueTypeCondition_builder) Build() *NodePredic
 
 // A condition over tags in ValueRefs that belong to the node.
 //
-// Only tag keys and values with READ_SCOPE_WORKPLAN or above are subjected
-// to this condition. Data in READ_SCOPE_NODE is not filterable by (but
-// it still can be used in node-level CEL expressions).
+// Only indexed tag keys and values are subjected to this condition.
+// Non-index tags are not filterable by (but they still can be read by
+// node-level CEL expressions).
 //
 // If only key is given, the condition will evaluate to true if there's
 // a tag with such key (regardless of its value). If the value is given
@@ -1155,9 +1155,9 @@ func (*nodePredicate_Condition_TagCondition_IntValue) isNodePredicate_Condition_
 
 // A condition over value of a successfully resolved node Attribute.
 //
-// Only attributes with READ_SCOPE_WORKPLAN or above are subjected to this
-// condition. Data in READ_SCOPE_NODE is not filterable by (but it still can
-// be used in node-level CEL expressions).
+// Only indexed attributes are subjected to this condition. Non-indexed
+// attributes are not filterable by (but they still can be read by
+// node-level CEL expressions).
 //
 // The condition will evaluate to true if the resolved attribute value is
 // equal to the value in the condition (for scalar-valued attributes) or

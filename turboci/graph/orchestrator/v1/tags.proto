@@ -6,8 +6,6 @@ syntax = "proto3";
 
 package turboci.graph.orchestrator.v1;
 
-import "turboci/graph/orchestrator/v1/read_scope.proto";
-
 option go_package = "go.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb";
 option java_multiple_files = true;
 
@@ -19,7 +17,7 @@ option java_multiple_files = true;
 //
 // They allow the Orchestrator to look inside the values, in particular when:
 //   * Evaluating CEL expressions over node's data.
-//   * Exposing the node for search queries.
+//   * Exposing the subset of node data for various search queries.
 //
 // A given ValueWrite can export zero or more tags.
 //
@@ -35,9 +33,9 @@ option java_multiple_files = true;
 // the ValueWrite, and are visible as long as you have read access to that
 // ValueRef.
 //
-// Tag keys and values with ReadScope larger than READ_SCOPE_NODE are also
-// exposed in more places (see the ReadScope enum), but this can have
-// performance penalty and should be used cautiously.
+// Tag keys and values can optionally be indexed, allowing various search
+// queries to filter by them, but this can have performance penalty and should
+// be used cautiously.
 //
 // If using one of the TurboCI client libraries, you may annotate your value
 // protobufs with the `turboci.tag` field annotation in order to have the
@@ -50,28 +48,23 @@ message Tag {
   // this tag originated.
   optional string key = 1;
 
-  // Scope indicates the level at which the tag *key* presence can be read.
+  // If true the tag presence will be exposed in various search indexes.
   //
-  // This can be different from Value's scope in scenarios where one would like
-  // to expose the key's presence for searching (by setting key's scope to
-  // READ_SCOPE_WORKPLAN), but keep tag values outside the search index (by
-  // setting their scope to READ_SCOPE_NODE) for performance reasons. In this
-  // scenarios values still can be accessed by CEL expressions over node.
-  //
-  // Defaults to READ_SCOPE_NODE.
-  optional ReadScope scope = 2;
+  // This must be true if at least one Value is indexed. If the tag has no
+  // values or they are all not indexed, this can either be true (to expose
+  // the fact that the tag key exists at all irrespective of its value) or false
+  // (to not touch the search index).
+  optional bool indexed = 2;
 
   // A single value associated with a tag.
   //
   // Next ID: 6
   message Value {
-    // Scope indicates the level at which this *value* can be read.
+    // If true this particular value will be exposed in various search indexes.
     //
-    // Must be <= `Tag.scope` (i.e. can't index the tag's value without indexing
-    // the tag's key presence as well).
-    //
-    // Defaults to READ_SCOPE_NODE.
-    optional ReadScope scope = 1;
+    // If it is set to true, Tag.indexed must be set to true as well (can't
+    // index a value without indexing tag's presence).
+    optional bool indexed = 1;
 
     // Indicates how many times this value was duplicated within the parent
     // ValueWrite.
@@ -84,7 +77,7 @@ message Tag {
     // unset.
     //
     // This information is never indexed, but it is available for node-level
-    // CEL expressions, which makes it read scope be READ_SCOPE_NODE.
+    // CEL expressions.
     optional uint32 duplicate_count = 2;
 
     // Data for this value.

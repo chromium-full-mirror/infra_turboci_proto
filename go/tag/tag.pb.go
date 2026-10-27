@@ -36,89 +36,25 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Friendly version of graph.orchestrator.v1.ReadScope for field annotations.
+// Indicates that the annotated field presence and/or value should be captured
+// as a Tag when generating a ValueWrite using the Turbo CI client libraries.
 //
-// Drops READ_SCOPE_ prefix but otherwise maps exactly.
-//
-// buf:lint:ignore ENUM_VALUE_PREFIX
-// buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX
-type ReadScope int32
-
-const (
-	// Field's value and/or presence will be readable only from node-level CEL
-	// expressions.
-	//
-	// Use this if you only want to access the field presence and/or values in CEL
-	// expressions, but don't need to filter by it in search queries.
-	//
-	// This mode has almost zero overhead, which is why it is the default.
-	ReadScope_NODE ReadScope = 0
-	// Field's value and/or presence will be exposed to workplan-level searches.
-	//
-	// Use this is you want to filter by this field value and/or presence in
-	// search queries.
-	//
-	// This implies NODE as well. Values of fields with this read scope are
-	// indexed in the workplan search index.
-	//
-	// This mode has overhead, in particular when applied to array-valued fields
-	// with high-cardinality of possible values or to scalar fields that are
-	// inside repeated messages. This can result in a lot of additions to the
-	// search index.
-	ReadScope_WORKPLAN ReadScope = 1
-)
-
-// Enum value maps for ReadScope.
-var (
-	ReadScope_name = map[int32]string{
-		0: "NODE",
-		1: "WORKPLAN",
-	}
-	ReadScope_value = map[string]int32{
-		"NODE":     0,
-		"WORKPLAN": 1,
-	}
-)
-
-func (x ReadScope) Enum() *ReadScope {
-	p := new(ReadScope)
-	*p = x
-	return p
-}
-
-func (x ReadScope) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ReadScope) Descriptor() protoreflect.EnumDescriptor {
-	return file_turboci_tag_proto_enumTypes[0].Descriptor()
-}
-
-func (ReadScope) Type() protoreflect.EnumType {
-	return &file_turboci_tag_proto_enumTypes[0]
-}
-
-func (x ReadScope) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Indicates that the annotated field presence and optionally its value should
-// be exported as a Tag when generating a ValueWrite using the Turbo CI client
-// libraries.
+// Tags are readable from node CEL expressions and they can optionally be
+// indexed, allowing QueryNodes and other search RPCs to filter nodes by tag
+// presence and values.
 //
 // The tag key is the field's fully qualified name.
 //
-// Can only be applied to non-message singular and repeated fields of the
-// following types:
+// This annotation can only be applied to non-message singular and repeated
+// fields of the following types:
 //   - string
 //   - uint32, fixed32, int32, int64, sint32, sint64, sfixed32, sfixed64 -
 //     captured as int64.
-//   - bool - These will have their value indexed, by default, at
-//     max(key_scope, value_scope). Bool fields also implicitly have
-//     `index_unset` as `true`. Without these, you will get weird effects
-//     when attempting to search for `tag==false` or having to know that
-//     presence-of-tag-in-search is the same as true, but absence may be false
-//     OR unindexed.
+//   - bool - These will have their value captured by default even if they
+//     are not explicitly set in the parent proto (see `capture_unset`).
+//     Otherwise one can get weird effects when attempting to search for
+//     `tag==false` or one will have to know that presence-of-tag-in-search is
+//     the same as true, but absence may be false OR uncaptured.
 //   - enums - captured as both int64 and the string representation of the
 //     enum.
 //
@@ -132,7 +68,7 @@ func (x ReadScope) Number() protoreflect.EnumNumber {
 // the field's value will be captured; if the generated code does not have
 // msg.HasField(), the field's value will be captured only if it is non-zero.
 //
-// Individual fields can also tweak this behavior by setting `index_unset` to
+// Individual fields can also tweak this behavior by setting `capture_unset` to
 // true.
 //
 // More on field presence:
@@ -147,63 +83,48 @@ func (x ReadScope) Number() protoreflect.EnumNumber {
 //	import "turboci/tag.proto";
 //
 //	message MyMessage {
-//	  // This will export the key 'my.cool.package.v1.MyMessage.my_field' if
+//	  // This will export the tag 'my.cool.package.v1.MyMessage.my_field' if
 //	  // `my_field` has a non-zero value.
 //	  //
-//	  // The tag presence will be indexed within the workplan, i.e. one would
-//	  // be able to find nodes that have this field set somewhere among their
-//	  // ValueRefs.
-//	  //
-//	  // The tag *value* will not be indexed, i.e. one will *not* be able to
+//	  // The field value will not be indexed, i.e. one will *not* be able to
 //	  // filter nodes by a particular value of this field.
 //	  //
 //	  // Node-level CEL expressions (like attribute CEL expressions) will be
 //	  // able to read values of this field. It will also be returned whenever
 //	  // the ValueRef itself is read.
-//	  string my_field = 1 [(turboci.tag).key_scope = WORKPLAN];
-//
-//	  // This will export the key 'my.cool.package.v1.MyMessage.other_field'
-//	  // if `other_field` has any value explicitly set (including "").
-//	  //
-//	  // Additionally, the tag key and value will both be available on the
-//	  // ValueRef as well as indexed for searching within the workplan.
-//	  optional string other_field = 2 [(turboci.tag).value_scope = WORKPLAN];
-//
-//	  // This will export the key 'my.cool.package.v1.MyMessage.local_field'
-//	  // if `local_field` has any non-zero value.
-//	  //
-//	  // The tag key and value will be available only to node-level CEL
-//	  // expressions (like attribute CEL expressions) or when reading the
-//	  // ValueRef.
-//	  //
-//	  // It will not be possible to search the workplan for nodes that have
-//	  // this field.
 //	  //
 //	  // This can also be spelled as `[(turboci.tag) = {}]`.
-//	  int local_field = 3 [(turboci.tag).key_scope = NODE];
+//	  string my_field = 1 [(turboci.tag).indexed = false];
 //
-//	  // This will export the key 'my.cool.package.v1.MyMessage.enum_field'
+//	  // This will export the tag 'my.cool.package.v1.MyMessage.other_field'
+//	  // if `other_field` has any value explicitly set (including "").
+//	  //
+//	  // Additionally, one would be able to filter nodes by a value of this
+//	  // field in e.g. QueryNodes RPC.
+//	  optional string other_field = 2 [(turboci.tag).indexed = true];
+//
+//	  // This will export the tag 'my.cool.package.v1.MyMessage.enum_field'
 //	  // if `enum_field` has any value explicit set (including 0).
 //	  //
 //	  // The value will be captured both as the enum string name as well as
 //	  // its integer value (e.g. "MY_ENUM_VALUE1" and 1).
 //	  //
-//	  // The tag key and both variants on its value will be available on the
-//	  // ValueRef as well as indexed for searching within the workplan.
-//	  optional MyEnum enum_field = 3 [(turboci.tag).key_scope = WORKPLAN];
+//	  // Both variants on tag value will be available on the ValueRef as well
+//	  // as indexed for searching.
+//	  optional MyEnum enum_field = 3 [(turboci.tag).indexed = true];
 //	}
 //
 // Next ID: 5
 type Tag struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_KeyScope    ReadScope              `protobuf:"varint,1,opt,name=key_scope,json=keyScope,proto3,enum=turboci.ReadScope,oneof"`
-	xxx_hidden_ValueScope  ReadScope              `protobuf:"varint,2,opt,name=value_scope,json=valueScope,proto3,enum=turboci.ReadScope,oneof"`
-	xxx_hidden_AltKey      []string               `protobuf:"bytes,3,rep,name=alt_key,json=altKey,proto3"`
-	xxx_hidden_IndexUnset  bool                   `protobuf:"varint,4,opt,name=index_unset,json=indexUnset,proto3,oneof"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state                   protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Indexed      bool                   `protobuf:"varint,1,opt,name=indexed,proto3,oneof"`
+	xxx_hidden_IndexKeyOnly bool                   `protobuf:"varint,2,opt,name=index_key_only,json=indexKeyOnly,proto3,oneof"`
+	xxx_hidden_AltKey       []string               `protobuf:"bytes,3,rep,name=alt_key,json=altKey,proto3"`
+	xxx_hidden_CaptureUnset bool                   `protobuf:"varint,4,opt,name=capture_unset,json=captureUnset,proto3,oneof"`
+	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
+	XXX_presence            [1]uint32
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *Tag) Reset() {
@@ -231,22 +152,18 @@ func (x *Tag) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *Tag) GetKeyScope() ReadScope {
+func (x *Tag) GetIndexed() bool {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
-			return x.xxx_hidden_KeyScope
-		}
+		return x.xxx_hidden_Indexed
 	}
-	return ReadScope_NODE
+	return false
 }
 
-func (x *Tag) GetValueScope() ReadScope {
+func (x *Tag) GetIndexKeyOnly() bool {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
-			return x.xxx_hidden_ValueScope
-		}
+		return x.xxx_hidden_IndexKeyOnly
 	}
-	return ReadScope_NODE
+	return false
 }
 
 func (x *Tag) GetAltKey() []string {
@@ -256,20 +173,20 @@ func (x *Tag) GetAltKey() []string {
 	return nil
 }
 
-func (x *Tag) GetIndexUnset() bool {
+func (x *Tag) GetCaptureUnset() bool {
 	if x != nil {
-		return x.xxx_hidden_IndexUnset
+		return x.xxx_hidden_CaptureUnset
 	}
 	return false
 }
 
-func (x *Tag) SetKeyScope(v ReadScope) {
-	x.xxx_hidden_KeyScope = v
+func (x *Tag) SetIndexed(v bool) {
+	x.xxx_hidden_Indexed = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
 }
 
-func (x *Tag) SetValueScope(v ReadScope) {
-	x.xxx_hidden_ValueScope = v
+func (x *Tag) SetIndexKeyOnly(v bool) {
+	x.xxx_hidden_IndexKeyOnly = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
 }
 
@@ -277,97 +194,104 @@ func (x *Tag) SetAltKey(v []string) {
 	x.xxx_hidden_AltKey = v
 }
 
-func (x *Tag) SetIndexUnset(v bool) {
-	x.xxx_hidden_IndexUnset = v
+func (x *Tag) SetCaptureUnset(v bool) {
+	x.xxx_hidden_CaptureUnset = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
 }
 
-func (x *Tag) HasKeyScope() bool {
+func (x *Tag) HasIndexed() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *Tag) HasValueScope() bool {
+func (x *Tag) HasIndexKeyOnly() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
 }
 
-func (x *Tag) HasIndexUnset() bool {
+func (x *Tag) HasCaptureUnset() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
-func (x *Tag) ClearKeyScope() {
+func (x *Tag) ClearIndexed() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_KeyScope = ReadScope_NODE
+	x.xxx_hidden_Indexed = false
 }
 
-func (x *Tag) ClearValueScope() {
+func (x *Tag) ClearIndexKeyOnly() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_ValueScope = ReadScope_NODE
+	x.xxx_hidden_IndexKeyOnly = false
 }
 
-func (x *Tag) ClearIndexUnset() {
+func (x *Tag) ClearCaptureUnset() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
-	x.xxx_hidden_IndexUnset = false
+	x.xxx_hidden_CaptureUnset = false
 }
 
 type Tag_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// The scope at which to expose this tag's key.
+	// If true the value of the annotated field will be exposed in search indexes.
 	//
-	// This can be different from `value_scope` in scenarios where one would like
-	// to expose the field's presence for searching (by setting `key_scope` to
-	// WORKPLAN), but keep its values outside the search index (by setting
-	// `value_scope` to NODE) for performance reasons. In this scenarios values
-	// still can be accessed by CEL expressions over node.
+	// This is a **prerequisite** for the annotated field to be exposed for search
+	// filtering, but individual search operations may impose more requirements on
+	// what is actually searchable.
 	//
-	// Defaults to NODE.
-	KeyScope *ReadScope
-	// The scope at which to expose this tag's value.
+	// Indexing a field has an overhead related to maintaining the index, making
+	// some node writes slower. Use this only if you need to target the field
+	// in searches.
 	//
-	// If this is greater than `key_scope`, then `key_scope` will be increased to
-	// match this.
+	// All annotated fields (regardless if they are indexed or not) are readable
+	// as Tags in CEL expressions evaluated over node's data. If you only need to
+	// access the field in a CEL expression, don't index it.
+	Indexed *bool
+	// If set, only field presence will be indexed, but not its value.
 	//
-	// Defaults to NODE.
-	ValueScope *ReadScope
+	// Implies `indexed = true`.
+	//
+	// Use this as an optimization to reduce overhead on index maintenance in case
+	// you only search by the field presence.
+	//
+	// This doesn't affect what data is captured into Tag and what is available to
+	// CEL expressions evaluated over node's data.
+	IndexKeyOnly *bool
 	// Alternate keys for this tag.
 	//
 	// Intended exclusively for migrating readers from an old name to the new one.
 	//
-	// The tag will be recorded under both the alt key(s) and also the canonical
+	// The field will be captured under both the alt key(s) and also the canonical
 	// key.
 	AltKey []string
 	// If `true` will treat the field as if it is set to its default value when
 	// it is actually unset in the parent message.
 	//
 	// This defaults to `true` for bool fields, and `false` for all other fields.
-	IndexUnset *bool
+	CaptureUnset *bool
 }
 
 func (b0 Tag_builder) Build() *Tag {
 	m0 := &Tag{}
 	b, x := &b0, m0
 	_, _ = b, x
-	if b.KeyScope != nil {
+	if b.Indexed != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
-		x.xxx_hidden_KeyScope = *b.KeyScope
+		x.xxx_hidden_Indexed = *b.Indexed
 	}
-	if b.ValueScope != nil {
+	if b.IndexKeyOnly != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
-		x.xxx_hidden_ValueScope = *b.ValueScope
+		x.xxx_hidden_IndexKeyOnly = *b.IndexKeyOnly
 	}
 	x.xxx_hidden_AltKey = b.AltKey
-	if b.IndexUnset != nil {
+	if b.CaptureUnset != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
-		x.xxx_hidden_IndexUnset = *b.IndexUnset
+		x.xxx_hidden_CaptureUnset = *b.CaptureUnset
 	}
 	return m0
 }
@@ -398,40 +322,31 @@ var File_turboci_tag_proto protoreflect.FileDescriptor
 
 const file_turboci_tag_proto_rawDesc = "" +
 	"\n" +
-	"\x11turboci/tag.proto\x12\aturboci\x1a google/protobuf/descriptor.proto\"\xe2\x01\n" +
-	"\x03Tag\x124\n" +
-	"\tkey_scope\x18\x01 \x01(\x0e2\x12.turboci.ReadScopeH\x00R\bkeyScope\x88\x01\x01\x128\n" +
-	"\vvalue_scope\x18\x02 \x01(\x0e2\x12.turboci.ReadScopeH\x01R\n" +
-	"valueScope\x88\x01\x01\x12\x17\n" +
-	"\aalt_key\x18\x03 \x03(\tR\x06altKey\x12$\n" +
-	"\vindex_unset\x18\x04 \x01(\bH\x02R\n" +
-	"indexUnset\x88\x01\x01B\f\n" +
+	"\x11turboci/tag.proto\x12\aturboci\x1a google/protobuf/descriptor.proto\"\xc3\x01\n" +
+	"\x03Tag\x12\x1d\n" +
+	"\aindexed\x18\x01 \x01(\bH\x00R\aindexed\x88\x01\x01\x12)\n" +
+	"\x0eindex_key_only\x18\x02 \x01(\bH\x01R\findexKeyOnly\x88\x01\x01\x12\x17\n" +
+	"\aalt_key\x18\x03 \x03(\tR\x06altKey\x12(\n" +
+	"\rcapture_unset\x18\x04 \x01(\bH\x02R\fcaptureUnset\x88\x01\x01B\n" +
 	"\n" +
-	"_key_scopeB\x0e\n" +
-	"\f_value_scopeB\x0e\n" +
-	"\f_index_unset*#\n" +
-	"\tReadScope\x12\b\n" +
-	"\x04NODE\x10\x00\x12\f\n" +
-	"\bWORKPLAN\x10\x01:D\n" +
+	"\b_indexedB\x11\n" +
+	"\x0f_index_key_onlyB\x10\n" +
+	"\x0e_capture_unset:D\n" +
 	"\x03tag\x12\x1d.google.protobuf.FieldOptions\x18\xd9\xe0\xbe\xff\x01 \x01(\v2\f.turboci.TagR\x03tag\x88\x01\x01B.P\x01Z*go.chromium.org/turboci/proto/go/tag;tagpbb\x06proto3"
 
-var file_turboci_tag_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_turboci_tag_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_turboci_tag_proto_goTypes = []any{
-	(ReadScope)(0),                    // 0: turboci.ReadScope
-	(*Tag)(nil),                       // 1: turboci.Tag
-	(*descriptorpb.FieldOptions)(nil), // 2: google.protobuf.FieldOptions
+	(*Tag)(nil),                       // 0: turboci.Tag
+	(*descriptorpb.FieldOptions)(nil), // 1: google.protobuf.FieldOptions
 }
 var file_turboci_tag_proto_depIdxs = []int32{
-	0, // 0: turboci.Tag.key_scope:type_name -> turboci.ReadScope
-	0, // 1: turboci.Tag.value_scope:type_name -> turboci.ReadScope
-	2, // 2: turboci.tag:extendee -> google.protobuf.FieldOptions
-	1, // 3: turboci.tag:type_name -> turboci.Tag
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	3, // [3:4] is the sub-list for extension type_name
-	2, // [2:3] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	1, // 0: turboci.tag:extendee -> google.protobuf.FieldOptions
+	0, // 1: turboci.tag:type_name -> turboci.Tag
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	1, // [1:2] is the sub-list for extension type_name
+	0, // [0:1] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_turboci_tag_proto_init() }
@@ -445,14 +360,13 @@ func file_turboci_tag_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_turboci_tag_proto_rawDesc), len(file_turboci_tag_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 1,
 			NumServices:   0,
 		},
 		GoTypes:           file_turboci_tag_proto_goTypes,
 		DependencyIndexes: file_turboci_tag_proto_depIdxs,
-		EnumInfos:         file_turboci_tag_proto_enumTypes,
 		MessageInfos:      file_turboci_tag_proto_msgTypes,
 		ExtensionInfos:    file_turboci_tag_proto_extTypes,
 	}.Build()

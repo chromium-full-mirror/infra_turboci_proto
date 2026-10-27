@@ -114,22 +114,15 @@ func TestStageAttribute(t *testing.T) {
 		}
 	})
 
-	t.Run("sets_optional_read_scope", func(t *testing.T) {
+	t.Run("sets_indexed", func(t *testing.T) {
 		t.Parallel()
 
-		scopes := []orchestratorpb.ReadScope{
-			orchestratorpb.ReadScope_READ_SCOPE_NODE,
-			orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
+		attr, err := StageAttribute("my_team.metric", "true", WithIndexed(true))
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
 		}
-
-		for _, rs := range scopes {
-			attr, err := StageAttribute("my_team.metric", "true", WithScope(rs))
-			if err != nil {
-				t.Fatalf("unexpected error for scope %v: %v", rs, err)
-			}
-			if attr.GetScope() != rs {
-				t.Errorf("got scope %v, want %v", attr.GetScope(), rs)
-			}
+		if !attr.GetIndexed() {
+			t.Errorf("unexpectedly not indexed")
 		}
 	})
 
@@ -283,22 +276,15 @@ func TestCheckAttribute(t *testing.T) {
 		}
 	})
 
-	t.Run("sets_optional_read_scope", func(t *testing.T) {
+	t.Run("sets_indexed", func(t *testing.T) {
 		t.Parallel()
 
-		scopes := []orchestratorpb.ReadScope{
-			orchestratorpb.ReadScope_READ_SCOPE_NODE,
-			orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
+		attr, err := CheckAttribute("my_team.metric", "true", WithIndexed(true))
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
 		}
-
-		for _, rs := range scopes {
-			attr, err := CheckAttribute("my_team.metric", "true", WithScope(rs))
-			if err != nil {
-				t.Fatalf("unexpected error for scope %v: %v", rs, err)
-			}
-			if attr.GetScope() != rs {
-				t.Errorf("got scope %v, want %v", attr.GetScope(), rs)
-			}
+		if !attr.GetIndexed() {
+			t.Errorf("unexpectedly not indexed")
 		}
 	})
 

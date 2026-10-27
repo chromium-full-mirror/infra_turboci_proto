@@ -28,7 +28,7 @@ var cmpOpts = []cmp.Option{
 	protocmp.Transform(),
 	cmp.AllowUnexported(
 		Tag{},
-		scopeCount{},
+		perValueState{},
 	),
 }
 
@@ -125,13 +125,10 @@ func TestTagsFor(t *testing.T) {
 				WorkplanStr: proto.String("foo"),
 			}.Build(),
 			wantTags: MakeMap(
-				// because it's set to value_scope=WORKPLAN, both the key and value are
-				// set to WORKPLAN.
 				Builder{
-					Key:        "testing.tags.ComplexMessage.workplan_str",
-					KeyScope:   orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
-					ValueScope: orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
-					Strings:    []string{"foo"},
+					Key:     "testing.tags.ComplexMessage.workplan_str",
+					Indexed: true,
+					Strings: []string{"foo"},
 				}.Build(),
 
 				// NOTE: local_bool captures false even when unset.
@@ -293,13 +290,11 @@ func TestTagsFor(t *testing.T) {
 				SplitIndex: proto.Int64(123),
 			}.Build(),
 			wantTags: MakeMap(
-				// This has the key indexed at the WORKPLAN level, but the value is
-				// only indexed at the NODE level.
 				Builder{
-					Key:        "testing.tags.ComplexMessage.split_index",
-					KeyScope:   orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
-					ValueScope: orchestratorpb.ReadScope_READ_SCOPE_NODE,
-					Ints:       []int{123},
+					Key:          "testing.tags.ComplexMessage.split_index",
+					Indexed:      true,
+					IndexKeyOnly: true,
+					Ints:         []int{123},
 				}.Build(),
 				// NOTE: local_bool captures false even when unset.
 				Builder{
@@ -336,10 +331,9 @@ func TestTagsFor(t *testing.T) {
 					Strings: []string{"foo"},
 				}.Build(),
 				Builder{
-					Key:        "testing.tags.ComplexMessage.workplan_str",
-					KeyScope:   orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
-					ValueScope: orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
-					Strings:    []string{"wp"},
+					Key:     "testing.tags.ComplexMessage.workplan_str",
+					Indexed: true,
+					Strings: []string{"wp"},
 				}.Build(),
 				Builder{
 					Key:   "testing.tags.ComplexMessage.local_bool",
@@ -355,10 +349,10 @@ func TestTagsFor(t *testing.T) {
 					Strings: []string{"a", "a", "b", "c"},
 				}.Build(),
 				Builder{
-					Key:        "testing.tags.ComplexMessage.split_index",
-					KeyScope:   orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
-					ValueScope: orchestratorpb.ReadScope_READ_SCOPE_NODE,
-					Ints:       []int{123},
+					Key:          "testing.tags.ComplexMessage.split_index",
+					Indexed:      true,
+					IndexKeyOnly: true,
+					Ints:         []int{123},
 				}.Build(),
 				Builder{
 					Key:     "testing.tags.ComplexMessage.SubMessage.sub_tagged",
@@ -526,27 +520,59 @@ func TestTagsProto(t *testing.T) {
 
 		protos := MakeMap(
 			Builder{
-				Key:        "my.tag",
-				KeyScope:   orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
-				ValueScope: orchestratorpb.ReadScope_READ_SCOPE_NODE,
-				Strings:    []string{"val1", "val1"},
-				Ints:       []int{42},
+				Key:     "my.tag",
+				Indexed: true,
+				Strings: []string{"val1", "val1"},
+				Ints:    []int{42},
 			}.Build(),
 		).Proto()
 		if len(protos) != 1 {
 			t.Fatalf("expected length 1, got %d: %v", len(protos), protos)
 		}
 		want := orchestratorpb.Tag_builder{
-			Key:   proto.String("my.tag"),
-			Scope: orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN.Enum(),
+			Key:     proto.String("my.tag"),
+			Indexed: proto.Bool(true),
 			Values: []*orchestratorpb.Tag_Value{
 				orchestratorpb.Tag_Value_builder{
-					Scope:          orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
+					Indexed:        proto.Bool(true),
 					StrValue:       proto.String("val1"),
 					DuplicateCount: proto.Uint32(1),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
-					Scope:    orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
+					Indexed:  proto.Bool(true),
+					IntValue: proto.Int64(42),
+				}.Build(),
+			},
+		}.Build()
+		if diff := cmp.Diff(want, protos[0], cmpOpts...); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
+	})
+
+	t.Run("index_key_only", func(t *testing.T) {
+		t.Parallel()
+
+		protos := MakeMap(
+			Builder{
+				Key:          "my.tag",
+				Indexed:      true,
+				IndexKeyOnly: true,
+				Strings:      []string{"val1", "val1"},
+				Ints:         []int{42},
+			}.Build(),
+		).Proto()
+		if len(protos) != 1 {
+			t.Fatalf("expected length 1, got %d: %v", len(protos), protos)
+		}
+		want := orchestratorpb.Tag_builder{
+			Key:     proto.String("my.tag"),
+			Indexed: proto.Bool(true),
+			Values: []*orchestratorpb.Tag_Value{
+				orchestratorpb.Tag_Value_builder{
+					StrValue:       proto.String("val1"),
+					DuplicateCount: proto.Uint32(1),
+				}.Build(),
+				orchestratorpb.Tag_Value_builder{
 					IntValue: proto.Int64(42),
 				}.Build(),
 			},
@@ -561,9 +587,7 @@ func TestTagsProto(t *testing.T) {
 
 		protos := MakeMap(
 			Builder{
-				Key:        "my.tag",
-				KeyScope:   orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
-				ValueScope: orchestratorpb.ReadScope_READ_SCOPE_NODE,
+				Key: "my.tag",
 				Strings: []string{
 					"zebra",
 					"",
@@ -577,24 +601,19 @@ func TestTagsProto(t *testing.T) {
 			t.Fatalf("expected length 1, got %d: %v", len(protos), protos)
 		}
 		want := orchestratorpb.Tag_builder{
-			Key:   proto.String("my.tag"),
-			Scope: orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN.Enum(),
+			Key: proto.String("my.tag"),
 			Values: []*orchestratorpb.Tag_Value{
 				orchestratorpb.Tag_Value_builder{
-					Scope:    orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					StrValue: proto.String(""),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
-					Scope:    orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					StrValue: proto.String("apple"),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
-					Scope:          orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					StrValue:       proto.String("banana"),
 					DuplicateCount: proto.Uint32(1),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
-					Scope:    orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					StrValue: proto.String("zebra"),
 				}.Build(),
 			},
@@ -609,25 +628,20 @@ func TestTagsProto(t *testing.T) {
 
 		protos := MakeMap(
 			Builder{
-				Key:        "my.tag",
-				KeyScope:   orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
-				ValueScope: orchestratorpb.ReadScope_READ_SCOPE_NODE,
-				Bools:      []bool{true, false, true},
+				Key:   "my.tag",
+				Bools: []bool{true, false, true},
 			}.Build(),
 		).Proto()
 		if len(protos) != 1 {
 			t.Fatalf("expected length 1, got %d: %v", len(protos), protos)
 		}
 		want := orchestratorpb.Tag_builder{
-			Key:   proto.String("my.tag"),
-			Scope: orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN.Enum(),
+			Key: proto.String("my.tag"),
 			Values: []*orchestratorpb.Tag_Value{
 				orchestratorpb.Tag_Value_builder{
-					Scope:     orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					BoolValue: proto.Bool(false),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
-					Scope:          orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					BoolValue:      proto.Bool(true),
 					DuplicateCount: proto.Uint32(1),
 				}.Build(),
@@ -643,34 +657,27 @@ func TestTagsProto(t *testing.T) {
 
 		protos := MakeMap(
 			Builder{
-				Key:        "my.tag",
-				KeyScope:   orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
-				ValueScope: orchestratorpb.ReadScope_READ_SCOPE_NODE,
-				Ints:       []int{42, -100, 0, 10, -100},
+				Key:  "my.tag",
+				Ints: []int{42, -100, 0, 10, -100},
 			}.Build(),
 		).Proto()
 		if len(protos) != 1 {
 			t.Fatalf("expected length 1, got %d: %v", len(protos), protos)
 		}
 		want := orchestratorpb.Tag_builder{
-			Key:   proto.String("my.tag"),
-			Scope: orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN.Enum(),
+			Key: proto.String("my.tag"),
 			Values: []*orchestratorpb.Tag_Value{
 				orchestratorpb.Tag_Value_builder{
-					Scope:          orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					IntValue:       proto.Int64(-100),
 					DuplicateCount: proto.Uint32(1),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
-					Scope:    orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					IntValue: proto.Int64(0),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
-					Scope:    orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					IntValue: proto.Int64(10),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
-					Scope:    orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					IntValue: proto.Int64(42),
 				}.Build(),
 			},
@@ -686,51 +693,41 @@ func TestTagsProto(t *testing.T) {
 		// StrValue < BoolValue < IntValue.
 		protos := MakeMap(
 			Builder{
-				Key:        "my.tag",
-				KeyScope:   orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN,
-				ValueScope: orchestratorpb.ReadScope_READ_SCOPE_NODE,
-				Ints:       []int{100, -5, 0},
-				Strings:    []string{"zebra", "apple", "apple"},
-				Bools:      []bool{true, false},
+				Key:     "my.tag",
+				Ints:    []int{100, -5, 0},
+				Strings: []string{"zebra", "apple", "apple"},
+				Bools:   []bool{true, false},
 			}.Build(),
 		).Proto()
 		if len(protos) != 1 {
 			t.Fatalf("expected length 1, got %d: %v", len(protos), protos)
 		}
 		want := orchestratorpb.Tag_builder{
-			Key:   proto.String("my.tag"),
-			Scope: orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN.Enum(),
+			Key: proto.String("my.tag"),
 			Values: []*orchestratorpb.Tag_Value{
 				// Strings first (lexicographical)
 				orchestratorpb.Tag_Value_builder{
-					Scope:          orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					StrValue:       proto.String("apple"),
 					DuplicateCount: proto.Uint32(1),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
-					Scope:    orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					StrValue: proto.String("zebra"),
 				}.Build(),
 				// Booleans second (false before true)
 				orchestratorpb.Tag_Value_builder{
-					Scope:     orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					BoolValue: proto.Bool(false),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
-					Scope:     orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					BoolValue: proto.Bool(true),
 				}.Build(),
 				// Integers third (numerical)
 				orchestratorpb.Tag_Value_builder{
-					Scope:    orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					IntValue: proto.Int64(-5),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
-					Scope:    orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					IntValue: proto.Int64(0),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
-					Scope:    orchestratorpb.ReadScope_READ_SCOPE_NODE.Enum(),
 					IntValue: proto.Int64(100),
 				}.Build(),
 			},
@@ -824,28 +821,27 @@ func TestMetadata(t *testing.T) {
 			AltKey: []string{"previous.package.name.Message.field"},
 		}.Build(),
 		"testing.tags.ComplexMessage.local_str": tagpb.Tag_builder{
-			KeyScope: tagpb.ReadScope_NODE.Enum(),
+			Indexed: proto.Bool(false),
 		}.Build(),
 		"testing.tags.ComplexMessage.workplan_str": tagpb.Tag_builder{
-			KeyScope:   tagpb.ReadScope_WORKPLAN.Enum(),
-			ValueScope: tagpb.ReadScope_WORKPLAN.Enum(),
+			Indexed: proto.Bool(true),
 		}.Build(),
 		"testing.tags.ComplexMessage.local_bool": tagpb.Tag_builder{
-			KeyScope:   tagpb.ReadScope_NODE.Enum(),
-			IndexUnset: proto.Bool(true),
+			Indexed:      proto.Bool(false),
+			CaptureUnset: proto.Bool(true),
 		}.Build(),
 		"testing.tags.ComplexMessage.local_enum": tagpb.Tag_builder{
-			KeyScope: tagpb.ReadScope_NODE.Enum(),
+			Indexed: proto.Bool(false),
 		}.Build(),
 		"testing.tags.ComplexMessage.rep_str": tagpb.Tag_builder{
-			KeyScope: tagpb.ReadScope_NODE.Enum(),
+			Indexed: proto.Bool(false),
 		}.Build(),
 		"testing.tags.ComplexMessage.split_index": tagpb.Tag_builder{
-			KeyScope:   tagpb.ReadScope_WORKPLAN.Enum(),
-			ValueScope: tagpb.ReadScope_NODE.Enum(),
+			Indexed:      proto.Bool(true),
+			IndexKeyOnly: proto.Bool(true),
 		}.Build(),
 		"testing.tags.ComplexMessage.explicit_presence_bool": tagpb.Tag_builder{
-			IndexUnset: proto.Bool(false),
+			CaptureUnset: proto.Bool(false),
 		}.Build(),
 	}))
 

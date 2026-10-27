@@ -28,32 +28,30 @@ message ComplexMessage {
     optional string sub_tagged = 1 [(turboci.tag).alt_key = "previous.package.name.Message.field"];
   }
 
-  optional string local_str = 1 [(turboci.tag).key_scope = NODE];
-  optional string workplan_str = 2 [(turboci.tag).value_scope = WORKPLAN];
+  optional string local_str = 1 [(turboci.tag).indexed = false];
+  optional string workplan_str = 2 [(turboci.tag).indexed = true];
 
-  optional bool local_bool = 4 [(turboci.tag).key_scope = NODE];
-  optional TestEnum local_enum = 5 [(turboci.tag).key_scope = NODE];
-  repeated string rep_str = 6 [(turboci.tag).key_scope = NODE];
+  optional bool local_bool = 4 [(turboci.tag).indexed = false];
+  optional TestEnum local_enum = 5 [(turboci.tag).indexed = false];
+  repeated string rep_str = 6 [(turboci.tag).indexed = false];
   map<string, SubMessage> map_sub = 7;
   repeated SubMessage rep_sub = 8;
   optional SubMessage sub = 9;
 
   optional int64 split_index = 10 [
-    // Allows us to search based on tag's presence.
-    (turboci.tag).key_scope = WORKPLAN,
-    // But not based on tag's value.
-    (turboci.tag).value_scope = NODE
+    (turboci.tag).indexed = true,
+    (turboci.tag).index_key_only = true
   ];
 
   // Normally tagged boolean fields (like local_bool above) will capture unset
   // as `false`. For this field we explicitly disable that, so
-  // explicit_presence_bool will only be indexed if the field is explicitly
+  // explicit_presence_bool will only be captured if the field is explicitly
   // assigned a value.
-  optional bool explicit_presence_bool = 11 [(turboci.tag).index_unset = false];
+  optional bool explicit_presence_bool = 11 [(turboci.tag).capture_unset = false];
 }
 
 message UnsupportedKindMessage {
-  optional bytes bad_field = 1 [(turboci.tag).key_scope = NODE];
+  optional bytes bad_field = 1 [(turboci.tag) = {}];
 }
 
 message RecursiveMessage {

@@ -7,7 +7,6 @@ import unittest
 
 from turboci.graph.orchestrator.v1 import attribute_pb2
 from turboci.graph.orchestrator.v1 import check_state_pb2
-from turboci.graph.orchestrator.v1 import read_scope_pb2
 from turboci.graph.orchestrator.v1 import stage_state_pb2
 from turboci.graph.orchestrator.v1 import write_nodes_request_pb2
 from turboci.utils import attrs
@@ -84,6 +83,25 @@ _INVALID_ATTRIBUTE_TYPE_VALUES = (
 
 class TestForStage(unittest.TestCase):
   """Behavior tests for attrs.for_stage."""
+
+  def test_works(self):
+    attr = attrs.for_stage(
+        name='my_team.has_flag',
+        expression='1',
+        on_state=stage_state_pb2.STAGE_STATE_FINAL,
+        attribute_type=attribute_pb2.ATTRIBUTE_TYPE_INT64,
+        indexed=True,
+    )
+
+    self.assertEqual(
+        attr,
+        write_nodes_request_pb2.WriteNodesRequest.StageAttributeWrite(
+            name='my_team.has_flag',
+            expression='1',
+            on_state=stage_state_pb2.STAGE_STATE_FINAL,
+            attribute_type=attribute_pb2.ATTRIBUTE_TYPE_INT64,
+            indexed=True,
+        ))
 
   def test_default_on_state_left_unset_when_omitted(self):
     # Arrange
@@ -278,41 +296,6 @@ class TestForStage(unittest.TestCase):
     with self.assertRaisesRegex(ValueError, 'expression cannot be empty'):
       attrs.for_stage(name='my_team.attr', expression='')
 
-  def test_explicit_valid_scope_accepted(self):
-    # Arrange
-    cases = (
-        (
-            read_scope_pb2.READ_SCOPE_NODE,
-            read_scope_pb2.READ_SCOPE_NODE,
-            'enum NODE',
-        ),
-        (
-            'READ_SCOPE_NODE',
-            read_scope_pb2.READ_SCOPE_NODE,
-            'str NODE',
-        ),
-        (
-            read_scope_pb2.READ_SCOPE_WORKPLAN,
-            read_scope_pb2.READ_SCOPE_WORKPLAN,
-            'enum WORKPLAN',
-        ),
-        (
-            'READ_SCOPE_WORKPLAN',
-            read_scope_pb2.READ_SCOPE_WORKPLAN,
-            'str WORKPLAN',
-        ),
-    )
-
-    # Act & Assert
-    for scope_input, expected_scope, desc in cases:
-      with self.subTest(desc=desc):
-        attr = attrs.for_stage(
-            name='my_team.attr',
-            expression='true',
-            scope=scope_input,
-        )
-        self.assertEqual(attr.scope, expected_scope)
-
   def test_invalid_stage_state_value_raises_value_error(self):
     # Arrange
     invalid_states = (
@@ -375,22 +358,28 @@ class TestForStage(unittest.TestCase):
               attribute_type=invalid_val,  # type: ignore
           )
 
-  def test_invalid_scope_python_type_raises_type_error(self):
-    # Arrange & Act & Assert
-    for invalid_val in (True, False, 3.14, [1]):
-      with self.subTest(val=invalid_val):
-        with self.assertRaisesRegex(
-            TypeError, r'unexpected type for scope:'
-        ):
-          attrs.for_stage(
-              name='my_team.attr',
-              expression='true',
-              scope=invalid_val,  # type: ignore
-          )
-
 
 class TestForCheck(unittest.TestCase):
   """Behavior tests for attrs.for_check."""
+
+  def test_works(self):
+    attr = attrs.for_check(
+        name='my_team.has_flag',
+        expression='1',
+        on_state=check_state_pb2.CHECK_STATE_PLANNED,
+        attribute_type=attribute_pb2.ATTRIBUTE_TYPE_INT64,
+        indexed=True,
+    )
+
+    self.assertEqual(
+        attr,
+        write_nodes_request_pb2.WriteNodesRequest.CheckAttributeWrite(
+            name='my_team.has_flag',
+            expression='1',
+            on_state=check_state_pb2.CHECK_STATE_PLANNED,
+            attribute_type=attribute_pb2.ATTRIBUTE_TYPE_INT64,
+            indexed=True,
+        ))
 
   def test_default_on_state_left_unset_when_omitted(self):
     # Arrange
@@ -565,41 +554,6 @@ class TestForCheck(unittest.TestCase):
     with self.assertRaisesRegex(ValueError, 'expression cannot be empty'):
       attrs.for_check(name='my_team.attr', expression='')
 
-  def test_explicit_valid_scope_accepted(self):
-    # Arrange
-    cases = (
-        (
-            read_scope_pb2.READ_SCOPE_NODE,
-            read_scope_pb2.READ_SCOPE_NODE,
-            'enum NODE',
-        ),
-        (
-            'READ_SCOPE_NODE',
-            read_scope_pb2.READ_SCOPE_NODE,
-            'str NODE',
-        ),
-        (
-            read_scope_pb2.READ_SCOPE_WORKPLAN,
-            read_scope_pb2.READ_SCOPE_WORKPLAN,
-            'enum WORKPLAN',
-        ),
-        (
-            'READ_SCOPE_WORKPLAN',
-            read_scope_pb2.READ_SCOPE_WORKPLAN,
-            'str WORKPLAN',
-        ),
-    )
-
-    # Act & Assert
-    for scope_input, expected_scope, desc in cases:
-      with self.subTest(desc=desc):
-        attr = attrs.for_check(
-            name='my_team.attr',
-            expression='true',
-            scope=scope_input,
-        )
-        self.assertEqual(attr.scope, expected_scope)
-
   def test_invalid_check_state_value_raises_value_error(self):
     # Arrange
     invalid_states = (
@@ -660,19 +614,6 @@ class TestForCheck(unittest.TestCase):
               name='my_team.attr',
               expression='true',
               attribute_type=invalid_val,  # type: ignore
-          )
-
-  def test_invalid_scope_python_type_raises_type_error(self):
-    # Arrange & Act & Assert
-    for invalid_val in (True, False, 3.14, [1]):
-      with self.subTest(val=invalid_val):
-        with self.assertRaisesRegex(
-            TypeError, r'unexpected type for scope:'
-        ):
-          attrs.for_check(
-              name='my_team.attr',
-              expression='true',
-              scope=invalid_val,  # type: ignore
           )
 
 

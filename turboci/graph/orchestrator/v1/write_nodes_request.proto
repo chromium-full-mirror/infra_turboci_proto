@@ -13,7 +13,6 @@ import "turboci/graph/orchestrator/v1/check_kind.proto";
 import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/edge.proto";
 import "turboci/graph/orchestrator/v1/field_options.proto";
-import "turboci/graph/orchestrator/v1/read_scope.proto";
 import "turboci/graph/orchestrator/v1/stage.proto";
 import "turboci/graph/orchestrator/v1/stage_attempt_execution_policy.proto";
 import "turboci/graph/orchestrator/v1/stage_execution_policy.proto";
@@ -221,10 +220,20 @@ message WriteNodesRequest {
     // If not set, the inferred expression's type will be used.
     optional AttributeType attribute_type = 4;
 
-    // The level at which this attribute (both key and values) can be read.
+    // Whether this attribute should be exposed in search indexes.
     //
-    // Defaults to READ_SCOPE_NODE.
-    optional ReadScope scope = 5;
+    // This is a **prerequisite** for the attribute to be exposed for search
+    // filtering, but individual search operations may impose more requirements
+    // on what is actually searchable.
+    //
+    // Indexing an attribute has an overhead related to maintaining the index,
+    // making some node writes slower. Use this only if you need to target the
+    // attribute value in searches.
+    //
+    // All attributes (regardless if they are indexed or not) are readable in
+    // CEL expressions evaluated over node's data. If you only need to access
+    // the attribute in a CEL expression, don't index it.
+    optional bool indexed = 5;
   }
 
   // An Attribute declaration on StageWrite.
@@ -261,10 +270,20 @@ message WriteNodesRequest {
     // If not set, the inferred expression's type will be used.
     optional AttributeType attribute_type = 4;
 
-    // The level at which this attribute (both key and values) can be read.
+    // Whether this attribute should be exposed in search indexes.
     //
-    // Defaults to READ_SCOPE_NODE.
-    optional ReadScope scope = 5;
+    // This is a **prerequisite** for the attribute to be exposed for search
+    // filtering, but individual search operations may impose more requirements
+    // on what is actually searchable.
+    //
+    // Indexing an attribute has an overhead related to maintaining the index,
+    // making some node writes slower. Use this only if you need to target the
+    // attribute value in searches.
+    //
+    // All attributes (regardless if they are indexed or not) are readable in
+    // CEL expressions evaluated over node's data. If you only need to access
+    // the attribute in a CEL expression, don't index it.
+    optional bool indexed = 5;
   }
 
   // A description of modifications to make to a single Check.

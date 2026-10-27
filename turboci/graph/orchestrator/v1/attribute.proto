@@ -8,7 +8,6 @@ package turboci.graph.orchestrator.v1;
 
 import "turboci/graph/orchestrator/v1/check_state.proto";
 import "turboci/graph/orchestrator/v1/evaluation_error.proto";
-import "turboci/graph/orchestrator/v1/read_scope.proto";
 import "turboci/graph/orchestrator/v1/revision.proto";
 import "turboci/graph/orchestrator/v1/stage_state.proto";
 
@@ -92,8 +91,8 @@ message Attribute {
   // Inferred or explicitly supplied Attribute result type.
   optional AttributeType attribute_type = 5;
 
-  // The level at which this attribute (both key and values) can be read.
-  optional ReadScope scope = 11;
+  // Whether this attribute is exposed in search indexes.
+  optional bool indexed = 11;
 
   // Revision timestamp when this Attribute was evaluated.
   optional Revision resolved_at = 6;

@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import descriptor_pb2 as google_dot_protobuf_dot_descriptor__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11turboci/tag.proto\x12\x07turboci\x1a google/protobuf/descriptor.proto\"\xb8\x01\n\x03Tag\x12*\n\tkey_scope\x18\x01 \x01(\x0e\x32\x12.turboci.ReadScopeH\x00\x88\x01\x01\x12,\n\x0bvalue_scope\x18\x02 \x01(\x0e\x32\x12.turboci.ReadScopeH\x01\x88\x01\x01\x12\x0f\n\x07\x61lt_key\x18\x03 \x03(\t\x12\x18\n\x0bindex_unset\x18\x04 \x01(\x08H\x02\x88\x01\x01\x42\x0c\n\n_key_scopeB\x0e\n\x0c_value_scopeB\x0e\n\x0c_index_unset*#\n\tReadScope\x12\x08\n\x04NODE\x10\x00\x12\x0c\n\x08WORKPLAN\x10\x01:?\n\x03tag\x12\x1d.google.protobuf.FieldOptions\x18\xd9\xe0\xbe\xff\x01 \x01(\x0b\x32\x0c.turboci.Tag\x88\x01\x01\x42.P\x01Z*go.chromium.org/turboci/proto/go/tag;tagpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11turboci/tag.proto\x12\x07turboci\x1a google/protobuf/descriptor.proto\"\x96\x01\n\x03Tag\x12\x14\n\x07indexed\x18\x01 \x01(\x08H\x00\x88\x01\x01\x12\x1b\n\x0eindex_key_only\x18\x02 \x01(\x08H\x01\x88\x01\x01\x12\x0f\n\x07\x61lt_key\x18\x03 \x03(\t\x12\x1a\n\rcapture_unset\x18\x04 \x01(\x08H\x02\x88\x01\x01\x42\n\n\x08_indexedB\x11\n\x0f_index_key_onlyB\x10\n\x0e_capture_unset:?\n\x03tag\x12\x1d.google.protobuf.FieldOptions\x18\xd9\xe0\xbe\xff\x01 \x01(\x0b\x32\x0c.turboci.Tag\x88\x01\x01\x42.P\x01Z*go.chromium.org/turboci/proto/go/tag;tagpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,8 +33,6 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'turboci.tag_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'P\001Z*go.chromium.org/turboci/proto/go/tag;tagpb'
-  _globals['_READSCOPE']._serialized_start=251
-  _globals['_READSCOPE']._serialized_end=286
   _globals['_TAG']._serialized_start=65
-  _globals['_TAG']._serialized_end=249
+  _globals['_TAG']._serialized_end=215
 # @@protoc_insertion_point(module_scope)

@@ -39,12 +39,14 @@ type tagFieldExtractor struct {
 	// This appends to a slice []*Tag_Value because enum scalars extract two
 	// values, and to avoid extra intermediate allocations of returning tiny
 	// slices.
-	extractScalar func(*[]*orchestratorpb.Tag_Value, protoreflect.Value, orchestratorpb.ReadScope)
+	extractScalar func(tags *[]*orchestratorpb.Tag_Value, v protoreflect.Value, indexValue bool)
+
 	// The tag keys which this extractor will yield.
 	// If this is empty, this field only does recurseMessage.
-	keys       []string
-	keyScope   orchestratorpb.ReadScope
-	valueScope orchestratorpb.ReadScope
+	keys []string
+
+	indexKey   bool
+	indexValue bool
 
 	// otherwise, recurseMessage will be set with zero or more of [isList, isMap].
 	recurseMessage tagExtractor
@@ -94,14 +96,14 @@ func (t *tagFieldExtractor) extract(tags Map, val protoreflect.Value) {
 		}
 		values := make([]*orchestratorpb.Tag_Value, 0, expectedValues)
 		for val := range t.rangeValues(val) {
-			t.extractScalar(&values, val, t.valueScope)
+			t.extractScalar(&values, val, t.indexValue)
 		}
 		tags.Add(func(yield func(*orchestratorpb.Tag) bool) {
 			for _, key := range t.keys {
 				if !yield(orchestratorpb.Tag_builder{
-					Key:    &key,
-					Scope:  t.keyScope.Enum(),
-					Values: values,
+					Key:     &key,
+					Indexed: &t.indexKey,
+					Values:  values,
 				}.Build()) {
 					return
 				}
@@ -164,41 +166,41 @@ var (
 )
 
 // makeTagScalarExtractor returns a function which extracts a *single* scalar
-// value into one *or more* Tag_Value proto messages with the given scope.
+// value into one *or more* Tag_Value proto messages.
 //
 // Returns nil if extraction from this field kind is not possible.
-func makeTagScalarExtractor(field protoreflect.FieldDescriptor) func(*[]*orchestratorpb.Tag_Value, protoreflect.Value, orchestratorpb.ReadScope) {
+func makeTagScalarExtractor(field protoreflect.FieldDescriptor) func(*[]*orchestratorpb.Tag_Value, protoreflect.Value, bool) {
 	switch field.Kind() {
 	case protoreflect.EnumKind:
 		vals := field.Enum().Values()
 
-		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, scope orchestratorpb.ReadScope) {
+		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, indexValue bool) {
 			enum := v.Enum()
 			*out = append(
 				*out, orchestratorpb.Tag_Value_builder{
-					Scope:    &scope,
+					Indexed:  &indexValue,
 					IntValue: proto.Int64(int64(enum)),
 				}.Build(),
 				orchestratorpb.Tag_Value_builder{
-					Scope:    &scope,
+					Indexed:  &indexValue,
 					StrValue: proto.String(string(vals.ByNumber(enum).Name())),
 				}.Build(),
 			)
 		}
 
 	case protoreflect.BoolKind:
-		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, scope orchestratorpb.ReadScope) {
+		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, indexValue bool) {
 			*out = append(*out, orchestratorpb.Tag_Value_builder{
-				Scope:     &scope,
+				Indexed:   &indexValue,
 				BoolValue: proto.Bool(v.Bool()),
 			}.Build())
 		}
 
 	case protoreflect.StringKind:
-		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, scope orchestratorpb.ReadScope) {
+		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, indexValue bool) {
 			*out = append(*out,
 				orchestratorpb.Tag_Value_builder{
-					Scope:    &scope,
+					Indexed:  &indexValue,
 					StrValue: proto.String(v.String()),
 				}.Build(),
 			)
@@ -208,20 +210,20 @@ func makeTagScalarExtractor(field protoreflect.FieldDescriptor) func(*[]*orchest
 		protoreflect.Sint32Kind, protoreflect.Sint64Kind,
 		protoreflect.Sfixed32Kind, protoreflect.Sfixed64Kind:
 
-		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, scope orchestratorpb.ReadScope) {
+		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, indexValue bool) {
 			*out = append(*out,
 				orchestratorpb.Tag_Value_builder{
-					Scope:    &scope,
+					Indexed:  &indexValue,
 					IntValue: proto.Int64(v.Int()),
 				}.Build(),
 			)
 		}
 
 	case protoreflect.Fixed32Kind, protoreflect.Uint32Kind:
-		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, scope orchestratorpb.ReadScope) {
+		return func(out *[]*orchestratorpb.Tag_Value, v protoreflect.Value, indexValue bool) {
 			*out = append(*out,
 				orchestratorpb.Tag_Value_builder{
-					Scope:    &scope,
+					Indexed:  &indexValue,
 					IntValue: proto.Int64(int64(v.Uint())),
 				}.Build(),
 			)
@@ -231,23 +233,9 @@ func makeTagScalarExtractor(field protoreflect.FieldDescriptor) func(*[]*orchest
 	return nil
 }
 
-// toReadScope converts the source-annotation friendly tagpb.ReadScope to
-// orchestratorpb.ReadScope.
-func toReadScope(in tagpb.ReadScope) orchestratorpb.ReadScope {
-	switch in {
-	case tagpb.ReadScope_NODE:
-		return orchestratorpb.ReadScope_READ_SCOPE_NODE
-	case tagpb.ReadScope_WORKPLAN:
-		return orchestratorpb.ReadScope_READ_SCOPE_WORKPLAN
-	default:
-		// Something weird and unknown, default to the safest scope.
-		return orchestratorpb.ReadScope_READ_SCOPE_NODE
-	}
-}
-
 // normalizeTag normalizes `tag`:
-//   - KeyScope is set to max(keyScope, valueScope)
-//   - IndexUnset defaults to true for boolean fields
+//   - Sets `indexed` if `index_key_only` is true.
+//   - CaptureUnset defaults to true for boolean fields
 //   - sorted and unique AltKey
 func normalizeTag(tag *tagpb.Tag, kind protoreflect.Kind) *tagpb.Tag {
 	var tagCopy *tagpb.Tag
@@ -258,13 +246,14 @@ func normalizeTag(tag *tagpb.Tag, kind protoreflect.Kind) *tagpb.Tag {
 		return tagCopy
 	}
 
-	if tag.GetKeyScope() < tag.GetValueScope() {
-		get().SetKeyScope(tag.GetValueScope())
+	// `index_key_only` implies `indexed`.
+	if tag.GetIndexKeyOnly() && !tag.GetIndexed() {
+		get().SetIndexed(true)
 	}
 
-	if !tag.HasIndexUnset() && kind == protoreflect.BoolKind {
-		// Bool defaults to capturing unset.
-		get().SetIndexUnset(true)
+	// Bool defaults to capturing unset.
+	if !tag.HasCaptureUnset() && kind == protoreflect.BoolKind {
+		get().SetCaptureUnset(true)
 	}
 
 	ak := tag.GetAltKey()
@@ -280,6 +269,8 @@ func normalizeTag(tag *tagpb.Tag, kind protoreflect.Kind) *tagpb.Tag {
 
 // makeTagFieldExtractor returns a tagFieldExtractor for the field + tag,
 // or an error if this field cannot be tagged.
+//
+// Tag here is normalized per normalizeTag.
 func makeTagFieldExtractor(field protoreflect.FieldDescriptor, tag *tagpb.Tag) (*tagFieldExtractor, error) {
 	keys := append([]string{string(field.FullName())}, tag.GetAltKey()...)
 	codec := makeTagScalarExtractor(field)
@@ -289,12 +280,11 @@ func makeTagFieldExtractor(field protoreflect.FieldDescriptor, tag *tagpb.Tag) (
 	if field.IsMap() {
 		return nil, fmt.Errorf("%s: turboci.tag: unsupported field: map", field.FullName())
 	}
-
 	return &tagFieldExtractor{
 		keys:          keys,
-		keyScope:      toReadScope(tag.GetKeyScope()),
-		valueScope:    toReadScope(tag.GetValueScope()),
-		captureUnset:  tag.GetIndexUnset(),
+		indexKey:      tag.GetIndexed(),
+		indexValue:    tag.GetIndexed() && !tag.GetIndexKeyOnly(),
+		captureUnset:  tag.GetCaptureUnset(),
 		isEnum:        field.Kind() == protoreflect.EnumKind,
 		isList:        field.IsList(),
 		extractScalar: codec,

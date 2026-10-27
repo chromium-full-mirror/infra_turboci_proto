@@ -21,54 +21,25 @@ import "google/protobuf/descriptor.proto";
 option go_package = "go.chromium.org/turboci/proto/go/tag;tagpb";
 option java_multiple_files = true;
 
-// Friendly version of graph.orchestrator.v1.ReadScope for field annotations.
+// Indicates that the annotated field presence and/or value should be captured
+// as a Tag when generating a ValueWrite using the Turbo CI client libraries.
 //
-// Drops READ_SCOPE_ prefix but otherwise maps exactly.
-//
-// buf:lint:ignore ENUM_VALUE_PREFIX
-// buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX
-enum ReadScope {
-  // Field's value and/or presence will be readable only from node-level CEL
-  // expressions.
-  //
-  // Use this if you only want to access the field presence and/or values in CEL
-  // expressions, but don't need to filter by it in search queries.
-  //
-  // This mode has almost zero overhead, which is why it is the default.
-  NODE = 0;
-
-  // Field's value and/or presence will be exposed to workplan-level searches.
-  //
-  // Use this is you want to filter by this field value and/or presence in
-  // search queries.
-  //
-  // This implies NODE as well. Values of fields with this read scope are
-  // indexed in the workplan search index.
-  //
-  // This mode has overhead, in particular when applied to array-valued fields
-  // with high-cardinality of possible values or to scalar fields that are
-  // inside repeated messages. This can result in a lot of additions to the
-  // search index.
-  WORKPLAN = 1;
-}
-
-// Indicates that the annotated field presence and optionally its value should
-// be exported as a Tag when generating a ValueWrite using the Turbo CI client
-// libraries.
+// Tags are readable from node CEL expressions and they can optionally be
+// indexed, allowing QueryNodes and other search RPCs to filter nodes by tag
+// presence and values.
 //
 // The tag key is the field's fully qualified name.
 //
-// Can only be applied to non-message singular and repeated fields of the
-// following types:
+// This annotation can only be applied to non-message singular and repeated
+// fields of the following types:
 //   * string
 //   * uint32, fixed32, int32, int64, sint32, sint64, sfixed32, sfixed64 -
 //     captured as int64.
-//   * bool - These will have their value indexed, by default, at
-//     max(key_scope, value_scope). Bool fields also implicitly have
-//     `index_unset` as `true`. Without these, you will get weird effects
-//     when attempting to search for `tag==false` or having to know that
-//     presence-of-tag-in-search is the same as true, but absence may be false
-//     OR unindexed.
+//   * bool - These will have their value captured by default even if they
+//     are not explicitly set in the parent proto (see `capture_unset`).
+//     Otherwise one can get weird effects when attempting to search for
+//     `tag==false` or one will have to know that presence-of-tag-in-search is
+//     the same as true, but absence may be false OR uncaptured.
 //   * enums - captured as both int64 and the string representation of the
 //     enum.
 //
@@ -82,7 +53,7 @@ enum ReadScope {
 // the field's value will be captured; if the generated code does not have
 // msg.HasField(), the field's value will be captured only if it is non-zero.
 //
-// Individual fields can also tweak this behavior by setting `index_unset` to
+// Individual fields can also tweak this behavior by setting `capture_unset` to
 // true.
 //
 // More on field presence:
@@ -97,78 +68,70 @@ enum ReadScope {
 //   import "turboci/tag.proto";
 //
 //   message MyMessage {
-//     // This will export the key 'my.cool.package.v1.MyMessage.my_field' if
+//     // This will export the tag 'my.cool.package.v1.MyMessage.my_field' if
 //     // `my_field` has a non-zero value.
 //     //
-//     // The tag presence will be indexed within the workplan, i.e. one would
-//     // be able to find nodes that have this field set somewhere among their
-//     // ValueRefs.
-//     //
-//     // The tag *value* will not be indexed, i.e. one will *not* be able to
+//     // The field value will not be indexed, i.e. one will *not* be able to
 //     // filter nodes by a particular value of this field.
 //     //
 //     // Node-level CEL expressions (like attribute CEL expressions) will be
 //     // able to read values of this field. It will also be returned whenever
 //     // the ValueRef itself is read.
-//     string my_field = 1 [(turboci.tag).key_scope = WORKPLAN];
-//
-//     // This will export the key 'my.cool.package.v1.MyMessage.other_field'
-//     // if `other_field` has any value explicitly set (including "").
-//     //
-//     // Additionally, the tag key and value will both be available on the
-//     // ValueRef as well as indexed for searching within the workplan.
-//     optional string other_field = 2 [(turboci.tag).value_scope = WORKPLAN];
-//
-//     // This will export the key 'my.cool.package.v1.MyMessage.local_field'
-//     // if `local_field` has any non-zero value.
-//     //
-//     // The tag key and value will be available only to node-level CEL
-//     // expressions (like attribute CEL expressions) or when reading the
-//     // ValueRef.
-//     //
-//     // It will not be possible to search the workplan for nodes that have
-//     // this field.
 //     //
 //     // This can also be spelled as `[(turboci.tag) = {}]`.
-//     int local_field = 3 [(turboci.tag).key_scope = NODE];
+//     string my_field = 1 [(turboci.tag).indexed = false];
 //
-//     // This will export the key 'my.cool.package.v1.MyMessage.enum_field'
+//     // This will export the tag 'my.cool.package.v1.MyMessage.other_field'
+//     // if `other_field` has any value explicitly set (including "").
+//     //
+//     // Additionally, one would be able to filter nodes by a value of this
+//     // field in e.g. QueryNodes RPC.
+//     optional string other_field = 2 [(turboci.tag).indexed = true];
+//
+//     // This will export the tag 'my.cool.package.v1.MyMessage.enum_field'
 //     // if `enum_field` has any value explicit set (including 0).
 //     //
 //     // The value will be captured both as the enum string name as well as
 //     // its integer value (e.g. "MY_ENUM_VALUE1" and 1).
 //     //
-//     // The tag key and both variants on its value will be available on the
-//     // ValueRef as well as indexed for searching within the workplan.
-//     optional MyEnum enum_field = 3 [(turboci.tag).key_scope = WORKPLAN];
+//     // Both variants on tag value will be available on the ValueRef as well
+//     // as indexed for searching.
+//     optional MyEnum enum_field = 3 [(turboci.tag).indexed = true];
 //   }
 //
 // Next ID: 5
 message Tag {
-  // The scope at which to expose this tag's key.
+  // If true the value of the annotated field will be exposed in search indexes.
   //
-  // This can be different from `value_scope` in scenarios where one would like
-  // to expose the field's presence for searching (by setting `key_scope` to
-  // WORKPLAN), but keep its values outside the search index (by setting
-  // `value_scope` to NODE) for performance reasons. In this scenarios values
-  // still can be accessed by CEL expressions over node.
+  // This is a **prerequisite** for the annotated field to be exposed for search
+  // filtering, but individual search operations may impose more requirements on
+  // what is actually searchable.
   //
-  // Defaults to NODE.
-  optional ReadScope key_scope = 1;
+  // Indexing a field has an overhead related to maintaining the index, making
+  // some node writes slower. Use this only if you need to target the field
+  // in searches.
+  //
+  // All annotated fields (regardless if they are indexed or not) are readable
+  // as Tags in CEL expressions evaluated over node's data. If you only need to
+  // access the field in a CEL expression, don't index it.
+  optional bool indexed = 1;
 
-  // The scope at which to expose this tag's value.
+  // If set, only field presence will be indexed, but not its value.
   //
-  // If this is greater than `key_scope`, then `key_scope` will be increased to
-  // match this.
+  // Implies `indexed = true`.
   //
-  // Defaults to NODE.
-  optional ReadScope value_scope = 2;
+  // Use this as an optimization to reduce overhead on index maintenance in case
+  // you only search by the field presence.
+  //
+  // This doesn't affect what data is captured into Tag and what is available to
+  // CEL expressions evaluated over node's data.
+  optional bool index_key_only = 2;
 
   // Alternate keys for this tag.
   //
   // Intended exclusively for migrating readers from an old name to the new one.
   //
-  // The tag will be recorded under both the alt key(s) and also the canonical
+  // The field will be captured under both the alt key(s) and also the canonical
   // key.
   repeated string alt_key = 3;
 
@@ -176,7 +139,7 @@ message Tag {
   // it is actually unset in the parent message.
   //
   // This defaults to `true` for bool fields, and `false` for all other fields.
-  optional bool index_unset = 4;
+  optional bool capture_unset = 4;
 }
 
 extend google.protobuf.FieldOptions {

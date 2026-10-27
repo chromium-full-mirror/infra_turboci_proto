@@ -32,7 +32,7 @@ const (
 //
 // They allow the Orchestrator to look inside the values, in particular when:
 //   - Evaluating CEL expressions over node's data.
-//   - Exposing the node for search queries.
+//   - Exposing the subset of node data for various search queries.
 //
 // A given ValueWrite can export zero or more tags.
 //
@@ -48,9 +48,9 @@ const (
 // the ValueWrite, and are visible as long as you have read access to that
 // ValueRef.
 //
-// Tag keys and values with ReadScope larger than READ_SCOPE_NODE are also
-// exposed in more places (see the ReadScope enum), but this can have
-// performance penalty and should be used cautiously.
+// Tag keys and values can optionally be indexed, allowing various search
+// queries to filter by them, but this can have performance penalty and should
+// be used cautiously.
 //
 // If using one of the TurboCI client libraries, you may annotate your value
 // protobufs with the `turboci.tag` field annotation in order to have the
@@ -61,7 +61,7 @@ const (
 type Tag struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Key         *string                `protobuf:"bytes,1,opt,name=key,proto3,oneof"`
-	xxx_hidden_Scope       ReadScope              `protobuf:"varint,2,opt,name=scope,proto3,enum=turboci.graph.orchestrator.v1.ReadScope,oneof"`
+	xxx_hidden_Indexed     bool                   `protobuf:"varint,2,opt,name=indexed,proto3,oneof"`
 	xxx_hidden_Values      *[]*Tag_Value          `protobuf:"bytes,3,rep,name=values,proto3"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
@@ -104,13 +104,11 @@ func (x *Tag) GetKey() string {
 	return ""
 }
 
-func (x *Tag) GetScope() ReadScope {
+func (x *Tag) GetIndexed() bool {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
-			return x.xxx_hidden_Scope
-		}
+		return x.xxx_hidden_Indexed
 	}
-	return ReadScope_READ_SCOPE_NODE
+	return false
 }
 
 func (x *Tag) GetValues() []*Tag_Value {
@@ -127,8 +125,8 @@ func (x *Tag) SetKey(v string) {
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
 }
 
-func (x *Tag) SetScope(v ReadScope) {
-	x.xxx_hidden_Scope = v
+func (x *Tag) SetIndexed(v bool) {
+	x.xxx_hidden_Indexed = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
 }
 
@@ -143,7 +141,7 @@ func (x *Tag) HasKey() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *Tag) HasScope() bool {
+func (x *Tag) HasIndexed() bool {
 	if x == nil {
 		return false
 	}
@@ -155,9 +153,9 @@ func (x *Tag) ClearKey() {
 	x.xxx_hidden_Key = nil
 }
 
-func (x *Tag) ClearScope() {
+func (x *Tag) ClearIndexed() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_NODE
+	x.xxx_hidden_Indexed = false
 }
 
 type Tag_builder struct {
@@ -166,16 +164,13 @@ type Tag_builder struct {
 	// Key should be the protobuf 'full name' of the proto field from which
 	// this tag originated.
 	Key *string
-	// Scope indicates the level at which the tag *key* presence can be read.
+	// If true the tag presence will be exposed in various search indexes.
 	//
-	// This can be different from Value's scope in scenarios where one would like
-	// to expose the key's presence for searching (by setting key's scope to
-	// READ_SCOPE_WORKPLAN), but keep tag values outside the search index (by
-	// setting their scope to READ_SCOPE_NODE) for performance reasons. In this
-	// scenarios values still can be accessed by CEL expressions over node.
-	//
-	// Defaults to READ_SCOPE_NODE.
-	Scope *ReadScope
+	// This must be true if at least one Value is indexed. If the tag has no
+	// values or they are all not indexed, this can either be true (to expose
+	// the fact that the tag key exists at all irrespective of its value) or false
+	// (to not touch the search index).
+	Indexed *bool
 	// One or more values associated with this tag.
 	//
 	// Must be sorted and unique on `data`.
@@ -193,9 +188,9 @@ func (b0 Tag_builder) Build() *Tag {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
 		x.xxx_hidden_Key = b.Key
 	}
-	if b.Scope != nil {
+	if b.Indexed != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
-		x.xxx_hidden_Scope = *b.Scope
+		x.xxx_hidden_Indexed = *b.Indexed
 	}
 	x.xxx_hidden_Values = &b.Values
 	return m0
@@ -206,7 +201,7 @@ func (b0 Tag_builder) Build() *Tag {
 // Next ID: 6
 type Tag_Value struct {
 	state                     protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Scope          ReadScope              `protobuf:"varint,1,opt,name=scope,proto3,enum=turboci.graph.orchestrator.v1.ReadScope,oneof"`
+	xxx_hidden_Indexed        bool                   `protobuf:"varint,1,opt,name=indexed,proto3,oneof"`
 	xxx_hidden_DuplicateCount uint32                 `protobuf:"varint,2,opt,name=duplicate_count,json=duplicateCount,proto3,oneof"`
 	xxx_hidden_Data           isTag_Value_Data       `protobuf_oneof:"data"`
 	XXX_raceDetectHookData    protoimpl.RaceDetectHookData
@@ -240,13 +235,11 @@ func (x *Tag_Value) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *Tag_Value) GetScope() ReadScope {
+func (x *Tag_Value) GetIndexed() bool {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
-			return x.xxx_hidden_Scope
-		}
+		return x.xxx_hidden_Indexed
 	}
-	return ReadScope_READ_SCOPE_NODE
+	return false
 }
 
 func (x *Tag_Value) GetDuplicateCount() uint32 {
@@ -283,8 +276,8 @@ func (x *Tag_Value) GetIntValue() int64 {
 	return 0
 }
 
-func (x *Tag_Value) SetScope(v ReadScope) {
-	x.xxx_hidden_Scope = v
+func (x *Tag_Value) SetIndexed(v bool) {
+	x.xxx_hidden_Indexed = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
 }
 
@@ -305,7 +298,7 @@ func (x *Tag_Value) SetIntValue(v int64) {
 	x.xxx_hidden_Data = &tag_Value_IntValue{v}
 }
 
-func (x *Tag_Value) HasScope() bool {
+func (x *Tag_Value) HasIndexed() bool {
 	if x == nil {
 		return false
 	}
@@ -350,9 +343,9 @@ func (x *Tag_Value) HasIntValue() bool {
 	return ok
 }
 
-func (x *Tag_Value) ClearScope() {
+func (x *Tag_Value) ClearIndexed() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Scope = ReadScope_READ_SCOPE_NODE
+	x.xxx_hidden_Indexed = false
 }
 
 func (x *Tag_Value) ClearDuplicateCount() {
@@ -406,13 +399,11 @@ func (x *Tag_Value) WhichData() case_Tag_Value_Data {
 type Tag_Value_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Scope indicates the level at which this *value* can be read.
+	// If true this particular value will be exposed in various search indexes.
 	//
-	// Must be <= `Tag.scope` (i.e. can't index the tag's value without indexing
-	// the tag's key presence as well).
-	//
-	// Defaults to READ_SCOPE_NODE.
-	Scope *ReadScope
+	// If it is set to true, Tag.indexed must be set to true as well (can't
+	// index a value without indexing tag's presence).
+	Indexed *bool
 	// Indicates how many times this value was duplicated within the parent
 	// ValueWrite.
 	//
@@ -424,7 +415,7 @@ type Tag_Value_builder struct {
 	// unset.
 	//
 	// This information is never indexed, but it is available for node-level
-	// CEL expressions, which makes it read scope be READ_SCOPE_NODE.
+	// CEL expressions.
 	DuplicateCount *uint32
 	// Data for this value.
 	//
@@ -444,9 +435,9 @@ func (b0 Tag_Value_builder) Build() *Tag_Value {
 	m0 := &Tag_Value{}
 	b, x := &b0, m0
 	_, _ = b, x
-	if b.Scope != nil {
+	if b.Indexed != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
-		x.xxx_hidden_Scope = *b.Scope
+		x.xxx_hidden_Indexed = *b.Indexed
 	}
 	if b.DuplicateCount != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
@@ -503,39 +494,38 @@ var File_turboci_graph_orchestrator_v1_tags_proto protoreflect.FileDescriptor
 
 const file_turboci_graph_orchestrator_v1_tags_proto_rawDesc = "" +
 	"\n" +
-	"(turboci/graph/orchestrator/v1/tags.proto\x12\x1dturboci.graph.orchestrator.v1\x1a.turboci/graph/orchestrator/v1/read_scope.proto\"\xb7\x03\n" +
+	"(turboci/graph/orchestrator/v1/tags.proto\x12\x1dturboci.graph.orchestrator.v1\"\xef\x02\n" +
 	"\x03Tag\x12\x15\n" +
-	"\x03key\x18\x01 \x01(\tH\x00R\x03key\x88\x01\x01\x12C\n" +
-	"\x05scope\x18\x02 \x01(\x0e2(.turboci.graph.orchestrator.v1.ReadScopeH\x01R\x05scope\x88\x01\x01\x12@\n" +
-	"\x06values\x18\x03 \x03(\v2(.turboci.graph.orchestrator.v1.Tag.ValueR\x06values\x1a\xff\x01\n" +
-	"\x05Value\x12C\n" +
-	"\x05scope\x18\x01 \x01(\x0e2(.turboci.graph.orchestrator.v1.ReadScopeH\x01R\x05scope\x88\x01\x01\x12,\n" +
+	"\x03key\x18\x01 \x01(\tH\x00R\x03key\x88\x01\x01\x12\x1d\n" +
+	"\aindexed\x18\x02 \x01(\bH\x01R\aindexed\x88\x01\x01\x12@\n" +
+	"\x06values\x18\x03 \x03(\v2(.turboci.graph.orchestrator.v1.Tag.ValueR\x06values\x1a\xdb\x01\n" +
+	"\x05Value\x12\x1d\n" +
+	"\aindexed\x18\x01 \x01(\bH\x01R\aindexed\x88\x01\x01\x12,\n" +
 	"\x0fduplicate_count\x18\x02 \x01(\rH\x02R\x0eduplicateCount\x88\x01\x01\x12\x1d\n" +
 	"\tstr_value\x18\x03 \x01(\tH\x00R\bstrValue\x12\x1f\n" +
 	"\n" +
 	"bool_value\x18\x04 \x01(\bH\x00R\tboolValue\x12\x1d\n" +
 	"\tint_value\x18\x05 \x01(\x03H\x00R\bintValueB\x06\n" +
-	"\x04dataB\b\n" +
-	"\x06_scopeB\x12\n" +
+	"\x04dataB\n" +
+	"\n" +
+	"\b_indexedB\x12\n" +
 	"\x10_duplicate_countB\x06\n" +
-	"\x04_keyB\b\n" +
-	"\x06_scopeBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
+	"\x04_keyB\n" +
+	"\n" +
+	"\b_indexedBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"
 
 var file_turboci_graph_orchestrator_v1_tags_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_turboci_graph_orchestrator_v1_tags_proto_goTypes = []any{
 	(*Tag)(nil),       // 0: turboci.graph.orchestrator.v1.Tag
 	(*Tag_Value)(nil), // 1: turboci.graph.orchestrator.v1.Tag.Value
-	(ReadScope)(0),    // 2: turboci.graph.orchestrator.v1.ReadScope
 }
 var file_turboci_graph_orchestrator_v1_tags_proto_depIdxs = []int32{
-	2, // 0: turboci.graph.orchestrator.v1.Tag.scope:type_name -> turboci.graph.orchestrator.v1.ReadScope
-	1, // 1: turboci.graph.orchestrator.v1.Tag.values:type_name -> turboci.graph.orchestrator.v1.Tag.Value
-	2, // 2: turboci.graph.orchestrator.v1.Tag.Value.scope:type_name -> turboci.graph.orchestrator.v1.ReadScope
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	1, // 0: turboci.graph.orchestrator.v1.Tag.values:type_name -> turboci.graph.orchestrator.v1.Tag.Value
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_turboci_graph_orchestrator_v1_tags_proto_init() }
@@ -543,7 +533,6 @@ func file_turboci_graph_orchestrator_v1_tags_proto_init() {
 	if File_turboci_graph_orchestrator_v1_tags_proto != nil {
 		return
 	}
-	file_turboci_graph_orchestrator_v1_read_scope_proto_init()
 	file_turboci_graph_orchestrator_v1_tags_proto_msgTypes[0].OneofWrappers = []any{}
 	file_turboci_graph_orchestrator_v1_tags_proto_msgTypes[1].OneofWrappers = []any{
 		(*tag_Value_StrValue)(nil),

@@ -7,7 +7,6 @@ from turboci.graph.orchestrator.v1 import check_kind_pb2 as _check_kind_pb2
 from turboci.graph.orchestrator.v1 import check_state_pb2 as _check_state_pb2
 from turboci.graph.orchestrator.v1 import edge_pb2 as _edge_pb2
 from turboci.graph.orchestrator.v1 import field_options_pb2 as _field_options_pb2
-from turboci.graph.orchestrator.v1 import read_scope_pb2 as _read_scope_pb2
 from turboci.graph.orchestrator.v1 import stage_pb2 as _stage_pb2
 from turboci.graph.orchestrator.v1 import stage_attempt_execution_policy_pb2 as _stage_attempt_execution_policy_pb2
 from turboci.graph.orchestrator.v1 import stage_execution_policy_pb2 as _stage_execution_policy_pb2
@@ -50,31 +49,31 @@ class WriteNodesRequest(_message.Message):
         details: _containers.RepeatedCompositeFieldContainer[_value_write_pb2.ValueWrite]
         def __init__(self, message: _Optional[str] = ..., details: _Optional[_Iterable[_Union[_value_write_pb2.ValueWrite, _Mapping]]] = ...) -> None: ...
     class CheckAttributeWrite(_message.Message):
-        __slots__ = ("name", "expression", "on_state", "attribute_type", "scope")
+        __slots__ = ("name", "expression", "on_state", "attribute_type", "indexed")
         NAME_FIELD_NUMBER: _ClassVar[int]
         EXPRESSION_FIELD_NUMBER: _ClassVar[int]
         ON_STATE_FIELD_NUMBER: _ClassVar[int]
         ATTRIBUTE_TYPE_FIELD_NUMBER: _ClassVar[int]
-        SCOPE_FIELD_NUMBER: _ClassVar[int]
+        INDEXED_FIELD_NUMBER: _ClassVar[int]
         name: str
         expression: str
         on_state: _check_state_pb2.CheckState
         attribute_type: _attribute_pb2.AttributeType
-        scope: _read_scope_pb2.ReadScope
-        def __init__(self, name: _Optional[str] = ..., expression: _Optional[str] = ..., on_state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ..., attribute_type: _Optional[_Union[_attribute_pb2.AttributeType, str]] = ..., scope: _Optional[_Union[_read_scope_pb2.ReadScope, str]] = ...) -> None: ...
+        indexed: bool
+        def __init__(self, name: _Optional[str] = ..., expression: _Optional[str] = ..., on_state: _Optional[_Union[_check_state_pb2.CheckState, str]] = ..., attribute_type: _Optional[_Union[_attribute_pb2.AttributeType, str]] = ..., indexed: _Optional[bool] = ...) -> None: ...
     class StageAttributeWrite(_message.Message):
-        __slots__ = ("name", "expression", "on_state", "attribute_type", "scope")
+        __slots__ = ("name", "expression", "on_state", "attribute_type", "indexed")
         NAME_FIELD_NUMBER: _ClassVar[int]
         EXPRESSION_FIELD_NUMBER: _ClassVar[int]
         ON_STATE_FIELD_NUMBER: _ClassVar[int]
         ATTRIBUTE_TYPE_FIELD_NUMBER: _ClassVar[int]
-        SCOPE_FIELD_NUMBER: _ClassVar[int]
+        INDEXED_FIELD_NUMBER: _ClassVar[int]
         name: str
         expression: str
         on_state: _stage_state_pb2.StageState
         attribute_type: _attribute_pb2.AttributeType
-        scope: _read_scope_pb2.ReadScope
-        def __init__(self, name: _Optional[str] = ..., expression: _Optional[str] = ..., on_state: _Optional[_Union[_stage_state_pb2.StageState, str]] = ..., attribute_type: _Optional[_Union[_attribute_pb2.AttributeType, str]] = ..., scope: _Optional[_Union[_read_scope_pb2.ReadScope, str]] = ...) -> None: ...
+        indexed: bool
+        def __init__(self, name: _Optional[str] = ..., expression: _Optional[str] = ..., on_state: _Optional[_Union[_stage_state_pb2.StageState, str]] = ..., attribute_type: _Optional[_Union[_attribute_pb2.AttributeType, str]] = ..., indexed: _Optional[bool] = ...) -> None: ...
     class CheckWrite(_message.Message):
         __slots__ = ("identifier", "realm", "kind", "sub_type", "display_name", "options", "dependencies", "result_data", "finalize_results", "state", "attributes")
         IDENTIFIER_FIELD_NUMBER: _ClassVar[int]

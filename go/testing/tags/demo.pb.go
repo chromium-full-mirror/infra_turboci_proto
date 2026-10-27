@@ -446,7 +446,7 @@ type ComplexMessage_builder struct {
 	SplitIndex  *int64
 	// Normally tagged boolean fields (like local_bool above) will capture unset
 	// as `false`. For this field we explicitly disable that, so
-	// explicit_presence_bool will only be indexed if the field is explicitly
+	// explicit_presence_bool will only be captured if the field is explicitly
 	// assigned a value.
 	ExplicitPresenceBool *bool
 }
@@ -1509,7 +1509,7 @@ const file_testing_tags_demo_proto_rawDesc = "" +
 	"\x0f_untagged_field\"\x83\a\n" +
 	"\x0eComplexMessage\x12*\n" +
 	"\tlocal_str\x18\x01 \x01(\tB\bʅ\xf6\xfb\x0f\x02\b\x00H\x00R\blocalStr\x88\x01\x01\x120\n" +
-	"\fworkplan_str\x18\x02 \x01(\tB\bʅ\xf6\xfb\x0f\x02\x10\x01H\x01R\vworkplanStr\x88\x01\x01\x12,\n" +
+	"\fworkplan_str\x18\x02 \x01(\tB\bʅ\xf6\xfb\x0f\x02\b\x01H\x01R\vworkplanStr\x88\x01\x01\x12,\n" +
 	"\n" +
 	"local_bool\x18\x04 \x01(\bB\bʅ\xf6\xfb\x0f\x02\b\x00H\x02R\tlocalBool\x88\x01\x01\x12D\n" +
 	"\n" +
@@ -1520,7 +1520,7 @@ const file_testing_tags_demo_proto_rawDesc = "" +
 	"\x03sub\x18\t \x01(\v2'.testing.tags.ComplexMessage.SubMessageH\x04R\x03sub\x88\x01\x01\x120\n" +
 	"\vsplit_index\x18\n" +
 	" \x01(\x03B\n" +
-	"ʅ\xf6\xfb\x0f\x04\b\x01\x10\x00H\x05R\n" +
+	"ʅ\xf6\xfb\x0f\x04\b\x01\x10\x01H\x05R\n" +
 	"splitIndex\x88\x01\x01\x12C\n" +
 	"\x16explicit_presence_bool\x18\v \x01(\bB\bʅ\xf6\xfb\x0f\x02 \x00H\x06R\x14explicitPresenceBool\x88\x01\x01\x1al\n" +
 	"\n" +
@@ -1538,9 +1538,9 @@ const file_testing_tags_demo_proto_rawDesc = "" +
 	"\v_local_enumB\x06\n" +
 	"\x04_subB\x0e\n" +
 	"\f_split_indexB\x19\n" +
-	"\x17_explicit_presence_bool\"R\n" +
-	"\x16UnsupportedKindMessage\x12*\n" +
-	"\tbad_field\x18\x01 \x01(\fB\bʅ\xf6\xfb\x0f\x02\b\x00H\x00R\bbadField\x88\x01\x01B\f\n" +
+	"\x17_explicit_presence_bool\"P\n" +
+	"\x16UnsupportedKindMessage\x12(\n" +
+	"\tbad_field\x18\x01 \x01(\fB\x06ʅ\xf6\xfb\x0f\x00H\x00R\bbadField\x88\x01\x01B\f\n" +
 	"\n" +
 	"_bad_field\"\x8a\x01\n" +
 	"\x10RecursiveMessage\x12;\n" +
