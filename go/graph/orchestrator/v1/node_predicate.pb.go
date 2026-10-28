@@ -273,7 +273,7 @@ type NodePredicate_Condition struct {
 	xxx_hidden_Kind      isNodePredicate_Condition_Kind                 `protobuf_oneof:"kind"`
 	xxx_hidden_ValueType *[]*NodePredicate_Condition_ValueTypeCondition `protobuf:"bytes,3,rep,name=value_type,json=valueType,proto3"`
 	xxx_hidden_Tag       *[]*NodePredicate_Condition_TagCondition       `protobuf:"bytes,4,rep,name=tag,proto3"`
-	xxx_hidden_Attribute *NodePredicate_Condition_AttributeCondition    `protobuf:"bytes,5,opt,name=attribute,proto3,oneof"`
+	xxx_hidden_Attribute *[]*NodePredicate_Condition_AttributeCondition `protobuf:"bytes,5,rep,name=attribute,proto3"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -339,9 +339,11 @@ func (x *NodePredicate_Condition) GetTag() []*NodePredicate_Condition_TagConditi
 	return nil
 }
 
-func (x *NodePredicate_Condition) GetAttribute() *NodePredicate_Condition_AttributeCondition {
+func (x *NodePredicate_Condition) GetAttribute() []*NodePredicate_Condition_AttributeCondition {
 	if x != nil {
-		return x.xxx_hidden_Attribute
+		if x.xxx_hidden_Attribute != nil {
+			return *x.xxx_hidden_Attribute
+		}
 	}
 	return nil
 }
@@ -370,8 +372,8 @@ func (x *NodePredicate_Condition) SetTag(v []*NodePredicate_Condition_TagConditi
 	x.xxx_hidden_Tag = &v
 }
 
-func (x *NodePredicate_Condition) SetAttribute(v *NodePredicate_Condition_AttributeCondition) {
-	x.xxx_hidden_Attribute = v
+func (x *NodePredicate_Condition) SetAttribute(v []*NodePredicate_Condition_AttributeCondition) {
+	x.xxx_hidden_Attribute = &v
 }
 
 func (x *NodePredicate_Condition) HasKind() bool {
@@ -397,13 +399,6 @@ func (x *NodePredicate_Condition) HasCheck() bool {
 	return ok
 }
 
-func (x *NodePredicate_Condition) HasAttribute() bool {
-	if x == nil {
-		return false
-	}
-	return x.xxx_hidden_Attribute != nil
-}
-
 func (x *NodePredicate_Condition) ClearKind() {
 	x.xxx_hidden_Kind = nil
 }
@@ -418,10 +413,6 @@ func (x *NodePredicate_Condition) ClearCheck() {
 	if _, ok := x.xxx_hidden_Kind.(*nodePredicate_Condition_Check); ok {
 		x.xxx_hidden_Kind = nil
 	}
-}
-
-func (x *NodePredicate_Condition) ClearAttribute() {
-	x.xxx_hidden_Attribute = nil
 }
 
 const NodePredicate_Condition_Kind_not_set_case case_NodePredicate_Condition_Kind = 0
@@ -465,7 +456,7 @@ type NodePredicate_Condition_builder struct {
 	// Match nodes that have any of these tags in ValueRefs.
 	Tag []*NodePredicate_Condition_TagCondition
 	// Match nodes that have any of these resolved attributes.
-	Attribute *NodePredicate_Condition_AttributeCondition
+	Attribute []*NodePredicate_Condition_AttributeCondition
 }
 
 func (b0 NodePredicate_Condition_builder) Build() *NodePredicate_Condition {
@@ -480,7 +471,7 @@ func (b0 NodePredicate_Condition_builder) Build() *NodePredicate_Condition {
 	}
 	x.xxx_hidden_ValueType = &b.ValueType
 	x.xxx_hidden_Tag = &b.Tag
-	x.xxx_hidden_Attribute = b.Attribute
+	x.xxx_hidden_Attribute = &b.Attribute
 	return m0
 }
 
@@ -1424,18 +1415,18 @@ var File_turboci_graph_orchestrator_v1_node_predicate_proto protoreflect.FileDes
 
 const file_turboci_graph_orchestrator_v1_node_predicate_proto_rawDesc = "" +
 	"\n" +
-	"2turboci/graph/orchestrator/v1/node_predicate.proto\x12\x1dturboci.graph.orchestrator.v1\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a.turboci/graph/orchestrator/v1/value_slot.proto\"\xe5\r\n" +
+	"2turboci/graph/orchestrator/v1/node_predicate.proto\x12\x1dturboci.graph.orchestrator.v1\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a.turboci/graph/orchestrator/v1/value_slot.proto\"\xd2\r\n" +
 	"\rNodePredicate\x12V\n" +
 	"\tcondition\x18\x01 \x01(\v26.turboci.graph.orchestrator.v1.NodePredicate.ConditionH\x00R\tcondition\x12F\n" +
 	"\x03all\x18\x02 \x01(\v22.turboci.graph.orchestrator.v1.NodePredicate.TermsH\x00R\x03all\x12F\n" +
-	"\x03any\x18\x03 \x01(\v22.turboci.graph.orchestrator.v1.NodePredicate.TermsH\x00R\x03any\x1a\x96\v\n" +
+	"\x03any\x18\x03 \x01(\v22.turboci.graph.orchestrator.v1.NodePredicate.TermsH\x00R\x03any\x1a\x83\v\n" +
 	"\tCondition\x12]\n" +
 	"\x05stage\x18\x01 \x01(\v2E.turboci.graph.orchestrator.v1.NodePredicate.Condition.StageConditionH\x00R\x05stage\x12]\n" +
 	"\x05check\x18\x02 \x01(\v2E.turboci.graph.orchestrator.v1.NodePredicate.Condition.CheckConditionH\x00R\x05check\x12h\n" +
 	"\n" +
 	"value_type\x18\x03 \x03(\v2I.turboci.graph.orchestrator.v1.NodePredicate.Condition.ValueTypeConditionR\tvalueType\x12U\n" +
-	"\x03tag\x18\x04 \x03(\v2C.turboci.graph.orchestrator.v1.NodePredicate.Condition.TagConditionR\x03tag\x12l\n" +
-	"\tattribute\x18\x05 \x01(\v2I.turboci.graph.orchestrator.v1.NodePredicate.Condition.AttributeConditionH\x01R\tattribute\x88\x01\x01\x1a\x9e\x02\n" +
+	"\x03tag\x18\x04 \x03(\v2C.turboci.graph.orchestrator.v1.NodePredicate.Condition.TagConditionR\x03tag\x12g\n" +
+	"\tattribute\x18\x05 \x03(\v2I.turboci.graph.orchestrator.v1.NodePredicate.Condition.AttributeConditionR\tattribute\x1a\x9e\x02\n" +
 	"\x0eStageCondition\x12?\n" +
 	"\x05state\x18\x01 \x03(\x0e2).turboci.graph.orchestrator.v1.StageStateR\x05state\x12\"\n" +
 	"\rargs_type_url\x18\x02 \x03(\tR\vargsTypeUrl\x12\x19\n" +
@@ -1466,9 +1457,7 @@ const file_turboci_graph_orchestrator_v1_node_predicate_proto_rawDesc = "" +
 	"\tint_value\x18\x04 \x01(\x03H\x00R\bintValueB\a\n" +
 	"\x05valueB\a\n" +
 	"\x05_nameB\x06\n" +
-	"\x04kindB\f\n" +
-	"\n" +
-	"_attribute\x1aK\n" +
+	"\x04kind\x1aK\n" +
 	"\x05Terms\x12B\n" +
 	"\x05terms\x18\x02 \x03(\v2,.turboci.graph.orchestrator.v1.NodePredicateR\x05termsB\x06\n" +
 	"\x04exprBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3"

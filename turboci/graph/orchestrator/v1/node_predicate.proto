@@ -157,7 +157,7 @@ message NodePredicate {
       }
     }
     // Match nodes that have any of these resolved attributes.
-    optional AttributeCondition attribute = 5;
+    repeated AttributeCondition attribute = 5;
   }
 
   // A collection of NodePredicates for using in All/Any boolean expressions.

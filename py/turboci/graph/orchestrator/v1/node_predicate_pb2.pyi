@@ -75,8 +75,8 @@ class NodePredicate(_message.Message):
         check: NodePredicate.Condition.CheckCondition
         value_type: _containers.RepeatedCompositeFieldContainer[NodePredicate.Condition.ValueTypeCondition]
         tag: _containers.RepeatedCompositeFieldContainer[NodePredicate.Condition.TagCondition]
-        attribute: NodePredicate.Condition.AttributeCondition
-        def __init__(self, stage: _Optional[_Union[NodePredicate.Condition.StageCondition, _Mapping]] = ..., check: _Optional[_Union[NodePredicate.Condition.CheckCondition, _Mapping]] = ..., value_type: _Optional[_Iterable[_Union[NodePredicate.Condition.ValueTypeCondition, _Mapping]]] = ..., tag: _Optional[_Iterable[_Union[NodePredicate.Condition.TagCondition, _Mapping]]] = ..., attribute: _Optional[_Union[NodePredicate.Condition.AttributeCondition, _Mapping]] = ...) -> None: ...
+        attribute: _containers.RepeatedCompositeFieldContainer[NodePredicate.Condition.AttributeCondition]
+        def __init__(self, stage: _Optional[_Union[NodePredicate.Condition.StageCondition, _Mapping]] = ..., check: _Optional[_Union[NodePredicate.Condition.CheckCondition, _Mapping]] = ..., value_type: _Optional[_Iterable[_Union[NodePredicate.Condition.ValueTypeCondition, _Mapping]]] = ..., tag: _Optional[_Iterable[_Union[NodePredicate.Condition.TagCondition, _Mapping]]] = ..., attribute: _Optional[_Iterable[_Union[NodePredicate.Condition.AttributeCondition, _Mapping]]] = ...) -> None: ...
     class Terms(_message.Message):
         __slots__ = ("terms",)
         TERMS_FIELD_NUMBER: _ClassVar[int]

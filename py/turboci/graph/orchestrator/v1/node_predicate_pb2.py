@@ -29,7 +29,7 @@ from turboci.graph.orchestrator.v1 import stage_state_pb2 as turboci_dot_graph_d
 from turboci.graph.orchestrator.v1 import value_slot_pb2 as turboci_dot_graph_dot_orchestrator_dot_v1_dot_value__slot__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n2turboci/graph/orchestrator/v1/node_predicate.proto\x12\x1dturboci.graph.orchestrator.v1\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a.turboci/graph/orchestrator/v1/value_slot.proto\"\xf0\x0b\n\rNodePredicate\x12K\n\tcondition\x18\x01 \x01(\x0b\x32\x36.turboci.graph.orchestrator.v1.NodePredicate.ConditionH\x00\x12\x41\n\x03\x61ll\x18\x02 \x01(\x0b\x32\x32.turboci.graph.orchestrator.v1.NodePredicate.TermsH\x00\x12\x41\n\x03\x61ny\x18\x03 \x01(\x0b\x32\x32.turboci.graph.orchestrator.v1.NodePredicate.TermsH\x00\x1a\xbd\t\n\tCondition\x12V\n\x05stage\x18\x01 \x01(\x0b\x32\x45.turboci.graph.orchestrator.v1.NodePredicate.Condition.StageConditionH\x00\x12V\n\x05\x63heck\x18\x02 \x01(\x0b\x32\x45.turboci.graph.orchestrator.v1.NodePredicate.Condition.CheckConditionH\x00\x12]\n\nvalue_type\x18\x03 \x03(\x0b\x32I.turboci.graph.orchestrator.v1.NodePredicate.Condition.ValueTypeCondition\x12P\n\x03tag\x18\x04 \x03(\x0b\x32\x43.turboci.graph.orchestrator.v1.NodePredicate.Condition.TagCondition\x12\x61\n\tattribute\x18\x05 \x01(\x0b\x32I.turboci.graph.orchestrator.v1.NodePredicate.Condition.AttributeConditionH\x01\x88\x01\x01\x1a\xde\x01\n\x0eStageCondition\x12\x38\n\x05state\x18\x01 \x03(\x0e\x32).turboci.graph.orchestrator.v1.StageState\x12\x15\n\rargs_type_url\x18\x02 \x03(\t\x12\x10\n\x08sub_type\x18\x03 \x03(\t\x12M\n\x10\x63oncluded_reason\x18\x04 \x03(\x0e\x32\x33.turboci.graph.orchestrator.v1.StageConcludedReason\x12\x1a\n\x12work_executor_type\x18\x05 \x03(\x05\x1a\x94\x01\n\x0e\x43heckCondition\x12\x38\n\x05state\x18\x01 \x03(\x0e\x32).turboci.graph.orchestrator.v1.CheckState\x12\x36\n\x04kind\x18\x02 \x03(\x0e\x32(.turboci.graph.orchestrator.v1.CheckKind\x12\x10\n\x08sub_type\x18\x03 \x03(\t\x1ap\n\x12ValueTypeCondition\x12\x15\n\x08type_url\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x36\n\x04slot\x18\x02 \x03(\x0e\x32(.turboci.graph.orchestrator.v1.ValueSlotB\x0b\n\t_type_url\x1aq\n\x0cTagCondition\x12\x10\n\x03key\x18\x01 \x01(\tH\x01\x88\x01\x01\x12\x13\n\tstr_value\x18\x02 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x03 \x01(\x08H\x00\x12\x13\n\tint_value\x18\x04 \x01(\x03H\x00\x42\x07\n\x05valueB\x06\n\x04_key\x1ay\n\x12\x41ttributeCondition\x12\x11\n\x04name\x18\x01 \x01(\tH\x01\x88\x01\x01\x12\x13\n\tstr_value\x18\x02 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x03 \x01(\x08H\x00\x12\x13\n\tint_value\x18\x04 \x01(\x03H\x00\x42\x07\n\x05valueB\x07\n\x05_nameB\x06\n\x04kindB\x0c\n\n_attribute\x1a\x44\n\x05Terms\x12;\n\x05terms\x18\x02 \x03(\x0b\x32,.turboci.graph.orchestrator.v1.NodePredicateB\x06\n\x04\x65xprBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n2turboci/graph/orchestrator/v1/node_predicate.proto\x12\x1dturboci.graph.orchestrator.v1\x1a.turboci/graph/orchestrator/v1/check_kind.proto\x1a/turboci/graph/orchestrator/v1/check_state.proto\x1a:turboci/graph/orchestrator/v1/stage_concluded_reason.proto\x1a/turboci/graph/orchestrator/v1/stage_state.proto\x1a.turboci/graph/orchestrator/v1/value_slot.proto\"\xdd\x0b\n\rNodePredicate\x12K\n\tcondition\x18\x01 \x01(\x0b\x32\x36.turboci.graph.orchestrator.v1.NodePredicate.ConditionH\x00\x12\x41\n\x03\x61ll\x18\x02 \x01(\x0b\x32\x32.turboci.graph.orchestrator.v1.NodePredicate.TermsH\x00\x12\x41\n\x03\x61ny\x18\x03 \x01(\x0b\x32\x32.turboci.graph.orchestrator.v1.NodePredicate.TermsH\x00\x1a\xaa\t\n\tCondition\x12V\n\x05stage\x18\x01 \x01(\x0b\x32\x45.turboci.graph.orchestrator.v1.NodePredicate.Condition.StageConditionH\x00\x12V\n\x05\x63heck\x18\x02 \x01(\x0b\x32\x45.turboci.graph.orchestrator.v1.NodePredicate.Condition.CheckConditionH\x00\x12]\n\nvalue_type\x18\x03 \x03(\x0b\x32I.turboci.graph.orchestrator.v1.NodePredicate.Condition.ValueTypeCondition\x12P\n\x03tag\x18\x04 \x03(\x0b\x32\x43.turboci.graph.orchestrator.v1.NodePredicate.Condition.TagCondition\x12\\\n\tattribute\x18\x05 \x03(\x0b\x32I.turboci.graph.orchestrator.v1.NodePredicate.Condition.AttributeCondition\x1a\xde\x01\n\x0eStageCondition\x12\x38\n\x05state\x18\x01 \x03(\x0e\x32).turboci.graph.orchestrator.v1.StageState\x12\x15\n\rargs_type_url\x18\x02 \x03(\t\x12\x10\n\x08sub_type\x18\x03 \x03(\t\x12M\n\x10\x63oncluded_reason\x18\x04 \x03(\x0e\x32\x33.turboci.graph.orchestrator.v1.StageConcludedReason\x12\x1a\n\x12work_executor_type\x18\x05 \x03(\x05\x1a\x94\x01\n\x0e\x43heckCondition\x12\x38\n\x05state\x18\x01 \x03(\x0e\x32).turboci.graph.orchestrator.v1.CheckState\x12\x36\n\x04kind\x18\x02 \x03(\x0e\x32(.turboci.graph.orchestrator.v1.CheckKind\x12\x10\n\x08sub_type\x18\x03 \x03(\t\x1ap\n\x12ValueTypeCondition\x12\x15\n\x08type_url\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x36\n\x04slot\x18\x02 \x03(\x0e\x32(.turboci.graph.orchestrator.v1.ValueSlotB\x0b\n\t_type_url\x1aq\n\x0cTagCondition\x12\x10\n\x03key\x18\x01 \x01(\tH\x01\x88\x01\x01\x12\x13\n\tstr_value\x18\x02 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x03 \x01(\x08H\x00\x12\x13\n\tint_value\x18\x04 \x01(\x03H\x00\x42\x07\n\x05valueB\x06\n\x04_key\x1ay\n\x12\x41ttributeCondition\x12\x11\n\x04name\x18\x01 \x01(\tH\x01\x88\x01\x01\x12\x13\n\tstr_value\x18\x02 \x01(\tH\x00\x12\x14\n\nbool_value\x18\x03 \x01(\x08H\x00\x12\x13\n\tint_value\x18\x04 \x01(\x03H\x00\x42\x07\n\x05valueB\x07\n\x05_nameB\x06\n\x04kind\x1a\x44\n\x05Terms\x12;\n\x05terms\x18\x02 \x03(\x0b\x32,.turboci.graph.orchestrator.v1.NodePredicateB\x06\n\x04\x65xprBIP\x01ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -38,19 +38,19 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'P\001ZEgo.chromium.org/turboci/proto/go/graph/orchestrator/v1;orchestratorpb'
   _globals['_NODEPREDICATE']._serialized_start=340
-  _globals['_NODEPREDICATE']._serialized_end=1860
+  _globals['_NODEPREDICATE']._serialized_end=1841
   _globals['_NODEPREDICATE_CONDITION']._serialized_start=569
-  _globals['_NODEPREDICATE_CONDITION']._serialized_end=1782
-  _globals['_NODEPREDICATE_CONDITION_STAGECONDITION']._serialized_start=1035
-  _globals['_NODEPREDICATE_CONDITION_STAGECONDITION']._serialized_end=1257
-  _globals['_NODEPREDICATE_CONDITION_CHECKCONDITION']._serialized_start=1260
-  _globals['_NODEPREDICATE_CONDITION_CHECKCONDITION']._serialized_end=1408
-  _globals['_NODEPREDICATE_CONDITION_VALUETYPECONDITION']._serialized_start=1410
-  _globals['_NODEPREDICATE_CONDITION_VALUETYPECONDITION']._serialized_end=1522
-  _globals['_NODEPREDICATE_CONDITION_TAGCONDITION']._serialized_start=1524
-  _globals['_NODEPREDICATE_CONDITION_TAGCONDITION']._serialized_end=1637
-  _globals['_NODEPREDICATE_CONDITION_ATTRIBUTECONDITION']._serialized_start=1639
-  _globals['_NODEPREDICATE_CONDITION_ATTRIBUTECONDITION']._serialized_end=1760
-  _globals['_NODEPREDICATE_TERMS']._serialized_start=1784
-  _globals['_NODEPREDICATE_TERMS']._serialized_end=1852
+  _globals['_NODEPREDICATE_CONDITION']._serialized_end=1763
+  _globals['_NODEPREDICATE_CONDITION_STAGECONDITION']._serialized_start=1030
+  _globals['_NODEPREDICATE_CONDITION_STAGECONDITION']._serialized_end=1252
+  _globals['_NODEPREDICATE_CONDITION_CHECKCONDITION']._serialized_start=1255
+  _globals['_NODEPREDICATE_CONDITION_CHECKCONDITION']._serialized_end=1403
+  _globals['_NODEPREDICATE_CONDITION_VALUETYPECONDITION']._serialized_start=1405
+  _globals['_NODEPREDICATE_CONDITION_VALUETYPECONDITION']._serialized_end=1517
+  _globals['_NODEPREDICATE_CONDITION_TAGCONDITION']._serialized_start=1519
+  _globals['_NODEPREDICATE_CONDITION_TAGCONDITION']._serialized_end=1632
+  _globals['_NODEPREDICATE_CONDITION_ATTRIBUTECONDITION']._serialized_start=1634
+  _globals['_NODEPREDICATE_CONDITION_ATTRIBUTECONDITION']._serialized_end=1755
+  _globals['_NODEPREDICATE_TERMS']._serialized_start=1765
+  _globals['_NODEPREDICATE_TERMS']._serialized_end=1833
 # @@protoc_insertion_point(module_scope)
