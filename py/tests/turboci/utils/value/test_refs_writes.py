@@ -7,6 +7,8 @@ import unittest
 
 from google.protobuf import any_pb2
 from google.protobuf import wrappers_pb2
+from testing.tags import demo_pb2
+from turboci.graph.orchestrator.v1 import tags_pb2
 from turboci.graph.orchestrator.v1 import value_ref_pb2
 from turboci.graph.orchestrator.v1 import value_write_pb2
 from turboci.utils import value
@@ -40,17 +42,12 @@ class TestRef(unittest.TestCase):
         ),
     )
 
-  def test_passthrough(self):
+  def test_any_fails(self):
     apb = any_pb2.Any()
     apb.Pack(wrappers_pb2.StringValue(value='morp'))
 
-    self.assertEqual(
-        value.write(apb),
-        value_write_pb2.ValueWrite(
-            data=apb,
-            realm='$from_container',
-        ),
-    )
+    with self.assertRaisesRegex(ValueError, r'google\.protobuf\.Any'):
+      value.write(apb)
 
 
 class TestWrite(unittest.TestCase):
@@ -68,6 +65,47 @@ class TestWrite(unittest.TestCase):
         ),
     )
 
+  def test_tags_are_added(self):
+    msg = demo_pb2.MyMessage(tagged_field='hello')
+    apb = any_pb2.Any()
+    apb.Pack(msg)
+    expected_tags = [
+        tags_pb2.Tag(
+            key='testing.tags.MyMessage.tagged_field',
+            indexed=False,
+            values=[
+                tags_pb2.Tag.Value(
+                    indexed=False,
+                    str_value='hello',
+                )
+            ],
+        )
+    ]
+    self.assertEqual(
+        value.write(msg, 'some:realm'),
+        value_write_pb2.ValueWrite(
+            data=apb,
+            realm='some:realm',
+            tags=expected_tags,
+        ),
+    )
+    self.assertEqual(
+        value.ref(msg, 'some:realm'),
+        value_ref_pb2.ValueRef(
+            type_url=value.url(demo_pb2.MyMessage),
+            inline=apb,
+            digest=str(value.Digest.compute(apb)),
+            realm='some:realm',
+            tags=expected_tags,
+        ),
+    )
+
 
 if __name__ == '__main__':
+  import sys
+  import unittest.util
+
+  if '-v' in sys.argv or '--verbose' in sys.argv:
+    unittest.util._MAX_LENGTH = 999999999  # pylint: disable=protected-access
+    unittest.TestCase.maxDiff = None
   unittest.main()

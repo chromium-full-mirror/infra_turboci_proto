@@ -19,6 +19,7 @@ from google.protobuf import any_pb2
 from turboci.graph.orchestrator.v1 import value_ref_pb2
 from turboci.graph.orchestrator.v1 import value_write_pb2
 from turboci.graph.orchestrator.v1 import omit_reason_pb2
+from turboci.utils import tags
 from turboci.utils.value import digest
 
 
@@ -34,6 +35,8 @@ def write(
     ) = '$from_container',
 ) -> value_write_pb2.ValueWrite:
   """Makes a ValueWrite.
+
+  This internally calls `tags.for_message` to generate tags for `data`.
 
   The special realm forms have the following meanings:
     * '' - This value must already exist in the DB. For example, if you are
@@ -51,21 +54,23 @@ def write(
       or Check.
 
   Args:
-    data: Proto message to store. As a convenience, if this is literally
-      any_pb2.Any, it's used verbatim.
+    data: Proto message to store. This must not be of type any_pb2.Any.
     realm: The security realm for this ref, or one of the special realm forms.
       Defaults to '$from_container'.
 
   Returns:
-    A ValueWrite with data set to the Any-packed version of `data`.
+    A ValueWrite with data set to the Any-packed version of `data`, and tags set
+    via `tags.for_message(data)`.
   """
   apb: any_pb2.Any
   if isinstance(data, any_pb2.Any):
-    apb = data
-  else:
-    apb = any_pb2.Any()
-    apb.Pack(data, deterministic=True)
-  return value_write_pb2.ValueWrite(data=apb, realm=realm)
+    raise ValueError('Cannot handle google.protobuf.Any as `data`')
+
+  apb = any_pb2.Any()
+  apb.Pack(data, deterministic=True)
+  return value_write_pb2.ValueWrite(
+      data=apb, realm=realm, tags=tags.for_message(data).to_proto()
+  )
 
 
 def ref(
@@ -136,4 +141,5 @@ def ref_from_write(
       digest=str(digest.Digest.compute(val_write.data)),
       realm=val_write.realm,
       omit_reason=omit_reason,
+      tags=val_write.tags,
   )

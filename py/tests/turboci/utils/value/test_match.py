@@ -8,6 +8,7 @@ import unittest
 from google.protobuf import timestamp_pb2
 from google.protobuf import wrappers_pb2
 from turboci.graph.orchestrator.v1 import value_ref_pb2
+from turboci.utils import tags
 from turboci.utils import value
 
 
@@ -25,23 +26,19 @@ class TestMatch(unittest.TestCase):
 
     # Match inline with tags
     write_tagged = value.write(msg, realm='project:realm')
-    write_tagged.tags.add()  # TODO
-    write_tagged.tags.add()  # TODO
-    # write_tagged.tags.extend(
-    #     tags.make_map(
-    #         tags.Template(key='t1', strings=['t1hi']).make(),
-    #         tags.Template(key='t2', strings=['t2hi']).make(),
-    #     ).to_proto()
-    # )
+    write_tagged.tags.extend(
+        tags.Map(
+            tags.make('t1', 't1hi'),
+            tags.make('t2', 't2hi'),
+        ).to_proto()
+    )
     ref_tagged = value.ref(msg, 'project:realm')
-    ref_tagged.tags.add()  # TODO
-    ref_tagged.tags.add()  # TODO
-    # ref_tagged.tags.extend(
-    #     tags.make_map(
-    #         tags.Template(key='t1', strings=['t1hi']).make(),
-    #         tags.Template(key='t2', strings=['t2hi']).make(),
-    #     ).to_proto()
-    # )
+    ref_tagged.tags.extend(
+        tags.Map(
+            tags.make('t1', 't1hi'),
+            tags.make('t2', 't2hi'),
+        ).to_proto()
+    )
     self.assertTrue(value.write_matches_ref(write_tagged, ref_tagged))
     self.assertFalse(value.write_matches_ref(write_tagged, ref_inline))
     self.assertFalse(value.write_matches_ref(write, ref_tagged))
@@ -129,21 +126,17 @@ class TestMatch(unittest.TestCase):
 
     # Inline vs Inline with tags
     ref_tagged_a = value.ref(msg, 'project:realm')
-    ref_tagged_a.tags.add()  # TODO
-    ref_tagged_a.tags.add()  # TODO
-    # ref_tagged_a.tags.extend(
-    #     tags.make_map(
-    #         tags.Template(key='t1', strings=['t1hi']).make(),
-    #     ).to_proto()
-    # )
+    ref_tagged_a.tags.extend(
+        tags.Map(
+            tags.make('t1', 't1hi'),
+        ).to_proto()
+    )
     ref_tagged_b = value.ref(msg, 'project:realm')
-    ref_tagged_b.tags.add()  # TODO
-    ref_tagged_b.tags.add()  # TODO
-    # ref_tagged_b.tags.extend(
-    #     tags.make_map(
-    #         tags.Template(key='t1', strings=['t1hi']).make(),
-    #     ).to_proto()
-    # )
+    ref_tagged_b.tags.extend(
+        tags.Map(
+            tags.make('t1', 't1hi'),
+        ).to_proto()
+    )
     self.assertTrue(value.ref_matches_ref(ref_tagged_a, ref_tagged_b))
     self.assertFalse(value.ref_matches_ref(ref_tagged_a, ref_a))
     self.assertFalse(value.ref_matches_ref(ref_a, ref_tagged_b))
