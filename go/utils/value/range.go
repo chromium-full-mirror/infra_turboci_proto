@@ -5,14 +5,42 @@
 package value
 
 import (
+	"fmt"
 	"iter"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
 )
 
-// RefsInStage is an iterator which iterates through every non-nil *ValueRef
+// RefsIn returns an iterator which iterates through all ValueRefs in the
+// object.
+//
+// Object may be:
+//   - *Stage
+//   - *Stage_Attempt
+//   - *Check
+//   - *WorkPlan
+//   - *Edit
+//
+// Otherwise this will panic.
+func RefsIn(object any) iter.Seq2[orchestratorpb.ValueSlot, *orchestratorpb.ValueRef] {
+	switch x := any(object).(type) {
+	case *orchestratorpb.Stage:
+		return refsInStage(x)
+	case *orchestratorpb.Stage_Attempt:
+		return refsInStageAttempt(x)
+	case *orchestratorpb.Check:
+		return refsInCheck(x)
+	case *orchestratorpb.WorkPlan:
+		return refsInWorkplan(x)
+	case *orchestratorpb.Edit:
+		return refsInEdit(x)
+	}
+	panic(fmt.Sprintf("impossible: bad type %T", object))
+}
+
+// refsInStage is an iterator which iterates through every non-nil *ValueRef
 // in the stage.
-func RefsInStage(stage *orchestratorpb.Stage) iter.Seq2[orchestratorpb.ValueSlot, *orchestratorpb.ValueRef] {
+func refsInStage(stage *orchestratorpb.Stage) iter.Seq2[orchestratorpb.ValueSlot, *orchestratorpb.ValueRef] {
 	return func(yield func(orchestratorpb.ValueSlot, *orchestratorpb.ValueRef) bool) {
 		if args := stage.GetArgs(); args != nil && !yield(orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, args) {
 			return
@@ -23,7 +51,7 @@ func RefsInStage(stage *orchestratorpb.Stage) iter.Seq2[orchestratorpb.ValueSlot
 		}
 
 		for _, edit := range stage.GetEdits() {
-			for slot, ref := range RefsInEdit(edit) {
+			for slot, ref := range refsInEdit(edit) {
 				if ref != nil && !yield(slot, ref) {
 					return
 				}
@@ -31,7 +59,7 @@ func RefsInStage(stage *orchestratorpb.Stage) iter.Seq2[orchestratorpb.ValueSlot
 		}
 
 		for _, attempt := range stage.GetAttempts() {
-			for slot, ref := range RefsInStageAttempt(attempt) {
+			for slot, ref := range refsInStageAttempt(attempt) {
 				if ref != nil && !yield(slot, ref) {
 					return
 				}
@@ -40,9 +68,9 @@ func RefsInStage(stage *orchestratorpb.Stage) iter.Seq2[orchestratorpb.ValueSlot
 	}
 }
 
-// RefsInStageAttempt is an iterator which iterates through every non-nil
+// refsInStageAttempt is an iterator which iterates through every non-nil
 // *ValueRef in the stage attempt.
-func RefsInStageAttempt(attempt *orchestratorpb.Stage_Attempt) iter.Seq2[orchestratorpb.ValueSlot, *orchestratorpb.ValueRef] {
+func refsInStageAttempt(attempt *orchestratorpb.Stage_Attempt) iter.Seq2[orchestratorpb.ValueSlot, *orchestratorpb.ValueRef] {
 	return func(yield func(orchestratorpb.ValueSlot, *orchestratorpb.ValueRef) bool) {
 		for _, detail := range attempt.GetDetails() {
 			if detail != nil && !yield(orchestratorpb.ValueSlot_VALUE_SLOT_ATTEMPT_DETAIL, detail) {
@@ -59,9 +87,9 @@ func RefsInStageAttempt(attempt *orchestratorpb.Stage_Attempt) iter.Seq2[orchest
 	}
 }
 
-// RefsInEdit is an iterator which iterates through every non-nil
+// refsInEdit is an iterator which iterates through every non-nil
 // *ValueRef in the edit.
-func RefsInEdit(edit *orchestratorpb.Edit) iter.Seq2[orchestratorpb.ValueSlot, *orchestratorpb.ValueRef] {
+func refsInEdit(edit *orchestratorpb.Edit) iter.Seq2[orchestratorpb.ValueSlot, *orchestratorpb.ValueRef] {
 	switch edit.WhichDelta() {
 	case orchestratorpb.Edit_Stage_case:
 		return func(yield func(orchestratorpb.ValueSlot, *orchestratorpb.ValueRef) bool) {
@@ -104,9 +132,9 @@ func RefsInEdit(edit *orchestratorpb.Edit) iter.Seq2[orchestratorpb.ValueSlot, *
 	panic("impossible")
 }
 
-// RefsInCheck is an iterator which iterates through every non-nil
+// refsInCheck is an iterator which iterates through every non-nil
 // *ValueRef in the check.
-func RefsInCheck(check *orchestratorpb.Check) iter.Seq2[orchestratorpb.ValueSlot, *orchestratorpb.ValueRef] {
+func refsInCheck(check *orchestratorpb.Check) iter.Seq2[orchestratorpb.ValueSlot, *orchestratorpb.ValueRef] {
 	return func(yield func(orchestratorpb.ValueSlot, *orchestratorpb.ValueRef) bool) {
 		for _, option := range check.GetOptions() {
 			if option != nil && !yield(orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_OPTION, option) {
@@ -121,7 +149,7 @@ func RefsInCheck(check *orchestratorpb.Check) iter.Seq2[orchestratorpb.ValueSlot
 			}
 		}
 		for _, edit := range check.GetEdits() {
-			for slot, ref := range RefsInEdit(edit) {
+			for slot, ref := range refsInEdit(edit) {
 				if ref != nil && !yield(slot, ref) {
 					return
 				}
@@ -130,19 +158,19 @@ func RefsInCheck(check *orchestratorpb.Check) iter.Seq2[orchestratorpb.ValueSlot
 	}
 }
 
-// RefsInWorkplan is an iterator which iterates through every non-nil
+// refsInWorkplan is an iterator which iterates through every non-nil
 // *ValueRef in the WorkPlan.
-func RefsInWorkplan(wp *orchestratorpb.WorkPlan) iter.Seq2[orchestratorpb.ValueSlot, *orchestratorpb.ValueRef] {
+func refsInWorkplan(wp *orchestratorpb.WorkPlan) iter.Seq2[orchestratorpb.ValueSlot, *orchestratorpb.ValueRef] {
 	return func(yield func(orchestratorpb.ValueSlot, *orchestratorpb.ValueRef) bool) {
 		for _, stg := range wp.GetStages() {
-			for slot, ref := range RefsInStage(stg) {
+			for slot, ref := range refsInStage(stg) {
 				if !yield(slot, ref) {
 					return
 				}
 			}
 		}
 		for _, chk := range wp.GetChecks() {
-			for slot, ref := range RefsInCheck(chk) {
+			for slot, ref := range refsInCheck(chk) {
 				if !yield(slot, ref) {
 					return
 				}
