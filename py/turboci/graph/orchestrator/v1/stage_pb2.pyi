@@ -51,7 +51,7 @@ class Stage(_message.Message):
         builtin_executor: _builtin_executor_pb2.BuiltinExecutor
         def __init__(self, requested: _Optional[_Union[_stage_execution_policy_pb2.StageExecutionPolicy, _Mapping]] = ..., validated: _Optional[_Union[_stage_execution_policy_pb2.StageExecutionPolicy, _Mapping]] = ..., builtin_executor: _Optional[_Union[_builtin_executor_pb2.BuiltinExecutor, str]] = ...) -> None: ...
     class Attempt(_message.Message):
-        __slots__ = ("identifier", "version", "last_heartbeat", "state", "state_history", "waiting_until", "process_uid", "details", "progress", "execution_policy")
+        __slots__ = ("identifier", "version", "last_heartbeat", "cancelled_at", "state", "state_history", "waiting_until", "process_uid", "details", "progress", "execution_policy")
         class StateHistoryEntry(_message.Message):
             __slots__ = ("state", "version")
             STATE_FIELD_NUMBER: _ClassVar[int]
@@ -75,6 +75,7 @@ class Stage(_message.Message):
         IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
         VERSION_FIELD_NUMBER: _ClassVar[int]
         LAST_HEARTBEAT_FIELD_NUMBER: _ClassVar[int]
+        CANCELLED_AT_FIELD_NUMBER: _ClassVar[int]
         STATE_FIELD_NUMBER: _ClassVar[int]
         STATE_HISTORY_FIELD_NUMBER: _ClassVar[int]
         WAITING_UNTIL_FIELD_NUMBER: _ClassVar[int]
@@ -85,6 +86,7 @@ class Stage(_message.Message):
         identifier: _identifier_pb2.StageAttempt
         version: _revision_pb2.Revision
         last_heartbeat: _revision_pb2.Revision
+        cancelled_at: _revision_pb2.Revision
         state: _stage_attempt_state_pb2.StageAttemptState
         state_history: _containers.RepeatedCompositeFieldContainer[Stage.Attempt.StateHistoryEntry]
         waiting_until: _timestamp_pb2.Timestamp
@@ -92,7 +94,7 @@ class Stage(_message.Message):
         details: _containers.RepeatedCompositeFieldContainer[_value_ref_pb2.ValueRef]
         progress: _containers.RepeatedCompositeFieldContainer[Stage.Attempt.Progress]
         execution_policy: _stage_attempt_execution_policy_pb2.StageAttemptExecutionPolicy
-        def __init__(self, identifier: _Optional[_Union[_identifier_pb2.StageAttempt, _Mapping]] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., last_heartbeat: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., state: _Optional[_Union[_stage_attempt_state_pb2.StageAttemptState, str]] = ..., state_history: _Optional[_Iterable[_Union[Stage.Attempt.StateHistoryEntry, _Mapping]]] = ..., waiting_until: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., process_uid: _Optional[str] = ..., details: _Optional[_Iterable[_Union[_value_ref_pb2.ValueRef, _Mapping]]] = ..., progress: _Optional[_Iterable[_Union[Stage.Attempt.Progress, _Mapping]]] = ..., execution_policy: _Optional[_Union[_stage_attempt_execution_policy_pb2.StageAttemptExecutionPolicy, _Mapping]] = ...) -> None: ...
+        def __init__(self, identifier: _Optional[_Union[_identifier_pb2.StageAttempt, _Mapping]] = ..., version: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., last_heartbeat: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., cancelled_at: _Optional[_Union[_revision_pb2.Revision, _Mapping]] = ..., state: _Optional[_Union[_stage_attempt_state_pb2.StageAttemptState, str]] = ..., state_history: _Optional[_Iterable[_Union[Stage.Attempt.StateHistoryEntry, _Mapping]]] = ..., waiting_until: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., process_uid: _Optional[str] = ..., details: _Optional[_Iterable[_Union[_value_ref_pb2.ValueRef, _Mapping]]] = ..., progress: _Optional[_Iterable[_Union[Stage.Attempt.Progress, _Mapping]]] = ..., execution_policy: _Optional[_Union[_stage_attempt_execution_policy_pb2.StageAttemptExecutionPolicy, _Mapping]] = ...) -> None: ...
     class Assignment(_message.Message):
         __slots__ = ("target", "goal_state")
         TARGET_FIELD_NUMBER: _ClassVar[int]

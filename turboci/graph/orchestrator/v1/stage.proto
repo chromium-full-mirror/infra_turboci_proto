@@ -228,7 +228,7 @@ message Stage {
   // Stages in the AWAITING state ALWAYS have an active Attempt, even before
   // the Orchestrator sends the first RPC to the Executor for this Stage.
   //
-  // Next ID: 12
+  // Next ID: 13
   message Attempt {
     // The Stage Attempt's identifier.
     optional ids.v1.StageAttempt identifier = 1 [(google.api.field_behavior) = IMMUTABLE];
@@ -249,6 +249,12 @@ message Stage {
     // THROTTLED (because we accepted a WriteNodes in order to enter the
     // THROTTLED state).
     optional Revision last_heartbeat = 10;
+
+    // If the attempt was cancelled, when it happened.
+    //
+    // Matches Stage.cancelled_at, but useful to have in this message for cases
+    // when it is used on its own without the parent Stage.
+    optional Revision cancelled_at = 12;
 
     // The current state of this Attempt.
     optional StageAttemptState state = 3;
