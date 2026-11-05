@@ -1,12 +1,15 @@
 # Copyright 2026 The Chromium Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
-"""Defines decode, lookup and find."""
+"""Defines OmittedDataError, decode, decode_data, get_data, lookup and results."""
 
 from __future__ import annotations
 
 __all__ = [
+    'OmittedDataError',
     'decode',
+    'decode_data',
+    'get_data',
     'lookup',
     'results',
 ]
@@ -14,11 +17,11 @@ __all__ = [
 
 import typing
 
-from google.protobuf import any_pb2
-from google.protobuf import message
 from google.protobuf import json_format
+from google.protobuf import message
 
 from turboci.graph.orchestrator.v1 import check_pb2
+from turboci.graph.orchestrator.v1 import omit_reason_pb2
 from turboci.graph.orchestrator.v1 import value_data_pb2
 from turboci.graph.orchestrator.v1 import value_ref_pb2
 from turboci.utils import value
@@ -29,55 +32,99 @@ from turboci.utils.value import ordered
 T = typing.TypeVar('T', bound=message.Message)
 
 
+class OmittedDataError(ValueError):
+  """Raised when attempting to read or copy data from an omitted ValueRef."""
+
+  omit_reason: omit_reason_pb2.OmitReason
+
+  def __init__(
+      self,
+      omit_reason: omit_reason_pb2.OmitReason,
+      prefix: str = '',
+  ) -> None:
+    self.omit_reason = omit_reason
+    try:
+      reason_name = omit_reason_pb2.OmitReason.Name(omit_reason)
+    except ValueError:
+      reason_name = str(int(omit_reason))
+    msg = f'data is omitted: {reason_name}'
+    if prefix:
+      msg = f'{prefix}: {msg}'
+    super().__init__(msg)
+
+
 def decode(
     ds: data_source.DataSource, ref: value_ref_pb2.ValueRef, msg: type[T]
-) -> T:
-  """Decode decodes and returns a proto of type `msg` from the given ValueRef.
+) -> None | T:
+  """Decodes and returns a proto of type `msg` from the given ValueRef.
 
   Args:
     ds: A DataSource used to pull ValueData by digest.
     ref: The ValueRef to decode.
     msg: The expected message type to decode.
 
+  Returns:
+    The decoded message of type `msg`, or None if `ref`'s data is not present in
+    `ds`.
+
   Raises:
+    OmittedDataError: If `ref` has `omit_reason` set.
     ValueError: If the type of the ref does not match the type of `msg`.
-    protobuf.DecodeError: If the data cannot be decoded.
+    message.DecodeError: If the data cannot be decoded.
   """
   if ref.type_url != (targ_url := value.url(msg)):
-    raise ValueError(
-        f'cannot decode ValueRef[{ref.type_url}] into {targ_url!r}.'
-    )
+    raise ValueError(f'mismatched types "{targ_url}" != "{ref.type_url}"')
 
-  bin_data: None | any_pb2.Any = None
-  json_data: None | value_data_pb2.ValueData.JsonAny = None
-  if ref.HasField('inline'):
-    bin_data = ref.inline
+  return decode_data(get_data(ds, ref), msg)
 
-  if ref.HasField('digest') and bin_data is None:
-    try:
-      got = ds[ref.digest]
-      if got.HasField('binary'):
-        bin_data = got.binary
-      elif got.HasField('json'):
-        json_data = got.json
-    except KeyError:
-      pass
 
-  if not bin_data and not json_data:
-    raise ValueError(f'could not find data for ValueRef[{ref.type_url}]')
+def decode_data(
+    data: None | value_data_pb2.ValueData, msg: type[T]
+) -> None | T:
+  """Decodes and returns a proto of type `msg` from the given ValueData.
 
-  if bin_data:
+  Args:
+    data: The ValueData to decode, or None.
+    msg: The expected message type to decode.
+
+  Returns:
+    The decoded message of type `msg`, or None if `data` is None or has neither
+    binary nor json populated.
+
+  Raises:
+    message.DecodeError: If the ValueData has a type_url mismatch or cannot be
+      decoded.
+  """
+  if data is None:
+    return None
+
+  which = data.WhichOneof('data')
+  if which is None:
+    return None
+
+  targ_url = value.url(msg)
+  if which == 'binary':
+    bin_data = data.binary
+    if bin_data.type_url != targ_url:
+      raise message.DecodeError(
+          f'BUG: mismatched types "{targ_url}" != "{bin_data.type_url}" in'
+          ' ValueData'
+      )
     ret = msg()
-    if not bin_data.Unpack(ret):
-      raise message.DecodeError(f'failed to unpack {ref.type_url!r}')
+    try:
+      if not bin_data.Unpack(ret):
+        raise message.DecodeError(f'failed to unpack "{targ_url}"')
+    except message.DecodeError as ex:
+      raise message.DecodeError(
+          f'failed to unmarshal binary for "{targ_url}": {ex}'
+      ) from ex
     return ret
 
-  if not json_data:
-    raise ValueError(f'could not find data for ValueRef[{ref.type_url}]')
-
-  if json_data.type_url != ref.type_url:
+  json_data = data.json
+  if json_data.type_url != targ_url:
     raise message.DecodeError(
-        f'BUG: mismatched refs {json_data.type_url!r} vs {ref.type_url!r}'
+        f'BUG: mismatched types "{targ_url}" != "{json_data.type_url}" in'
+        ' ValueData'
     )
 
   ret = msg()
@@ -85,7 +132,7 @@ def decode(
     json_format.Parse(json_data.value, ret, ignore_unknown_fields=True)
   except json_format.ParseError as ex:
     raise message.DecodeError(
-        f'failed to parse JSON for {ref.type_url!r}: {ex}'
+        f'failed to parse JSON for "{targ_url}": {ex}'
     ) from ex
   return ret
 
@@ -134,8 +181,37 @@ def results(
     All non-omitted result data in this Check which match `msg` (which may be
     none).
   """
-  ret = []
+  ret: list[T] = []
   for rslt in check.results:
-    if x := lookup(ds, rslt.data, msg):
+    if (x := lookup(ds, rslt.data, msg)) is not None:
       ret.append(x)
   return ret
+
+
+def get_data(
+    ds: data_source.DataSource, ref: value_ref_pb2.ValueRef
+) -> None | value_data_pb2.ValueData:
+  """Gets the raw ValueData for the given ref.
+
+  Synthesizes a new ValueData if `ref` contains inline data.
+
+  Args:
+    ds: A DataSource used to pull ValueData by digest.
+    ref: The ValueRef to retrieve data for.
+
+  Returns:
+    The ValueData for `ref`, or None if `ref` is not present in `ds`.
+
+  Raises:
+    OmittedDataError: If `ref` has `omit_reason` set.
+  """
+  if ref.HasField('omit_reason'):
+    raise OmittedDataError(ref.omit_reason)
+
+  if ref.HasField('inline'):
+    return value_data_pb2.ValueData(binary=ref.inline)
+
+  if ref.HasField('digest'):
+    return ds.get(ref.digest)
+
+  return None

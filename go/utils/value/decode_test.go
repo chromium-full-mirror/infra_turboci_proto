@@ -6,6 +6,7 @@ package value
 
 import (
 	"cmp"
+	"errors"
 	"slices"
 	"strings"
 	"testing"
@@ -118,6 +119,22 @@ func TestDecode(t *testing.T) {
 		_, err := Decode[*structpb.Value](dSrc, vref)
 		if err == nil || !strings.Contains(err.Error(), "mismatched types") {
 			t.Fatalf("expected error containing %q, got %v", "mismatched types", err)
+		}
+	})
+
+	t.Run(`omitted`, func(t *testing.T) {
+		t.Parallel()
+
+		vref := MustInline(structpb.NewStringValue("hi"), "proj:realm")
+		Omit(vref, orchestratorpb.OmitReason_OMIT_REASON_NO_ACCESS)
+
+		_, err := Decode[*structpb.Value](nil, vref)
+		var omitErr OmittedDataError
+		if !errors.As(err, &omitErr) {
+			t.Fatalf("expected OmittedDataError, got %v", err)
+		}
+		if omitErr.OmitReason != orchestratorpb.OmitReason_OMIT_REASON_NO_ACCESS {
+			t.Errorf("got OmitReason %v, want NO_ACCESS", omitErr.OmitReason)
 		}
 	})
 }

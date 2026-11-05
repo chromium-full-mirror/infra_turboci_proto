@@ -40,7 +40,8 @@ binary content has already been stored.
 
 ### `decode.py`
 
-Unpacks `ValueRef` objects back into usable runtime Protobuf objects. It
+Unpacks `ValueRef` and `ValueData` objects back into usable runtime Protobuf
+objects (`decode`, `decode_data`, `get_data`, and `OmittedDataError`). It
 supports decoding inline data and resolving digest lookups from a `DataSource`.
 It includes utilities for searching sorted lists of references (`lookup`) and
 aggregating result lists specifically for `Check` proto objects (`results`).
@@ -65,6 +66,12 @@ Maintains ordered lists of `ValueRef` objects sorted by `type_url`. It includes
 utilities to locate references efficiently (`find`, `find_all`) and update
 operations (`add_ref`, `set_ref`) that strictly preserve ordering and enforce
 realm consistency.
+
+### `ref_to_write.py`
+
+Provides `ref_to_write` to copy a `ValueRef` into a `ValueWrite` without
+recomputing tags. Directly copies binary data when available, or re-encodes JSON
+`ValueData` to deterministic binary `Any` via descriptor lookup.
 
 ### `refs_writes.py`
 

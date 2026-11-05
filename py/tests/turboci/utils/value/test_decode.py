@@ -10,6 +10,7 @@ from google.protobuf import message
 from google.protobuf import struct_pb2
 from google.protobuf import wrappers_pb2
 from turboci.graph.orchestrator.v1 import check_pb2
+from turboci.graph.orchestrator.v1 import omit_reason_pb2
 from turboci.graph.orchestrator.v1 import value_data_pb2
 from turboci.graph.orchestrator.v1 import value_ref_pb2
 from turboci.utils import value
@@ -45,13 +46,36 @@ class TestDecode(unittest.TestCase):
     want.update({'key': [1, 2, 3]})
     self.assertEqual(decoded, want)
 
-  def test_missing_data(self):
+  def test_missing_data(self) -> None:
     ref = value_ref_pb2.ValueRef(
         realm='project:realm',
         digest='fake-digest',
         type_url=value.url(wrappers_pb2.StringValue),
     )
-    with self.assertRaisesRegex(ValueError, 'could not find data'):
+    self.assertIsNone(value.decode({}, ref, wrappers_pb2.StringValue))
+
+  def test_omitted(self) -> None:
+    ref = value.ref(
+        wrappers_pb2.StringValue(value='norp'),
+        'project:realm',
+        omit_reason='OMIT_REASON_NO_ACCESS',
+    )
+    with self.assertRaisesRegex(value.OmittedDataError, 'data is omitted') as ctx:
+      value.decode({}, ref, wrappers_pb2.StringValue)
+    self.assertIsInstance(ctx.exception, ValueError)
+    self.assertEqual(
+        ctx.exception.omit_reason, omit_reason_pb2.OMIT_REASON_NO_ACCESS
+    )
+
+  def test_ref_type_mismatch(self) -> None:
+    ref = value.ref(wrappers_pb2.BoolValue(value=True), 'project:realm')
+    with self.assertRaisesRegex(ValueError, 'mismatched types'):
+      value.decode({}, ref, wrappers_pb2.StringValue)
+
+  def test_binary_corrupt(self) -> None:
+    ref = value.ref(wrappers_pb2.StringValue(value='norp'), 'project:realm')
+    ref.inline.value = b'\xff\xff\xff'
+    with self.assertRaises(message.DecodeError):
       value.decode({}, ref, wrappers_pb2.StringValue)
 
   def test_binary_unpack_mismatch(self):
@@ -110,6 +134,55 @@ class TestDecode(unittest.TestCase):
     }
     decoded = value.decode(ds, ref, value_ref_pb2.ValueRef)
     self.assertEqual(decoded, value_ref_pb2.ValueRef(realm='proj:realm'))
+
+
+class TestGetDataAndDecodeData(unittest.TestCase):
+
+  def test_get_data_inline(self) -> None:
+    ref = value.ref(wrappers_pb2.StringValue(value='norp'), 'project:realm')
+    got = value.get_data({}, ref)
+    self.assertEqual(got, value_data_pb2.ValueData(binary=ref.inline))
+
+  def test_get_data_externed(self) -> None:
+    ref = value.ref(wrappers_pb2.StringValue(value='norp'), 'project:realm')
+    ds = value.SimpleDataSource()
+    value.absorb_inline(ds, ref)
+    got = value.get_data(ds, ref)
+    self.assertEqual(got, ds[ref.digest])
+
+  def test_get_data_omitted(self) -> None:
+    ref = value.ref(
+        wrappers_pb2.StringValue(value='norp'),
+        'project:realm',
+        omit_reason='OMIT_REASON_UNWANTED',
+    )
+    with self.assertRaisesRegex(value.OmittedDataError, 'data is omitted') as ctx:
+      value.get_data({}, ref)
+    self.assertEqual(
+        ctx.exception.omit_reason, omit_reason_pb2.OMIT_REASON_UNWANTED
+    )
+
+  def test_get_data_missing(self) -> None:
+    ref = value_ref_pb2.ValueRef(
+        realm='project:realm',
+        digest='missing',
+        type_url=value.url(wrappers_pb2.StringValue),
+    )
+    self.assertIsNone(value.get_data({}, ref))
+    self.assertIsNone(value.get_data({}, value_ref_pb2.ValueRef()))
+
+  def test_decode_data(self) -> None:
+    self.assertIsNone(value.decode_data(None, wrappers_pb2.StringValue))
+    self.assertIsNone(
+        value.decode_data(value_data_pb2.ValueData(), wrappers_pb2.StringValue)
+    )
+
+    ref = value.ref(wrappers_pb2.StringValue(value='norp'), 'project:realm')
+    data = value.get_data({}, ref)
+    self.assertEqual(
+        value.decode_data(data, wrappers_pb2.StringValue),
+        wrappers_pb2.StringValue(value='norp'),
+    )
 
 
 class TestLookup(unittest.TestCase):

@@ -12,7 +12,6 @@ import (
 
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/anypb"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
 )
@@ -22,6 +21,7 @@ import (
 // `source` is used to lookup the data for this ValueRef if it's not inline.
 //
 // If ValueRef has a type_url which does not match `T`, this returns an error.
+// If ValueRef has an OmitReason set, this returns an [OmittedDataError].
 func Decode[T proto.Message](source DataSource, ref *orchestratorpb.ValueRef) (T, error) {
 	var zero T
 	typeURL := URL[T]()
@@ -29,20 +29,25 @@ func Decode[T proto.Message](source DataSource, ref *orchestratorpb.ValueRef) (T
 		return zero, fmt.Errorf("mismatched types %q != %q", typeURL, ref.GetTypeUrl())
 	}
 
-	var binData *anypb.Any
-	var jsonData *orchestratorpb.ValueData_JsonAny
-
-	if data := ref.GetInline(); data != nil {
-		binData = data
-	} else {
-		got := source.Retrieve(Digest(ref.GetDigest()))
-		binData, jsonData = got.GetBinary(), got.GetJson()
+	data, err := GetData(source, ref)
+	if err != nil {
+		return zero, err
 	}
+	return DecodeData[T](data)
+}
+
+// DecodeData decodes and returns a proto of type `T` from the given ValueData.
+//
+// If ValueData has a type_url which does not match `T`, this returns an error.
+func DecodeData[T proto.Message](data *orchestratorpb.ValueData) (T, error) {
+	var zero T
+	binData, jsonData := data.GetBinary(), data.GetJson()
 
 	if binData == nil && jsonData == nil {
 		return zero, nil
 	}
 
+	typeURL := URL[T]()
 	if binData != nil {
 		if binData.TypeUrl != typeURL {
 			// This should never happen; it means a ValueRef for type X pointed to a
@@ -134,4 +139,23 @@ func Results[T proto.Message](source DataSource, check *orchestratorpb.Check) ([
 		}
 	}
 	return ret, errors.Join(errs...)
+}
+
+// GetData gets the raw ValueData for the given ref.
+//
+// Synthesizes a new one if `ref` contains inline data.
+//
+// Returns an [OmittedDataError] if `ref` has an OmitReason set.
+func GetData(source DataSource, ref *orchestratorpb.ValueRef) (*orchestratorpb.ValueData, error) {
+	if ref.HasOmitReason() {
+		return nil, OmittedDataError{OmitReason: ref.GetOmitReason()}
+	}
+
+	if data := ref.GetInline(); data != nil {
+		return orchestratorpb.ValueData_builder{
+			Binary: data,
+		}.Build(), nil
+	}
+
+	return source.Retrieve(Digest(ref.GetDigest())), nil
 }

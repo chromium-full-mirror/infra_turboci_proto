@@ -10,6 +10,17 @@ import (
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
 )
 
+// OmittedDataError is returned when attempting to read or copy data from a
+// ValueRef whose data has been omitted (i.e. ref.HasOmitReason() is true).
+type OmittedDataError struct {
+	OmitReason orchestratorpb.OmitReason
+}
+
+// Error implements error.
+func (e OmittedDataError) Error() string {
+	return fmt.Sprintf("data is omitted: %s", e.OmitReason)
+}
+
 // Omit sets the OmitReason in this ref.
 //
 // If the ref has inline data, it's converted to a digest and then dropped.
