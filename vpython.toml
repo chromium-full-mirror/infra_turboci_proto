@@ -1,0 +1,10 @@
+requires-python = '>=3.11,<3.12'
+dependencies = [
+  'googleapis-common-protos==1.69.2',
+  'grpcio-status==1.74.0',
+  'grpcio==1.74.0',
+  'protobuf==6.32.1',
+  'pyrefly>=1.4.0',
+  'types-grpcio==1.85.0.20261028',
+  'types-protobuf==6.32.1.20251105',
+]

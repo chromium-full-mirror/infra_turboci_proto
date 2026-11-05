@@ -40,10 +40,7 @@ _FieldValue: typing.TypeAlias = (
 
 
 def _is_map_field(field: descriptor.FieldDescriptor) -> bool:
-  return (
-      field.type == descriptor.FieldDescriptor.TYPE_MESSAGE
-      and field.message_type.GetOptions().map_entry
-  )
+  return bool(field.message_type and field.message_type.GetOptions().map_entry)
 
 
 def _is_list_field(field: descriptor.FieldDescriptor) -> bool:
@@ -73,10 +70,10 @@ def _normalize_tag(
   if tag.index_key_only:
     _get().indexed = True
   elif not tag.indexed:
-    _get().ClearField('indexed')
+    _get().ClearField("indexed")
 
   if (
-      not tag.HasField('capture_unset')
+      not tag.HasField("capture_unset")
       and field_type == descriptor.FieldDescriptor.TYPE_BOOL
   ):
     _get().capture_unset = True
@@ -90,7 +87,7 @@ def _normalize_tag(
 def _make_scalar_extractor(
     field: descriptor.FieldDescriptor,
 ) -> typing.Callable[[_ScalarValue, bool], list[tags_pb2.Tag.Value]] | None:
-  if field.type == descriptor.FieldDescriptor.TYPE_ENUM:
+  if field.enum_type:
     values_by_number = field.enum_type.values_by_number
 
     def _enum_extractor(
@@ -153,17 +150,19 @@ def _tagged_field_extractor(
     tag: tag_pb2.Tag,
 ) -> _FieldExtractor:
   if _is_map_field(field):
-    raise ValueError(f'{field.full_name}: turboci.tag: unsupported field: map')
+    raise ValueError(f"{field.full_name}: turboci.tag: unsupported field: map")
 
   codec = _make_scalar_extractor(field)
   if codec is None:
     kind_name = (
-        descriptor_pb2.FieldDescriptorProto.Type.Name(field.type)
-        .removeprefix('TYPE_')
+        descriptor_pb2.FieldDescriptorProto.Type.Name(
+            descriptor_pb2.FieldDescriptorProto.Type.ValueType(field.type)
+        )
+        .removeprefix("TYPE_")
         .lower()
     )
     raise ValueError(
-        f'{field.full_name}: turboci.tag: unsupported field kind {kind_name}'
+        f"{field.full_name}: turboci.tag: unsupported field kind {kind_name}"
     )
 
   keys = (field.full_name, *tag.alt_key)
@@ -173,6 +172,8 @@ def _tagged_field_extractor(
   is_list = _is_list_field(field)
 
   def _extract(val: _FieldValue) -> typing.Iterator[tags_pb2.Tag]:
+    # pyrefly can't figure out that codec is non-None, so give it some help.
+    assert codec
     if is_list:
       items = typing.cast(collections.abc.Iterable[_ScalarValue], val)
     else:
@@ -194,7 +195,8 @@ def _submsg_desc(
     field: descriptor.FieldDescriptor,
 ) -> descriptor.Descriptor | None:
   if _is_map_field(field):
-    val_field = field.message_type.fields_by_name['value']
+    assert field.message_type
+    val_field = field.message_type.fields_by_name["value"]
     if val_field.type == descriptor.FieldDescriptor.TYPE_MESSAGE:
       return val_field.message_type
     return None
@@ -252,9 +254,16 @@ def _explore_type(
   to_add[msg_desc] = fields
 
   for field in msg_desc.fields:
+    # NOTE: tag_pb2.tag has a tighter type than
+    # Descriptor.GetOptions.HasExtension, so we need to ignore the bad argument
+    # type/index here.
+
+    # pyrefly: ignore[bad-argument-type]
     if field.GetOptions().HasExtension(tag_pb2.tag):
       tag_opt = _normalize_tag(
-          field.GetOptions().Extensions[tag_pb2.tag], field.type
+          # pyrefly: ignore[bad-index]
+          field.GetOptions().Extensions[tag_pb2.tag],
+          field.type,
       )
       fields[field] = _tagged_field_extractor(field, tag_opt)
       continue
@@ -297,6 +306,7 @@ def _fixup_convergence(
         continue
 
       parent_desc = field.containing_type
+      assert parent_desc
       parent_extractor = to_add[parent_desc]
       parent_extractor[field] = _make_submsg_extractor(field, ext)
       did_something = True

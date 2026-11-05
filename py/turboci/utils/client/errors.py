@@ -46,13 +46,16 @@ class ParsedRPCStatus:
     if status:
       code = status.code
       for detail in status.details:
+        # pyrefly: ignore[bad-argument-type]
         if detail.Is(stage_pb2.StageAttemptCurrentState.DESCRIPTOR):
           current_state = stage_pb2.StageAttemptCurrentState()
           detail.Unpack(current_state)
+        # pyrefly: ignore[bad-argument-type]
         elif detail.Is(stage_pb2.StageAttemptClaimedFailure.DESCRIPTOR):
           claim_failure = stage_pb2.StageAttemptClaimedFailure()
           detail.Unpack(claim_failure)
         elif detail.Is(
+            # pyrefly: ignore[bad-argument-type]
             transaction_invariant_pb2.TransactionConflictFailure.DESCRIPTOR
         ):
           conflict = transaction_invariant_pb2.TransactionConflictFailure()

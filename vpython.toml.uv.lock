@@ -1,0 +1,33 @@
+googleapis-common-protos==1.69.2 ; python_full_version < '3.12' \
+    --hash=sha256:0b30452ff9c7a27d80bfc5718954063e8ab53dd3697093d3bc99581f5fd24212 \
+    --hash=sha256:2900d9cd6e7520950cacb16f6739657e34c2e378d6825aea5cf09c52e56ea57d
+    # via grpcio-status
+grpcio==1.74.0 ; python_full_version < '3.12' \
+    --hash=sha256:148c65eb5a2a90894e551f5ade4e11e0a866e24e6cf26d5c710a77953417037b \
+    --hash=sha256:2cc286cbfff89209f2aa9fe76547e2000b62ef88647d10db4f617caf5a97d551 \
+    --hash=sha256:73da7c6e54023bf04fa16fd4e227868958aa07a64dafa7b52d50577e69c0649c \
+    --hash=sha256:7b14bb1c0cb2adbf0cb27a3fbb84bb435ddd57a56c126054bb490a95f8e45b05 \
+    --hash=sha256:8efe72fde5500f47aca1ef59495cb59c885afe04ac89dd11d810f2de87d935d4 \
+    --hash=sha256:9970dd75ec7458d48a0746513159184247f9c88ab5ab49b57691697847484d8e \
+    --hash=sha256:e40549c5752bf1f4b748557daa74791ff556d7e0d47560d98039990e602c982b \
+    --hash=sha256:f612cfc47960aa7317d14c4b242b6aff1f6874f88f744a41f6af62efe535f327
+    # via grpcio-status
+grpcio-status==1.74.0 ; python_full_version < '3.12' \
+    --hash=sha256:52cdbd759a6760fc8f668098a03f208f493dd5c76bf8e02598bbbaf1f6fc2876 \
+    --hash=sha256:e8c2ad13fd71925f314d874e4f68a2481ec0e110c9858f113c0397da895c8403
+protobuf==6.32.1 ; python_full_version < '3.12' \
+    --hash=sha256:2601b779fc7d32a866c6b4404f9d42a3f67c5b9f3f15b4db3cccabe06b95c346 \
+    --hash=sha256:38e2892a35558a6d4bb88a71b6492fd69c22dbd73ced0fc0367e212bb6a284b7
+    # via
+    #   googleapis-common-protos
+    #   grpcio-status
+pyrefly==1.4.0 ; python_full_version < '3.12' \
+    --hash=sha256:460cec39bc8743915e9c2c8c10ba926ad0b29b099d89c1859fb97e0059f42fa7 \
+    --hash=sha256:5a6370d686b6cbbac8869832f09a52012888371956fbc68d446a349bc85ccd43 \
+    --hash=sha256:7aff37c2b711c8240ed650da0c6148237b327bf7e5dfacee65884f1adea22305 \
+    --hash=sha256:b6951f51687304caebfedf13dd1a943aeafdbc95abcc4e24a683b97467a77007
+types-grpcio==1.85.0.20261028 ; python_full_version < '3.12' \
+    --hash=sha256:2c2684330ae57ab64ffb43183ac652e73d2609024e6076e3e9d2b8ae06816207
+types-protobuf==6.32.1.20251105 ; python_full_version < '3.12' \
+    --hash=sha256:8c7a6f5025e53079ee310d11cdf731732ee86915684a0853e32e7967b5454d2b \
+    --hash=sha256:a15109d38f7cfefd2539ef86d3f93a6a41c7cad53924f8aa1a51eaddbb72a660

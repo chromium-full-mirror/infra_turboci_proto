@@ -106,6 +106,6 @@ if __name__ == '__main__':
   import unittest.util
 
   if '-v' in sys.argv or '--verbose' in sys.argv:
-    unittest.util._MAX_LENGTH = 999999999  # pylint: disable=protected-access
+    unittest.util._MAX_LENGTH = 999999999  # pyrefly: ignore [bad-assignment]
     unittest.TestCase.maxDiff = None
   unittest.main()

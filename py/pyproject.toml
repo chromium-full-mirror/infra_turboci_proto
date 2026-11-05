@@ -16,6 +16,28 @@ classifiers = [
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 
-[tool.pyright]
-venvPath = "."
-venv = ".venv"
+[tool.pyrefly]
+infer-with-first-use = false
+check-unannotated-defs = true
+infer-return-types = "never"
+search-path = [".venv/lib/python3.11/site-packages"]
+project-includes = ["tests/**/*.py*", "turboci/utils/**/*.py*"]
+
+[tool.pyrefly.errors]
+implicit-import = false
+unused-coroutine = false
+protocol-implicitly-defined-attribute = false
+redundant-condition = false
+unreachable = false
+unsafe-overlap = false
+redefinition = false
+bad-dunder-all = false
+bad-override-mutable-attribute = false
+bad-override-param-name = false
+abstract-method-call = false
+
+[tool.pyink]
+pyink = true
+pyink-indentation = 2
+pyink-use-majority-quotes = true
+line-length = 80

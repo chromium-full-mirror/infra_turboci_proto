@@ -53,14 +53,16 @@ def CheckProtoBackwardCompatibility(input_api, output_api):
         )
     )
 
-  rslt = input_api.RunTests([
-      input_api.Command(
-          name='build.py breaking',
-          cmd=['build.py', 'breaking'],
-          kwargs={'cwd': input_api.PresubmitLocalPath()},
-          message=msg,
-      )
-  ])
+  rslt = input_api.RunTests(
+      [
+          input_api.Command(
+              name='build.py breaking',
+              cmd=['build.py', 'breaking'],
+              kwargs={'cwd': input_api.PresubmitLocalPath()},
+              message=msg,
+          )
+      ]
+  )
   if any(r.fatal for r in rslt):
     rslt.extend(to_add)
   return rslt
@@ -183,23 +185,22 @@ def test_ProtoFormat(input_api, output_api):
   ]
 
 
-def test_PyFormat(input_api, output_api):
-  _adjustGlobalsOnce(input_api)
-  # Note: GetPylint returns a list of Command.
-  return input_api.canned_checks.GetPylint(
-      input_api,
-      output_api,
-      version='3.2',
-      pylintrc='.pylintrc',
-      files_to_skip=input_api.DEFAULT_FILES_TO_SKIP + ('tools/.*',),
-  )
-
-
 def test_PyImports(input_api, output_api):
   return [
       input_api.Command(
           name='build.py check_python_imports',
           cmd=['build.py', 'check_python_imports'],
+          kwargs={'cwd': input_api.PresubmitLocalPath()},
+          message=output_api.PresubmitError,
+      )
+  ]
+
+
+def test_Pyrefly(input_api, output_api):
+  return [
+      input_api.Command(
+          name='build.py check_pyrefly',
+          cmd=['build.py', 'check_pyrefly', '-v'],
           kwargs={'cwd': input_api.PresubmitLocalPath()},
           message=output_api.PresubmitError,
       )

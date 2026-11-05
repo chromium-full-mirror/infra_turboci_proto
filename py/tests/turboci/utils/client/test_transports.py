@@ -47,7 +47,7 @@ class MockRpcError(grpc.RpcError, grpc.Call):
   def details(self) -> str:
     return self._details
 
-  def trailing_metadata(  # pyright: ignore [reportIncompatibleMethodOverride]
+  def trailing_metadata(  # pyrefly: ignore [bad-override]
       self,
   ) -> tuple[_Metadatum, ...]:
     return self._metadata
