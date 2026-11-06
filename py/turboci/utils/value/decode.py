@@ -28,7 +28,6 @@ from turboci.utils import value
 from turboci.utils.value import data_source
 from turboci.utils.value import ordered
 
-
 T = typing.TypeVar('T', bound=message.Message)
 
 
@@ -55,7 +54,7 @@ class OmittedDataError(ValueError):
 
 def decode(
     ds: data_source.DataSource, ref: value_ref_pb2.ValueRef, msg: type[T]
-) -> None | T:
+) -> T:
   """Decodes and returns a proto of type `msg` from the given ValueRef.
 
   Args:
@@ -78,9 +77,7 @@ def decode(
   return decode_data(get_data(ds, ref), msg)
 
 
-def decode_data(
-    data: None | value_data_pb2.ValueData, msg: type[T]
-) -> None | T:
+def decode_data(data: None | value_data_pb2.ValueData, msg: type[T]) -> T:
   """Decodes and returns a proto of type `msg` from the given ValueData.
 
   Args:
@@ -92,15 +89,16 @@ def decode_data(
     binary nor json populated.
 
   Raises:
+    ValueError: If data is None, or empty.
     message.DecodeError: If the ValueData has a type_url mismatch or cannot be
       decoded.
   """
   if data is None:
-    return None
+    raise ValueError('data is None')
 
   which = data.WhichOneof('data')
   if which is None:
-    return None
+    raise ValueError('data is empty')
 
   targ_url = value.url(msg)
   if which == 'binary':

@@ -52,7 +52,8 @@ class TestDecode(unittest.TestCase):
         digest='fake-digest',
         type_url=value.url(wrappers_pb2.StringValue),
     )
-    self.assertIsNone(value.decode({}, ref, wrappers_pb2.StringValue))
+    with self.assertRaisesRegex(ValueError, 'data is None'):
+      self.assertIsNone(value.decode({}, ref, wrappers_pb2.StringValue))
 
   def test_omitted(self) -> None:
     ref = value.ref(
@@ -60,7 +61,9 @@ class TestDecode(unittest.TestCase):
         'project:realm',
         omit_reason='OMIT_REASON_NO_ACCESS',
     )
-    with self.assertRaisesRegex(value.OmittedDataError, 'data is omitted') as ctx:
+    with self.assertRaisesRegex(
+        value.OmittedDataError, 'data is omitted'
+    ) as ctx:
       value.decode({}, ref, wrappers_pb2.StringValue)
     self.assertIsInstance(ctx.exception, ValueError)
     self.assertEqual(
@@ -156,7 +159,9 @@ class TestGetDataAndDecodeData(unittest.TestCase):
         'project:realm',
         omit_reason='OMIT_REASON_UNWANTED',
     )
-    with self.assertRaisesRegex(value.OmittedDataError, 'data is omitted') as ctx:
+    with self.assertRaisesRegex(
+        value.OmittedDataError, 'data is omitted'
+    ) as ctx:
       value.get_data({}, ref)
     self.assertEqual(
         ctx.exception.omit_reason, omit_reason_pb2.OMIT_REASON_UNWANTED
@@ -172,10 +177,15 @@ class TestGetDataAndDecodeData(unittest.TestCase):
     self.assertIsNone(value.get_data({}, value_ref_pb2.ValueRef()))
 
   def test_decode_data(self) -> None:
-    self.assertIsNone(value.decode_data(None, wrappers_pb2.StringValue))
-    self.assertIsNone(
-        value.decode_data(value_data_pb2.ValueData(), wrappers_pb2.StringValue)
-    )
+    with self.assertRaisesRegex(ValueError, 'data is None'):
+      self.assertIsNone(value.decode_data(None, wrappers_pb2.StringValue))
+
+    with self.assertRaisesRegex(ValueError, 'data is empty'):
+      self.assertIsNone(
+          value.decode_data(
+              value_data_pb2.ValueData(), wrappers_pb2.StringValue
+          )
+      )
 
     ref = value.ref(wrappers_pb2.StringValue(value='norp'), 'project:realm')
     data = value.get_data({}, ref)
