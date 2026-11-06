@@ -1,0 +1,27 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  complex {
+    local_enum: TEST_ENUM_ONE
+  }
+}
+output {
+  # NOTE: local_bool captures false even when unset.
+  tag {
+    key: "testing.tags.ComplexMessage.local_bool"
+    values {
+      bool_value: false
+    }
+  }
+  # We pick up the numeric and string representations of the enum.
+  tag {
+    key: "testing.tags.ComplexMessage.local_enum"
+    values {
+      str_value: "TEST_ENUM_ONE"
+    }
+    values {
+      int_value: 1
+    }
+  }
+}

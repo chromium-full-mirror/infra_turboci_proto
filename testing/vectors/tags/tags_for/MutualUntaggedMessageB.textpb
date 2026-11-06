@@ -1,0 +1,16 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  mutual_untagged_b {
+    untagged: "level1"
+    deeper {
+      deeper {
+        untagged: "level2"
+      }
+    }
+  }
+}
+output {
+  # No errors, no tags.
+}

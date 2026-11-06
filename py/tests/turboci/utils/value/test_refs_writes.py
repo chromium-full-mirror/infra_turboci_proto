@@ -72,10 +72,8 @@ class TestWrite(unittest.TestCase):
     expected_tags = [
         tags_pb2.Tag(
             key='testing.tags.MyMessage.tagged_field',
-            indexed=False,
             values=[
                 tags_pb2.Tag.Value(
-                    indexed=False,
                     str_value='hello',
                 )
             ],

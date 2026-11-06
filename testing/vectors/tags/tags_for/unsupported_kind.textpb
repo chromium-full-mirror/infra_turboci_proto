@@ -1,0 +1,11 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  unsupported_kind {
+    bad_field: "bad"
+  }
+}
+output {
+  error: "testing.tags.UnsupportedKindMessage.bad_field: turboci.tag: unsupported field kind bytes"
+}

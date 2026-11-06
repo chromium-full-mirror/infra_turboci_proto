@@ -1,0 +1,34 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  complex {
+    rep_str: "c"
+    rep_str: "a"
+    rep_str: "b"
+    rep_str: "a"
+  }
+}
+output {
+  # NOTE: local_bool captures false even when unset.
+  tag {
+    key: "testing.tags.ComplexMessage.local_bool"
+    values {
+      bool_value: false
+    }
+  }
+  # Sorted and unique values.
+  tag {
+    key: "testing.tags.ComplexMessage.rep_str"
+    values {
+      duplicate_count: 1
+      str_value: "a"
+    }
+    values {
+      str_value: "b"
+    }
+    values {
+      str_value: "c"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+# No input message at all.
+# Tests should treat this as nil MyMessage.
+output {
+  # No expected errors or tags.
+}

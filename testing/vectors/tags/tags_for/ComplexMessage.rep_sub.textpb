@@ -1,0 +1,47 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  complex {
+    rep_sub {
+      sub_tagged: "sub1"
+    }
+    rep_sub {
+      sub_tagged: "sub2"
+    }
+    rep_sub {
+      sub_tagged: "sub1"
+    }
+  }
+}
+output {
+  # This field also has an alt_key, so it's duplicated to the previous key.
+  tag {
+    key: "previous.package.name.Message.field"
+    values {
+      duplicate_count: 1
+      str_value: "sub1"
+    }
+    values {
+      str_value: "sub2"
+    }
+  }
+  # Values are collapsed.
+  tag {
+    key: "testing.tags.ComplexMessage.SubMessage.sub_tagged"
+    values {
+      duplicate_count: 1
+      str_value: "sub1"
+    }
+    values {
+      str_value: "sub2"
+    }
+  }
+  # NOTE: local_bool captures false even when unset.
+  tag {
+    key: "testing.tags.ComplexMessage.local_bool"
+    values {
+      bool_value: false
+    }
+  }
+}

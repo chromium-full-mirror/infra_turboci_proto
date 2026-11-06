@@ -1,0 +1,48 @@
+// Copyright 2026 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+syntax = "proto3";
+
+package testing.vectors.tags.tags_for;
+
+import "google/protobuf/empty.proto";
+import "testing/tags/demo.proto";
+import "turboci/graph/orchestrator/v1/tags.proto";
+
+option go_package = "go.chromium.org/turboci/proto/go/testing/vectors/tags/tags_for;tagsforvectorspb";
+option java_multiple_files = true;
+
+// TagsFor tests that a given user message (in the input) resolves either to a
+// specific set of tags, or an error, when extracted with the TurboCI tag
+// extraction methods.
+message TagsFor {
+  message Input {
+    oneof msg {
+      testing.tags.MyMessage my = 1;
+      testing.tags.ComplexMessage complex = 2;
+      testing.tags.UnsupportedKindMessage unsupported_kind = 3;
+      testing.tags.RecursiveMessage recursive = 4;
+      testing.tags.RecursiveUntaggedMessage recursive_untagged = 5;
+      testing.tags.MutualMessageA mutual_a = 6;
+      testing.tags.MutualMessageB mutual_b = 7;
+      testing.tags.MutualUntaggedMessageA mutual_untagged_a = 8;
+      testing.tags.MutualUntaggedMessageB mutual_untagged_b = 9;
+      testing.tags.LoopMessageA loop_a = 10;
+      testing.tags.LoopMessageB loop_b = 11;
+      testing.tags.LoopMessageC loop_c = 12;
+      testing.tags.LoopMessageD loop_d = 13;
+
+      // An untagged type just to have one handy.
+      google.protobuf.Empty empty = 14;
+    }
+  }
+  Input input = 1;
+
+  message Output {
+    optional string error = 1;
+
+    repeated turboci.graph.orchestrator.v1.Tag tag = 2;
+  }
+  Output output = 2;
+}

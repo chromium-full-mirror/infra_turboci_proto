@@ -1,0 +1,23 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  complex {
+    explicit_presence_bool: false
+  }
+}
+output {
+  tag {
+    key: "testing.tags.ComplexMessage.explicit_presence_bool"
+    values {
+      bool_value: false
+    }
+  }
+  # NOTE: local_bool captures false even when unset.
+  tag {
+    key: "testing.tags.ComplexMessage.local_bool"
+    values {
+      bool_value: false
+    }
+  }
+}

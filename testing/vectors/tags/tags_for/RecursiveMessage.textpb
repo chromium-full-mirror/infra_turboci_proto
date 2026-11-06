@@ -1,0 +1,28 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  recursive {
+    tagged: "root"
+    deeper {
+      tagged: "level1"
+      deeper {
+        tagged: "level2"
+      }
+    }
+  }
+}
+output {
+  tag {
+    key: "testing.tags.RecursiveMessage.tagged"
+    values {
+      str_value: "level1"
+    }
+    values {
+      str_value: "level2"
+    }
+    values {
+      str_value: "root"
+    }
+  }
+}

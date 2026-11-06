@@ -1,0 +1,16 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  my {
+    tagged_field: "hello"
+  }
+}
+output {
+  tag {
+    key: "testing.tags.MyMessage.tagged_field"
+    values {
+      str_value: "hello"
+    }
+  }
+}

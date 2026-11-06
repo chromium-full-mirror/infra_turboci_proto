@@ -1,0 +1,9 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  empty {}
+}
+output {
+  # No errors, no tags.
+}

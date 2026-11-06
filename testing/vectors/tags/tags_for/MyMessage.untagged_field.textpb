@@ -1,0 +1,11 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  my {
+    untagged_field: "hello"
+  }
+}
+output {
+  # No errors, no tags
+}

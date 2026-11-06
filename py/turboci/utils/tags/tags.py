@@ -88,7 +88,9 @@ class _TagValue:
       indexed: bool = False,
       duplicate_count: int = 0,
   ) -> tags_pb2.Tag.Value:
-    ret = tags_pb2.Tag.Value(indexed=indexed)
+    ret = tags_pb2.Tag.Value()
+    if indexed:
+      ret.indexed = True
     if duplicate_count > 0:
       ret.duplicate_count = duplicate_count
     if isinstance(self.value, str):
@@ -186,11 +188,13 @@ class Tag:
 
   def to_proto(self, key: str) -> tags_pb2.Tag:
     """Returns this as a tags_pb2.Tag with the given key."""
-    return tags_pb2.Tag(
+    ret = tags_pb2.Tag(
         key=key,
-        indexed=self.indexed,
         values=self.values(),
     )
+    if self.indexed:
+      ret.indexed = True
+    return ret
 
 
 class Map(dict[str, Tag]):

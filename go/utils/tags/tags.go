@@ -271,6 +271,9 @@ func MakeMap(tags ...*orchestratorpb.Tag) Map {
 
 // Proto converts this Tags into a normalized list of orchestratorpb.Tag protos.
 func (t Map) Proto() []*orchestratorpb.Tag {
+	if len(t) == 0 {
+		return nil
+	}
 	ret := make([]*orchestratorpb.Tag, 0, len(t))
 	for k, val := range t {
 		ret = append(ret, val.Proto(k))

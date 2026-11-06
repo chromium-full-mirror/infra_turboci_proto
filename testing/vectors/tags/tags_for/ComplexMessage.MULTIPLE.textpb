@@ -1,0 +1,125 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  complex {
+    local_str: "foo"
+    workplan_str: "wp"
+    # local_bool=false is picked up by default
+    local_enum: TEST_ENUM_ONE
+    rep_str: "c"
+    rep_str: "a"
+    rep_str: "b"
+    rep_str: "a"
+    map_sub {
+      key: "k1"
+      value {
+        sub_tagged: "sub1"
+      }
+    }
+    map_sub {
+      key: "k2"
+      value {
+        sub_tagged: "sub2"
+      }
+    }
+    rep_sub {
+      sub_tagged: "rep1"
+    }
+    rep_sub {
+      sub_tagged: "rep2"
+    }
+    sub {
+      sub_tagged: "single"
+    }
+    split_index: 123
+    # explicit_presence_bool does NOT get picked up by default.
+  }
+}
+output {
+  tag {
+    key: "previous.package.name.Message.field"
+    values {
+      str_value: "rep1"
+    }
+    values {
+      str_value: "rep2"
+    }
+    values {
+      str_value: "single"
+    }
+    values {
+      str_value: "sub1"
+    }
+    values {
+      str_value: "sub2"
+    }
+  }
+  tag {
+    key: "testing.tags.ComplexMessage.SubMessage.sub_tagged"
+    values {
+      str_value: "rep1"
+    }
+    values {
+      str_value: "rep2"
+    }
+    values {
+      str_value: "single"
+    }
+    values {
+      str_value: "sub1"
+    }
+    values {
+      str_value: "sub2"
+    }
+  }
+  tag {
+    key: "testing.tags.ComplexMessage.local_bool"
+    values {
+      bool_value: false
+    }
+  }
+  tag {
+    key: "testing.tags.ComplexMessage.local_enum"
+    values {
+      str_value: "TEST_ENUM_ONE"
+    }
+    values {
+      int_value: 1
+    }
+  }
+  tag {
+    key: "testing.tags.ComplexMessage.local_str"
+    values {
+      str_value: "foo"
+    }
+  }
+  tag {
+    key: "testing.tags.ComplexMessage.rep_str"
+    values {
+      duplicate_count: 1
+      str_value: "a"
+    }
+    values {
+      str_value: "b"
+    }
+    values {
+      str_value: "c"
+    }
+  }
+  tag {
+    key: "testing.tags.ComplexMessage.split_index"
+    indexed: true
+    values {
+      int_value: 123
+    }
+  }
+  tag {
+    key: "testing.tags.ComplexMessage.workplan_str"
+    indexed: true
+    values {
+      indexed: true
+      str_value: "wp"
+    }
+  }
+}

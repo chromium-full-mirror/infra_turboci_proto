@@ -1,0 +1,25 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  complex {
+    workplan_str: "foo"
+  }
+}
+output {
+  # NOTE: local_bool captures false even when unset.
+  tag {
+    key: "testing.tags.ComplexMessage.local_bool"
+    values {
+      bool_value: false
+    }
+  }
+  tag {
+    key: "testing.tags.ComplexMessage.workplan_str"
+    indexed: true
+    values {
+      indexed: true
+      str_value: "foo"
+    }
+  }
+}

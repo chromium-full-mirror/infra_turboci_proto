@@ -1,0 +1,24 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  complex {
+    split_index: 123
+  }
+}
+output {
+  # NOTE: local_bool captures false even when unset.
+  tag {
+    key: "testing.tags.ComplexMessage.local_bool"
+    values {
+      bool_value: false
+    }
+  }
+  tag {
+    key: "testing.tags.ComplexMessage.split_index"
+    indexed: true
+    values {
+      int_value: 123
+    }
+  }
+}

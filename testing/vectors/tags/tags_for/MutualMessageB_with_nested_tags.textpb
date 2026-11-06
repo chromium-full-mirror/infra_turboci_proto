@@ -1,0 +1,24 @@
+# proto-file: testing/vectors/tags/tags_for/test_case.proto
+# proto-message: TagsFor
+
+input {
+  mutual_b {
+    tagged: "b_root"
+    deeper {
+      deeper {
+        tagged: "b_nested"
+      }
+    }
+  }
+}
+output {
+  tag {
+    key: "testing.tags.MutualMessageB.tagged"
+    values {
+      str_value: "b_nested"
+    }
+    values {
+      str_value: "b_root"
+    }
+  }
+}

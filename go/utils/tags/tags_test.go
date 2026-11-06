@@ -22,6 +22,8 @@ import (
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
 	tagpb "go.chromium.org/turboci/proto/go/tag"
 	testingtagspb "go.chromium.org/turboci/proto/go/testing/tags"
+	tagsforvectorspb "go.chromium.org/turboci/proto/go/testing/vectors/tags/tags_for"
+	"go.chromium.org/turboci/proto/go/utils/internal/test_vector"
 )
 
 var cmpOpts = []cmp.Option{
@@ -35,12 +37,12 @@ var cmpOpts = []cmp.Option{
 func TestTagsFor(t *testing.T) {
 	t.Parallel()
 
-	// Note we construct a completely separate descriptor pool using raw
-	// binary descriptors embedded into the binary. This simulates "normal"
-	// dynamic descriptor pools. We shouldn't directly reuse MessageDescriptor
-	// already present in the built-in registry, since it may have ties to other
-	// built-in descriptors, and then we'll be testing something weird, not truly
-	// dynamic descriptor pools.
+	// Note we construct a completely separate descriptor pool using raw binary
+	// descriptors embedded into the binary. This simulates "normal" dynamic
+	// descriptor pools. We shouldn't directly reuse MessageDescriptor already
+	// present in the built-in registry, since it may have ties to other built-in
+	// descriptors, and then we'll be testing something weird, not truly dynamic
+	// descriptor pools.
 	dynreg := &protoregistry.Files{}
 	for _, exemplar := range []proto.Message{
 		// Note: order matters - need to register leafs of the dep graph first.
@@ -49,6 +51,8 @@ func TestTagsFor(t *testing.T) {
 		&emptypb.Empty{},
 		&tagpb.Tag{},
 		&testingtagspb.MyMessage{},
+		&orchestratorpb.Tag{},
+		&tagsforvectorspb.TagsFor{},
 	} {
 		path := exemplar.ProtoReflect().Descriptor().ParentFile().Path()
 		fd, err := protoregistry.GlobalFiles.FindFileByPath(path)
@@ -66,449 +70,98 @@ func TestTagsFor(t *testing.T) {
 		}
 	}
 
-	tests := []struct {
-		name     string
-		msg      proto.Message
-		wantErr  string
-		wantTags Map
-		// extraAssert is called after comparing to wantTags to allow additional
-		// assertions.
-		extraAssert func(t *testing.T, tags Map)
-	}{
-		{
-			name: "nil",
-			msg:  (*testingtagspb.MyMessage)(nil),
-		},
-		{
-			name: "Empty",
-			msg:  &emptypb.Empty{},
-		},
-		{
-			name: "MyMessage.untagged_field",
-			msg: testingtagspb.MyMessage_builder{
-				UntaggedField: proto.String("hello"),
-			}.Build(),
-		},
-		{
-			name: "MyMessage.tagged_field",
-			msg: testingtagspb.MyMessage_builder{
-				TaggedField: proto.String("hello"),
-			}.Build(),
-			wantTags: MakeMap(
-				Builder{
-					Key:     "testing.tags.MyMessage.tagged_field",
-					Strings: []string{"hello"},
-				}.Build(),
-			),
-		},
-		{
-			name: "ComplexMessage.local_str",
-			msg: testingtagspb.ComplexMessage_builder{
-				LocalStr: proto.String("foo"),
-			}.Build(),
-			wantTags: MakeMap(
-				Builder{
-					Key:     "testing.tags.ComplexMessage.local_str",
-					Strings: []string{"foo"},
-				}.Build(),
+	test_vector.Run(t, "tags/tags_for", func(t *testing.T, tc *tagsforvectorspb.TagsFor) {
+		var msg proto.Message
+		switch m := tc.GetInput(); m.WhichMsg() {
+		case tagsforvectorspb.TagsFor_Input_My_case:
+			msg = m.GetMy()
+		case tagsforvectorspb.TagsFor_Input_Complex_case:
+			msg = m.GetComplex()
+		case tagsforvectorspb.TagsFor_Input_UnsupportedKind_case:
+			msg = m.GetUnsupportedKind()
+		case tagsforvectorspb.TagsFor_Input_Recursive_case:
+			msg = m.GetRecursive()
+		case tagsforvectorspb.TagsFor_Input_RecursiveUntagged_case:
+			msg = m.GetRecursiveUntagged()
+		case tagsforvectorspb.TagsFor_Input_MutualA_case:
+			msg = m.GetMutualA()
+		case tagsforvectorspb.TagsFor_Input_MutualB_case:
+			msg = m.GetMutualB()
+		case tagsforvectorspb.TagsFor_Input_MutualUntaggedA_case:
+			msg = m.GetMutualUntaggedA()
+		case tagsforvectorspb.TagsFor_Input_MutualUntaggedB_case:
+			msg = m.GetMutualUntaggedB()
+		case tagsforvectorspb.TagsFor_Input_LoopA_case:
+			msg = m.GetLoopA()
+		case tagsforvectorspb.TagsFor_Input_LoopB_case:
+			msg = m.GetLoopB()
+		case tagsforvectorspb.TagsFor_Input_LoopC_case:
+			msg = m.GetLoopC()
+		case tagsforvectorspb.TagsFor_Input_LoopD_case:
+			msg = m.GetLoopD()
+		case tagsforvectorspb.TagsFor_Input_Empty_case:
+			msg = m.GetEmpty()
+		default:
+			// default to typed nil MyMessage.
+			msg = (*testingtagspb.MyMessage)(nil)
+		}
 
-				// NOTE: local_bool captures false even when unset.
-				Builder{
-					Key:   "testing.tags.ComplexMessage.local_bool",
-					Bools: []bool{false},
-				}.Build(),
-			),
-		},
-		{
-			name: "ComplexMessage.workplan_str",
-			msg: testingtagspb.ComplexMessage_builder{
-				WorkplanStr: proto.String("foo"),
-			}.Build(),
-			wantTags: MakeMap(
-				Builder{
-					Key:     "testing.tags.ComplexMessage.workplan_str",
-					Indexed: true,
-					Strings: []string{"foo"},
-				}.Build(),
+		// Construct a dynamicpb counterpart of `msg`.
+		blob, err := proto.Marshal(msg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		desc, err := dynreg.FindDescriptorByName(msg.ProtoReflect().Descriptor().FullName())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		dyn := dynamicpb.NewMessage(desc.(protoreflect.MessageDescriptor))
+		err = proto.Unmarshal(blob, dyn)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-				// NOTE: local_bool captures false even when unset.
-				Builder{
-					Key:   "testing.tags.ComplexMessage.local_bool",
-					Bools: []bool{false},
-				}.Build(),
-			),
-		},
-		{
-			name: "ComplexMessage.local_bool=true",
-			msg: testingtagspb.ComplexMessage_builder{
-				LocalBool: proto.Bool(true),
-			}.Build(),
-			wantTags: MakeMap(
-				Builder{
-					Key:   "testing.tags.ComplexMessage.local_bool",
-					Bools: []bool{true},
-				}.Build(),
-			),
-		},
-		{
-			name: "ComplexMessage.local_bool__unset",
-			msg:  testingtagspb.ComplexMessage_builder{}.Build(),
-			wantTags: MakeMap(
-				// NOTE: local_bool captures false even when unset.
-				Builder{
-					Key:   "testing.tags.ComplexMessage.local_bool",
-					Bools: []bool{false},
-				}.Build(),
-			),
-		},
-		{
-			name: "ComplexMessage.local_enum",
-			msg: testingtagspb.ComplexMessage_builder{
-				LocalEnum: testingtagspb.TestEnum_TEST_ENUM_ONE.Enum(),
-			}.Build(),
-			wantTags: MakeMap(
-				// We pick up the numeric and string representations of the enum.
-				Builder{
-					Key:     "testing.tags.ComplexMessage.local_enum",
-					Strings: []string{"TEST_ENUM_ONE"},
-					Ints:    []int{1},
-				}.Build(),
+		for _, subcase := range []struct {
+			name string
+			msg  proto.Message
+		}{
+			{name: "static desc pool", msg: msg},
+			{name: "dynamic desc pool", msg: dyn},
+		} {
+			t.Run(subcase.name, func(t *testing.T) {
+				t.Parallel()
 
-				// NOTE: local_bool captures false even when unset.
-				Builder{
-					Key:   "testing.tags.ComplexMessage.local_bool",
-					Bools: []bool{false},
-				}.Build(),
-			),
-		},
-		{
-			name: "ComplexMessage.rep_str",
-			msg: testingtagspb.ComplexMessage_builder{
-				RepStr: []string{"c", "a", "b", "a"},
-			}.Build(),
-			wantTags: MakeMap(
-				// Sorted and unique values.
-				Builder{
-					Key:     "testing.tags.ComplexMessage.rep_str",
-					Strings: []string{"a", "a", "b", "c"},
-				}.Build(),
-
-				// NOTE: local_bool captures false even when unset.
-				Builder{
-					Key:   "testing.tags.ComplexMessage.local_bool",
-					Bools: []bool{false},
-				}.Build(),
-			),
-			extraAssert: func(t *testing.T, tags Map) {
-				count, _ := tags["testing.tags.ComplexMessage.rep_str"].HasValue("a")
-				if count != 2 {
-					t.Errorf("expected count 2, got %d", count)
-				}
-			},
-		},
-		{
-			name: "ComplexMessage.map_sub",
-			msg: testingtagspb.ComplexMessage_builder{
-				MapSub: map[string]*testingtagspb.ComplexMessage_SubMessage{
-					"k1": testingtagspb.ComplexMessage_SubMessage_builder{SubTagged: proto.String("sub1")}.Build(),
-					"k2": testingtagspb.ComplexMessage_SubMessage_builder{SubTagged: proto.String("sub2")}.Build(),
-					"k3": testingtagspb.ComplexMessage_SubMessage_builder{SubTagged: proto.String("sub1")}.Build(),
-				},
-			}.Build(),
-			wantTags: MakeMap(
-				// Note that the keys are ignored and the values are collapsed.
-				Builder{
-					Key:     "testing.tags.ComplexMessage.SubMessage.sub_tagged",
-					Strings: []string{"sub1", "sub1", "sub2"},
-				}.Build(),
-				// This field also has an alt_key, so it's duplicated to the previous key.
-				Builder{
-					Key:     "previous.package.name.Message.field",
-					Strings: []string{"sub1", "sub1", "sub2"},
-				}.Build(),
-				// NOTE: local_bool captures false even when unset.
-				Builder{
-					Key:   "testing.tags.ComplexMessage.local_bool",
-					Bools: []bool{false},
-				}.Build(),
-			),
-		},
-		{
-			name: "ComplexMessage.rep_sub",
-			msg: testingtagspb.ComplexMessage_builder{
-				RepSub: []*testingtagspb.ComplexMessage_SubMessage{
-					testingtagspb.ComplexMessage_SubMessage_builder{SubTagged: proto.String("sub1")}.Build(),
-					testingtagspb.ComplexMessage_SubMessage_builder{SubTagged: proto.String("sub2")}.Build(),
-					testingtagspb.ComplexMessage_SubMessage_builder{SubTagged: proto.String("sub1")}.Build(),
-				},
-			}.Build(),
-			wantTags: MakeMap(
-				// Values are collapsed.
-				Builder{
-					Key:     "testing.tags.ComplexMessage.SubMessage.sub_tagged",
-					Strings: []string{"sub1", "sub1", "sub2"},
-				}.Build(),
-				// This field also has an alt_key, so it's duplicated to the previous key.
-				Builder{
-					Key:     "previous.package.name.Message.field",
-					Strings: []string{"sub1", "sub1", "sub2"},
-				}.Build(),
-				// NOTE: local_bool captures false even when unset.
-				Builder{
-					Key:   "testing.tags.ComplexMessage.local_bool",
-					Bools: []bool{false},
-				}.Build(),
-			),
-		},
-		{
-			name: "ComplexMessage.sub",
-			msg: testingtagspb.ComplexMessage_builder{
-				Sub: testingtagspb.ComplexMessage_SubMessage_builder{
-					SubTagged: proto.String("hi"),
-				}.Build(),
-			}.Build(),
-			wantTags: MakeMap(
-				Builder{
-					Key:     "testing.tags.ComplexMessage.SubMessage.sub_tagged",
-					Strings: []string{"hi"},
-				}.Build(),
-				// This field also has an alt_key, so it's duplicated to the previous key.
-				Builder{
-					Key:     "previous.package.name.Message.field",
-					Strings: []string{"hi"},
-				}.Build(),
-				// NOTE: local_bool captures false even when unset.
-				Builder{
-					Key:   "testing.tags.ComplexMessage.local_bool",
-					Bools: []bool{false},
-				}.Build(),
-			),
-		},
-		{
-			name: "ComplexMessage.split_index",
-			msg: testingtagspb.ComplexMessage_builder{
-				SplitIndex: proto.Int64(123),
-			}.Build(),
-			wantTags: MakeMap(
-				Builder{
-					Key:          "testing.tags.ComplexMessage.split_index",
-					Indexed:      true,
-					IndexKeyOnly: true,
-					Ints:         []int{123},
-				}.Build(),
-				// NOTE: local_bool captures false even when unset.
-				Builder{
-					Key:   "testing.tags.ComplexMessage.local_bool",
-					Bools: []bool{false},
-				}.Build(),
-			),
-		},
-		{
-			name: "ComplexMessage.MULTIPLE",
-			msg: testingtagspb.ComplexMessage_builder{
-				LocalStr:    proto.String("foo"),
-				WorkplanStr: proto.String("wp"),
-				// local_bool=false is picked up by default
-				LocalEnum: testingtagspb.TestEnum_TEST_ENUM_ONE.Enum(),
-				RepStr:    []string{"c", "a", "b", "a"},
-				MapSub: map[string]*testingtagspb.ComplexMessage_SubMessage{
-					"k1": testingtagspb.ComplexMessage_SubMessage_builder{SubTagged: proto.String("sub1")}.Build(),
-					"k2": testingtagspb.ComplexMessage_SubMessage_builder{SubTagged: proto.String("sub2")}.Build(),
-				},
-				RepSub: []*testingtagspb.ComplexMessage_SubMessage{
-					testingtagspb.ComplexMessage_SubMessage_builder{SubTagged: proto.String("rep1")}.Build(),
-					testingtagspb.ComplexMessage_SubMessage_builder{SubTagged: proto.String("rep2")}.Build(),
-				},
-				Sub: testingtagspb.ComplexMessage_SubMessage_builder{
-					SubTagged: proto.String("single"),
-				}.Build(),
-				SplitIndex: proto.Int64(123),
-				// ExplicitPresenceBool does NOT get picked up by default.
-			}.Build(),
-			wantTags: MakeMap(
-				Builder{
-					Key:     "testing.tags.ComplexMessage.local_str",
-					Strings: []string{"foo"},
-				}.Build(),
-				Builder{
-					Key:     "testing.tags.ComplexMessage.workplan_str",
-					Indexed: true,
-					Strings: []string{"wp"},
-				}.Build(),
-				Builder{
-					Key:   "testing.tags.ComplexMessage.local_bool",
-					Bools: []bool{false},
-				}.Build(),
-				Builder{
-					Key:     "testing.tags.ComplexMessage.local_enum",
-					Strings: []string{"TEST_ENUM_ONE"},
-					Ints:    []int{1},
-				}.Build(),
-				Builder{
-					Key:     "testing.tags.ComplexMessage.rep_str",
-					Strings: []string{"a", "a", "b", "c"},
-				}.Build(),
-				Builder{
-					Key:          "testing.tags.ComplexMessage.split_index",
-					Indexed:      true,
-					IndexKeyOnly: true,
-					Ints:         []int{123},
-				}.Build(),
-				Builder{
-					Key:     "testing.tags.ComplexMessage.SubMessage.sub_tagged",
-					Strings: []string{"rep1", "rep2", "single", "sub1", "sub2"},
-				}.Build(),
-				Builder{
-					Key:     "previous.package.name.Message.field",
-					Strings: []string{"rep1", "rep2", "single", "sub1", "sub2"},
-				}.Build(),
-			),
-		},
-		{
-			name: "unsupported_kind",
-			msg: testingtagspb.UnsupportedKindMessage_builder{
-				BadField: []byte("bad"),
-			}.Build(),
-			wantErr: "testing.tags.UnsupportedKindMessage.bad_field: turboci.tag: unsupported field kind bytes",
-		},
-		{
-			name: "RecursiveMessage",
-			msg: testingtagspb.RecursiveMessage_builder{
-				Tagged: proto.String("root"),
-				Deeper: testingtagspb.RecursiveMessage_builder{
-					Tagged: proto.String("level1"),
-					Deeper: testingtagspb.RecursiveMessage_builder{
-						Tagged: proto.String("level2"),
-					}.Build(),
-				}.Build(),
-			}.Build(),
-			wantTags: MakeMap(
-				Builder{
-					Key:     "testing.tags.RecursiveMessage.tagged",
-					Strings: []string{"level1", "level2", "root"},
-				}.Build(),
-			),
-		},
-		{
-			name: "RecursiveUntaggedMessage",
-			msg: testingtagspb.RecursiveUntaggedMessage_builder{
-				Untagged: proto.String("root"),
-				Deeper: testingtagspb.RecursiveUntaggedMessage_builder{
-					Untagged: proto.String("level1"),
-					Deeper: testingtagspb.RecursiveUntaggedMessage_builder{
-						Untagged: proto.String("level2"),
-					}.Build(),
-				}.Build(),
-			}.Build(),
-		},
-		{
-			name: "MutualMessageA_with_nested_tags",
-			msg: testingtagspb.MutualMessageA_builder{
-				Deeper: testingtagspb.MutualMessageB_builder{
-					Tagged: proto.String("b_level1"),
-					Deeper: testingtagspb.MutualMessageA_builder{
-						Deeper: testingtagspb.MutualMessageB_builder{
-							Tagged: proto.String("b_level2"),
-						}.Build(),
-					}.Build(),
-				}.Build(),
-			}.Build(),
-			wantTags: MakeMap(
-				Builder{
-					Key:     "testing.tags.MutualMessageB.tagged",
-					Strings: []string{"b_level1", "b_level2"},
-				}.Build(),
-			),
-		},
-		{
-			name: "MutualMessageB_with_nested_tags",
-			msg: testingtagspb.MutualMessageB_builder{
-				Tagged: proto.String("b_root"),
-				Deeper: testingtagspb.MutualMessageA_builder{
-					Deeper: testingtagspb.MutualMessageB_builder{
-						Tagged: proto.String("b_nested"),
-					}.Build(),
-				}.Build(),
-			}.Build(),
-			wantTags: MakeMap(
-				Builder{
-					Key:     "testing.tags.MutualMessageB.tagged",
-					Strings: []string{"b_nested", "b_root"},
-				}.Build(),
-			),
-		},
-		{
-			name: "MutualUntaggedMessageA",
-			msg: testingtagspb.MutualUntaggedMessageA_builder{
-				Deeper: testingtagspb.MutualUntaggedMessageB_builder{
-					Untagged: proto.String("level1"),
-					Deeper: testingtagspb.MutualUntaggedMessageA_builder{
-						Deeper: testingtagspb.MutualUntaggedMessageB_builder{
-							Untagged: proto.String("level2"),
-						}.Build(),
-					}.Build(),
-				}.Build(),
-			}.Build(),
-		},
-		{
-			name: "MutualUntaggedMessageB",
-			msg: testingtagspb.MutualUntaggedMessageB_builder{
-				Untagged: proto.String("level1"),
-				Deeper: testingtagspb.MutualUntaggedMessageA_builder{
-					Deeper: testingtagspb.MutualUntaggedMessageB_builder{
-						Untagged: proto.String("level2"),
-					}.Build(),
-				}.Build(),
-			}.Build(),
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
-			// Construct a dynamicpb counterpart of `tc.msg`.
-			blob, err := proto.Marshal(tc.msg)
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			desc, err := dynreg.FindDescriptorByName(tc.msg.ProtoReflect().Descriptor().FullName())
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			dyn := dynamicpb.NewMessage(desc.(protoreflect.MessageDescriptor))
-			err = proto.Unmarshal(blob, dyn)
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-
-			for _, subcase := range []struct {
-				name string
-				msg  proto.Message
-			}{
-				{name: "static desc pool", msg: tc.msg},
-				{name: "dynamic desc pool", msg: dyn},
-			} {
-				t.Run(subcase.name, func(t *testing.T) {
-					tags, err := ForMessage(subcase.msg)
-					if tc.wantErr != "" {
-						if err == nil || !strings.Contains(err.Error(), tc.wantErr) {
-							t.Fatalf("expected error containing %q, got %v", tc.wantErr, err)
-						}
-					} else {
-						if err != nil {
-							t.Fatalf("unexpected error: %v", err)
-						}
-						if diff := cmp.Diff(tc.wantTags, tags, cmpOpts...); diff != "" {
-							t.Errorf("mismatch (-want +got):\n%s", diff)
-						}
-						if tc.extraAssert != nil {
-							tc.extraAssert(t, tags)
-						}
+				tags, err := ForMessage(subcase.msg)
+				output := tc.GetOutput()
+				if output.HasError() {
+					if err == nil || !strings.Contains(err.Error(), output.GetError()) {
+						t.Fatalf("expected error containing %q, got %v", output.GetError(), err)
 					}
-				})
-			}
-		})
+				} else {
+					if err != nil {
+						t.Fatalf("unexpected error: %v", err)
+					}
+					if diff := cmp.Diff(output.GetTag(), tags.Proto(), cmpOpts...); diff != "" {
+						t.Errorf("mismatch (-want +got):\n%s", diff)
+					}
+				}
+			})
+		}
+	})
+}
+
+func TestHasValue(t *testing.T) {
+	t.Parallel()
+
+	tags, err := ForMessage(testingtagspb.ComplexMessage_builder{
+		RepStr: []string{"c", "a", "b", "a"},
+	}.Build())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	count, indexed := tags["testing.tags.ComplexMessage.rep_str"].HasValue("a")
+	if count != 2 || indexed {
+		t.Errorf("expected (2, false), got (%d, %v)", count, indexed)
 	}
 }
 
