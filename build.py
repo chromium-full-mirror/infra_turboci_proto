@@ -687,10 +687,10 @@ def task_all():
         task_breaking,
         task_compile_stubs,
         task_store_descriptors,
+        task_install_venv_link,
         task_check_python_imports,
         task_check_pyrefly,
         task_test_python,
-        task_install_venv_link,
         task_test_go,
     )
 
