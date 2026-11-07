@@ -15,12 +15,11 @@ from google.protobuf import message_factory
 from testing.tags import demo_pb2
 from testing.vectors.tags.tags_for import test_case_pb2
 from tests.turboci.utils.internal import test_vector
+from tests.turboci.utils.tags.test_for_tags_vectors import _TAGS_FOR_VECTORS
 from turboci import tag_pb2
 from turboci.graph.orchestrator.v1 import tags_pb2
 from turboci.utils import tags
 from turboci.utils.tags import extractor
-
-from .test_for_tags_vectors import _TAGS_FOR_VECTORS
 
 
 class TestForMessage(unittest.TestCase):

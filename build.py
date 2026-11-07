@@ -648,7 +648,12 @@ def task_generate_embedded_vectors(mode: None | str = None):
 
 
 def task_check_python_imports():
-  """Checks that Python files have only one import per import statement."""
+  """Checks that Python files have good imports.
+
+  Rules:
+    * only one import per import statement.
+    * no relative imports.
+  """
   violations = False
   for rel_path in quick_glob("py/**/*.py"):
     if (
@@ -666,34 +671,52 @@ def task_check_python_imports():
       if isinstance(node, (ast.Import, ast.ImportFrom)):
         if getattr(node, "module", None) == "__future__":
           continue
-        if len(node.names) > 1:
+
+        relImport = isinstance(node, ast.ImportFrom) and node.level > 0
+        multiImport = len(node.names) > 1
+
+        if relImport or multiImport:
           violations = True
           end_lineno = getattr(node, "end_lineno", node.lineno)
           found = "\n".join(lines[node.lineno - 1 : end_lineno])
-          recommended = []
-          if isinstance(node, ast.Import):
-            for alias in node.names:
-              if alias.asname:
-                recommended.append(f"import {alias.name} as {alias.asname}")
-              else:
-                recommended.append(f"import {alias.name}")
-          else:
-            prefix = "." * node.level + (node.module or "")
-            for alias in node.names:
-              if alias.asname:
-                recommended.append(
-                    f"from {prefix} import {alias.name} as {alias.asname}"
-                )
-              else:
-                recommended.append(f"from {prefix} import {alias.name}")
+          recommended: list[str] = []
+          prefix = ""
+          if isinstance(node, ast.ImportFrom):
+            if node.level > 0:
+              pkg_parts = Path(rel_path).relative_to("py").parent.parts
+              up = node.level - 1
+              base_parts = list(pkg_parts[: max(0, len(pkg_parts) - up)])
+              if node.module:
+                base_parts.append(node.module)
+              prefix = ".".join(base_parts)
+            else:
+              prefix = node.module or ""
+
+          for alias in node.names:
+            stmt = (
+                f"from {prefix} import {alias.name}"
+                if prefix
+                else f"import {alias.name}"
+            )
+            if alias.asname:
+              stmt = f"{stmt} as {alias.asname}"
+            recommended.append(stmt)
           rec_str = "\n".join(f"    {r}" for r in recommended)
           found_str = "\n".join(f"    {line}" for line in found.splitlines())
-          print(f"{rel_path}:{node.lineno}: multiple imports per statement")
-          print("  Found:")
-          print(found_str)
-          print("  Recommended:")
-          print(rec_str)
-          print()
+          if multiImport:
+            print(f"{rel_path}:{node.lineno}: multiple imports per statement")
+            print("  Found:")
+            print(found_str)
+            print("  Recommended:")
+            print(rec_str)
+            print()
+          if relImport:
+            print(f"{rel_path}:{node.lineno}: relative import")
+            print("  Found:")
+            print(found_str)
+            print("  Recommended:")
+            print(rec_str)
+            print()
 
   if violations:
     sys.exit(1)
@@ -809,14 +832,19 @@ def main(args: list[str]):
       if name.startswith("task_")
   }
 
+  verbose = "-v" in args or "--verbose" in args
+
   def _help() -> NoReturn:
     print(f"Usage: {sys.argv[0]} [cmd] [additional args...]")
     print()
     print("Commands:")
     for task, fn in sorted(tasks.items()):
-      print()
-      print(f"{task}{inspect.signature(fn)}:")
-      print(textwrap.dedent(fn.__doc__.strip() or ""))
+      if verbose:
+        print()
+        print(f"{task}{inspect.signature(fn)}:")
+        print(textwrap.dedent(fn.__doc__.strip() or ""))
+      else:
+        print(f"{task}{inspect.signature(fn)}")
     sys.exit(1)
 
   if not args:
