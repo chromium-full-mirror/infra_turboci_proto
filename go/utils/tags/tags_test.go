@@ -70,7 +70,7 @@ func TestTagsFor(t *testing.T) {
 		}
 	}
 
-	test_vector.Run(t, "tags/tags_for", func(t *testing.T, tc *tagsforvectorspb.TagsFor) {
+	test_vector.Run(t, _TAGS_FOR_VECTORS, func(t *testing.T, tc *tagsforvectorspb.TagsFor) {
 		var msg proto.Message
 		switch m := tc.GetInput(); m.WhichMsg() {
 		case tagsforvectorspb.TagsFor_Input_My_case:

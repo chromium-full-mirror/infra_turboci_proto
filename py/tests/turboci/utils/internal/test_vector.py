@@ -6,22 +6,19 @@
 from __future__ import annotations
 
 import collections.abc
-import pathlib
 import typing
 import unittest
+from base64 import b64decode
 
 from google.protobuf import message
 from google.protobuf import text_format
 
-_REPO_ROOT = pathlib.Path(__file__).resolve().parents[5]
-_VECTORS_ROOT = _REPO_ROOT / 'testing' / 'vectors'
-
-_TestT = typing.TypeVar('_TestT', bound=message.Message)
+_TestT = typing.TypeVar("_TestT", bound=message.Message)
 
 
 def run(
     tc: unittest.TestCase,
-    vectorsPath: str,
+    vectors: dict[str, str],
     test_cls: type[_TestT],
     cb: collections.abc.Callable[[_TestT], None],
 ) -> None:
@@ -35,14 +32,7 @@ def run(
     cb: Callback invoked inside `tc.subTest(vector=<name>)` with `(input_pb,
       output_pb)`.
   """
-  resolved = _VECTORS_ROOT / vectorsPath
-  tc.assertTrue(
-      resolved.is_dir(),
-      f'vectorsPath is not a valid test vector dir: {vectorsPath}.',
-  )
-  in_files = sorted(resolved.glob('*.textpb'))
-  tc.assertTrue(in_files, f'no *.textpb files found in {resolved}')
-  for in_path in in_files:
-    base = in_path.name.removesuffix('.textpb')
-    with tc.subTest(vector=base):
-      cb(text_format.Parse(in_path.read_text(encoding='utf-8'), test_cls()))
+  tc.assertTrue(vectors, "must supply at least one test vector")
+  for name, vector in vectors.items():
+    with tc.subTest(vector=name):
+      cb(text_format.Parse(b64decode(vector), test_cls()))

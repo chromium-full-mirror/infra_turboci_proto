@@ -185,6 +185,17 @@ def test_ProtoFormat(input_api, output_api):
   ]
 
 
+def test_EmbeddedVectors(input_api, output_api):
+  return [
+      input_api.Command(
+          name='build.py generate_embedded_vectors check',
+          cmd=['build.py', 'generate_embedded_vectors', 'check'],
+          kwargs={'cwd': input_api.PresubmitLocalPath()},
+          message=output_api.PresubmitError,
+      )
+  ]
+
+
 def test_PyImports(input_api, output_api):
   return [
       input_api.Command(
