@@ -5,7 +5,9 @@
 package tags
 
 import (
+	"iter"
 	"maps"
+	"slices"
 	"strings"
 	"testing"
 
@@ -508,4 +510,311 @@ func TestMetadata(t *testing.T) {
 	t.Run(fieldTagsTestCase[*testingtagspb.LoopMessageD](map[string]*tagpb.Tag{
 		"testing.tags.LoopMessageD.tagged": {},
 	}))
+}
+
+func intTagValue(v int64, count uint32) *orchestratorpb.Tag_Value {
+	if count <= 0 {
+		panic("count must be > 0")
+	}
+	b := orchestratorpb.Tag_Value_builder{IntValue: proto.Int64(v)}
+	if count > 1 {
+		b.DuplicateCount = proto.Uint32(count - 1)
+	}
+	return b.Build()
+}
+
+func strTagValue(v string, count uint32) *orchestratorpb.Tag_Value {
+	if count <= 0 {
+		panic("count must be > 0")
+	}
+	b := orchestratorpb.Tag_Value_builder{StrValue: proto.String(v)}
+	if count > 1 {
+		b.DuplicateCount = proto.Uint32(count - 1)
+	}
+	return b.Build()
+}
+
+func boolTagValue(v bool, count uint32) *orchestratorpb.Tag_Value {
+	if count <= 0 {
+		panic("count must be > 0")
+	}
+	b := orchestratorpb.Tag_Value_builder{BoolValue: proto.Bool(v)}
+	if count > 1 {
+		b.DuplicateCount = proto.Uint32(count - 1)
+	}
+	return b.Build()
+}
+
+func makeTagProto(key string, vals ...*orchestratorpb.Tag_Value) *orchestratorpb.Tag {
+	return orchestratorpb.Tag_builder{
+		Key:    proto.String(key),
+		Values: vals,
+	}.Build()
+}
+
+func asIndexedTag(tag *orchestratorpb.Tag) *orchestratorpb.Tag {
+	c := proto.CloneOf(tag)
+	c.SetIndexed(true)
+	return c
+}
+
+func makeValueRef(tags ...*orchestratorpb.Tag) *orchestratorpb.ValueRef {
+	return orchestratorpb.ValueRef_builder{Tags: tags}.Build()
+}
+
+func TestFromValueRefs(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		refs iter.Seq[*orchestratorpb.ValueRef]
+		want Map
+	}{
+		{
+			name: "homogeneous",
+			refs: slices.Values([]*orchestratorpb.ValueRef{
+				makeValueRef(
+					makeTagProto("attempt_num", intTagValue(10, 1), intTagValue(20, 3)),
+					makeTagProto("env", strTagValue("prod", 2)),
+				),
+				makeValueRef(
+					makeTagProto("attempt_num", intTagValue(20, 2), intTagValue(30, 1)),
+					makeTagProto("flaky", boolTagValue(true, 4), boolTagValue(false, 1)),
+				),
+			}),
+			want: MakeMap(
+				Builder{Key: "attempt_num", Ints: []int{10, 20, 20, 20, 20, 20, 30}}.Build(),
+				Builder{Key: "env", Strings: []string{"prod", "prod"}}.Build(),
+				Builder{Key: "flaky", Bools: []bool{false, true, true, true, true}}.Build(),
+			),
+		},
+		{
+			name: "mixed_types",
+			refs: slices.Values([]*orchestratorpb.ValueRef{
+				makeValueRef(makeTagProto("mixed", intTagValue(1, 1), strTagValue("one", 3), intTagValue(2, 5))),
+				makeValueRef(makeTagProto("mixed", strTagValue("two", 1), strTagValue("one", 1))),
+			}),
+			want: MakeMap(
+				Builder{
+					Key:     "mixed",
+					Ints:    []int{1, 2, 2, 2, 2, 2},
+					Strings: []string{"one", "one", "one", "one", "two"},
+				}.Build(),
+			),
+		},
+		{
+			name: "unset_data_and_presence_merges",
+			refs: slices.Values([]*orchestratorpb.ValueRef{
+				makeValueRef(
+					makeTagProto("presence_only"),
+					asIndexedTag(makeTagProto("presence_only_indexed")),
+					makeTagProto(
+						"only_unset_data",
+						&orchestratorpb.Tag_Value{},
+					),
+					makeTagProto("partially_set", &orchestratorpb.Tag_Value{}, strTagValue("valid", 2)),
+					asIndexedTag(makeTagProto("presence_then_value")),
+					makeTagProto("value_then_presence", strTagValue("v1", 1)),
+				),
+				makeValueRef(
+					makeTagProto("presence_then_value", strTagValue("v1", 2)),
+					asIndexedTag(makeTagProto("value_then_presence")),
+				),
+			}),
+			want: Map{
+				"presence_only":         &Tag{},
+				"presence_only_indexed": &Tag{indexed: true},
+				"only_unset_data":       &Tag{},
+				"partially_set": MakeMap(
+					Builder{Key: "partially_set", Strings: []string{"valid", "valid"}}.Build(),
+				)["partially_set"],
+				"presence_then_value": MakeMap(
+					Builder{Key: "presence_then_value", IndexKeyOnly: true, Strings: []string{"v1", "v1"}}.Build(),
+				)["presence_then_value"],
+				"value_then_presence": MakeMap(
+					Builder{Key: "value_then_presence", IndexKeyOnly: true, Strings: []string{"v1"}}.Build(),
+				)["value_then_presence"],
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			got := FromValueRefs(tc.refs)
+			if diff := cmp.Diff(tc.want, got, cmpOpts...); diff != "" {
+				t.Errorf("FromValueRefs() mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestAddValueRefs(t *testing.T) {
+	t.Parallel()
+
+	m := Map{}
+	m.AddValueRefs(slices.Values([]*orchestratorpb.ValueRef{
+		makeValueRef(
+			makeTagProto("k", strTagValue("b", 1), intTagValue(2, 2)),
+			asIndexedTag(makeTagProto("presence_then_val")),
+			makeTagProto("val_then_presence", intTagValue(7, 1)),
+		),
+	}))
+	m.AddValueRefs(slices.Values([]*orchestratorpb.ValueRef{
+		makeValueRef(
+			makeTagProto("k", strTagValue("a", 2), intTagValue(2, 1), boolTagValue(true, 1)),
+			makeTagProto("presence_then_val", intTagValue(7, 1)),
+			asIndexedTag(makeTagProto("val_then_presence")),
+		),
+	}))
+
+	want := MakeMap(
+		Builder{
+			Key:     "k",
+			Strings: []string{"a", "a", "b"},
+			Ints:    []int{2, 2, 2},
+			Bools:   []bool{true},
+		}.Build(),
+		Builder{
+			Key:          "presence_then_val",
+			IndexKeyOnly: true,
+			Ints:         []int{7},
+		}.Build(),
+		Builder{
+			Key:          "val_then_presence",
+			IndexKeyOnly: true,
+			Ints:         []int{7},
+		}.Build(),
+	)
+	if diff := cmp.Diff(want, m, cmpOpts...); diff != "" {
+		t.Errorf("AddValueRefs() mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestMapAndTagQueries(t *testing.T) {
+	t.Parallel()
+
+	m := FromValueRefs(slices.Values([]*orchestratorpb.ValueRef{
+		makeValueRef(
+			makeTagProto("mixed", intTagValue(10, 2), intTagValue(-5, 1), strTagValue("b", 1), strTagValue("a", 3), boolTagValue(true, 2), boolTagValue(false, 1)),
+			makeTagProto("ints_only", intTagValue(3, 1), intTagValue(1, 2)),
+			makeTagProto("strs_only", strTagValue("z", 1), strTagValue("a", 2)),
+			makeTagProto("bools_only", boolTagValue(true, 1), boolTagValue(false, 2)),
+			makeTagProto("presence_only"),
+		),
+		makeValueRef(
+			makeTagProto(
+				"mixed",
+				orchestratorpb.Tag_Value_builder{IntValue: proto.Int64(10), Indexed: proto.Bool(true)}.Build(),
+				strTagValue("a", 1),
+			),
+		),
+	}))
+
+	for _, tc := range []struct {
+		key         string
+		wantPresent bool
+		wantInts    []int64
+		wantStrings []string
+		wantBools   []bool
+	}{
+		{
+			key:         "mixed",
+			wantPresent: true,
+			wantInts:    []int64{-5, 10, 10, 10},
+			wantStrings: []string{"a", "a", "a", "a", "b"},
+			wantBools:   []bool{false, true, true},
+		},
+		{
+			key:         "ints_only",
+			wantPresent: true,
+			wantInts:    []int64{1, 1, 3},
+			wantStrings: []string{},
+			wantBools:   []bool{},
+		},
+		{
+			key:         "strs_only",
+			wantPresent: true,
+			wantInts:    []int64{},
+			wantStrings: []string{"a", "a", "z"},
+			wantBools:   []bool{},
+		},
+		{
+			key:         "bools_only",
+			wantPresent: true,
+			wantInts:    []int64{},
+			wantStrings: []string{},
+			wantBools:   []bool{false, false, true},
+		},
+		{
+			key:         "presence_only",
+			wantPresent: true,
+			wantInts:    []int64{},
+			wantStrings: []string{},
+			wantBools:   []bool{},
+		},
+		{
+			key:         "missing",
+			wantPresent: false,
+			wantInts:    []int64{},
+			wantStrings: []string{},
+			wantBools:   []bool{},
+		},
+	} {
+		t.Run(tc.key, func(t *testing.T) {
+			t.Parallel()
+			if gotPresent := m[tc.key] != nil; gotPresent != tc.wantPresent {
+				t.Errorf("m[%q] != nil = %v, want %v", tc.key, gotPresent, tc.wantPresent)
+			}
+			if got := m.IntValues(tc.key); got == nil || !slices.Equal(got, tc.wantInts) {
+				t.Errorf("m.IntValues(%q) = %#v, want %#v", tc.key, got, tc.wantInts)
+			}
+			if got := m.StringValues(tc.key); got == nil || !slices.Equal(got, tc.wantStrings) {
+				t.Errorf("m.StringValues(%q) = %#v, want %#v", tc.key, got, tc.wantStrings)
+			}
+			if got := m.BoolValues(tc.key); got == nil || !slices.Equal(got, tc.wantBools) {
+				t.Errorf("m.BoolValues(%q) = %#v, want %#v", tc.key, got, tc.wantBools)
+			}
+		})
+	}
+
+	t.Run("nil_map", func(t *testing.T) {
+		t.Parallel()
+		var nilMap Map
+		if got := nilMap.IntValues("k"); got == nil || len(got) != 0 {
+			t.Errorf("nilMap.IntValues(%q) = %#v, want []int64{}", "k", got)
+		}
+		if got := nilMap.StringValues("k"); got == nil || len(got) != 0 {
+			t.Errorf("nilMap.StringValues(%q) = %#v, want []string{}", "k", got)
+		}
+		if got := nilMap.BoolValues("k"); got == nil || len(got) != 0 {
+			t.Errorf("nilMap.BoolValues(%q) = %#v, want []bool{}", "k", got)
+		}
+	})
+
+	for _, tc := range []struct {
+		name        string
+		key         string
+		val         any
+		wantCount   uint32
+		wantIndexed bool
+	}{
+		{"has_value_int_indexed", "mixed", int64(10), 3, true},
+		{"has_value_int_unindexed", "mixed", int64(-5), 1, false},
+		{"has_value_int_missing", "mixed", int64(99), 0, false},
+		{"has_value_str_repeated", "mixed", "a", 4, false},
+		{"has_value_str_single", "mixed", "b", 1, false},
+		{"has_value_str_missing", "mixed", "c", 0, false},
+		{"has_value_bool_true", "mixed", true, 2, false},
+		{"has_value_bool_false", "mixed", false, 1, false},
+		{"has_value_presence_only", "presence_only", "a", 0, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			gotCount, gotIndexed := m[tc.key].HasValue(tc.val)
+			if gotCount != tc.wantCount || gotIndexed != tc.wantIndexed {
+				t.Errorf("m[%q].HasValue(%v) = (%d, %v), want (%d, %v)", tc.key, tc.val, gotCount, gotIndexed, tc.wantCount, tc.wantIndexed)
+			}
+		})
+	}
 }

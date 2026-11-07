@@ -269,6 +269,14 @@ func MakeMap(tags ...*orchestratorpb.Tag) Map {
 	return t
 }
 
+// FromValueRefs constructs a Map containing all Tags from the given ValueRef
+// iterator, merging Tags with identical keys.
+func FromValueRefs(refs iter.Seq[*orchestratorpb.ValueRef]) Map {
+	t := Map{}
+	t.AddValueRefs(refs)
+	return t
+}
+
 // Proto converts this Tags into a normalized list of orchestratorpb.Tag protos.
 func (t Map) Proto() []*orchestratorpb.Tag {
 	if len(t) == 0 {
@@ -304,6 +312,80 @@ func (t Map) Add(tags iter.Seq[*orchestratorpb.Tag]) {
 			dat.AddValue(value)
 		}
 	}
+}
+
+// AddValueRefs adds Tag data from an iterator of ValueRefs, merging Tags with
+// identical keys.
+func (t Map) AddValueRefs(refs iter.Seq[*orchestratorpb.ValueRef]) {
+	for vr := range refs {
+		t.Add(slices.Values(vr.GetTags()))
+	}
+}
+
+// IntValues returns all int64 values for key in canonical sorted order,
+// repeating each value 1 + duplicate_count times.
+//
+// Returns a non-nil empty slice if key is not in the Map or has no int64
+// values.
+func (t Map) IntValues(key string) []int64 {
+	ret := []int64{}
+	tag := t[key]
+	if tag == nil {
+		return ret
+	}
+	for _, tv := range tag.Values() {
+		if tv.WhichData() == orchestratorpb.Tag_Value_IntValue_case {
+			v := tv.GetIntValue()
+			for range tv.GetDuplicateCount() + 1 {
+				ret = append(ret, v)
+			}
+		}
+	}
+	return ret
+}
+
+// StringValues returns all string values for key in canonical sorted order,
+// repeating each value 1 + duplicate_count times.
+//
+// Returns a non-nil empty slice if key is not in the Map or has no string
+// values.
+func (t Map) StringValues(key string) []string {
+	ret := []string{}
+	tag := t[key]
+	if tag == nil {
+		return ret
+	}
+	for _, tv := range tag.Values() {
+		if tv.WhichData() == orchestratorpb.Tag_Value_StrValue_case {
+			v := tv.GetStrValue()
+			for range tv.GetDuplicateCount() + 1 {
+				ret = append(ret, v)
+			}
+		}
+	}
+	return ret
+}
+
+// BoolValues returns all bool values for key in canonical sorted order,
+// repeating each value 1 + duplicate_count times.
+//
+// Returns a non-nil empty slice if key is not in the Map or has no bool
+// values.
+func (t Map) BoolValues(key string) []bool {
+	ret := []bool{}
+	tag := t[key]
+	if tag == nil {
+		return ret
+	}
+	for _, tv := range tag.Values() {
+		if tv.WhichData() == orchestratorpb.Tag_Value_BoolValue_case {
+			v := tv.GetBoolValue()
+			for range tv.GetDuplicateCount() + 1 {
+				ret = append(ret, v)
+			}
+		}
+	}
+	return ret
 }
 
 // newTagValue makes a new Tag_Value.
