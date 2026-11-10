@@ -77,8 +77,7 @@ func ParseFilter(vf *orchestratorpb.ValueFilter) (*ParsedFilter, error) {
 // If `hasAccess` is nil, access checks are disabled (meaning that no refs will
 // be omitted with NO_ACCESS).
 //
-// See [RefsInStage], [RefsInStageAttempt] and [RefsInCheck] for iterators
-// which easily compose with this.
+// See [RefsIn] for an iterator which easily composes with this.
 func (pf *ParsedFilter) Apply(slot orchestratorpb.ValueSlot, ref *orchestratorpb.ValueRef, hasAccess AccessCheck) (needsJSON bool, err error) {
 	access := true
 	if hasAccess != nil {

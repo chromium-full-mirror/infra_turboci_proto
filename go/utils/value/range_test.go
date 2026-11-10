@@ -6,12 +6,18 @@ package value
 
 import (
 	"testing"
+	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/testing/protocmp"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
+	idspb "go.chromium.org/turboci/proto/go/graph/ids/v1"
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+	"go.chromium.org/turboci/proto/go/utils/ids"
 )
 
 type NodeType string
@@ -113,31 +119,55 @@ func populateAllValueRefs(msg proto.Message, nodeType NodeType) (numRefs int) {
 	return numRefs
 }
 
-// TestRefsInStage ensures that `RefsInStage` actually covers all ValueRefs in
-// the Stage proto.
+// TestRefsInStage ensures that `RefsIn` actually covers all ValueRefs in the
+// Stage proto.
 //
 // If this test fails, it likely means that protobufs for orchestrator.Stage
-// have changed and RefsInStage needs to be updated.
+// have changed and RefsIn needs to be updated.
 func TestRefsInStage(t *testing.T) {
 	stg := &orchestratorpb.Stage{}
 	expect := populateAllValueRefs(stg, Stage)
 
-	var found int
-	for range RefsIn(stg) {
-		found++
+	stageID := ids.Stage("S1")
+	editAttemptID := idspb.StageAttempt_builder{Stage: stageID, Idx: proto.Int32(1)}.Build()
+	attemptID := idspb.StageAttempt_builder{Stage: stageID, Idx: proto.Int32(2)}.Build()
+	ts := timestamppb.New(time.Unix(100, 0))
+
+	stg.SetIdentifier(stageID)
+	stg.GetEdits()[0].SetForNode(ids.Wrap(stageID))
+	stg.GetEdits()[0].SetVersion(orchestratorpb.Revision_builder{Ts: ts}.Build())
+	stg.GetEdits()[0].GetStage().GetAttempts()[0].SetIdentifier(editAttemptID)
+	stg.GetAttempts()[0].SetIdentifier(attemptID)
+
+	var got []RefContext
+	for ctx := range RefsIn(stg) {
+		got = append(got, ctx)
 	}
 
-	if found != expect {
-		t.Errorf("got %d, want %d", found, expect)
+	if len(got) != expect {
+		t.Fatalf("got %d, want %d", len(got), expect)
+	}
+	want := []RefContext{
+		&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_ARGS, id: ids.Wrap(stageID)},
+		&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_LEGACY_WORKNODE, id: ids.Wrap(stageID)},
+		&CommonRefContext{
+			slot: orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_EDIT_REASON_DETAIL,
+			id:   ids.Wrap(idspb.StageEdit_builder{Stage: stageID, Version: ts}.Build()),
+		},
+		&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_EDIT_ATTEMPT_DETAIL, id: ids.Wrap(editAttemptID)},
+		&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_ATTEMPT_DETAIL, id: ids.Wrap(attemptID)},
+		&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_ATTEMPT_PROGRESS_DETAIL, id: ids.Wrap(attemptID)},
+	}
+	if diff := cmp.Diff(want, got, cmp.AllowUnexported(CommonRefContext{}), protocmp.Transform()); diff != "" {
+		t.Errorf("RefsIn(Stage) mismatch (-want +got):\n%s", diff)
 	}
 }
 
-// TestRefsInStageAttempt ensures that `RefsInStageAttempt` actually covers all
-// ValueRefs in the Stage Attempt proto.
+// TestRefsInStageAttempt ensures that `RefsIn` actually covers all ValueRefs
+// in the Stage Attempt proto.
 //
 // If this test fails, it likely means that protobufs for
-// orchestrator.Stage_Attempt have changed and RefsInStageAttempt needs to be
-// updated.
+// orchestrator.Stage_Attempt have changed and RefsIn needs to be updated.
 func TestRefsInStageAttempt(t *testing.T) {
 	atmpt := &orchestratorpb.Stage_Attempt{}
 	expect := populateAllValueRefs(atmpt, Stage)
@@ -152,11 +182,11 @@ func TestRefsInStageAttempt(t *testing.T) {
 	}
 }
 
-// TestRefsInStageEdit ensures that `RefsInStageEdit` actually covers all
-// ValueRefs in the Stage Edit proto.
+// TestRefsInStageEdit ensures that `RefsIn` actually covers all ValueRefs in
+// the Stage Edit proto.
 //
-// If this test fails, it likely means that protobufs for
-// orchestrator.Edit have changed and RefsInStageEdit needs to be updated.
+// If this test fails, it likely means that protobufs for orchestrator.Edit
+// have changed and RefsIn needs to be updated.
 func TestRefsInStageEdit(t *testing.T) {
 	edit := orchestratorpb.Edit_builder{
 		Stage: &orchestratorpb.StageDelta{},
@@ -173,30 +203,88 @@ func TestRefsInStageEdit(t *testing.T) {
 	}
 }
 
-// TestRefsInCheck ensures that `RefsInCheck` actually covers all ValueRefs in
-// the Check proto.
+// TestRefsInCheck ensures that `RefsIn` actually covers all ValueRefs in the
+// Check proto, traversing Check.results in reverse order.
 //
-// If this test fails, it likely means that protobufs for
-// orchestrator.Check have changed and RefsInCheck needs to be updated.
+// If this test fails, it likely means that protobufs for orchestrator.Check
+// have changed and RefsIn needs to be updated.
 func TestRefsInCheck(t *testing.T) {
 	check := &orchestratorpb.Check{}
 	expect := populateAllValueRefs(check, Check)
 
-	var found int
-	for range RefsIn(check) {
-		found++
+	checkID := ids.Check("C1")
+	res0ID := idspb.CheckResult_builder{Check: checkID, Idx: proto.Int32(1)}.Build()
+	res1ID := idspb.CheckResult_builder{Check: checkID, Idx: proto.Int32(2)}.Build()
+	editResID := idspb.CheckResult_builder{Check: checkID, Idx: proto.Int32(3)}.Build()
+	ts := timestamppb.New(time.Unix(100, 0))
+	actor0 := orchestratorpb.Actor_builder{
+		WorkplanCreator: &orchestratorpb.Actor_WorkplanCreator{},
+	}.Build()
+	actor1 := orchestratorpb.Actor_builder{
+		Orchestrator: &orchestratorpb.Actor_Orchestrator{},
+	}.Build()
+
+	check.SetIdentifier(checkID)
+	res0 := check.GetResults()[0]
+	res0.SetIdentifier(res0ID)
+	res0.SetOwner(actor0)
+	res1 := proto.CloneOf(res0)
+	res1.SetIdentifier(res1ID)
+	res1.SetOwner(actor1)
+	check.SetResults([]*orchestratorpb.Check_Result{res0, res1})
+	expect++
+
+	check.GetEdits()[0].SetForNode(ids.Wrap(checkID))
+	check.GetEdits()[0].SetVersion(orchestratorpb.Revision_builder{Ts: ts}.Build())
+	check.GetEdits()[0].GetCheck().GetResults()[0].SetIdentifier(editResID)
+
+	var got []RefContext
+	for ctx := range RefsIn(check) {
+		got = append(got, ctx)
 	}
 
-	if found != expect {
-		t.Errorf("got %d, want %d", found, expect)
+	if len(got) != expect {
+		t.Fatalf("got %d, want %d", len(got), expect)
+	}
+	editID := ids.Wrap(idspb.CheckEdit_builder{Check: checkID, Version: ts}.Build())
+	want := []RefContext{
+		&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_OPTION, id: ids.Wrap(checkID)},
+		&ResultDataRefContext{
+			CommonRefContext: CommonRefContext{
+				slot: orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_RESULT_DATA,
+				id:   ids.Wrap(res1ID),
+			},
+			Idx:   1,
+			Actor: actor1,
+		},
+		&ResultDataRefContext{
+			CommonRefContext: CommonRefContext{
+				slot: orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_RESULT_DATA,
+				id:   ids.Wrap(res0ID),
+			},
+			Idx:   0,
+			Actor: actor0,
+		},
+		&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_REASON_DETAIL, id: editID},
+		&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_OPTION, id: editID},
+		&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_RESULT_DATA, id: ids.Wrap(editResID)},
+	}
+	if diff := cmp.Diff(want, got, cmp.AllowUnexported(CommonRefContext{}), protocmp.Transform()); diff != "" {
+		t.Errorf("RefsIn(Check) mismatch (-want +got):\n%s", diff)
+	}
+	if got[0].Slot() != orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_OPTION {
+		t.Errorf("got[0].Slot() = %v, want %v", got[0].Slot(), orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_OPTION)
+	}
+	if !proto.Equal(got[0].Id(), ids.Wrap(checkID)) {
+		t.Errorf("got[0].Id() = %v, want %v", got[0].Id(), ids.Wrap(checkID))
 	}
 }
 
-// TestRefsInCheckEdit ensures that `RefsInCheckEdit` actually covers all
-// ValueRefs in the Check Edit proto.
+// TestRefsInCheckEdit ensures that `RefsIn` actually covers all ValueRefs in
+// the Check Edit proto.
 //
-// If this test fails, it likely means that protobufs for
-// orchestrator.Edit have changed and RefsInCheckEdit needs to be updated.
+// If this test fails, it likely means that protobufs for orchestrator.Edit
+// have changed and RefsIn needs to be updated.
 func TestRefsInCheckEdit(t *testing.T) {
 	edit := orchestratorpb.Edit_builder{
 		Check: orchestratorpb.CheckDelta_builder{
