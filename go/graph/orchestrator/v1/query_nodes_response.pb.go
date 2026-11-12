@@ -264,16 +264,26 @@ type QueryNodesResponse_builder struct {
 	Workplans []*WorkPlan
 	// The workplan for which this query is retrieving data.
 	//
-	// Callers may need to merge workplans across pages.
-	Workplan *WorkPlan
-	// A map containing requested [ValueData] for nodes in the `workplan` (or in a
-	// prior response page, when a node's [ValueData] don't all fit in the page).
+	// It will have Stages and Checks populated with nodes matching the query.
+	// Callers may need to merge such workplans across all response pages to get
+	// the full result.
 	//
-	// This is keyed by [ValueRef].digest.
+	// It is possible for `workplan` to have no nodes at all in case the response
+	// is still paginating through ValueData of a (huge) previously returned node.
+	Workplan *WorkPlan
+	// A map containing requested ValueData for nodes in the `workplan` (or in a
+	// prior response page, when a node's ValueData don't all fit in the page).
+	//
+	// This is keyed by ValueRef.digest.
+	//
+	// Callers may need to merge these data across all response pages to get
+	// the full result.
 	ValueData map[string]*ValueData
 	// Describes what QueryNodes did to explicitly selected nodes.
 	//
-	// Populated only when `QueryNodesRequest.selected` was used.
+	// Populated only when `QueryNodesRequest.selected` was used. Describes only
+	// nodes returned in the current page. Callers may need to merge these lists
+	// across all response pages to get the full result.
 	Selected []*QueryNodesResponse_SelectedNode
 	// State of the current stage attempt.
 	//
@@ -288,9 +298,7 @@ type QueryNodesResponse_builder struct {
 	//
 	// It is possible for QueryNodesResponse to return a completely empty page
 	// (with empty `workplans`), but with populated `next_page_token`. The caller
-	// should resume the query as usual. The server can return such response if
-	// it has to filter out a lot of nodes and it runs out of allotted request
-	// time to do that.
+	// should resume the query as usual.
 	NextPageToken *string
 }
 

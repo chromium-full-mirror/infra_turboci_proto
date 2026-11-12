@@ -658,8 +658,13 @@ type QueryNodesRequest_NodeSetSelected_builder struct {
 	//
 	// Must be non-empty. All nodes must belong to the same workplan.
 	//
+	// This is treated as a set (i.e. duplicates are ignored, ordering doesn't
+	// matter). The nodes will be returned ordered by their IDs (all checks
+	// first, followed by all stages). This matters if the response is
+	// paginated.
+	//
 	// All nodes in this set will have a corresponding SelectedNode populated in
-	// QueryNodesResponse.selected.
+	// QueryNodesResponse.selected (perhaps spread out across multiple pages).
 	//
 	// If the workplan ID encoded in the token doesn't match the ID of the
 	// workplan being read, the request will be authorized as an external read.
