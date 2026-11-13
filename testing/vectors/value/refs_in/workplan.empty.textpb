@@ -1,0 +1,6 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  workplan {}
+}

@@ -1,0 +1,210 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  check {
+    identifier {
+      id: "C1"
+    }
+    options {
+      digest: "option0"
+    }
+    options {
+      digest: "option1"
+    }
+    results {
+      identifier {
+        check {
+          id: "C1"
+        }
+        idx: 1
+      }
+      owner {
+        workplan_creator {}
+      }
+      data {
+        digest: "res0_data0"
+      }
+      data {
+        digest: "res0_data1"
+      }
+    }
+    results {
+      identifier {
+        check {
+          id: "C1"
+        }
+        idx: 2
+      }
+      owner {
+        orchestrator {}
+      }
+      data {
+        digest: "res1_data0"
+      }
+    }
+    edits {
+      for_node {
+        check {
+          id: "C1"
+        }
+      }
+      version {
+        ts {
+          seconds: 100
+        }
+      }
+      reason {
+        details {
+          digest: "edit0_reason0"
+        }
+      }
+      check {
+        options {
+          digest: "edit0_option0"
+        }
+        results {
+          identifier {
+            check {
+              id: "C1"
+            }
+            idx: 3
+          }
+          data {
+            digest: "edit0_res_data0"
+          }
+        }
+      }
+    }
+  }
+}
+output {
+  refs {
+    slot: VALUE_SLOT_CHECK_OPTION
+    id {
+      check {
+        id: "C1"
+      }
+    }
+    ref {
+      digest: "option0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_OPTION
+    id {
+      check {
+        id: "C1"
+      }
+    }
+    ref {
+      digest: "option1"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_RESULT_DATA
+    id {
+      check_result {
+        check {
+          id: "C1"
+        }
+        idx: 2
+      }
+    }
+    result_data {
+      idx: 1
+      actor {
+        orchestrator {}
+      }
+    }
+    ref {
+      digest: "res1_data0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_RESULT_DATA
+    id {
+      check_result {
+        check {
+          id: "C1"
+        }
+        idx: 1
+      }
+    }
+    result_data {
+      idx: 0
+      actor {
+        workplan_creator {}
+      }
+    }
+    ref {
+      digest: "res0_data0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_RESULT_DATA
+    id {
+      check_result {
+        check {
+          id: "C1"
+        }
+        idx: 1
+      }
+    }
+    result_data {
+      idx: 0
+      actor {
+        workplan_creator {}
+      }
+    }
+    ref {
+      digest: "res0_data1"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_EDIT_REASON_DETAIL
+    id {
+      check_edit {
+        check {
+          id: "C1"
+        }
+        version {
+          seconds: 100
+        }
+      }
+    }
+    ref {
+      digest: "edit0_reason0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_EDIT_OPTION
+    id {
+      check_edit {
+        check {
+          id: "C1"
+        }
+        version {
+          seconds: 100
+        }
+      }
+    }
+    ref {
+      digest: "edit0_option0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_EDIT_RESULT_DATA
+    id {
+      check_result {
+        check {
+          id: "C1"
+        }
+        idx: 3
+      }
+    }
+    ref {
+      digest: "edit0_res_data0"
+    }
+  }
+}

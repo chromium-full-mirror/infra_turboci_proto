@@ -1,0 +1,110 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  stage_attempt {
+    identifier {
+      stage {
+        is_worknode: false
+        id: "S1"
+      }
+      idx: 3
+    }
+    details {
+      digest: "detail0"
+    }
+    details {
+      digest: "detail1"
+    }
+    progress {
+      details {
+        digest: "progress0_detail0"
+      }
+      details {
+        digest: "progress0_detail1"
+      }
+    }
+    progress {
+      details {
+        digest: "progress1_detail0"
+      }
+    }
+  }
+}
+output {
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 3
+      }
+    }
+    ref {
+      digest: "detail0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 3
+      }
+    }
+    ref {
+      digest: "detail1"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_PROGRESS_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 3
+      }
+    }
+    ref {
+      digest: "progress0_detail0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_PROGRESS_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 3
+      }
+    }
+    ref {
+      digest: "progress0_detail1"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_PROGRESS_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 3
+      }
+    }
+    ref {
+      digest: "progress1_detail0"
+    }
+  }
+}

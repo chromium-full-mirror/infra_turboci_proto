@@ -1,0 +1,33 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  edit {
+    reason {
+      details {
+        digest: "reason0"
+      }
+    }
+    stage {
+      attempts {
+        details {
+          digest: "attempt_detail0"
+        }
+      }
+    }
+  }
+}
+output {
+  refs {
+    slot: VALUE_SLOT_STAGE_EDIT_REASON_DETAIL
+    ref {
+      digest: "reason0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_STAGE_EDIT_ATTEMPT_DETAIL
+    ref {
+      digest: "attempt_detail0"
+    }
+  }
+}

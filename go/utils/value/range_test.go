@@ -5,7 +5,9 @@
 package value
 
 import (
+	"fmt"
 	"iter"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -19,7 +21,9 @@ import (
 
 	idspb "go.chromium.org/turboci/proto/go/graph/ids/v1"
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+	refsinvectorspb "go.chromium.org/turboci/proto/go/testing/vectors/value/refs_in"
 	"go.chromium.org/turboci/proto/go/utils/ids"
+	"go.chromium.org/turboci/proto/go/utils/internal/test_vector"
 )
 
 var (
@@ -312,4 +316,79 @@ func TestRefsIn_Counts(t *testing.T) {
 			}
 		})
 	}
+}
+
+type yieldedRef struct {
+	Ctx RefContext
+	Ref *orchestratorpb.ValueRef
+}
+
+func TestRefsIn_Vectors(t *testing.T) {
+	t.Parallel()
+
+	test_vector.Run(t, _REFS_IN_VECTORS, func(t *testing.T, tc *refsinvectorspb.RefsIn) {
+		var obj any
+		switch in := tc.GetInput(); in.WhichObject() {
+		case refsinvectorspb.RefsIn_Input_Stage_case:
+			obj = in.GetStage()
+		case refsinvectorspb.RefsIn_Input_StageAttempt_case:
+			obj = in.GetStageAttempt()
+		case refsinvectorspb.RefsIn_Input_Check_case:
+			obj = in.GetCheck()
+		case refsinvectorspb.RefsIn_Input_Workplan_case:
+			obj = in.GetWorkplan()
+		case refsinvectorspb.RefsIn_Input_Edit_case:
+			obj = in.GetEdit()
+		default:
+			obj = nil
+		}
+
+		if tc.HasErr() {
+			defer func() {
+				r := recover()
+				if r == nil {
+					t.Fatalf("expected panic containing %q, got nil", tc.GetErr())
+				}
+				if got := fmt.Sprint(r); !strings.Contains(got, tc.GetErr()) {
+					t.Errorf("panic = %q, want substring %q", got, tc.GetErr())
+				}
+			}()
+			collectCtxs(RefsIn(obj))
+			return
+		}
+
+		var got []yieldedRef
+		for ctx, ref := range RefsIn(obj) {
+			if ctx.Slot() == orchestratorpb.ValueSlot_VALUE_SLOT_UNKNOWN {
+				t.Errorf("unexpected VALUE_SLOT_UNKNOWN for ref %v", ref)
+			}
+			got = append(got, yieldedRef{Ctx: ctx, Ref: ref})
+		}
+
+		var want []yieldedRef
+		for _, out := range tc.GetOutput().GetRefs() {
+			var ctx RefContext
+			if out.HasResultData() {
+				rd := out.GetResultData()
+				ctx = &ResultDataRefContext{
+					CommonRefContext: CommonRefContext{
+						slot: out.GetSlot(),
+						id:   out.GetId(),
+					},
+					Idx:   int(rd.GetIdx()),
+					Actor: rd.GetActor(),
+				}
+			} else {
+				ctx = &CommonRefContext{
+					slot: out.GetSlot(),
+					id:   out.GetId(),
+				}
+			}
+			want = append(want, yieldedRef{Ctx: ctx, Ref: out.GetRef()})
+		}
+
+		if diff := cmp.Diff(want, got, cmp.AllowUnexported(CommonRefContext{}), protocmp.Transform()); diff != "" {
+			t.Errorf("RefsIn(%T) mismatch (-want +got):\n%s", obj, diff)
+		}
+	})
 }

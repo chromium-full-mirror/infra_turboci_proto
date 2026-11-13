@@ -1,0 +1,130 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  edit {
+    for_node {
+      check {
+        id: "C1"
+      }
+    }
+    version {
+      ts {
+        seconds: 200
+      }
+    }
+    reason {
+      details {
+        digest: "reason0"
+      }
+    }
+    check {
+      options {
+        digest: "option0"
+      }
+      options {
+        digest: "option1"
+      }
+      results {
+        identifier {
+          check {
+            id: "C1"
+          }
+          idx: 1
+        }
+        data {
+          digest: "res1_data0"
+        }
+      }
+      results {
+        identifier {
+          check {
+            id: "C1"
+          }
+          idx: 2
+        }
+        data {
+          digest: "res2_data0"
+        }
+      }
+    }
+  }
+}
+output {
+  refs {
+    slot: VALUE_SLOT_CHECK_EDIT_REASON_DETAIL
+    id {
+      check_edit {
+        check {
+          id: "C1"
+        }
+        version {
+          seconds: 200
+        }
+      }
+    }
+    ref {
+      digest: "reason0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_EDIT_OPTION
+    id {
+      check_edit {
+        check {
+          id: "C1"
+        }
+        version {
+          seconds: 200
+        }
+      }
+    }
+    ref {
+      digest: "option0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_EDIT_OPTION
+    id {
+      check_edit {
+        check {
+          id: "C1"
+        }
+        version {
+          seconds: 200
+        }
+      }
+    }
+    ref {
+      digest: "option1"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_EDIT_RESULT_DATA
+    id {
+      check_result {
+        check {
+          id: "C1"
+        }
+        idx: 1
+      }
+    }
+    ref {
+      digest: "res1_data0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_EDIT_RESULT_DATA
+    id {
+      check_result {
+        check {
+          id: "C1"
+        }
+        idx: 2
+      }
+    }
+    ref {
+      digest: "res2_data0"
+    }
+  }
+}

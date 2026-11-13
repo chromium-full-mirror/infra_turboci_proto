@@ -1,0 +1,54 @@
+// Copyright 2026 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+syntax = "proto3";
+
+package testing.vectors.value.refs_in;
+
+import "turboci/graph/ids/v1/identifier.proto";
+import "turboci/graph/orchestrator/v1/actor.proto";
+import "turboci/graph/orchestrator/v1/check.proto";
+import "turboci/graph/orchestrator/v1/edit.proto";
+import "turboci/graph/orchestrator/v1/stage.proto";
+import "turboci/graph/orchestrator/v1/value_ref.proto";
+import "turboci/graph/orchestrator/v1/value_slot.proto";
+import "turboci/graph/orchestrator/v1/workplan.proto";
+
+option go_package = "go.chromium.org/turboci/proto/go/testing/vectors/value/refs_in;refsinvectorspb";
+option java_multiple_files = true;
+
+// RefsIn tests that a given TurboCI graph object yields the expected sequence
+// of (RefContext, ValueRef) pairs in order.
+message RefsIn {
+  message Input {
+    oneof object {
+      turboci.graph.orchestrator.v1.Stage stage = 1;
+      turboci.graph.orchestrator.v1.Stage.Attempt stage_attempt = 2;
+      turboci.graph.orchestrator.v1.Check check = 3;
+      turboci.graph.orchestrator.v1.WorkPlan workplan = 4;
+      turboci.graph.orchestrator.v1.Edit edit = 5;
+    }
+  }
+  optional Input input = 1;
+
+  message Output {
+    message ValueRefAndContext {
+      // Present iff the yielded RefContext is a ResultDataRefContext.
+      message ResultData {
+        optional int32 idx = 1;
+        optional turboci.graph.orchestrator.v1.Actor actor = 2;
+      }
+
+      optional turboci.graph.orchestrator.v1.ValueSlot slot = 1;
+      optional turboci.graph.ids.v1.Identifier id = 2;
+      optional ResultData result_data = 3;
+      optional turboci.graph.orchestrator.v1.ValueRef ref = 4;
+    }
+
+    repeated ValueRefAndContext refs = 1;
+  }
+  optional Output output = 2;
+
+  optional string err = 3;
+}

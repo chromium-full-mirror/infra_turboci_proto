@@ -99,7 +99,7 @@ func refsInStage(stage *orchestratorpb.Stage) iter.Seq2[RefContext, *orchestrato
 		}
 
 		for _, edit := range stage.GetEdits() {
-			for ctx, ref := range refsInEdit(edit) {
+			for ctx, ref := range refsInStageEdit(edit) {
 				if ref != nil && !yield(ctx, ref) {
 					return
 				}
@@ -136,59 +136,96 @@ func refsInStageAttempt(attempt *orchestratorpb.Stage_Attempt) iter.Seq2[RefCont
 	}
 }
 
+func stageEditID(edit *orchestratorpb.Edit) *idspb.Identifier {
+	stg := edit.GetForNode().GetStage()
+	ver := edit.GetVersion().GetTs()
+	if stg == nil && ver == nil {
+		return nil
+	}
+	return ids.Wrap(idspb.StageEdit_builder{
+		Stage:   stg,
+		Version: ver,
+	}.Build())
+}
+
+func checkEditID(edit *orchestratorpb.Edit) *idspb.Identifier {
+	chk := edit.GetForNode().GetCheck()
+	ver := edit.GetVersion().GetTs()
+	if chk == nil && ver == nil {
+		return nil
+	}
+	return ids.Wrap(idspb.CheckEdit_builder{
+		Check:   chk,
+		Version: ver,
+	}.Build())
+}
+
+func refsInStageEdit(edit *orchestratorpb.Edit) iter.Seq2[RefContext, *orchestratorpb.ValueRef] {
+	if edit.HasCheck() || edit.GetForNode().HasCheck() {
+		panic("impossible: Check edit in Stage")
+	}
+	return func(yield func(RefContext, *orchestratorpb.ValueRef) bool) {
+		editID := stageEditID(edit)
+		for _, detail := range edit.GetReason().GetDetails() {
+			if detail != nil && !yield(&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_EDIT_REASON_DETAIL, id: editID}, detail) {
+				return
+			}
+		}
+		for _, attempt := range edit.GetStage().GetAttempts() {
+			attemptID := ids.Wrap(attempt.GetIdentifier())
+			for _, detail := range attempt.GetDetails() {
+				if detail != nil && !yield(&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_EDIT_ATTEMPT_DETAIL, id: attemptID}, detail) {
+					return
+				}
+			}
+		}
+	}
+}
+
+func refsInCheckEdit(edit *orchestratorpb.Edit) iter.Seq2[RefContext, *orchestratorpb.ValueRef] {
+	if edit.HasStage() || edit.GetForNode().HasStage() {
+		panic("impossible: Stage edit in Check")
+	}
+	return func(yield func(RefContext, *orchestratorpb.ValueRef) bool) {
+		editID := checkEditID(edit)
+		for _, detail := range edit.GetReason().GetDetails() {
+			if detail != nil && !yield(&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_REASON_DETAIL, id: editID}, detail) {
+				return
+			}
+		}
+		for _, option := range edit.GetCheck().GetOptions() {
+			if option != nil && !yield(&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_OPTION, id: editID}, option) {
+				return
+			}
+		}
+		for _, result := range edit.GetCheck().GetResults() {
+			resultID := ids.Wrap(result.GetIdentifier())
+			for _, dat := range result.GetData() {
+				if dat != nil && !yield(&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_RESULT_DATA, id: resultID}, dat) {
+					return
+				}
+			}
+		}
+	}
+}
+
 // refsInEdit is an iterator which iterates through every non-nil
 // *ValueRef in the Edit.
 func refsInEdit(edit *orchestratorpb.Edit) iter.Seq2[RefContext, *orchestratorpb.ValueRef] {
 	switch edit.WhichDelta() {
 	case orchestratorpb.Edit_Stage_case:
-		return func(yield func(RefContext, *orchestratorpb.ValueRef) bool) {
-			editID := ids.Wrap(idspb.StageEdit_builder{
-				Stage:   edit.GetForNode().GetStage(),
-				Version: edit.GetVersion().GetTs(),
-			}.Build())
-			for _, detail := range edit.GetReason().GetDetails() {
-				if detail != nil && !yield(&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_EDIT_REASON_DETAIL, id: editID}, detail) {
-					return
-				}
-			}
-			for _, attempt := range edit.GetStage().GetAttempts() {
-				attemptID := ids.Wrap(attempt.GetIdentifier())
-				for _, detail := range attempt.GetDetails() {
-					if detail != nil && !yield(&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_STAGE_EDIT_ATTEMPT_DETAIL, id: attemptID}, detail) {
-						return
-					}
-				}
-			}
-		}
-
+		return refsInStageEdit(edit)
 	case orchestratorpb.Edit_Check_case:
-		return func(yield func(RefContext, *orchestratorpb.ValueRef) bool) {
-			editID := ids.Wrap(idspb.CheckEdit_builder{
-				Check:   edit.GetForNode().GetCheck(),
-				Version: edit.GetVersion().GetTs(),
-			}.Build())
-			for _, detail := range edit.GetReason().GetDetails() {
-				if detail != nil && !yield(&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_REASON_DETAIL, id: editID}, detail) {
-					return
-				}
-			}
-			for _, option := range edit.GetCheck().GetOptions() {
-				if option != nil && !yield(&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_OPTION, id: editID}, option) {
-					return
-				}
-			}
-			for _, result := range edit.GetCheck().GetResults() {
-				resultID := ids.Wrap(result.GetIdentifier())
-				for _, dat := range result.GetData() {
-					if dat != nil && !yield(&CommonRefContext{slot: orchestratorpb.ValueSlot_VALUE_SLOT_CHECK_EDIT_RESULT_DATA, id: resultID}, dat) {
-						return
-					}
-				}
-			}
-		}
+		return refsInCheckEdit(edit)
+	}
+	switch edit.GetForNode().WhichType() {
+	case idspb.Identifier_Stage_case:
+		return refsInStageEdit(edit)
+	case idspb.Identifier_Check_case:
+		return refsInCheckEdit(edit)
 	}
 
-	panic("impossible")
+	panic("impossible: Edit must have stage or check delta or for_node set")
 }
 
 // refsInCheck is an iterator which iterates through every non-nil
@@ -221,7 +258,7 @@ func refsInCheck(check *orchestratorpb.Check) iter.Seq2[RefContext, *orchestrato
 			}
 		}
 		for _, edit := range check.GetEdits() {
-			for ctx, ref := range refsInEdit(edit) {
+			for ctx, ref := range refsInCheckEdit(edit) {
 				if ref != nil && !yield(ctx, ref) {
 					return
 				}

@@ -1,0 +1,29 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  stage_attempt {
+    details {
+      digest: "detail0"
+    }
+    progress {
+      details {
+        digest: "progress0_detail0"
+      }
+    }
+  }
+}
+output {
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_DETAIL
+    ref {
+      digest: "detail0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_PROGRESS_DETAIL
+    ref {
+      digest: "progress0_detail0"
+    }
+  }
+}

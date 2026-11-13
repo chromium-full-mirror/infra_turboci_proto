@@ -1,0 +1,79 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  stage {
+    args {
+      digest: "stage_args"
+    }
+    legacy {
+      worknode {
+        digest: "stage_worknode"
+      }
+    }
+    edits {
+      reason {
+        details {
+          digest: "edit_without_delta_reason"
+        }
+      }
+    }
+    edits {
+      stage {
+        attempts {
+          details {
+            digest: "edit_attempt_detail"
+          }
+        }
+      }
+    }
+    attempts {
+      details {
+        digest: "attempt_detail"
+      }
+      progress {
+        details {
+          digest: "attempt_progress_detail"
+        }
+      }
+    }
+  }
+}
+output {
+  refs {
+    slot: VALUE_SLOT_STAGE_ARGS
+    ref {
+      digest: "stage_args"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_STAGE_LEGACY_WORKNODE
+    ref {
+      digest: "stage_worknode"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_STAGE_EDIT_REASON_DETAIL
+    ref {
+      digest: "edit_without_delta_reason"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_STAGE_EDIT_ATTEMPT_DETAIL
+    ref {
+      digest: "edit_attempt_detail"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_DETAIL
+    ref {
+      digest: "attempt_detail"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_PROGRESS_DETAIL
+    ref {
+      digest: "attempt_progress_detail"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  edit {
+    for_node {
+      check {
+        id: "C1"
+      }
+    }
+    reason {
+      details {
+        digest: "reason0"
+      }
+    }
+  }
+}
+output {
+  refs {
+    slot: VALUE_SLOT_CHECK_EDIT_REASON_DETAIL
+    id {
+      check_edit {
+        check {
+          id: "C1"
+        }
+      }
+    }
+    ref {
+      digest: "reason0"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  edit {
+    for_node {
+      stage {
+        is_worknode: false
+        id: "S1"
+      }
+    }
+    reason {
+      details {
+        digest: "reason0"
+      }
+    }
+  }
+}
+output {
+  refs {
+    slot: VALUE_SLOT_STAGE_EDIT_REASON_DETAIL
+    id {
+      stage_edit {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+      }
+    }
+    ref {
+      digest: "reason0"
+    }
+  }
+}

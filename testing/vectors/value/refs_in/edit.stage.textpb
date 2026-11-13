@@ -1,0 +1,109 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  edit {
+    for_node {
+      stage {
+        is_worknode: false
+        id: "S1"
+      }
+    }
+    version {
+      ts {
+        seconds: 100
+      }
+    }
+    reason {
+      details {
+        digest: "reason0"
+      }
+      details {
+        digest: "reason1"
+      }
+    }
+    stage {
+      attempts {
+        identifier {
+          stage {
+            is_worknode: false
+            id: "S1"
+          }
+          idx: 1
+        }
+        details {
+          digest: "attempt1_detail0"
+        }
+        details {
+          digest: "attempt1_detail1"
+        }
+      }
+    }
+  }
+}
+output {
+  refs {
+    slot: VALUE_SLOT_STAGE_EDIT_REASON_DETAIL
+    id {
+      stage_edit {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        version {
+          seconds: 100
+        }
+      }
+    }
+    ref {
+      digest: "reason0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_STAGE_EDIT_REASON_DETAIL
+    id {
+      stage_edit {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        version {
+          seconds: 100
+        }
+      }
+    }
+    ref {
+      digest: "reason1"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_STAGE_EDIT_ATTEMPT_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 1
+      }
+    }
+    ref {
+      digest: "attempt1_detail0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_STAGE_EDIT_ATTEMPT_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 1
+      }
+    }
+    ref {
+      digest: "attempt1_detail1"
+    }
+  }
+}

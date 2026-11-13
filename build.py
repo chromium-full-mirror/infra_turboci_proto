@@ -596,6 +596,16 @@ def task_generate_embedded_vectors(mode: None | str = None):
               "_TAGS_FOR_VECTORS",
           ),
       },
+      "testing/vectors/value/refs_in": {
+          "go": (
+              "go/utils/value/refs_in_test_vectors.go",
+              "_REFS_IN_VECTORS",
+          ),
+          "py": (
+              "py/tests/turboci/utils/value/refs_in_test_vectors.py",
+              "_REFS_IN_VECTORS",
+          ),
+      },
   }
   for vector_path, language_map in export_to.items():
     for language, (outrelpath, outvar) in language_map.items():

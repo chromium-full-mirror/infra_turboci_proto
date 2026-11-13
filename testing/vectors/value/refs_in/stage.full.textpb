@@ -1,0 +1,290 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  stage {
+    identifier {
+      is_worknode: false
+      id: "S1"
+    }
+    args {
+      type_url: "type.googleapis.com/google.protobuf.Struct"
+      digest: "stage_args"
+    }
+    legacy {
+      worknode {
+        type_url: "type.googleapis.com/google.protobuf.Struct"
+        digest: "stage_worknode"
+      }
+    }
+    edits {
+      for_node {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+      }
+      version {
+        ts {
+          seconds: 100
+        }
+      }
+      reason {
+        details {
+          type_url: "type.googleapis.com/google.protobuf.Struct"
+          digest: "edit0_reason0"
+        }
+        details {
+          type_url: "type.googleapis.com/google.protobuf.Struct"
+          digest: "edit0_reason1"
+        }
+      }
+      stage {
+        attempts {
+          identifier {
+            stage {
+              is_worknode: false
+              id: "S1"
+            }
+            idx: 1
+          }
+          details {
+            type_url: "type.googleapis.com/google.protobuf.Struct"
+            digest: "edit0_attempt1_detail0"
+          }
+        }
+        attempts {
+          identifier {
+            stage {
+              is_worknode: false
+              id: "S1"
+            }
+            idx: 2
+          }
+          details {
+            type_url: "type.googleapis.com/google.protobuf.Struct"
+            digest: "edit0_attempt2_detail0"
+          }
+        }
+      }
+    }
+    attempts {
+      identifier {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 1
+      }
+      details {
+        type_url: "type.googleapis.com/google.protobuf.Struct"
+        digest: "attempt1_detail0"
+      }
+      details {
+        type_url: "type.googleapis.com/google.protobuf.Struct"
+        digest: "attempt1_detail1"
+      }
+      progress {
+        details {
+          type_url: "type.googleapis.com/google.protobuf.Struct"
+          digest: "attempt1_progress0_detail0"
+        }
+      }
+      progress {
+        details {
+          type_url: "type.googleapis.com/google.protobuf.Struct"
+          digest: "attempt1_progress1_detail0"
+        }
+      }
+    }
+    attempts {
+      identifier {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 2
+      }
+      details {
+        type_url: "type.googleapis.com/google.protobuf.Struct"
+        digest: "attempt2_detail0"
+      }
+    }
+  }
+}
+output {
+  refs {
+    slot: VALUE_SLOT_STAGE_ARGS
+    id {
+      stage {
+        is_worknode: false
+        id: "S1"
+      }
+    }
+    ref {
+      type_url: "type.googleapis.com/google.protobuf.Struct"
+      digest: "stage_args"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_STAGE_LEGACY_WORKNODE
+    id {
+      stage {
+        is_worknode: false
+        id: "S1"
+      }
+    }
+    ref {
+      type_url: "type.googleapis.com/google.protobuf.Struct"
+      digest: "stage_worknode"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_STAGE_EDIT_REASON_DETAIL
+    id {
+      stage_edit {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        version {
+          seconds: 100
+        }
+      }
+    }
+    ref {
+      type_url: "type.googleapis.com/google.protobuf.Struct"
+      digest: "edit0_reason0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_STAGE_EDIT_REASON_DETAIL
+    id {
+      stage_edit {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        version {
+          seconds: 100
+        }
+      }
+    }
+    ref {
+      type_url: "type.googleapis.com/google.protobuf.Struct"
+      digest: "edit0_reason1"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_STAGE_EDIT_ATTEMPT_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 1
+      }
+    }
+    ref {
+      type_url: "type.googleapis.com/google.protobuf.Struct"
+      digest: "edit0_attempt1_detail0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_STAGE_EDIT_ATTEMPT_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 2
+      }
+    }
+    ref {
+      type_url: "type.googleapis.com/google.protobuf.Struct"
+      digest: "edit0_attempt2_detail0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 1
+      }
+    }
+    ref {
+      type_url: "type.googleapis.com/google.protobuf.Struct"
+      digest: "attempt1_detail0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 1
+      }
+    }
+    ref {
+      type_url: "type.googleapis.com/google.protobuf.Struct"
+      digest: "attempt1_detail1"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_PROGRESS_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 1
+      }
+    }
+    ref {
+      type_url: "type.googleapis.com/google.protobuf.Struct"
+      digest: "attempt1_progress0_detail0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_PROGRESS_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 1
+      }
+    }
+    ref {
+      type_url: "type.googleapis.com/google.protobuf.Struct"
+      digest: "attempt1_progress1_detail0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_ATTEMPT_DETAIL
+    id {
+      stage_attempt {
+        stage {
+          is_worknode: false
+          id: "S1"
+        }
+        idx: 2
+      }
+    }
+    ref {
+      type_url: "type.googleapis.com/google.protobuf.Struct"
+      digest: "attempt2_detail0"
+    }
+  }
+}

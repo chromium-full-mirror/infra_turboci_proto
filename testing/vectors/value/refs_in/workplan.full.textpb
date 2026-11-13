@@ -1,0 +1,157 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  workplan {
+    stages {
+      identifier {
+        is_worknode: false
+        id: "S1"
+      }
+      args {
+        digest: "stage1_args"
+      }
+    }
+    stages {
+      identifier {
+        is_worknode: false
+        id: "S2"
+      }
+      args {
+        digest: "stage2_args"
+      }
+    }
+    checks {
+      identifier {
+        id: "C1"
+      }
+      options {
+        digest: "check1_option0"
+      }
+      results {
+        identifier {
+          check {
+            id: "C1"
+          }
+          idx: 1
+        }
+        owner {
+          workplan_creator {}
+        }
+        data {
+          digest: "check1_res0_data0"
+        }
+      }
+      results {
+        identifier {
+          check {
+            id: "C1"
+          }
+          idx: 2
+        }
+        owner {
+          orchestrator {}
+        }
+        data {
+          digest: "check1_res1_data0"
+        }
+      }
+    }
+    checks {
+      identifier {
+        id: "C2"
+      }
+      options {
+        digest: "check2_option0"
+      }
+    }
+  }
+}
+output {
+  refs {
+    slot: VALUE_SLOT_STAGE_ARGS
+    id {
+      stage {
+        is_worknode: false
+        id: "S1"
+      }
+    }
+    ref {
+      digest: "stage1_args"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_STAGE_ARGS
+    id {
+      stage {
+        is_worknode: false
+        id: "S2"
+      }
+    }
+    ref {
+      digest: "stage2_args"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_OPTION
+    id {
+      check {
+        id: "C1"
+      }
+    }
+    ref {
+      digest: "check1_option0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_RESULT_DATA
+    id {
+      check_result {
+        check {
+          id: "C1"
+        }
+        idx: 2
+      }
+    }
+    result_data {
+      idx: 1
+      actor {
+        orchestrator {}
+      }
+    }
+    ref {
+      digest: "check1_res1_data0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_RESULT_DATA
+    id {
+      check_result {
+        check {
+          id: "C1"
+        }
+        idx: 1
+      }
+    }
+    result_data {
+      idx: 0
+      actor {
+        workplan_creator {}
+      }
+    }
+    ref {
+      digest: "check1_res0_data0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_OPTION
+    id {
+      check {
+        id: "C2"
+      }
+    }
+    ref {
+      digest: "check2_option0"
+    }
+  }
+}

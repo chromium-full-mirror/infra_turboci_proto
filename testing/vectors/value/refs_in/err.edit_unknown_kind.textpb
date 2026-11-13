@@ -1,0 +1,7 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  edit {}
+}
+err: "impossible: Edit must have stage or check delta or for_node set"

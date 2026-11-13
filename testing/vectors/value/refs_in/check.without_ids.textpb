@@ -1,0 +1,59 @@
+# proto-file: testing/vectors/value/refs_in/test_case.proto
+# proto-message: RefsIn
+
+input {
+  check {
+    options {
+      digest: "option0"
+    }
+    results {
+      data {
+        digest: "res0_data0"
+      }
+    }
+    results {
+      data {
+        digest: "res1_data0"
+      }
+    }
+    edits {
+      reason {
+        details {
+          digest: "edit_without_delta_reason"
+        }
+      }
+    }
+  }
+}
+output {
+  refs {
+    slot: VALUE_SLOT_CHECK_OPTION
+    ref {
+      digest: "option0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_RESULT_DATA
+    result_data {
+      idx: 1
+    }
+    ref {
+      digest: "res1_data0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_RESULT_DATA
+    result_data {
+      idx: 0
+    }
+    ref {
+      digest: "res0_data0"
+    }
+  }
+  refs {
+    slot: VALUE_SLOT_CHECK_EDIT_REASON_DETAIL
+    ref {
+      digest: "edit_without_delta_reason"
+    }
+  }
+}
