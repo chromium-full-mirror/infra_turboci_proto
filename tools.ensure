@@ -4,7 +4,7 @@
 infra/3pp/tools/protoc/${os}-${arch=amd64,arm64}  version:3@32.1
 
 # This should roughly follow the version in infra.git
-infra/3pp/tools/go/${os}-${arch=amd64,arm64}      version:3@1.26.10
+infra/3pp/tools/go/${os}-${arch=amd64,arm64}      version:3@1.26.11
 
 @Subdir tools/bin
 infra/3pp/go/github.com/bufbuild/buf/${platform}  version:3@1.57.0
