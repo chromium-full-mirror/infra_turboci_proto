@@ -54,7 +54,7 @@ class ObservedNodeSet:
   wpid: identifier_pb2.WorkPlan
 
   # The set of nodes observed - these are the identifiers of the nodes encoded
-  # with `ids.to_string`.
+  # with `ids.to_string_err`.
   _nodes: set[str] = dataclasses.field(default_factory=set, init=False)
 
   # The revision of the workplan which we observed during the first observed
@@ -179,7 +179,7 @@ class ObservedNodeSet:
       )
     elif curwp:
       ident = ids.clear_workplan(copy.deepcopy(ident))
-    self._nodes.add(ids.to_string(ident))
+    self._nodes.add(ids.to_string_err(ident))
 
   def generate_precondition(self) -> transaction_details_pb2.TransactionDetails:
     """Generates a TransactionDetails proto from the observed nodes."""

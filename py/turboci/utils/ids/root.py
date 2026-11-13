@@ -28,51 +28,65 @@ def root(
   without type switches.
 
   Returns:
-    A 3-tuple of (WorkPlan, Check, Stage) where precisely one of Check or Stage
-   is populated.
+    A 3-tuple of (WorkPlan, Check, Stage).
   """
+  wp: identifier_pb2.WorkPlan | None = None
+  check: identifier_pb2.Check | None = None
+  stage: identifier_pb2.Stage | None = None
+
   match (unwrapped := wrapping.unwrap(ident)):
+    case None:
+      pass
     case identifier_pb2.WorkPlan():
-      return unwrapped, None, None
+      wp = unwrapped
     case identifier_pb2.Check():
-      return unwrapped.work_plan, unwrapped, None
+      check = unwrapped
     case identifier_pb2.CheckResult():
-      return unwrapped.check.work_plan, unwrapped.check, None
+      if unwrapped.HasField('check'):
+        check = unwrapped.check
     case identifier_pb2.CheckEdit():
-      return unwrapped.check.work_plan, unwrapped.check, None
+      if unwrapped.HasField('check'):
+        check = unwrapped.check
     case identifier_pb2.Stage():
-      return unwrapped.work_plan, None, unwrapped
+      stage = unwrapped
     case identifier_pb2.StageAttempt():
-      return unwrapped.stage.work_plan, None, unwrapped.stage
+      if unwrapped.HasField('stage'):
+        stage = unwrapped.stage
     case identifier_pb2.StageEdit():
-      return unwrapped.stage.work_plan, None, unwrapped.stage
+      if unwrapped.HasField('stage'):
+        stage = unwrapped.stage
     case _:
       raise NotImplementedError(f'root({type(ident)})')
 
+  if stage is not None and stage.HasField('work_plan'):
+    wp = stage.work_plan
+  elif check is not None and check.HasField('work_plan'):
+    wp = check.work_plan
 
-def same_root(a: wrapping.AnyIdentifier, b: wrapping.AnyIdentifier) -> bool:
+  return wp, check, stage
+
+
+def same_root(
+    a: wrapping.AnyIdentifier, b: wrapping.AnyIdentifier
+) -> bool:
   """Checks if two identifiers share the exact same Check or Stage root."""
-  if a is None or b is None:
-    return False
-
   _, chk_a, stg_a = root(a)
   _, chk_b, stg_b = root(b)
 
-  if chk_a and chk_b:
+  if chk_a is not None and chk_b is not None:
     return chk_a == chk_b
-  if stg_a and stg_b:
+  if stg_a is not None and stg_b is not None:
     return stg_a == stg_b
   return False
 
 
-def same_workplan(a: wrapping.AnyIdentifier, b: wrapping.AnyIdentifier) -> bool:
+def same_workplan(
+    a: wrapping.AnyIdentifier, b: wrapping.AnyIdentifier
+) -> bool:
   """Checks if two identifiers operate within the same WorkPlan context."""
-  if a is None or b is None:
-    return False
-
   wp_a, _, _ = root(a)
   wp_b, _, _ = root(b)
 
-  if wp_a and wp_b:
-    return wp_a == wp_b
-  return False
+  if wp_a is None or wp_b is None or not wp_a.id or not wp_b.id:
+    return False
+  return wp_a == wp_b

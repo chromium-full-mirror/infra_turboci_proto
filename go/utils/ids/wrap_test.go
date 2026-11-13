@@ -109,6 +109,12 @@ func TestKindOf(t *testing.T) {
 	if got, want := KindOf(must(CheckEditErr("c", time.Unix(1, 0)))), idspb.IdentifierKind_IDENTIFIER_KIND_CHECK_EDIT; got != want {
 		t.Errorf("got %v, want %v", got, want)
 	}
+	if got, want := KindOf((*idspb.Check)(nil)), idspb.IdentifierKind_IDENTIFIER_KIND_UNKNOWN; got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
+	if got, want := KindOf(&idspb.Identifier{}), idspb.IdentifierKind_IDENTIFIER_KIND_UNKNOWN; got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
 }
 
 func TestRoot(t *testing.T) {
@@ -307,6 +313,8 @@ func TestSameWorkplan(t *testing.T) {
 	c1 := SetWorkplan(Check("c1"), "wp")
 	c2 := SetWorkplan(Check("c2"), "wp")
 	c3 := SetWorkplan(Check("c1"), "other")
+	cNoWP1 := Check("c1")
+	cNoWP2 := Check("c2")
 
 	if !SameWorkPlan(c1, c2) {
 		t.Errorf("expected SameWorkPlan(c1, c2) to be true")
@@ -316,5 +324,8 @@ func TestSameWorkplan(t *testing.T) {
 	}
 	if SameWorkPlan(c1, (*idspb.Check)(nil)) {
 		t.Errorf("expected SameWorkPlan(c1, nil) to be false")
+	}
+	if SameWorkPlan(cNoWP1, cNoWP2) {
+		t.Errorf("expected SameWorkPlan(cNoWP1, cNoWP2) to be false")
 	}
 }

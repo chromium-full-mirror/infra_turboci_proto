@@ -54,7 +54,7 @@ func TestFromStringErrorConditions(t *testing.T) {
 		{
 			name:        "Empty input string",
 			input:       "",
-			expectedErr: "",
+			expectedErr: `token 0 in "" was empty?`,
 		},
 		{
 			name:        "Empty token in middle",
@@ -69,7 +69,12 @@ func TestFromStringErrorConditions(t *testing.T) {
 		{
 			name:        "Invalid idx - non-integer",
 			input:       "Lwp:Cchk:Rabc",
-			expectedErr: `token 2 in "Lwp:Cchk:Rabc": bad idx: strconv.ParseInt: parsing "abc": invalid syntax`,
+			expectedErr: `token 2 in "Lwp:Cchk:Rabc": bad idx: parsing "abc"`,
+		},
+		{
+			name:        "Invalid idx - zero",
+			input:       "Lwp:Cchk:R0",
+			expectedErr: `token 2 in "Lwp:Cchk:R0": bad idx: must be > 0`,
 		},
 		{
 			name:        "Invalid idx - negative",
@@ -109,7 +114,17 @@ func TestFromStringErrorConditions(t *testing.T) {
 		{
 			name:        "WorkPlan with only key, no trimmed part - L",
 			input:       "L",
-			expectedErr: "",
+			expectedErr: `token 0 in "L": unexpected empty token`,
+		},
+		{
+			name:        "Empty WorkPlan prefix - L:Cmeep",
+			input:       "L:Cmeep",
+			expectedErr: `token 0 in "L:Cmeep": unexpected empty token`,
+		},
+		{
+			name:        "Missing WorkPlan prefix - Cmeep",
+			input:       "Cmeep",
+			expectedErr: `token 0 in "Cmeep": missing required "WorkPlan"`,
 		},
 		{
 			name:        "Token with only key, no trimmed part - C",

@@ -41,9 +41,9 @@ func requireInt(trimmed string, errP *error) *int32 {
 	}
 	ret, err := strconv.ParseInt(trimmed, 10, 32)
 	if err != nil {
-		*errP = fmt.Errorf("bad idx: %w", err)
+		*errP = fmt.Errorf("bad idx: parsing %q: %w", trimmed, err)
 		return nil
-	} else if ret < 0 {
+	} else if ret <= 0 {
 		*errP = fmt.Errorf("bad idx: must be > 0")
 		return nil
 	}
@@ -90,7 +90,7 @@ func FromString(id string) (*idspb.Identifier, error) {
 
 	for i, tok := range toks {
 		if len(tok) == 0 {
-			if i == 0 {
+			if i == 0 && len(toks) > 1 {
 				// workplan allowed to be empty
 			} else {
 				return nil, fmt.Errorf("token %d in %q was empty?", i, id)
@@ -101,20 +101,20 @@ func FromString(id string) (*idspb.Identifier, error) {
 			var err error
 			badKeyErr := func() error { return fmt.Errorf("unexpected key %q", key) }
 
-			if i != 0 && len(trimmed) == 0 {
+			if len(trimmed) == 0 {
 				err = fmt.Errorf("unexpected empty token")
 			} else {
 				switch key {
 				case 'L':
 					if current != nil {
 						err = badKeyErr()
-					} else if len(trimmed) > 0 {
+					} else {
 						current = idspb.WorkPlan_builder{Id: &trimmed}.Build()
 					}
 
 				case 'C':
 					var wp *idspb.WorkPlan
-					if current != nil {
+					if i == 0 || current != nil {
 						wp = require[*idspb.WorkPlan](current, &err)
 					}
 					current = idspb.Check_builder{
@@ -148,7 +148,7 @@ func FromString(id string) (*idspb.Identifier, error) {
 
 				case 'N', 'S', '?':
 					var wp *idspb.WorkPlan
-					if current != nil {
+					if i == 0 || current != nil {
 						wp = require[*idspb.WorkPlan](current, &err)
 					}
 					stg := idspb.Stage_builder{

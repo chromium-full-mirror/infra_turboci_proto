@@ -9,6 +9,7 @@
 package ids
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -18,9 +19,11 @@ import (
 	idspb "go.chromium.org/turboci/proto/go/graph/ids/v1"
 )
 
-const Invalid = "<turboci invalid identifier>"
+// ErrInvalidIdentifier is the core error returned from ToStringErr if the
+// identifier is invalid (i.e. `errors.Is` will find it).
+var ErrInvalidIdentifier = errors.New("turboci invalid identifier")
 
-// ToString converts any TurboCI identifier proto into a string.
+// ToStringErr converts any TurboCI identifier proto into a string.
 //
 // The string format is defined in [identifier.proto].
 //
@@ -31,15 +34,20 @@ const Invalid = "<turboci invalid identifier>"
 // These IDs are not valid for reading or writing to the graph, but are a useful
 // intermediate/local representation for stages whose worknode-ness is unknown.
 //
-// Returns [Invalid] for nil identifiers.
+// Returns an error derived from [ErrInvalidIdentifier] for all bad identifiers.
+// For logging/display purposes, consider [ToString] instead which renders all
+// such errors as `"<" + err.Error() + ">"`.
 //
 // [identifier.proto]: https://chromium.googlesource.com/infra/turboci/proto/+/refs/heads/main/turboci/graph/ids/v1/identifier.proto
-func ToString[Id Identifier](id Id) string {
+func ToStringErr[Id Identifier](id Id) (string, error) {
 	if id == nil {
-		return Invalid
+		return "", fmt.Errorf("%w: id was nil", ErrInvalidIdentifier)
 	}
 
 	anyID := unwrap(id)
+	if anyID == nil {
+		return "", fmt.Errorf("%w: id could not be unwrapped", ErrInvalidIdentifier)
+	}
 
 	fmtVersion := func(ts *timestamppb.Timestamp) string {
 		return fmt.Sprintf("%d/%d", ts.GetSeconds(), ts.GetNanos())
@@ -54,7 +62,7 @@ func ToString[Id Identifier](id Id) string {
 	for stop := false; !stop; {
 		switch x := anyID.(type) {
 		case *idspb.WorkPlan:
-			if x.HasId() {
+			if x.GetId() != "" {
 				acc = append(acc, "L"+x.GetId())
 			}
 			stop = true
@@ -96,6 +104,20 @@ func ToString[Id Identifier](id Id) string {
 		}
 	}
 
+	if len(acc) == 0 {
+		return "", fmt.Errorf("%w: id was empty", ErrInvalidIdentifier)
+	}
+
 	slices.Reverse(acc)
-	return strings.Join(acc, "")
+	return strings.Join(acc, ""), nil
+}
+
+// ToString is the error-less counterpart of [ToStringErr]. All errors are
+// rendered as `"<" + err.Error() + ">"`.
+func ToString[Id Identifier](id Id) string {
+	ret, err := ToStringErr(id)
+	if err != nil {
+		return "<" + err.Error() + ">"
+	}
+	return ret
 }

@@ -76,15 +76,15 @@ func wrap(id any) *idspb.Identifier {
 	panic(fmt.Sprintf("bug: id.wrap got unexpected type %T", id))
 }
 
-// unwraps any Identifier into it's *specific* identifier type.
+// unwraps any Identifier into its *specific* identifier type.
 //
 // Allows generic functions to be written with a simpler type switch.
-func unwrap(id any) any {
+func unwrap[Id Identifier](id Id) any {
 	if id == nil {
 		return nil
 	}
 
-	switch x := id.(type) {
+	switch x := any(id).(type) {
 	case *idspb.Identifier:
 		switch x.WhichType() {
 		case idspb.Identifier_WorkPlan_case:
@@ -182,6 +182,8 @@ func Root[Id Identifier](id Id) (wp *idspb.WorkPlan, check *idspb.Check, stage *
 // KindOf describes any type of Identifier as an IdentifierKind enum.
 func KindOf[Id Identifier](id Id) idspb.IdentifierKind {
 	switch typ := unwrap(id); typ.(type) {
+	case nil:
+		return idspb.IdentifierKind_IDENTIFIER_KIND_UNKNOWN
 	case *idspb.WorkPlan:
 		return idspb.IdentifierKind_IDENTIFIER_KIND_WORK_PLAN
 	case *idspb.Check:
@@ -222,12 +224,16 @@ func SameRoot[A Identifier, B Identifier](a A, b B) bool {
 
 // SameWorkPlan returns `true` if the two identifiers have the same workplan.
 //
-// If either `a` or `b` is nil, this returns false.
+// If either `a` or `b` is nil, or either workplan is unset/empty, this returns
+// false.
 func SameWorkPlan[A Identifier, B Identifier](a A, b B) bool {
 	if a == nil || b == nil {
 		return false
 	}
 	aWP, _, _ := Root(a)
 	bWP, _, _ := Root(b)
+	if aWP.GetId() == "" || bWP.GetId() == "" {
+		return false
+	}
 	return proto.Equal(aWP, bWP)
 }

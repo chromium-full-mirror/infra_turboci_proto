@@ -5,10 +5,12 @@
 package ids
 
 import (
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/testing/protocmp"
 
 	idspb "go.chromium.org/turboci/proto/go/graph/ids/v1"
@@ -116,6 +118,9 @@ func TestToFromString(t *testing.T) {
 			if got := ToString(id); got != tc.expect {
 				t.Errorf("ToString(id) = %q, want %q", got, tc.expect)
 			}
+			if got, err := ToStringErr(id); err != nil || got != tc.expect {
+				t.Errorf("ToStringErr(id) = (%q, %v), want (%q, nil)", got, err, tc.expect)
+			}
 
 			if got := KindOf(id); got != tc.kind {
 				t.Errorf("KindOf(id) = %v, want %v", got, tc.kind)
@@ -146,6 +151,9 @@ func TestToFromString(t *testing.T) {
 			if got := ToString(id); got != wpExpect {
 				t.Errorf("ToString(id) = %q, want %q", got, wpExpect)
 			}
+			if got, err := ToStringErr(id); err != nil || got != wpExpect {
+				t.Errorf("ToStringErr(id) = (%q, %v), want (%q, nil)", got, err, wpExpect)
+			}
 
 			ident, err := FromString(wpExpect)
 			if err != nil {
@@ -158,8 +166,107 @@ func TestToFromString(t *testing.T) {
 	}
 }
 
-func TestToString_nil(t *testing.T) {
-	if got := ToString[*idspb.Check](nil); got != Invalid {
-		t.Errorf("got %q, want %q", got, Invalid)
+func TestToString_edgeCases(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		name string
+		got  string
+		want string
+	}{
+		{"nil", ToString[*idspb.Check](nil), "<turboci invalid identifier: id was nil>"},
+		{"empty_identifier", ToString(&idspb.Identifier{}), "<turboci invalid identifier: id could not be unwrapped>"},
+		{"empty_workplan", ToString(&idspb.WorkPlan{}), "<turboci invalid identifier: id was empty>"},
+		{"empty_workplan_id", ToString(idspb.WorkPlan_builder{Id: proto.String("")}.Build()), "<turboci invalid identifier: id was empty>"},
+		{"wrapped_empty_workplan", ToString(Wrap(&idspb.WorkPlan{})), "<turboci invalid identifier: id was empty>"},
+		{
+			"check_with_empty_workplan",
+			ToString(idspb.Check_builder{
+				Id:       proto.String("foo"),
+				WorkPlan: &idspb.WorkPlan{},
+			}.Build()),
+			":Cfoo",
+		},
+		{
+			"wrapped_check_with_empty_workplan_id",
+			ToString(Wrap(idspb.Check_builder{
+				Id:       proto.String("foo"),
+				WorkPlan: idspb.WorkPlan_builder{Id: proto.String("")}.Build(),
+			}.Build())),
+			":Cfoo",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.got != tc.want {
+				t.Errorf("got %q, want %q", tc.got, tc.want)
+			}
+		})
+	}
+}
+
+func TestToStringErr_edgeCases(t *testing.T) {
+	t.Parallel()
+
+	errCases := []struct {
+		name string
+		call func() (string, error)
+	}{
+		{"nil", func() (string, error) { return ToStringErr[*idspb.Check](nil) }},
+		{"empty_identifier", func() (string, error) { return ToStringErr(&idspb.Identifier{}) }},
+		{"empty_workplan", func() (string, error) { return ToStringErr(&idspb.WorkPlan{}) }},
+		{
+			"empty_workplan_id",
+			func() (string, error) {
+				return ToStringErr(idspb.WorkPlan_builder{Id: proto.String("")}.Build())
+			},
+		},
+		{"wrapped_empty_workplan", func() (string, error) { return ToStringErr(Wrap(&idspb.WorkPlan{})) }},
+	}
+
+	for _, tc := range errCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := tc.call()
+			if !errors.Is(err, ErrInvalidIdentifier) {
+				t.Errorf("got (%q, %v), want ErrInvalidIdentifier", got, err)
+			}
+		})
+	}
+
+	okCases := []struct {
+		name string
+		call func() (string, error)
+		want string
+	}{
+		{
+			"check_with_empty_workplan",
+			func() (string, error) {
+				return ToStringErr(idspb.Check_builder{
+					Id:       proto.String("foo"),
+					WorkPlan: &idspb.WorkPlan{},
+				}.Build())
+			},
+			":Cfoo",
+		},
+		{
+			"wrapped_check_with_empty_workplan_id",
+			func() (string, error) {
+				return ToStringErr(Wrap(idspb.Check_builder{
+					Id:       proto.String("foo"),
+					WorkPlan: idspb.WorkPlan_builder{Id: proto.String("")}.Build(),
+				}.Build()))
+			},
+			":Cfoo",
+		},
+	}
+
+	for _, tc := range okCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := tc.call()
+			if err != nil || got != tc.want {
+				t.Errorf("got (%q, %v), want (%q, nil)", got, err, tc.want)
+			}
+		})
 	}
 }

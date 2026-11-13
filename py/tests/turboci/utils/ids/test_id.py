@@ -3,18 +3,21 @@
 # found in the LICENSE file.
 """Test for id utils."""
 
+from __future__ import annotations
+
 import copy
-from dataclasses import dataclass
+import dataclasses
 import unittest
 
 from google.protobuf import timestamp_pb2
+from turboci.graph.ids.v1 import identifier_kind_pb2
 from turboci.graph.ids.v1 import identifier_pb2
 from turboci.utils import ids as id_utils
 
 _testTS = timestamp_pb2.Timestamp(seconds=12345, nanos=7890)
 
 
-@dataclass
+@dataclasses.dataclass
 class _id_test_case:
   ident: id_utils.AnyIdentifier
   ident_str: str
@@ -164,8 +167,12 @@ class ToFromIDTest(unittest.TestCase):
     for tc in _test_cases:
       with self.subTest(kind=tc.name):
         self.assertEqual(id_utils.to_string(tc.ident), tc.ident_str)
+        self.assertEqual(id_utils.to_string_err(tc.ident), tc.ident_str)
         self.assertEqual(
             id_utils.to_string(id_utils.wrap(tc.ident)), tc.ident_str
+        )
+        self.assertEqual(
+            id_utils.to_string_err(id_utils.wrap(tc.ident)), tc.ident_str
         )
         self.assertEqual(
             id_utils.from_string(tc.ident_str), id_utils.wrap(tc.ident)
@@ -202,6 +209,92 @@ class ToFromIDTest(unittest.TestCase):
             rf'^from_string: unrecognized ID {ident_str!r}$',
         ):
           id_utils.from_string(ident_str)
+
+  def test_from_string_edge_cases(self):
+    for bad in ('L', 'L:Cmeep', 'Cmeep', 'Lwp:C', 'Lwp:', 'Lwp:Cchk:R0', 'Lwp:Cchk:R-1'):
+      with self.subTest(bad=bad):
+        with self.assertRaises(ValueError):
+          id_utils.from_string(bad)
+
+  def test_unset_identifier(self):
+    empty = identifier_pb2.Identifier()
+    self.assertEqual(id_utils.wrap(empty), empty)
+    self.assertIsNone(id_utils.unwrap(empty))
+    self.assertEqual(
+        id_utils.kind_of(empty),
+        identifier_kind_pb2.IDENTIFIER_KIND_UNKNOWN,
+    )
+    self.assertEqual(id_utils.root(empty), (None, None, None))
+
+  def test_to_string_edge_cases(self):
+    self.assertEqual(
+        id_utils.to_string(identifier_pb2.Identifier()),
+        '<turboci invalid identifier: id could not be unwrapped>',
+    )
+    self.assertEqual(
+        id_utils.to_string(identifier_pb2.WorkPlan()),
+        '<turboci invalid identifier: id was empty>',
+    )
+    self.assertEqual(
+        id_utils.to_string(identifier_pb2.WorkPlan(id='')),
+        '<turboci invalid identifier: id was empty>',
+    )
+    self.assertEqual(
+        id_utils.to_string(
+            identifier_pb2.Identifier(work_plan=identifier_pb2.WorkPlan())
+        ),
+        '<turboci invalid identifier: id was empty>',
+    )
+    self.assertEqual(
+        id_utils.to_string(
+            identifier_pb2.Check(
+                id='foo', work_plan=identifier_pb2.WorkPlan()
+            )
+        ),
+        ':Cfoo',
+    )
+    self.assertEqual(
+        id_utils.to_string(
+            identifier_pb2.Identifier(
+                check=identifier_pb2.Check(
+                    id='foo', work_plan=identifier_pb2.WorkPlan(id='')
+                )
+            )
+        ),
+        ':Cfoo',
+    )
+
+  def test_to_string_err_edge_cases(self):
+    self.assertTrue(issubclass(id_utils.InvalidIdentifierError, ValueError))
+    for bad in (
+        identifier_pb2.Identifier(),
+        identifier_pb2.WorkPlan(),
+        identifier_pb2.WorkPlan(id=''),
+        identifier_pb2.Identifier(work_plan=identifier_pb2.WorkPlan()),
+    ):
+      with self.subTest(bad=bad):
+        with self.assertRaises(id_utils.InvalidIdentifierError) as cm:
+          id_utils.to_string_err(bad)
+        self.assertIsInstance(cm.exception, ValueError)
+
+    self.assertEqual(
+        id_utils.to_string_err(
+            identifier_pb2.Check(
+                id='foo', work_plan=identifier_pb2.WorkPlan()
+            )
+        ),
+        ':Cfoo',
+    )
+    self.assertEqual(
+        id_utils.to_string_err(
+            identifier_pb2.Identifier(
+                check=identifier_pb2.Check(
+                    id='foo', work_plan=identifier_pb2.WorkPlan(id='')
+                )
+            )
+        ),
+        ':Cfoo',
+    )
 
 
 
@@ -376,6 +469,27 @@ class TestSameRoot(unittest.TestCase):
     stage1 = id_utils.stage('hello', in_workplan=id_utils.workplan('123'))
     check2 = id_utils.check('goodbye')
     self.assertFalse(id_utils.same_root(stage1, check2))
+
+  def test_workplan_has_no_root(self):
+    wp1 = id_utils.workplan('123')
+    wp2 = id_utils.workplan('456')
+    self.assertFalse(id_utils.same_root(wp1, wp1))
+    self.assertFalse(id_utils.same_root(wp1, wp2))
+    self.assertFalse(id_utils.same_root(wp1, identifier_pb2.Identifier()))
+
+  def test_same_workplan(self):
+    wp1 = id_utils.workplan('123')
+    wp2 = id_utils.workplan('456')
+    c1 = id_utils.check('c1', in_workplan=wp1)
+    c2 = id_utils.check('c2', in_workplan=wp1)
+    c3 = id_utils.check('c1', in_workplan=wp2)
+    c_no_wp1 = id_utils.check('c1')
+    c_no_wp2 = id_utils.check('c2')
+
+    self.assertTrue(id_utils.same_workplan(c1, c2))
+    self.assertFalse(id_utils.same_workplan(c1, c3))
+    self.assertFalse(id_utils.same_workplan(c1, identifier_pb2.Identifier()))
+    self.assertFalse(id_utils.same_workplan(c_no_wp1, c_no_wp2))
 
 
 if __name__ == '__main__':
