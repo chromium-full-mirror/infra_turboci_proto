@@ -7,6 +7,7 @@ package ids
 import (
 	"errors"
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -86,9 +87,9 @@ func TestToFromString(t *testing.T) {
 		output := tc.GetOutput()
 
 		ident, err := FromString(input)
-		if output.GetErr() {
-			if err == nil {
-				t.Fatalf("expected error, got %v", ident)
+		if output.HasErr() {
+			if err == nil || !strings.Contains(err.Error(), output.GetErr()) {
+				t.Fatalf("expected error containing %q, got %v", output.GetErr(), err)
 			}
 			return
 		}

@@ -3,5 +3,5 @@
 
 input: "foo"
 output {
-  err: true
+  err: "in \"foo\": unexpected key \"f\""
 }

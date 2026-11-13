@@ -3,5 +3,5 @@
 
 input: "Lwp::Cchk"
 output {
-  err: true
+  err: "in \"Lwp::Cchk\": token 1 was empty?"
 }

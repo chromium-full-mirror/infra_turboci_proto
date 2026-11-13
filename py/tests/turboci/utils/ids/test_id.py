@@ -104,9 +104,10 @@ class ToFromIDTest(unittest.TestCase):
   def test_vectors(self):
     def _check(tc: test_case_pb2.ToFromString) -> None:
       output = tc.output
-      if output.err:
-        with self.assertRaises(ValueError):
+      if output.HasField('err'):
+        with self.assertRaises(ValueError) as cm:
           id_utils.from_string(tc.input)
+        self.assertIn(output.err, str(cm.exception))
         return
 
       ident = id_utils.from_string(tc.input)

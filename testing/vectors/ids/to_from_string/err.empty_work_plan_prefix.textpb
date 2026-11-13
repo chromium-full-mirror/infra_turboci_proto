@@ -3,5 +3,5 @@
 
 input: "L:Cmeep"
 output {
-  err: true
+  err: "in \"L:Cmeep\": unexpected empty token"
 }

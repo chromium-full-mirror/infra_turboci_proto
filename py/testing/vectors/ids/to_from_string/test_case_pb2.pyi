@@ -24,11 +24,11 @@ class ToFromString(_message.Message):
         PARSED_FIELD_NUMBER: _ClassVar[int]
         KIND_FIELD_NUMBER: _ClassVar[int]
         ROOT_FIELD_NUMBER: _ClassVar[int]
-        err: bool
+        err: str
         parsed: _identifier_pb2.Identifier
         kind: _identifier_kind_pb2.IdentifierKind
         root: ToFromString.Output.Root
-        def __init__(self, err: _Optional[bool] = ..., parsed: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., kind: _Optional[_Union[_identifier_kind_pb2.IdentifierKind, str]] = ..., root: _Optional[_Union[ToFromString.Output.Root, _Mapping]] = ...) -> None: ...
+        def __init__(self, err: _Optional[str] = ..., parsed: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., kind: _Optional[_Union[_identifier_kind_pb2.IdentifierKind, str]] = ..., root: _Optional[_Union[ToFromString.Output.Root, _Mapping]] = ...) -> None: ...
     INPUT_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_FIELD_NUMBER: _ClassVar[int]
     input: str

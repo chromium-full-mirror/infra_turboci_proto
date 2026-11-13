@@ -3,5 +3,5 @@
 
 input: "Lwp:Cchk:V123/abc"
 output {
-  err: true
+  err: "in \"Lwp:Cchk:V123/abc\": bad timestamp: parsing nanos \"abc\":"
 }

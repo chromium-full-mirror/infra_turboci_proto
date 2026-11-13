@@ -3,5 +3,5 @@
 
 input: "L"
 output {
-  err: true
+  err: "in \"L\": unexpected empty token"
 }

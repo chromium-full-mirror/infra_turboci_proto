@@ -3,5 +3,5 @@
 
 input: ":Xcleared_stage"
 output {
-  err: true
+  err: "in \":Xcleared_stage\": unexpected key \"LX\""
 }

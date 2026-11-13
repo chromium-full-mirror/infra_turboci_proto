@@ -3,5 +3,5 @@
 
 input: "Lwp:C"
 output {
-  err: true
+  err: "in \"Lwp:C\": unexpected empty token"
 }

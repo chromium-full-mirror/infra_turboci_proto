@@ -133,7 +133,7 @@ func (b0 ToFromString_builder) Build() *ToFromString {
 
 type ToFromString_Output struct {
 	state                  protoimpl.MessageState    `protogen:"opaque.v1"`
-	xxx_hidden_Err         bool                      `protobuf:"varint,1,opt,name=err,proto3,oneof"`
+	xxx_hidden_Err         *string                   `protobuf:"bytes,1,opt,name=err,proto3,oneof"`
 	xxx_hidden_Parsed      *v1.Identifier            `protobuf:"bytes,2,opt,name=parsed,proto3,oneof"`
 	xxx_hidden_Kind        v1.IdentifierKind         `protobuf:"varint,3,opt,name=kind,proto3,enum=turboci.graph.ids.v1.IdentifierKind,oneof"`
 	xxx_hidden_Root        *ToFromString_Output_Root `protobuf:"bytes,4,opt,name=root,proto3,oneof"`
@@ -168,11 +168,14 @@ func (x *ToFromString_Output) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *ToFromString_Output) GetErr() bool {
+func (x *ToFromString_Output) GetErr() string {
 	if x != nil {
-		return x.xxx_hidden_Err
+		if x.xxx_hidden_Err != nil {
+			return *x.xxx_hidden_Err
+		}
+		return ""
 	}
-	return false
+	return ""
 }
 
 func (x *ToFromString_Output) GetParsed() *v1.Identifier {
@@ -198,8 +201,8 @@ func (x *ToFromString_Output) GetRoot() *ToFromString_Output_Root {
 	return nil
 }
 
-func (x *ToFromString_Output) SetErr(v bool) {
-	x.xxx_hidden_Err = v
+func (x *ToFromString_Output) SetErr(v string) {
+	x.xxx_hidden_Err = &v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
 }
 
@@ -246,7 +249,7 @@ func (x *ToFromString_Output) HasRoot() bool {
 
 func (x *ToFromString_Output) ClearErr() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Err = false
+	x.xxx_hidden_Err = nil
 }
 
 func (x *ToFromString_Output) ClearParsed() {
@@ -265,7 +268,7 @@ func (x *ToFromString_Output) ClearRoot() {
 type ToFromString_Output_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	Err    *bool
+	Err    *string
 	Parsed *v1.Identifier
 	Kind   *v1.IdentifierKind
 	Root   *ToFromString_Output_Root
@@ -277,7 +280,7 @@ func (b0 ToFromString_Output_builder) Build() *ToFromString_Output {
 	_, _ = b, x
 	if b.Err != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
-		x.xxx_hidden_Err = *b.Err
+		x.xxx_hidden_Err = b.Err
 	}
 	x.xxx_hidden_Parsed = b.Parsed
 	if b.Kind != nil {
@@ -415,7 +418,7 @@ const file_testing_vectors_ids_to_from_string_test_case_proto_rawDesc = "" +
 	"\x05input\x18\x01 \x01(\tH\x00R\x05input\x88\x01\x01\x12O\n" +
 	"\x06output\x18\x02 \x01(\v27.testing.vectors.ids.to_from_string.ToFromString.OutputR\x06output\x1a\xf6\x03\n" +
 	"\x06Output\x12\x15\n" +
-	"\x03err\x18\x01 \x01(\bH\x00R\x03err\x88\x01\x01\x12=\n" +
+	"\x03err\x18\x01 \x01(\tH\x00R\x03err\x88\x01\x01\x12=\n" +
 	"\x06parsed\x18\x02 \x01(\v2 .turboci.graph.ids.v1.IdentifierH\x01R\x06parsed\x88\x01\x01\x12=\n" +
 	"\x04kind\x18\x03 \x01(\x0e2$.turboci.graph.ids.v1.IdentifierKindH\x02R\x04kind\x88\x01\x01\x12U\n" +
 	"\x04root\x18\x04 \x01(\v2<.testing.vectors.ids.to_from_string.ToFromString.Output.RootH\x03R\x04root\x88\x01\x01\x1a\xda\x01\n" +

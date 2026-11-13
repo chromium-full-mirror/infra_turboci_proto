@@ -3,5 +3,5 @@
 
 input: "Cmeep"
 output {
-  err: true
+  err: "in \"Cmeep\": unexpected key \"C\""
 }

@@ -3,5 +3,5 @@
 
 input: "Lwp:Cchk:R-1"
 output {
-  err: true
+  err: "in \"Lwp:Cchk:R-1\": bad idx \"-1\": must be > 0"
 }

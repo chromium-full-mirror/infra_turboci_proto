@@ -3,5 +3,5 @@
 
 input: "L1234567:Cbeans:R3:extra"
 output {
-  err: true
+  err: "in \"L1234567:Cbeans:R3:extra\": unexpected key \"LCRe\""
 }

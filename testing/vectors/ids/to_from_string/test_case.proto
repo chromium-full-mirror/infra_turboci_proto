@@ -19,7 +19,7 @@ message ToFromString {
   optional string input = 1;
 
   message Output {
-    optional bool err = 1;
+    optional string err = 1;
 
     optional turboci.graph.ids.v1.Identifier parsed = 2;
 

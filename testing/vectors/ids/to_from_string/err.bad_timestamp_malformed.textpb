@@ -3,5 +3,5 @@
 
 input: "Lwp:Cchk:Vbadts"
 output {
-  err: true
+  err: "in \"Lwp:Cchk:Vbadts\": bad timestamp: needed seconds/nanos"
 }

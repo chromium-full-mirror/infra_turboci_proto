@@ -3,5 +3,5 @@
 
 input: "Lwp:Cchk:Rabc"
 output {
-  err: true
+  err: "in \"Lwp:Cchk:Rabc\": bad idx \"abc\":"
 }

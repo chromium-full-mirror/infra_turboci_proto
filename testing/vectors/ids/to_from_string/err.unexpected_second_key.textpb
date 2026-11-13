@@ -3,5 +3,5 @@
 
 input: "L1234567:X938215823"
 output {
-  err: true
+  err: "in \"L1234567:X938215823\": unexpected key \"LX\""
 }

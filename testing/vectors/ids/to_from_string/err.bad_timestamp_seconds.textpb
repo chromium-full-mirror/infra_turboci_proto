@@ -3,5 +3,5 @@
 
 input: "Lwp:Cchk:Vabc/123"
 output {
-  err: true
+  err: "in \"Lwp:Cchk:Vabc/123\": bad timestamp: parsing seconds \"abc\":"
 }

@@ -3,5 +3,5 @@
 
 input: ""
 output {
-  err: true
+  err: "in \"\": token 0 was empty?"
 }

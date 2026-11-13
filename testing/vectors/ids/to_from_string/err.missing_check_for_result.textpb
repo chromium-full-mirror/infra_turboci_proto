@@ -3,5 +3,5 @@
 
 input: "Lwp:R1"
 output {
-  err: true
+  err: "in \"Lwp:R1\": unexpected key \"LR\""
 }
