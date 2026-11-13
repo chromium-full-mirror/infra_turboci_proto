@@ -1,0 +1,22 @@
+# proto-file: testing/vectors/ids/to_from_string/test_case.proto
+# proto-message: ToFromString
+
+input: ":Nmeep:A2"
+output {
+  parsed {
+    stage_attempt {
+      stage {
+        is_worknode: true
+        id: "meep"
+      }
+      idx: 2
+    }
+  }
+  kind: IDENTIFIER_KIND_STAGE_ATTEMPT
+  root {
+    stage {
+      is_worknode: true
+      id: "meep"
+    }
+  }
+}

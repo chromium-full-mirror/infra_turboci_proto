@@ -1,0 +1,7 @@
+# proto-file: testing/vectors/ids/to_from_string/test_case.proto
+# proto-message: ToFromString
+
+input: "L1234567:Cbeans:R3:extra"
+output {
+  err: true
+}

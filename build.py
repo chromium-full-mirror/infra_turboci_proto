@@ -606,6 +606,16 @@ def task_generate_embedded_vectors(mode: None | str = None):
               "_REFS_IN_VECTORS",
           ),
       },
+      "testing/vectors/ids/to_from_string": {
+          "go": (
+              "go/utils/ids/to_from_vectors_test.go",
+              "_TO_FROM_STRING_VECTORS",
+          ),
+          "py": (
+              "py/tests/turboci/utils/ids/test_to_from_vectors.py",
+              "_TO_FROM_STRING_VECTORS",
+          ),
+      },
   }
   for vector_path, language_map in export_to.items():
     for language, (outrelpath, outvar) in language_map.items():

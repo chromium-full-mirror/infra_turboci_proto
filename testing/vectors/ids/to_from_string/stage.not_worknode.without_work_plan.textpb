@@ -1,0 +1,19 @@
+# proto-file: testing/vectors/ids/to_from_string/test_case.proto
+# proto-message: ToFromString
+
+input: ":Smeep"
+output {
+  parsed {
+    stage {
+      is_worknode: false
+      id: "meep"
+    }
+  }
+  kind: IDENTIFIER_KIND_STAGE
+  root {
+    stage {
+      is_worknode: false
+      id: "meep"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+# proto-file: testing/vectors/ids/to_from_string/test_case.proto
+# proto-message: ToFromString
+
+input: "Lwp:Cchk:Vabc/123"
+output {
+  err: true
+}

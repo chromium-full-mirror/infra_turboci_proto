@@ -1,0 +1,17 @@
+# proto-file: testing/vectors/ids/to_from_string/test_case.proto
+# proto-message: ToFromString
+
+input: ":?meep"
+output {
+  parsed {
+    stage {
+      id: "meep"
+    }
+  }
+  kind: IDENTIFIER_KIND_STAGE
+  root {
+    stage {
+      id: "meep"
+    }
+  }
+}

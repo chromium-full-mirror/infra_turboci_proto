@@ -1,0 +1,32 @@
+# proto-file: testing/vectors/ids/to_from_string/test_case.proto
+# proto-message: ToFromString
+
+input: "L00012345:Ccool/beans & stuff:V12345/6789"
+output {
+  parsed {
+    check_edit {
+      check {
+        work_plan {
+          id: "00012345"
+        }
+        id: "cool/beans & stuff"
+      }
+      version {
+        seconds: 12345
+        nanos: 6789
+      }
+    }
+  }
+  kind: IDENTIFIER_KIND_CHECK_EDIT
+  root {
+    work_plan {
+      id: "00012345"
+    }
+    check {
+      work_plan {
+        id: "00012345"
+      }
+      id: "cool/beans & stuff"
+    }
+  }
+}

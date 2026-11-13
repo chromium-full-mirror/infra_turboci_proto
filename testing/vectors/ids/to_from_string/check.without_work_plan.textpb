@@ -1,0 +1,17 @@
+# proto-file: testing/vectors/ids/to_from_string/test_case.proto
+# proto-message: ToFromString
+
+input: ":Cmeep"
+output {
+  parsed {
+    check {
+      id: "meep"
+    }
+  }
+  kind: IDENTIFIER_KIND_CHECK
+  root {
+    check {
+      id: "meep"
+    }
+  }
+}

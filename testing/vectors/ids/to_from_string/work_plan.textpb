@@ -1,0 +1,17 @@
+# proto-file: testing/vectors/ids/to_from_string/test_case.proto
+# proto-message: ToFromString
+
+input: "L1234567"
+output {
+  parsed {
+    work_plan {
+      id: "1234567"
+    }
+  }
+  kind: IDENTIFIER_KIND_WORK_PLAN
+  root {
+    work_plan {
+      id: "1234567"
+    }
+  }
+}

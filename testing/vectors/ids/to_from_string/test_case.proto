@@ -1,0 +1,36 @@
+// Copyright 2026 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+syntax = "proto3";
+
+package testing.vectors.ids.to_from_string;
+
+import "turboci/graph/ids/v1/identifier.proto";
+import "turboci/graph/ids/v1/identifier_kind.proto";
+
+option go_package = "go.chromium.org/turboci/proto/go/testing/vectors/ids/to_from_string;tofromstringvectorspb";
+option java_multiple_files = true;
+
+// ToFromString tests that a given identifier string (in the input) resolves
+// either to a parsed Identifier (with expected ToString, KindOf, and Root
+// results), or an error.
+message ToFromString {
+  optional string input = 1;
+
+  message Output {
+    optional bool err = 1;
+
+    optional turboci.graph.ids.v1.Identifier parsed = 2;
+
+    optional turboci.graph.ids.v1.IdentifierKind kind = 3;
+
+    message Root {
+      optional turboci.graph.ids.v1.WorkPlan work_plan = 1;
+      optional turboci.graph.ids.v1.Check check = 2;
+      optional turboci.graph.ids.v1.Stage stage = 3;
+    }
+    optional Root root = 4;
+  }
+  Output output = 2;
+}

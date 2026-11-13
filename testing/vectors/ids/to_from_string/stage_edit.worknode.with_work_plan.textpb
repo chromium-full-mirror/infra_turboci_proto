@@ -1,0 +1,34 @@
+# proto-file: testing/vectors/ids/to_from_string/test_case.proto
+# proto-message: ToFromString
+
+input: "L00012345:N938215823:V12345/6789"
+output {
+  parsed {
+    stage_edit {
+      stage {
+        work_plan {
+          id: "00012345"
+        }
+        is_worknode: true
+        id: "938215823"
+      }
+      version {
+        seconds: 12345
+        nanos: 6789
+      }
+    }
+  }
+  kind: IDENTIFIER_KIND_STAGE_EDIT
+  root {
+    work_plan {
+      id: "00012345"
+    }
+    stage {
+      work_plan {
+        id: "00012345"
+      }
+      is_worknode: true
+      id: "938215823"
+    }
+  }
+}

@@ -6,164 +6,108 @@ package ids
 
 import (
 	"errors"
+	"slices"
 	"testing"
-	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/testing/protocmp"
 
 	idspb "go.chromium.org/turboci/proto/go/graph/ids/v1"
+	tofromstringvectorspb "go.chromium.org/turboci/proto/go/testing/vectors/ids/to_from_string"
+	"go.chromium.org/turboci/proto/go/utils/internal/test_vector"
 )
 
-func shouldWrap[I Identifier](ident I, err error) (*idspb.Identifier, error) {
-	if err != nil {
-		return nil, err
+func assertIdent[I Identifier](t *testing.T, tc *tofromstringvectorspb.ToFromString, id I) {
+	t.Helper()
+
+	output := tc.GetOutput()
+	wantStr := tc.GetInput()
+
+	if diff := cmp.Diff(output.GetParsed(), Wrap(id), protocmp.Transform()); diff != "" {
+		t.Errorf("Wrap(%T) mismatch (-want +got):\n%s", id, diff)
 	}
-	return Wrap(ident), nil
+	if got := ToString(id); got != wantStr {
+		t.Errorf("ToString(%T) = %q, want %q", id, got, wantStr)
+	}
+	if got, err := ToStringErr(id); err != nil || got != wantStr {
+		t.Errorf("ToStringErr(%T) = (%q, %v), want (%q, nil)", id, got, err, wantStr)
+	}
+	if got := KindOf(id); got != output.GetKind() {
+		t.Errorf("KindOf(%T) = %v, want %v", id, got, output.GetKind())
+	}
+	wp, chk, stg := Root(id)
+	wantRoot := output.GetRoot()
+	if diff := cmp.Diff(wantRoot.GetWorkPlan(), wp, protocmp.Transform()); diff != "" {
+		t.Errorf("Root(%T) work_plan mismatch (-want +got):\n%s", id, diff)
+	}
+	if diff := cmp.Diff(wantRoot.GetCheck(), chk, protocmp.Transform()); diff != "" {
+		t.Errorf("Root(%T) check mismatch (-want +got):\n%s", id, diff)
+	}
+	if diff := cmp.Diff(wantRoot.GetStage(), stg, protocmp.Transform()); diff != "" {
+		t.Errorf("Root(%T) stage mismatch (-want +got):\n%s", id, diff)
+	}
+}
+
+type variantCheck func(t *testing.T, tc *tofromstringvectorspb.ToFromString, ident *idspb.Identifier) bool
+
+func checkVariant[I Identifier](get func(*idspb.Identifier) I) variantCheck {
+	return func(t *testing.T, tc *tofromstringvectorspb.ToFromString, ident *idspb.Identifier) bool {
+		t.Helper()
+		v := get(ident)
+		if v == nil {
+			return false
+		}
+		assertIdent(t, tc, v)
+		return true
+	}
+}
+
+var variantChecks = []variantCheck{
+	checkVariant((*idspb.Identifier).GetWorkPlan),
+	checkVariant((*idspb.Identifier).GetCheck),
+	checkVariant((*idspb.Identifier).GetCheckResult),
+	checkVariant((*idspb.Identifier).GetCheckEdit),
+	checkVariant((*idspb.Identifier).GetStage),
+	checkVariant((*idspb.Identifier).GetStageAttempt),
+	checkVariant((*idspb.Identifier).GetStageEdit),
 }
 
 func TestToFromString(t *testing.T) {
 	t.Parallel()
 
-	type testCase struct {
-		expect  string
-		mkIdent func() (*idspb.Identifier, error)
-		kind    idspb.IdentifierKind
+	typeFields := (&idspb.Identifier{}).ProtoReflect().Descriptor().Oneofs().ByName("type").Fields().Len()
+	if len(variantChecks) != typeFields {
+		t.Fatalf("variantChecks has %d entries, but Identifier.type oneof has %d fields", len(variantChecks), typeFields)
 	}
 
-	tcs := []testCase{
-		{
-			":Cmeep",
-			func() (*idspb.Identifier, error) {
-				return shouldWrap(CheckErr("meep"))
-			},
-			idspb.IdentifierKind_IDENTIFIER_KIND_CHECK,
-		},
-		{
-			":Cmeep:R2", func() (*idspb.Identifier, error) {
-				return shouldWrap(CheckResultErr("meep", 2))
-			},
-			idspb.IdentifierKind_IDENTIFIER_KIND_CHECK_RESULT,
-		},
-		{
-			":Cmeep:V12345/6789",
-			func() (*idspb.Identifier, error) {
-				ts := time.Unix(12345, 6789)
-				return shouldWrap(CheckEditErr("meep", ts))
-			},
-			idspb.IdentifierKind_IDENTIFIER_KIND_CHECK_EDIT,
-		},
-		{
-			":Smeep",
-			func() (*idspb.Identifier, error) {
-				return shouldWrap(StageErr(StageNotWorknode, "meep"))
-			},
-			idspb.IdentifierKind_IDENTIFIER_KIND_STAGE,
-		},
-		{
-			":?meep",
-			func() (*idspb.Identifier, error) {
-				return shouldWrap(StageErr(StageIsUnknown, "meep"))
-			},
-			idspb.IdentifierKind_IDENTIFIER_KIND_STAGE,
-		},
-		{
-			":Nmeep",
-			func() (*idspb.Identifier, error) {
-				return shouldWrap(StageErr(StageIsWorknode, "meep"))
-			},
-			idspb.IdentifierKind_IDENTIFIER_KIND_STAGE,
-		},
-		{
-			":Smeep:A2",
-			func() (*idspb.Identifier, error) {
-				return shouldWrap(StageAttemptErr(StageNotWorknode, "meep", 2))
-			},
-			idspb.IdentifierKind_IDENTIFIER_KIND_STAGE_ATTEMPT,
-		},
-		{
-			":Nmeep:A2",
-			func() (*idspb.Identifier, error) {
-				return shouldWrap(StageAttemptErr(StageIsWorknode, "meep", 2))
-			},
-			idspb.IdentifierKind_IDENTIFIER_KIND_STAGE_ATTEMPT,
-		},
-		{
-			":Smeep:V12345/6789",
-			func() (*idspb.Identifier, error) {
-				ts := time.Unix(12345, 6789)
-				return shouldWrap(StageEditErr(StageNotWorknode, "meep", ts))
-			},
-			idspb.IdentifierKind_IDENTIFIER_KIND_STAGE_EDIT,
-		},
-		{
-			":Nmeep:V12345/6789",
-			func() (*idspb.Identifier, error) {
-				ts := time.Unix(12345, 6789)
-				return shouldWrap(StageEditErr(StageIsWorknode, "meep", ts))
-			},
-			idspb.IdentifierKind_IDENTIFIER_KIND_STAGE_EDIT,
-		},
-	}
+	test_vector.Run(t, _TO_FROM_STRING_VECTORS, func(t *testing.T, tc *tofromstringvectorspb.ToFromString) {
+		input := tc.GetInput()
+		output := tc.GetOutput()
 
-	for _, tc := range tcs {
-		t.Run(tc.expect, func(t *testing.T) {
-			t.Parallel()
-			id, err := tc.mkIdent()
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
+		ident, err := FromString(input)
+		if output.GetErr() {
+			if err == nil {
+				t.Fatalf("expected error, got %v", ident)
 			}
+			return
+		}
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-			if got := ToString(id); got != tc.expect {
-				t.Errorf("ToString(id) = %q, want %q", got, tc.expect)
-			}
-			if got, err := ToStringErr(id); err != nil || got != tc.expect {
-				t.Errorf("ToStringErr(id) = (%q, %v), want (%q, nil)", got, err, tc.expect)
-			}
+		if diff := cmp.Diff(output.GetParsed(), ident, protocmp.Transform()); diff != "" {
+			t.Errorf("FromString(%q) mismatch (-want +got):\n%s", input, diff)
+		}
 
-			if got := KindOf(id); got != tc.kind {
-				t.Errorf("KindOf(id) = %v, want %v", got, tc.kind)
-			}
-
-			ident, err := FromString(tc.expect)
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			if diff := cmp.Diff(id, ident, protocmp.Transform()); diff != "" {
-				t.Errorf("mismatch (-want +got):\n%s", diff)
-			}
+		assertIdent(t, tc, ident)
+		ok := slices.ContainsFunc(variantChecks, func(fn variantCheck) bool {
+			return fn(t, tc, ident)
 		})
-
-		const wp = "00012345"
-		wpExpect := "L" + wp + tc.expect
-		t.Run(wpExpect, func(t *testing.T) {
-			t.Parallel()
-			id, err := tc.mkIdent()
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			_, err = SetWorkplanErr(id, wp)
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-
-			if got := ToString(id); got != wpExpect {
-				t.Errorf("ToString(id) = %q, want %q", got, wpExpect)
-			}
-			if got, err := ToStringErr(id); err != nil || got != wpExpect {
-				t.Errorf("ToStringErr(id) = (%q, %v), want (%q, nil)", got, err, wpExpect)
-			}
-
-			ident, err := FromString(wpExpect)
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			if diff := cmp.Diff(id, ident, protocmp.Transform()); diff != "" {
-				t.Errorf("mismatch (-want +got):\n%s", diff)
-			}
-		})
-	}
+		if !ok {
+			t.Fatalf("unhandled identifier variant: %v", ident.WhichType())
+		}
+	})
 }
 
 func TestToString_edgeCases(t *testing.T) {

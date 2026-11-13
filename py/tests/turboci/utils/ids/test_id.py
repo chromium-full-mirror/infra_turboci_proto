@@ -6,215 +6,140 @@
 from __future__ import annotations
 
 import copy
-import dataclasses
 import unittest
 
 from google.protobuf import timestamp_pb2
+
+from testing.vectors.ids.to_from_string import test_case_pb2
+from tests.turboci.utils.ids import test_to_from_vectors
+from tests.turboci.utils.internal import test_vector
 from turboci.graph.ids.v1 import identifier_kind_pb2
 from turboci.graph.ids.v1 import identifier_pb2
 from turboci.utils import ids as id_utils
 
 _testTS = timestamp_pb2.Timestamp(seconds=12345, nanos=7890)
 
-
-@dataclasses.dataclass
-class _id_test_case:
-  ident: id_utils.AnyIdentifier
-  ident_str: str
-  note: str = ''
-
-  @property
-  def name(self):
-    kind = self.kind_name()
-    if self.note:
-      return f'{kind} ({self.note})'
-    return kind
-
-  def kind_name(self) -> str:
-    return id_utils.wrap(self.ident).WhichOneof('type')
-
-
-_test_cases: list[_id_test_case] = [
-    _id_test_case(identifier_pb2.WorkPlan(id='1234567'), 'L1234567'),
-    _id_test_case(
-        identifier_pb2.Check(
+_test_idents: list[id_utils.SpecificIdentifier] = [
+    identifier_pb2.WorkPlan(id='1234567'),
+    identifier_pb2.Check(
+        work_plan=identifier_pb2.WorkPlan(id='1234567'),
+        id='cool/beans & stuff',
+    ),
+    identifier_pb2.CheckResult(
+        check=identifier_pb2.Check(
             work_plan=identifier_pb2.WorkPlan(id='1234567'),
             id='cool/beans & stuff',
         ),
-        'L1234567:Ccool/beans & stuff',
+        idx=3,
     ),
-    _id_test_case(
-        identifier_pb2.CheckResult(
-            check=identifier_pb2.Check(
-                work_plan=identifier_pb2.WorkPlan(id='1234567'),
-                id='cool/beans & stuff',
-            ),
-            idx=3,
+    identifier_pb2.CheckEdit(
+        check=identifier_pb2.Check(
+            work_plan=identifier_pb2.WorkPlan(id='1234567'),
+            id='cool/beans & stuff',
         ),
-        'L1234567:Ccool/beans & stuff:R3',
+        version=_testTS,
     ),
-    _id_test_case(
-        identifier_pb2.CheckEdit(
-            check=identifier_pb2.Check(
-                work_plan=identifier_pb2.WorkPlan(id='1234567'),
-                id='cool/beans & stuff',
-            ),
-            version=_testTS,
-        ),
-        'L1234567:Ccool/beans & stuff:V12345/7890',
+    identifier_pb2.Stage(
+        work_plan=identifier_pb2.WorkPlan(id='1234567'),
+        is_worknode=True,
+        id='938215823',
     ),
-    _id_test_case(
-        identifier_pb2.Stage(
+    identifier_pb2.Stage(
+        work_plan=identifier_pb2.WorkPlan(id='1234567'),
+        is_worknode=False,
+        id='some stuff that is awesome',
+    ),
+    identifier_pb2.StageAttempt(
+        stage=identifier_pb2.Stage(
             work_plan=identifier_pb2.WorkPlan(id='1234567'),
             is_worknode=True,
             id='938215823',
         ),
-        'L1234567:N938215823',
-        note='worknode',
+        idx=3,
     ),
-    _id_test_case(
-        identifier_pb2.Stage(
+    identifier_pb2.StageAttempt(
+        stage=identifier_pb2.Stage(
             work_plan=identifier_pb2.WorkPlan(id='1234567'),
             is_worknode=False,
             id='some stuff that is awesome',
         ),
-        'L1234567:Ssome stuff that is awesome',
+        idx=3,
     ),
-    _id_test_case(
-        identifier_pb2.StageAttempt(
-            stage=identifier_pb2.Stage(
-                work_plan=identifier_pb2.WorkPlan(id='1234567'),
-                is_worknode=True,
-                id='938215823',
-            ),
-            idx=3,
-        ),
-        'L1234567:N938215823:A3',
-        note='worknode',
-    ),
-    _id_test_case(
-        identifier_pb2.StageAttempt(
-            stage=identifier_pb2.Stage(
-                work_plan=identifier_pb2.WorkPlan(id='1234567'),
-                is_worknode=False,
-                id='some stuff that is awesome',
-            ),
-            idx=3,
-        ),
-        'L1234567:Ssome stuff that is awesome:A3',
-    ),
-    _id_test_case(
-        identifier_pb2.StageEdit(
-            stage=identifier_pb2.Stage(
-                work_plan=identifier_pb2.WorkPlan(id='1234567'),
-                is_worknode=True,
-                id='938215823',
-            ),
-            version=_testTS,
-        ),
-        'L1234567:N938215823:V12345/7890',
-        note='worknode',
-    ),
-    _id_test_case(
-        identifier_pb2.StageEdit(
-            stage=identifier_pb2.Stage(
-                work_plan=identifier_pb2.WorkPlan(id='1234567'),
-                is_worknode=False,
-                id='some stuff that is awesome',
-            ),
-            version=_testTS,
-        ),
-        'L1234567:Ssome stuff that is awesome:V12345/7890',
-    ),
-    # Cleared (non-fully-qualified) identifier test cases
-    _id_test_case(
-        identifier_pb2.Check(
-            id='cleared_check',
-        ),
-        ':Ccleared_check',
-        note='cleared',
-    ),
-    _id_test_case(
-        identifier_pb2.CheckResult(
-            check=identifier_pb2.Check(id='cleared_check'),
-            idx=3,
-        ),
-        ':Ccleared_check:R3',
-        note='cleared',
-    ),
-    _id_test_case(
-        identifier_pb2.Stage(
+    identifier_pb2.StageEdit(
+        stage=identifier_pb2.Stage(
+            work_plan=identifier_pb2.WorkPlan(id='1234567'),
             is_worknode=True,
-            id='cleared_stage',
+            id='938215823',
         ),
-        ':Ncleared_stage',
-        note='cleared worknode',
+        version=_testTS,
     ),
-    _id_test_case(
-        identifier_pb2.StageAttempt(
-            stage=identifier_pb2.Stage(is_worknode=False, id='cleared_stage'),
-            idx=5,
+    identifier_pb2.StageEdit(
+        stage=identifier_pb2.Stage(
+            work_plan=identifier_pb2.WorkPlan(id='1234567'),
+            is_worknode=False,
+            id='some stuff that is awesome',
         ),
-        ':Scleared_stage:A5',
-        note='cleared',
+        version=_testTS,
+    ),
+    identifier_pb2.Check(
+        id='cleared_check',
+    ),
+    identifier_pb2.CheckResult(
+        check=identifier_pb2.Check(id='cleared_check'),
+        idx=3,
+    ),
+    identifier_pb2.Stage(
+        is_worknode=True,
+        id='cleared_stage',
+    ),
+    identifier_pb2.StageAttempt(
+        stage=identifier_pb2.Stage(is_worknode=False, id='cleared_stage'),
+        idx=5,
     ),
 ]
 
 
 class ToFromIDTest(unittest.TestCase):
 
-  def test_ok(self):
-    for tc in _test_cases:
-      with self.subTest(kind=tc.name):
-        self.assertEqual(id_utils.to_string(tc.ident), tc.ident_str)
-        self.assertEqual(id_utils.to_string_err(tc.ident), tc.ident_str)
-        self.assertEqual(
-            id_utils.to_string(id_utils.wrap(tc.ident)), tc.ident_str
-        )
-        self.assertEqual(
-            id_utils.to_string_err(id_utils.wrap(tc.ident)), tc.ident_str
-        )
-        self.assertEqual(
-            id_utils.from_string(tc.ident_str), id_utils.wrap(tc.ident)
-        )
-
-  def test_from_string__invalid_stage_prefix__raises_value_error(self):
-    invalid_cases = (
-        ('L1234567:X938215823', 'stage'),
-        (':Xcleared_stage', 'cleared stage'),
-        ('L1234567:X938215823:A3', 'stage attempt'),
-        ('L1234567:X938215823:V12345/7890', 'stage edit'),
-    )
-
-    for ident_str, desc in invalid_cases:
-      with self.subTest(case=desc):
-        with self.assertRaisesRegex(
-            ValueError,
-            r"^from_string: expected token to start with S, N or \?, got 'X'$",
-        ):
-          id_utils.from_string(ident_str)
-
-  def test_from_string__unrecognized_id__raises_value_error(self):
-    unrecognized_cases = (
-        ('', 'empty string'),
-        ('foo', 'unrecognized prefix'),
-        ('L1234567:Cbeans:X', 'unrecognized check suffix'),
-        ('L1234567:Cbeans:R3:extra', 'too many tokens'),
-    )
-
-    for ident_str, desc in unrecognized_cases:
-      with self.subTest(case=desc):
-        with self.assertRaisesRegex(
-            ValueError,
-            rf'^from_string: unrecognized ID {ident_str!r}$',
-        ):
-          id_utils.from_string(ident_str)
-
-  def test_from_string_edge_cases(self):
-    for bad in ('L', 'L:Cmeep', 'Cmeep', 'Lwp:C', 'Lwp:', 'Lwp:Cchk:R0', 'Lwp:Cchk:R-1'):
-      with self.subTest(bad=bad):
+  def test_vectors(self):
+    def _check(tc: test_case_pb2.ToFromString) -> None:
+      output = tc.output
+      if output.err:
         with self.assertRaises(ValueError):
-          id_utils.from_string(bad)
+          id_utils.from_string(tc.input)
+        return
+
+      ident = id_utils.from_string(tc.input)
+      self.assertEqual(ident, output.parsed)
+
+      self.assertEqual(id_utils.to_string(ident), tc.input)
+      self.assertEqual(id_utils.to_string_err(ident), tc.input)
+      self.assertEqual(id_utils.kind_of(ident), output.kind)
+
+      want_root = output.root
+      want_wp = want_root.work_plan if want_root.HasField('work_plan') else None
+      want_chk = want_root.check if want_root.HasField('check') else None
+      want_stg = want_root.stage if want_root.HasField('stage') else None
+      self.assertEqual(id_utils.root(ident), (want_wp, want_chk, want_stg))
+
+      unwrapped = id_utils.unwrap(ident)
+      if unwrapped is None:
+        self.fail(f'unwrap({ident!r}) unexpectedly returned None')
+      self.assertEqual(id_utils.wrap(ident), ident)
+      self.assertEqual(id_utils.wrap(unwrapped), ident)
+      self.assertEqual(id_utils.to_string(unwrapped), tc.input)
+      self.assertEqual(id_utils.to_string_err(unwrapped), tc.input)
+      self.assertEqual(id_utils.kind_of(unwrapped), output.kind)
+      self.assertEqual(
+          id_utils.root(unwrapped), (want_wp, want_chk, want_stg)
+      )
+
+    test_vector.run(
+        self,
+        test_to_from_vectors._TO_FROM_STRING_VECTORS,
+        test_case_pb2.ToFromString,
+        _check,
+    )
 
   def test_unset_identifier(self):
     empty = identifier_pb2.Identifier()
@@ -297,55 +222,42 @@ class ToFromIDTest(unittest.TestCase):
     )
 
 
-
-class TestWrap(unittest.TestCase):
-
-  def test_wrap(self):
-    for tc in _test_cases:
-      with self.subTest(kind=tc.name):
-        self.assertIsInstance(
-            id_utils.wrap(tc.ident), identifier_pb2.Identifier
-        )
-        self.assertEqual(
-            id_utils.wrap(tc.ident).WhichOneof('type'), tc.kind_name()
-        )
-        self.assertEqual(id_utils.unwrap(id_utils.wrap(tc.ident)), tc.ident)
-
-
 class TestCreate(unittest.TestCase):
 
   def test_creators(self):
-    def get_wp(msg):
+    def get_wp(
+        msg: identifier_pb2.Check | identifier_pb2.Stage,
+    ) -> identifier_pb2.WorkPlan | None:
       return msg.work_plan if msg.HasField('work_plan') else None
 
-    for tc in _test_cases:
-      with self.subTest(kind=tc.name):
+    for ident in _test_idents:
+      with self.subTest(ident=id_utils.to_string(ident)):
         created_id = None
-        match tc.ident:
+        match ident:
           case identifier_pb2.WorkPlan():
-            created_id = id_utils.workplan(tc.ident.id)
+            created_id = id_utils.workplan(ident.id)
           case identifier_pb2.Check():
-            created_id = id_utils.check(tc.ident.id, get_wp(tc.ident))
+            created_id = id_utils.check(ident.id, get_wp(ident))
           case identifier_pb2.CheckResult():
-            chk = tc.ident.check
+            chk = ident.check
             created_id = id_utils.check_result(
-                tc.ident.idx, id_utils.check(chk.id, get_wp(chk))
+                ident.idx, id_utils.check(chk.id, get_wp(chk))
             )
           case identifier_pb2.CheckEdit():
-            chk = tc.ident.check
+            chk = ident.check
             created_id = id_utils.check_edit(
                 _testTS, id_utils.check(chk.id, in_workplan=get_wp(chk))
             )
           case identifier_pb2.Stage():
             created_id = id_utils.stage(
-                tc.ident.id,
-                in_workplan=get_wp(tc.ident),
-                is_worknode=tc.ident.is_worknode,
+                ident.id,
+                in_workplan=get_wp(ident),
+                is_worknode=ident.is_worknode,
             )
           case identifier_pb2.StageAttempt():
-            stg = tc.ident.stage
+            stg = ident.stage
             created_id = id_utils.stage_attempt(
-                tc.ident.idx,
+                ident.idx,
                 id_utils.stage(
                     stg.id,
                     in_workplan=get_wp(stg),
@@ -353,7 +265,7 @@ class TestCreate(unittest.TestCase):
                 ),
             )
           case identifier_pb2.StageEdit():
-            stg = tc.ident.stage
+            stg = ident.stage
             created_id = id_utils.stage_edit(
                 _testTS,
                 id_utils.stage(
@@ -363,9 +275,9 @@ class TestCreate(unittest.TestCase):
                 ),
             )
           case _:
-            self.fail(f'unhandled type: {type(tc.ident)}')
+            self.fail(f'unhandled type: {type(ident)}')
 
-        self.assertEqual(created_id, tc.ident)
+        self.assertEqual(created_id, ident)
 
   def test_check_id_no_colon(self):
     with self.assertRaisesRegex(ValueError, "must not contain ':'"):
@@ -379,20 +291,18 @@ class TestCreate(unittest.TestCase):
 class TestSetWorkplan(unittest.TestCase):
 
   def test_set_workplan_str(self):
-    for tc in _test_cases:
-      with self.subTest(kind=tc.name):
+    for ident in _test_idents:
+      with self.subTest(ident=id_utils.to_string(ident)):
         new_workplan = id_utils.workplan('7654321')
-        updated = id_utils.set_workplan(
-            copy.deepcopy(tc.ident), new_workplan.id
-        )
+        updated = id_utils.set_workplan(copy.deepcopy(ident), new_workplan.id)
         # So this test also covers root and same_workplan.
         self.assertTrue(id_utils.same_workplan(updated, new_workplan))
 
   def test_set_workplan_proto(self):
-    for tc in _test_cases:
-      with self.subTest(kind=tc.name):
+    for ident in _test_idents:
+      with self.subTest(ident=id_utils.to_string(ident)):
         new_workplan = id_utils.workplan('7654321')
-        updated = id_utils.set_workplan(copy.deepcopy(tc.ident), new_workplan)
+        updated = id_utils.set_workplan(copy.deepcopy(ident), new_workplan)
         # So this test also covers root and same_workplan.
         self.assertTrue(id_utils.same_workplan(updated, new_workplan))
 
@@ -400,30 +310,30 @@ class TestSetWorkplan(unittest.TestCase):
 class TestClearWorkplan(unittest.TestCase):
 
   def test_clear_workplan_unwrapped(self):
-    for tc in _test_cases:
-      with self.subTest(kind=tc.name):
-        if isinstance(tc.ident, identifier_pb2.WorkPlan):
+    for ident in _test_idents:
+      with self.subTest(ident=id_utils.to_string(ident)):
+        if isinstance(ident, identifier_pb2.WorkPlan):
           with self.assertRaises(NotImplementedError):
-            id_utils.clear_workplan(copy.deepcopy(tc.ident))
+            id_utils.clear_workplan(copy.deepcopy(ident))
           continue
 
-        updated = id_utils.clear_workplan(copy.deepcopy(tc.ident))
+        updated = id_utils.clear_workplan(copy.deepcopy(ident))
         self.assert_workplan_cleared(updated)
 
   def test_clear_workplan_wrapped(self):
-    for tc in _test_cases:
-      with self.subTest(kind=tc.name):
-        if isinstance(tc.ident, identifier_pb2.WorkPlan):
-          wrapped = id_utils.wrap(tc.ident)
+    for ident in _test_idents:
+      with self.subTest(ident=id_utils.to_string(ident)):
+        if isinstance(ident, identifier_pb2.WorkPlan):
+          wrapped = id_utils.wrap(ident)
           with self.assertRaises(NotImplementedError):
             id_utils.clear_workplan(wrapped)
           continue
 
-        wrapped = id_utils.wrap(copy.deepcopy(tc.ident))
+        wrapped = id_utils.wrap(copy.deepcopy(ident))
         updated = id_utils.clear_workplan(wrapped)
         self.assert_workplan_cleared(updated)
 
-  def assert_workplan_cleared(self, ident):
+  def assert_workplan_cleared(self, ident: id_utils.AnyIdentifier) -> None:
     unwrapped = id_utils.unwrap(ident)
     match unwrapped:
       case identifier_pb2.Check() | identifier_pb2.Stage():

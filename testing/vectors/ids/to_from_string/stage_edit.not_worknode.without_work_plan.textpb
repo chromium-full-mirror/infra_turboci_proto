@@ -1,0 +1,25 @@
+# proto-file: testing/vectors/ids/to_from_string/test_case.proto
+# proto-message: ToFromString
+
+input: ":Smeep:V12345/6789"
+output {
+  parsed {
+    stage_edit {
+      stage {
+        is_worknode: false
+        id: "meep"
+      }
+      version {
+        seconds: 12345
+        nanos: 6789
+      }
+    }
+  }
+  kind: IDENTIFIER_KIND_STAGE_EDIT
+  root {
+    stage {
+      is_worknode: false
+      id: "meep"
+    }
+  }
+}

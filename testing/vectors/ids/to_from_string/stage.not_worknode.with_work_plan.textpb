@@ -1,0 +1,28 @@
+# proto-file: testing/vectors/ids/to_from_string/test_case.proto
+# proto-message: ToFromString
+
+input: "L00012345:Ssome stuff that is awesome"
+output {
+  parsed {
+    stage {
+      work_plan {
+        id: "00012345"
+      }
+      is_worknode: false
+      id: "some stuff that is awesome"
+    }
+  }
+  kind: IDENTIFIER_KIND_STAGE
+  root {
+    work_plan {
+      id: "00012345"
+    }
+    stage {
+      work_plan {
+        id: "00012345"
+      }
+      is_worknode: false
+      id: "some stuff that is awesome"
+    }
+  }
+}

@@ -8,107 +8,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
-	"google.golang.org/protobuf/testing/protocmp"
-
 	idspb "go.chromium.org/turboci/proto/go/graph/ids/v1"
 )
 
-func TestWrap(t *testing.T) {
-	t.Run("WorkPlan", func(t *testing.T) {
-		id := Workplan("wp")
-		wrapped := Wrap(id)
-		if diff := cmp.Diff(id, wrapped.GetWorkPlan(), protocmp.Transform()); diff != "" {
-			t.Errorf("mismatch (-want +got):\n%s", diff)
-		}
-	})
-
-	t.Run("Stage", func(t *testing.T) {
-		id := Stage("s")
-		wrapped := Wrap(id)
-		if diff := cmp.Diff(id, wrapped.GetStage(), protocmp.Transform()); diff != "" {
-			t.Errorf("mismatch (-want +got):\n%s", diff)
-		}
-	})
-
-	t.Run("StageAttempt", func(t *testing.T) {
-		id := must(StageAttemptErr(StageNotWorknode, "s", 1))
-		wrapped := Wrap(id)
-		if diff := cmp.Diff(id, wrapped.GetStageAttempt(), protocmp.Transform()); diff != "" {
-			t.Errorf("mismatch (-want +got):\n%s", diff)
-		}
-	})
-
-	t.Run("StageEdit", func(t *testing.T) {
-		id := must(StageEditErr(StageNotWorknode, "s", time.Unix(1, 0)))
-		wrapped := Wrap(id)
-		if diff := cmp.Diff(id, wrapped.GetStageEdit(), protocmp.Transform()); diff != "" {
-			t.Errorf("mismatch (-want +got):\n%s", diff)
-		}
-	})
-
-	t.Run("Check", func(t *testing.T) {
-		id := Check("c")
-		wrapped := Wrap(id)
-		if diff := cmp.Diff(id, wrapped.GetCheck(), protocmp.Transform()); diff != "" {
-			t.Errorf("mismatch (-want +got):\n%s", diff)
-		}
-	})
-
-	t.Run("CheckResult", func(t *testing.T) {
-		id := must(CheckResultErr("c", 1))
-		wrapped := Wrap(id)
-		if diff := cmp.Diff(id, wrapped.GetCheckResult(), protocmp.Transform()); diff != "" {
-			t.Errorf("mismatch (-want +got):\n%s", diff)
-		}
-	})
-
-	t.Run("CheckEdit", func(t *testing.T) {
-		id := must(CheckEditErr("c", time.Unix(1, 0)))
-		wrapped := Wrap(id)
-		if diff := cmp.Diff(id, wrapped.GetCheckEdit(), protocmp.Transform()); diff != "" {
-			t.Errorf("mismatch (-want +got):\n%s", diff)
-		}
-	})
-
-	t.Run("Identifier", func(t *testing.T) {
-		id := Wrap(Check("c"))
-		wrapped := Wrap(id)
-		if diff := cmp.Diff(id, wrapped, protocmp.Transform()); diff != "" {
-			t.Errorf("mismatch (-want +got):\n%s", diff)
-		}
-	})
-
-	t.Run("nil", func(t *testing.T) {
-		var id *idspb.Check
-		if got := Wrap(id); got != nil {
-			t.Errorf("expected nil, got %v", got)
-		}
-	})
+func TestWrap_nil(t *testing.T) {
+	var id *idspb.Check
+	if got := Wrap(id); got != nil {
+		t.Errorf("expected nil, got %v", got)
+	}
 }
 
-func TestKindOf(t *testing.T) {
-	if got, want := KindOf(Workplan("wp")), idspb.IdentifierKind_IDENTIFIER_KIND_WORK_PLAN; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
-	if got, want := KindOf(Stage("s")), idspb.IdentifierKind_IDENTIFIER_KIND_STAGE; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
-	if got, want := KindOf(must(StageAttemptErr(StageNotWorknode, "s", 1))), idspb.IdentifierKind_IDENTIFIER_KIND_STAGE_ATTEMPT; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
-	if got, want := KindOf(must(StageEditErr(StageNotWorknode, "s", time.Unix(1, 0)))), idspb.IdentifierKind_IDENTIFIER_KIND_STAGE_EDIT; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
-	if got, want := KindOf(Check("c")), idspb.IdentifierKind_IDENTIFIER_KIND_CHECK; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
-	if got, want := KindOf(must(CheckResultErr("c", 1))), idspb.IdentifierKind_IDENTIFIER_KIND_CHECK_RESULT; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
-	if got, want := KindOf(must(CheckEditErr("c", time.Unix(1, 0)))), idspb.IdentifierKind_IDENTIFIER_KIND_CHECK_EDIT; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
+func TestKindOf_nil(t *testing.T) {
 	if got, want := KindOf((*idspb.Check)(nil)), idspb.IdentifierKind_IDENTIFIER_KIND_UNKNOWN; got != want {
 		t.Errorf("got %v, want %v", got, want)
 	}
@@ -117,117 +27,17 @@ func TestKindOf(t *testing.T) {
 	}
 }
 
-func TestRoot(t *testing.T) {
-	t.Run("WorkPlan", func(t *testing.T) {
-		id := Workplan("wp")
-		wp, check, stage := Root(id)
-		if diff := cmp.Diff(id, wp, protocmp.Transform()); diff != "" {
-			t.Errorf("mismatch (-want +got):\n%s", diff)
-		}
-		if check != nil {
-			t.Errorf("expected nil check, got %v", check)
-		}
-		if stage != nil {
-			t.Errorf("expected nil stage, got %v", stage)
-		}
-	})
-
-	t.Run("Stage", func(t *testing.T) {
-		id := SetWorkplan(Stage("s"), "wp")
-		wp, check, stage := Root(id)
-		if got := wp.GetId(); got != "wp" {
-			t.Errorf("got %q, want \"wp\"", got)
-		}
-		if check != nil {
-			t.Errorf("expected nil check, got %v", check)
-		}
-		if got := stage.GetId(); got != "s" {
-			t.Errorf("got %q, want \"s\"", got)
-		}
-	})
-
-	t.Run("StageAttempt", func(t *testing.T) {
-		id := SetWorkplan(must(StageAttemptErr(StageNotWorknode, "s", 1)), "wp")
-		wp, check, stage := Root(id)
-		if got := wp.GetId(); got != "wp" {
-			t.Errorf("got %q, want \"wp\"", got)
-		}
-		if check != nil {
-			t.Errorf("expected nil check, got %v", check)
-		}
-		if got := stage.GetId(); got != "s" {
-			t.Errorf("got %q, want \"s\"", got)
-		}
-	})
-
-	t.Run("StageEdit", func(t *testing.T) {
-		id := SetWorkplan(must(StageEditErr(StageNotWorknode, "s", time.Unix(1, 0))), "wp")
-		wp, check, stage := Root(id)
-		if got := wp.GetId(); got != "wp" {
-			t.Errorf("got %q, want \"wp\"", got)
-		}
-		if check != nil {
-			t.Errorf("expected nil check, got %v", check)
-		}
-		if got := stage.GetId(); got != "s" {
-			t.Errorf("got %q, want \"s\"", got)
-		}
-	})
-
-	t.Run("Check", func(t *testing.T) {
-		id := SetWorkplan(Check("c"), "wp")
-		wp, check, stage := Root(id)
-		if got := wp.GetId(); got != "wp" {
-			t.Errorf("got %q, want \"wp\"", got)
-		}
-		if got := check.GetId(); got != "c" {
-			t.Errorf("got %q, want \"c\"", got)
-		}
-		if stage != nil {
-			t.Errorf("expected nil stage, got %v", stage)
-		}
-	})
-
-	t.Run("CheckResult", func(t *testing.T) {
-		id := SetWorkplan(must(CheckResultErr("c", 1)), "wp")
-		wp, check, stage := Root(id)
-		if got := wp.GetId(); got != "wp" {
-			t.Errorf("got %q, want \"wp\"", got)
-		}
-		if got := check.GetId(); got != "c" {
-			t.Errorf("got %q, want \"c\"", got)
-		}
-		if stage != nil {
-			t.Errorf("expected nil stage, got %v", stage)
-		}
-	})
-
-	t.Run("CheckEdit", func(t *testing.T) {
-		id := SetWorkplan(must(CheckEditErr("c", time.Unix(1, 0))), "wp")
-		wp, check, stage := Root(id)
-		if got := wp.GetId(); got != "wp" {
-			t.Errorf("got %q, want \"wp\"", got)
-		}
-		if got := check.GetId(); got != "c" {
-			t.Errorf("got %q, want \"c\"", got)
-		}
-		if stage != nil {
-			t.Errorf("expected nil stage, got %v", stage)
-		}
-	})
-
-	t.Run("nil", func(t *testing.T) {
-		wp, check, stage := Root[*idspb.Check](nil)
-		if wp != nil {
-			t.Errorf("expected nil wp, got %v", wp)
-		}
-		if check != nil {
-			t.Errorf("expected nil check, got %v", check)
-		}
-		if stage != nil {
-			t.Errorf("expected nil stage, got %v", stage)
-		}
-	})
+func TestRoot_nil(t *testing.T) {
+	wp, check, stage := Root[*idspb.Check](nil)
+	if wp != nil {
+		t.Errorf("expected nil wp, got %v", wp)
+	}
+	if check != nil {
+		t.Errorf("expected nil check, got %v", check)
+	}
+	if stage != nil {
+		t.Errorf("expected nil stage, got %v", stage)
+	}
 }
 
 func TestStageRoot(t *testing.T) {

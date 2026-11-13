@@ -1,0 +1,23 @@
+# proto-file: testing/vectors/ids/to_from_string/test_case.proto
+# proto-message: ToFromString
+
+input: ":Cmeep:V12345/6789"
+output {
+  parsed {
+    check_edit {
+      check {
+        id: "meep"
+      }
+      version {
+        seconds: 12345
+        nanos: 6789
+      }
+    }
+  }
+  kind: IDENTIFIER_KIND_CHECK_EDIT
+  root {
+    check {
+      id: "meep"
+    }
+  }
+}
