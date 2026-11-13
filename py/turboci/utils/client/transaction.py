@@ -229,13 +229,13 @@ def apply_node_predicate(
   for wp in plans:
     for i, check in reversed(list(enumerate(wp.checks))):
       if pred(data, check):
-        for _, ref in value.refs_in_check(check):
+        for _, ref in value.refs_in(check):
           data_to_remove.discard(ref.digest)
         continue
       wp.checks.pop(i)
     for i, stage in reversed(list(enumerate(wp.stages))):
       if pred(data, stage):
-        for _, ref in value.refs_in_stage(stage):
+        for _, ref in value.refs_in(stage):
           data_to_remove.discard(ref.digest)
         continue
       wp.stages.pop(i)
