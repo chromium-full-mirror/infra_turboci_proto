@@ -38,5 +38,5 @@ func ExampleFromString() {
 	// my-workplan
 	// my-check
 	// my-stage
-	// token 1 in "Lmy-workplan:Xwhatever": unexpected key 'X'
+	// in "Lmy-workplan:Xwhatever": unexpected key "LX"
 }

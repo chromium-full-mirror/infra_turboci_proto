@@ -12,10 +12,19 @@ __all__ = [
     'to_string_err',
 ]
 
+from collections import abc
+import json
+import typing
+
 from google.protobuf import timestamp_pb2
 
 from turboci.graph.ids.v1 import identifier_pb2
 from turboci.utils.ids import wrapping
+
+_T = typing.TypeVar('_T', bound=wrapping.SpecificIdentifier)
+_IdentParser: typing.TypeAlias = abc.Callable[
+    [list[str]], wrapping.SpecificIdentifier | None
+]
 
 
 class InvalidIdentifierError(ValueError):
@@ -107,88 +116,168 @@ def to_string(ident: wrapping.AnyIdentifier) -> str:
     return f'<{err}>'
 
 
+def _require_non_empty(trimmed: str) -> str:
+  if not trimmed:
+    raise ValueError('unexpected empty token')
+  return trimmed
+
+
+def _require_int(trimmed: str) -> int:
+  try:
+    ret = int(trimmed, 10)
+  except ValueError as ex:
+    raise ValueError(f'bad idx {json.dumps(trimmed)}: {ex}') from ex
+  if ret > 2**31 - 1 or ret < -(2**31):
+    raise ValueError(
+        f'bad idx {json.dumps(trimmed)}: value out of int32 range'
+    )
+  if ret <= 0:
+    raise ValueError(f'bad idx {json.dumps(trimmed)}: must be > 0')
+  return ret
+
+
+def _require_ts(trimmed: str) -> timestamp_pb2.Timestamp:
+  parts = trimmed.split('/')
+  if len(parts) != 2:
+    raise ValueError('bad timestamp: needed seconds/nanos')
+  try:
+    seconds = int(parts[0], 10)
+  except ValueError as ex:
+    raise ValueError(
+        f'bad timestamp: parsing seconds {json.dumps(parts[0])}: {ex}'
+    ) from ex
+  if seconds > 2**63 - 1 or seconds < -(2**63):
+    raise ValueError(
+        f'bad timestamp: parsing seconds {json.dumps(parts[0])}: '
+        'value out of int64 range'
+    )
+  try:
+    nanos = int(parts[1], 10)
+  except ValueError as ex:
+    raise ValueError(
+        f'bad timestamp: parsing nanos {json.dumps(parts[1])}: {ex}'
+    ) from ex
+  if nanos > 2**31 - 1 or nanos < -(2**31):
+    raise ValueError(
+        f'bad timestamp: parsing nanos {json.dumps(parts[1])}: '
+        'value out of int32 range'
+    )
+  return timestamp_pb2.Timestamp(seconds=seconds, nanos=nanos)
+
+
+def _optional_ident(
+    key: str,
+    toks: list[str],
+    want_cls: type[_T],
+) -> _T | None:
+  msg = _KEY_TO_IDENT[key](toks)
+  if msg is None:
+    return None
+  if not isinstance(msg, want_cls):
+    raise ValueError(
+        f'expected "{want_cls.DESCRIPTOR.name}", got "{msg.DESCRIPTOR.name}"'
+    )
+  return msg
+
+
+def _require_ident(
+    key: str,
+    toks: list[str],
+    want_cls: type[_T],
+) -> _T:
+  msg = _optional_ident(key, toks, want_cls)
+  if msg is None:
+    raise ValueError(f'missing required "{want_cls.DESCRIPTOR.name}"')
+  return msg
+
+
+def _stage_with_worknode(
+    toks: list[str], is_worknode: bool
+) -> identifier_pb2.Stage:
+  stg = _require_ident('L?', toks, identifier_pb2.Stage)
+  stg.is_worknode = is_worknode
+  return stg
+
+
+_KEY_TO_IDENT: dict[str, _IdentParser] = {
+    'L': lambda toks: (
+        identifier_pb2.WorkPlan(id=toks[0]) if toks[0] else None
+    ),
+    'LC': lambda toks: identifier_pb2.Check(
+        work_plan=_optional_ident('L', toks, identifier_pb2.WorkPlan),
+        id=_require_non_empty(toks[1]),
+    ),
+    'LCR': lambda toks: identifier_pb2.CheckResult(
+        check=_require_ident('LC', toks, identifier_pb2.Check),
+        idx=_require_int(toks[2]),
+    ),
+    'LCV': lambda toks: identifier_pb2.CheckEdit(
+        check=_require_ident('LC', toks, identifier_pb2.Check),
+        version=_require_ts(toks[2]),
+    ),
+    'L?': lambda toks: identifier_pb2.Stage(
+        work_plan=_optional_ident('L', toks, identifier_pb2.WorkPlan),
+        id=_require_non_empty(toks[1]),
+    ),
+    'LS': lambda toks: _stage_with_worknode(toks, False),
+    'LN': lambda toks: _stage_with_worknode(toks, True),
+    'L?A': lambda toks: identifier_pb2.StageAttempt(
+        stage=_require_ident('L?', toks, identifier_pb2.Stage),
+        idx=_require_int(toks[2]),
+    ),
+    'LSA': lambda toks: identifier_pb2.StageAttempt(
+        stage=_require_ident('LS', toks, identifier_pb2.Stage),
+        idx=_require_int(toks[2]),
+    ),
+    'LNA': lambda toks: identifier_pb2.StageAttempt(
+        stage=_require_ident('LN', toks, identifier_pb2.Stage),
+        idx=_require_int(toks[2]),
+    ),
+    'L?V': lambda toks: identifier_pb2.StageEdit(
+        stage=_require_ident('L?', toks, identifier_pb2.Stage),
+        version=_require_ts(toks[2]),
+    ),
+    'LSV': lambda toks: identifier_pb2.StageEdit(
+        stage=_require_ident('LS', toks, identifier_pb2.Stage),
+        version=_require_ts(toks[2]),
+    ),
+    'LNV': lambda toks: identifier_pb2.StageEdit(
+        stage=_require_ident('LN', toks, identifier_pb2.Stage),
+        version=_require_ts(toks[2]),
+    ),
+}
+
+
 def from_string(ident_str: str) -> identifier_pb2.Identifier:
   """Converts from a canonical string identifier to a wrapped Identifier."""
   toks = ident_str.split(':')
-  for i, t in enumerate(toks):
-    if i > 0 and not t:
-      raise ValueError(f'from_string: empty token {i} in {ident_str!r}')
 
-  # trim are the tokens with the leading char removed
-  trim = [t[1:] for t in toks]
-  ret = identifier_pb2.Identifier()
+  key_chars: list[str] = []
+  for i, tok in enumerate(toks):
+    if not tok:
+      if i == 0 and len(toks) > 1:
+        # workplan allowed to be empty
+        key_chars.append('L')
+      else:
+        raise ValueError(f'in {json.dumps(ident_str)}: token {i} was empty?')
+    elif i == 0 and tok == 'L':
+      raise ValueError(f'in {json.dumps(ident_str)}: unexpected empty token')
+    else:
+      key_chars.append(tok[0])
+      toks[i] = tok[1:]
 
-  def non_empty(v: str) -> str:
-    if not v:
-      raise ValueError(f'from_string: unexpected empty token in {ident_str!r}')
-    return v
+  key = ''.join(key_chars)
+  fn = _KEY_TO_IDENT.get(key)
+  if fn is None:
+    raise ValueError(
+        f'in {json.dumps(ident_str)}: unexpected key {json.dumps(key)}'
+    )
 
-  def set_wp(wp: identifier_pb2.WorkPlan) -> None:
-    if toks[0]:
-      wp.id = non_empty(trim[0])
+  try:
+    ret = fn(toks)
+  except ValueError as ex:
+    raise ValueError(f'in {json.dumps(ident_str)}: {ex}') from ex
 
-  def parse_is_worknode(stg: identifier_pb2.Stage) -> None:
-    """Parses toks[1][0] for S, N, ?"""
-    match toks[1][0]:
-      case 'N':
-        stg.is_worknode = True
-      case 'S':
-        stg.is_worknode = False
-      case '?':
-        stg.ClearField('is_worknode')
-      case _:
-        raise ValueError(
-            'from_string: expected token to start with S, N or ?, '
-            f'got {toks[1][0]!r}'
-        )
-
-  def parse_idx(v: str) -> int:
-    idx = int(v)
-    if idx <= 0:
-      raise ValueError(f'from_string: idx must be > 0, got {idx}')
-    return idx
-
-  def parse_vers(v: str, to: timestamp_pb2.Timestamp) -> None:
-    secs, nanos = v.split('/')
-    to.seconds = int(secs)
-    to.nanos = int(nanos)
-
-  match [t[0] if t else '' for t in toks]:
-    case ['L' | '']:
-      set_wp(ret.work_plan)
-
-    case ['L' | '', 'C']:
-      set_wp(ret.check.work_plan)
-      ret.check.id = non_empty(trim[1])
-
-    case ['L' | '', 'C', 'R']:
-      set_wp(ret.check_result.check.work_plan)
-      ret.check_result.check.id = non_empty(trim[1])
-      ret.check_result.idx = parse_idx(trim[2])
-
-    case ['L' | '', 'C', 'V']:
-      set_wp(ret.check_edit.check.work_plan)
-      ret.check_edit.check.id = non_empty(trim[1])
-      parse_vers(trim[2], ret.check_edit.version)
-
-    case ['L' | '', _]:
-      set_wp(ret.stage.work_plan)
-      parse_is_worknode(ret.stage)
-      ret.stage.id = non_empty(trim[1])
-
-    case ['L' | '', _, 'A']:
-      set_wp(ret.stage_attempt.stage.work_plan)
-      parse_is_worknode(ret.stage_attempt.stage)
-      ret.stage_attempt.stage.id = non_empty(trim[1])
-      ret.stage_attempt.idx = parse_idx(trim[2])
-
-    case ['L' | '', _, 'V']:
-      set_wp(ret.stage_edit.stage.work_plan)
-      parse_is_worknode(ret.stage_edit.stage)
-      ret.stage_edit.stage.id = non_empty(trim[1])
-      parse_vers(trim[2], ret.stage_edit.version)
-
-  if not ret.WhichOneof('type'):
-    raise ValueError(f'from_string: unrecognized ID {ident_str!r}')
-
-  return ret
+  if ret is None:
+    raise AssertionError('unreachable: parsed empty identifier')
+  return wrapping.wrap(ret)
