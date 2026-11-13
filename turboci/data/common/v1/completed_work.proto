@@ -1,0 +1,22 @@
+// Copyright 2026 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+syntax = "proto3";
+
+package turboci.data.common.v1;
+
+import "turboci/tag.proto";
+
+option go_package = "go.chromium.org/turboci/proto/go/data/common/v1;commonpb";
+option java_multiple_files = true;
+
+// Indicates whether the intended work ran to completion, irrespective of
+// whether the semantic result of the work was successful (as opposed to
+// crashing and never finishing the intended work).
+//
+// Next ID: 2
+message CompletedWork {
+  // Whether the intended work ran to completion.
+  optional bool completed = 1 [(turboci.tag).indexed = true];
+}
