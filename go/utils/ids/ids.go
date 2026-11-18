@@ -227,10 +227,10 @@ func Stage(id string) *idspb.Stage {
 	return must(StageErr(StageNotWorknode, id))
 }
 
-// StageUnknown returns a Stage identifier suitable for use with WriteNodes
-// (which will fill in the WorkPlan id with the WorkPlan id implied by the stage
-// attempt token). This has `is_worknode` unset, and can be used with WriteNodes
-// which will fill this in based on the args of the stage.
+// StageUnknown returns a Stage identifier with worknode flag unset.
+//
+// Such an identifier is not valid and will be rejected by WriteNodes. Still can
+// be useful in tests or when constructing an ID by parts.
 //
 // Panics if `id` is malformed. If this is a possibility, use [StageErr] instead.
 func StageUnknown(id string) *idspb.Stage {
