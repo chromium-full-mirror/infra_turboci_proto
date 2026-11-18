@@ -1,0 +1,25 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `AddStageAttributes` rejects a `StageWrite` that already holds two attributes
+# with the same name, and the error names the duplicate.
+
+input {
+  add_stage_attributes {
+    stage_write {
+      attributes {
+        name: "my_team.dup"
+        expression: "true"
+      }
+      attributes {
+        name: "my_team.dup"
+        expression: "false"
+      }
+    }
+    attributes {
+      name: "my_team.attr2"
+      expression: "false"
+    }
+  }
+}
+err: "duplicate attribute name \"my_team.dup\""

@@ -242,7 +242,7 @@ func AddStageAttributes(sw *orchestratorpb.WriteNodesRequest_StageWrite, attrs .
 	for _, existing := range sw.GetAttributes() {
 		name := existing.GetName()
 		if _, ok := seen[name]; ok {
-			return fmt.Errorf("attrs: attribute name %q was already present in StageWrite", name)
+			return fmt.Errorf("attrs: duplicate attribute name %q", name)
 		}
 		seen[name] = struct{}{}
 	}

@@ -14,7 +14,107 @@ import (
 	"google.golang.org/protobuf/testing/protocmp"
 
 	orchestratorpb "go.chromium.org/turboci/proto/go/graph/orchestrator/v1"
+	createattrsvectorspb "go.chromium.org/turboci/proto/go/testing/vectors/attrs/create_attrs"
+	"go.chromium.org/turboci/proto/go/utils/internal/test_vector"
 )
+
+func TestCreateAttrs_Vectors(t *testing.T) {
+	t.Parallel()
+
+	test_vector.Run(t, _CREATE_ATTRS_TEST_VECTORS, func(t *testing.T, tc *createattrsvectorspb.CreateAttrs) {
+		got, unchanged, err := runCreateAttrsInput(tc.GetInput())
+
+		if tc.HasErr() {
+			if err == nil || !strings.Contains(err.Error(), tc.GetErr()) {
+				t.Fatalf("error = %v, want substring %q", err, tc.GetErr())
+			}
+			if !unchanged {
+				t.Errorf("write was modified despite the error")
+			}
+			return
+		}
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if diff := cmp.Diff(wantCreateAttrsOutput(tc.GetOutput()), got, protocmp.Transform()); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
+	})
+}
+
+// runCreateAttrsInput calls the function selected by `in`.
+//
+// For `Add*Attributes` it returns the write after the call and whether the
+// call left it unchanged.
+func runCreateAttrsInput(in *createattrsvectorspb.CreateAttrs_Input) (got proto.Message, unchanged bool, err error) {
+	switch in.WhichCall() {
+	case createattrsvectorspb.CreateAttrs_Input_ForStage_case:
+		fs := in.GetForStage()
+		got, err = StageAttribute(fs.GetName(), fs.GetExpression(), stageArgs(fs)...)
+		return got, true, err
+	case createattrsvectorspb.CreateAttrs_Input_ForCheck_case:
+		fc := in.GetForCheck()
+		got, err = CheckAttribute(fc.GetName(), fc.GetExpression(), checkArgs(fc)...)
+		return got, true, err
+	case createattrsvectorspb.CreateAttrs_Input_AddStageAttributes_case:
+		add := in.GetAddStageAttributes()
+		sw := add.GetStageWrite()
+		before := proto.Clone(sw)
+		err = AddStageAttributes(sw, add.GetAttributes()...)
+		return sw, proto.Equal(before, sw), err
+	case createattrsvectorspb.CreateAttrs_Input_AddCheckAttributes_case:
+		add := in.GetAddCheckAttributes()
+		cw := add.GetCheckWrite()
+		before := proto.Clone(cw)
+		err = AddCheckAttributes(cw, add.GetAttributes()...)
+		return cw, proto.Equal(before, cw), err
+	default:
+		panic("test vector has no input call")
+	}
+}
+
+func stageArgs(fs *createattrsvectorspb.CreateAttrs_ForStage) []StageAttributeArg {
+	var args []StageAttributeArg
+	if fs.HasOnState() {
+		args = append(args, WithStageOnState(fs.GetOnState()))
+	}
+	if fs.HasAttributeType() {
+		args = append(args, WithAttributeType(fs.GetAttributeType()))
+	}
+	if fs.HasIndexed() {
+		args = append(args, WithIndexed(fs.GetIndexed()))
+	}
+	return args
+}
+
+func checkArgs(fc *createattrsvectorspb.CreateAttrs_ForCheck) []CheckAttributeArg {
+	var args []CheckAttributeArg
+	if fc.HasOnState() {
+		args = append(args, WithCheckOnState(fc.GetOnState()))
+	}
+	if fc.HasAttributeType() {
+		args = append(args, WithAttributeType(fc.GetAttributeType()))
+	}
+	if fc.HasIndexed() {
+		args = append(args, WithIndexed(fc.GetIndexed()))
+	}
+	return args
+}
+
+func wantCreateAttrsOutput(out *createattrsvectorspb.CreateAttrs_Output) proto.Message {
+	switch out.WhichResult() {
+	case createattrsvectorspb.CreateAttrs_Output_StageAttribute_case:
+		return out.GetStageAttribute()
+	case createattrsvectorspb.CreateAttrs_Output_CheckAttribute_case:
+		return out.GetCheckAttribute()
+	case createattrsvectorspb.CreateAttrs_Output_StageWrite_case:
+		return out.GetStageWrite()
+	case createattrsvectorspb.CreateAttrs_Output_CheckWrite_case:
+		return out.GetCheckWrite()
+	default:
+		panic("test vector has no output result")
+	}
+}
 
 func mustStageAttr(t testing.TB, name, expression string, args ...StageAttributeArg) *orchestratorpb.WriteNodesRequest_StageAttributeWrite {
 	t.Helper()
@@ -62,11 +162,9 @@ func TestStageAttribute(t *testing.T) {
 		t.Parallel()
 
 		_, err := StageAttribute("my_team.metric", "tags.stage.args.hasKey('env')", WithStageOnState(orchestratorpb.StageState_STAGE_STATE_UNKNOWN))
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
-		if !strings.Contains(err.Error(), "invalid stage state") {
-			t.Errorf("expected 'invalid stage state' error, got: %v", err)
+		wantErr := "attrs: invalid stage state: STAGE_STATE_UNKNOWN"
+		if err == nil || err.Error() != wantErr {
+			t.Fatalf("expected error %q, got: %v", wantErr, err)
 		}
 	})
 
@@ -126,6 +224,36 @@ func TestStageAttribute(t *testing.T) {
 		}
 	})
 
+	t.Run("sets_indexed_false", func(t *testing.T) {
+		t.Parallel()
+
+		attr, err := StageAttribute("my_team.metric", "true", WithIndexed(false))
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !attr.HasIndexed() || attr.GetIndexed() {
+			t.Errorf("got indexed (has=%v, value=%v), want explicit false", attr.HasIndexed(), attr.GetIndexed())
+		}
+	})
+
+	t.Run("rejects_invalid_name", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := StageAttribute("metric", "true")
+		if err == nil || !strings.Contains(err.Error(), `invalid attribute name "metric"`) {
+			t.Fatalf("expected error containing %q, got: %v", `invalid attribute name "metric"`, err)
+		}
+	})
+
+	t.Run("checks_name_before_expression", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := StageAttribute("metric", "")
+		if err == nil || !strings.Contains(err.Error(), `invalid attribute name "metric"`) {
+			t.Fatalf("expected error containing %q, got: %v", `invalid attribute name "metric"`, err)
+		}
+	})
+
 	t.Run("applies_multiple_valid_args", func(t *testing.T) {
 		t.Parallel()
 
@@ -174,16 +302,19 @@ func TestStageAttribute(t *testing.T) {
 	t.Run("rejects_invalid_attribute_type", func(t *testing.T) {
 		t.Parallel()
 
-		invalidTypes := []orchestratorpb.AttributeType{
-			orchestratorpb.AttributeType_ATTRIBUTE_TYPE_UNKNOWN,
-			orchestratorpb.AttributeType(999),
-			orchestratorpb.AttributeType(-1),
+		invalidTypes := []struct {
+			attrType orchestratorpb.AttributeType
+			wantErr  string
+		}{
+			{orchestratorpb.AttributeType_ATTRIBUTE_TYPE_UNKNOWN, "attrs: invalid attribute type: ATTRIBUTE_TYPE_UNKNOWN"},
+			{orchestratorpb.AttributeType(999), "attrs: invalid attribute type: 999"},
+			{orchestratorpb.AttributeType(-1), "attrs: invalid attribute type: -1"},
 		}
 
-		for _, attrType := range invalidTypes {
-			_, err := StageAttribute("my_team.metric", "true", WithAttributeType(attrType))
-			if err == nil || !strings.Contains(err.Error(), "invalid attribute type") {
-				t.Errorf("expected error containing %q for type %v, got: %v", "invalid attribute type", attrType, err)
+		for _, tc := range invalidTypes {
+			_, err := StageAttribute("my_team.metric", "true", WithAttributeType(tc.attrType))
+			if err == nil || err.Error() != tc.wantErr {
+				t.Errorf("expected error %q for type %v, got: %v", tc.wantErr, tc.attrType, err)
 			}
 		}
 	})
@@ -247,11 +378,9 @@ func TestCheckAttribute(t *testing.T) {
 		t.Parallel()
 
 		_, err := CheckAttribute("my_team.metric", "tags.check.options.hasKey('env')", WithCheckOnState(orchestratorpb.CheckState_CHECK_STATE_UNKNOWN))
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
-		if !strings.Contains(err.Error(), "invalid check state") {
-			t.Errorf("expected 'invalid check state' error, got: %v", err)
+		wantErr := "attrs: invalid check state: CHECK_STATE_UNKNOWN"
+		if err == nil || err.Error() != wantErr {
+			t.Fatalf("expected error %q, got: %v", wantErr, err)
 		}
 	})
 
@@ -285,6 +414,45 @@ func TestCheckAttribute(t *testing.T) {
 		}
 		if !attr.GetIndexed() {
 			t.Errorf("unexpectedly not indexed")
+		}
+	})
+
+	t.Run("sets_indexed_false", func(t *testing.T) {
+		t.Parallel()
+
+		attr, err := CheckAttribute("my_team.metric", "true", WithIndexed(false))
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !attr.HasIndexed() || attr.GetIndexed() {
+			t.Errorf("got indexed (has=%v, value=%v), want explicit false", attr.HasIndexed(), attr.GetIndexed())
+		}
+	})
+
+	t.Run("rejects_invalid_name", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := CheckAttribute("metric", "true")
+		if err == nil || !strings.Contains(err.Error(), `invalid attribute name "metric"`) {
+			t.Fatalf("expected error containing %q, got: %v", `invalid attribute name "metric"`, err)
+		}
+	})
+
+	t.Run("rejects_empty_expression", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := CheckAttribute("my_team.metric", "")
+		if err == nil || !strings.Contains(err.Error(), "expression cannot be empty") {
+			t.Fatalf("expected error containing %q, got: %v", "expression cannot be empty", err)
+		}
+	})
+
+	t.Run("checks_name_before_expression", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := CheckAttribute("metric", "")
+		if err == nil || !strings.Contains(err.Error(), `invalid attribute name "metric"`) {
+			t.Fatalf("expected error containing %q, got: %v", `invalid attribute name "metric"`, err)
 		}
 	})
 
@@ -366,6 +534,8 @@ func TestValidateAttributeName(t *testing.T) {
 			"my_team.my_component.metric_count",
 			"a.b",
 			"pkg.sub_pkg.name_123",
+			"checks.metric",
+			"my_team.stage.metric",
 		}
 		for _, name := range validNames {
 			if err := validateAttributeName(name); err != nil {
@@ -395,6 +565,8 @@ func TestValidateAttributeName(t *testing.T) {
 			{name: "team.metric.", desc: "trailing dot", wantErr: "invalid attribute name"},
 			{name: "team..metric", desc: "consecutive dots", wantErr: "invalid attribute name"},
 			{name: "team.metric-name", desc: "hyphen in name", wantErr: "invalid attribute name"},
+			{name: "foo.1bar", desc: "leading digit in second segment", wantErr: "invalid attribute name"},
+			{name: "foo.bar$", desc: "special character", wantErr: "invalid attribute name"},
 			{name: "check.my_attr", desc: "reserved check. prefix", wantErr: "reserved prefix"},
 			{name: "stage.my_attr", desc: "reserved stage. prefix", wantErr: "reserved prefix"},
 			{name: "work_node.my_attr", desc: "reserved work_node. prefix", wantErr: "reserved prefix"},
@@ -407,6 +579,30 @@ func TestValidateAttributeName(t *testing.T) {
 			err := validateAttributeName(tc.name)
 			if err == nil || !strings.Contains(err.Error(), tc.wantErr) {
 				t.Errorf("[%s] expected error containing %q for name %q, got: %v", tc.desc, tc.wantErr, tc.name, err)
+			}
+		}
+	})
+
+	t.Run("error_messages", func(t *testing.T) {
+		t.Parallel()
+
+		tests := []struct {
+			name    string
+			wantErr string
+		}{
+			{
+				name:    "My_team.metric",
+				wantErr: `attrs: invalid attribute name "My_team.metric": expected dot-separated lower_snake_case with at least one dot (e.g. 'namespace.my_attr')`,
+			},
+			{
+				name:    "check.metric",
+				wantErr: `attrs: invalid attribute name "check.metric": uses reserved prefix "check."`,
+			},
+		}
+		for _, tc := range tests {
+			err := validateAttributeName(tc.name)
+			if err == nil || err.Error() != tc.wantErr {
+				t.Errorf("validateAttributeName(%q) = %v, want %q", tc.name, err, tc.wantErr)
 			}
 		}
 	})
@@ -483,6 +679,32 @@ func TestAddStageAttributes(t *testing.T) {
 			t.Fatalf("expected error containing %q, got: %v", `duplicate attribute name "my_team.attr1"`, err)
 		}
 	})
+
+	t.Run("rejects_duplicate_already_in_stage_write", func(t *testing.T) {
+		t.Parallel()
+
+		sw := orchestratorpb.WriteNodesRequest_StageWrite_builder{
+			Attributes: []*orchestratorpb.WriteNodesRequest_StageAttributeWrite{
+				mustStageAttr(t, "my_team.dup", "true"),
+				mustStageAttr(t, "my_team.dup", "false"),
+			},
+		}.Build()
+
+		err := AddStageAttributes(sw, mustStageAttr(t, "my_team.other", "true"))
+		if err == nil || !strings.Contains(err.Error(), `duplicate attribute name "my_team.dup"`) {
+			t.Fatalf("expected error containing %q, got: %v", `duplicate attribute name "my_team.dup"`, err)
+		}
+	})
+
+	t.Run("rejects_duplicates_within_call", func(t *testing.T) {
+		t.Parallel()
+
+		sw := orchestratorpb.WriteNodesRequest_StageWrite_builder{}.Build()
+		err := AddStageAttributes(sw, mustStageAttr(t, "my_team.dup", "true"), mustStageAttr(t, "my_team.dup", "false"))
+		if err == nil || !strings.Contains(err.Error(), `duplicate attribute name "my_team.dup"`) {
+			t.Fatalf("expected error containing %q, got: %v", `duplicate attribute name "my_team.dup"`, err)
+		}
+	})
 }
 
 func TestAddCheckAttributes(t *testing.T) {
@@ -554,6 +776,32 @@ func TestAddCheckAttributes(t *testing.T) {
 		err := AddCheckAttributes(cw, a2)
 		if err == nil || !strings.Contains(err.Error(), `duplicate attribute name "my_team.attr1"`) {
 			t.Fatalf("expected error containing %q, got: %v", `duplicate attribute name "my_team.attr1"`, err)
+		}
+	})
+
+	t.Run("rejects_duplicate_already_in_check_write", func(t *testing.T) {
+		t.Parallel()
+
+		cw := orchestratorpb.WriteNodesRequest_CheckWrite_builder{
+			Attributes: []*orchestratorpb.WriteNodesRequest_CheckAttributeWrite{
+				mustCheckAttr(t, "my_team.dup", "true"),
+				mustCheckAttr(t, "my_team.dup", "false"),
+			},
+		}.Build()
+
+		err := AddCheckAttributes(cw, mustCheckAttr(t, "my_team.other", "true"))
+		if err == nil || !strings.Contains(err.Error(), `duplicate attribute name "my_team.dup"`) {
+			t.Fatalf("expected error containing %q, got: %v", `duplicate attribute name "my_team.dup"`, err)
+		}
+	})
+
+	t.Run("rejects_duplicates_within_call", func(t *testing.T) {
+		t.Parallel()
+
+		cw := orchestratorpb.WriteNodesRequest_CheckWrite_builder{}.Build()
+		err := AddCheckAttributes(cw, mustCheckAttr(t, "my_team.dup", "true"), mustCheckAttr(t, "my_team.dup", "false"))
+		if err == nil || !strings.Contains(err.Error(), `duplicate attribute name "my_team.dup"`) {
+			t.Fatalf("expected error containing %q, got: %v", `duplicate attribute name "my_team.dup"`, err)
 		}
 	})
 }

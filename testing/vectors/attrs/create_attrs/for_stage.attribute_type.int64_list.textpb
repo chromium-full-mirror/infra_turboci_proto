@@ -1,0 +1,19 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `StageAttribute` accepts `ATTRIBUTE_TYPE_INT64_LIST` as `attribute_type`.
+
+input {
+  for_stage {
+    name: "my_team.metric"
+    expression: "true"
+    attribute_type: ATTRIBUTE_TYPE_INT64_LIST
+  }
+}
+output {
+  stage_attribute {
+    name: "my_team.metric"
+    expression: "true"
+    attribute_type: ATTRIBUTE_TYPE_INT64_LIST
+  }
+}

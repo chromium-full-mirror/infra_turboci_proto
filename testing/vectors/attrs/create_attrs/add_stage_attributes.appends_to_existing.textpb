@@ -1,0 +1,46 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `AddStageAttributes` appends the passed attributes, unchanged and in order,
+# after the ones already in the `StageWrite`.
+
+input {
+  add_stage_attributes {
+    stage_write {
+      attributes {
+        name: "my_team.attr1"
+        expression: "true"
+        on_state: STAGE_STATE_FINAL
+        attribute_type: ATTRIBUTE_TYPE_BOOL
+        indexed: true
+      }
+    }
+    attributes {
+      name: "my_team.attr2"
+      expression: "false"
+    }
+    attributes {
+      name: "my_team.attr3"
+      expression: "1"
+    }
+  }
+}
+output {
+  stage_write {
+    attributes {
+      name: "my_team.attr1"
+      expression: "true"
+      on_state: STAGE_STATE_FINAL
+      attribute_type: ATTRIBUTE_TYPE_BOOL
+      indexed: true
+    }
+    attributes {
+      name: "my_team.attr2"
+      expression: "false"
+    }
+    attributes {
+      name: "my_team.attr3"
+      expression: "1"
+    }
+  }
+}

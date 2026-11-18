@@ -1,0 +1,14 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `StageAttribute` rejects a negative number as `on_state`, and the error shows
+# the rejected value.
+
+input {
+  for_stage {
+    name: "my_team.metric"
+    expression: "true"
+    on_state: -1
+  }
+}
+err: "invalid stage state: -1"

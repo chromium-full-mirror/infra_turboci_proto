@@ -616,6 +616,12 @@ def task_generate_embedded_vectors(mode: None | str = None):
               "_TO_FROM_STRING_VECTORS",
           ),
       },
+      "testing/vectors/attrs/create_attrs": {
+          "go": (
+              "go/utils/attrs/create_attrs_test_vectors.go",
+              "_CREATE_ATTRS_TEST_VECTORS",
+          ),
+      },
   }
   for vector_path, language_map in export_to.items():
     for language, (outrelpath, outvar) in language_map.items():

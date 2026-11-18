@@ -1,0 +1,17 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `StageAttribute` accepts a name with more than two segments.
+
+input {
+  for_stage {
+    name: "my_team.my_component.metric_count"
+    expression: "true"
+  }
+}
+output {
+  stage_attribute {
+    name: "my_team.my_component.metric_count"
+    expression: "true"
+  }
+}

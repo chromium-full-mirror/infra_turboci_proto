@@ -1,0 +1,13 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `StageAttribute` rejects a name with a reserved prefix, and the error names it
+# and the prefix.
+
+input {
+  for_stage {
+    name: "stage.metric"
+    expression: "true"
+  }
+}
+err: "invalid attribute name \"stage.metric\": uses reserved prefix \"stage.\""

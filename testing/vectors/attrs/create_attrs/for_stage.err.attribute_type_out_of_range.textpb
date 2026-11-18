@@ -1,0 +1,14 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `StageAttribute` rejects a number outside the enum as `attribute_type`, and
+# the error shows the rejected value.
+
+input {
+  for_stage {
+    name: "my_team.metric"
+    expression: "true"
+    attribute_type: 999
+  }
+}
+err: "invalid attribute type: 999"

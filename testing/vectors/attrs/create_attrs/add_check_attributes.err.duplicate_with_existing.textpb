@@ -1,0 +1,21 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `AddCheckAttributes` rejects an attribute whose name is already in the
+# `CheckWrite`, and the error names the duplicate.
+
+input {
+  add_check_attributes {
+    check_write {
+      attributes {
+        name: "my_team.dup"
+        expression: "true"
+      }
+    }
+    attributes {
+      name: "my_team.dup"
+      expression: "false"
+    }
+  }
+}
+err: "duplicate attribute name \"my_team.dup\""

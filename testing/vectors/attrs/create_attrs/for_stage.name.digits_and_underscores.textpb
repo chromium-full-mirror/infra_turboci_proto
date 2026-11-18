@@ -1,0 +1,17 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `StageAttribute` accepts a name with digits and underscores inside segments.
+
+input {
+  for_stage {
+    name: "step_1.val_2"
+    expression: "true"
+  }
+}
+output {
+  stage_attribute {
+    name: "step_1.val_2"
+    expression: "true"
+  }
+}

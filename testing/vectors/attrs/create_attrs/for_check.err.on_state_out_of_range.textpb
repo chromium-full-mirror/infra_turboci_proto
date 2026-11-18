@@ -1,0 +1,14 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `CheckAttribute` rejects a number outside the enum as `on_state`, and the
+# error shows the rejected value.
+
+input {
+  for_check {
+    name: "my_team.metric"
+    expression: "true"
+    on_state: 999
+  }
+}
+err: "invalid check state: 999"

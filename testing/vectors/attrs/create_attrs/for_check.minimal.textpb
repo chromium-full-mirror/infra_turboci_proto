@@ -1,0 +1,19 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `CheckAttribute` called with only a name and an expression returns a write
+# with just those two fields set (`on_state`, `attribute_type`, and `indexed`
+# stay unset).
+
+input {
+  for_check {
+    name: "my_team.metric"
+    expression: "true"
+  }
+}
+output {
+  check_attribute {
+    name: "my_team.metric"
+    expression: "true"
+  }
+}

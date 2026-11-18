@@ -1,0 +1,17 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `StageAttribute` accepts a name with a reserved word in a later segment.
+
+input {
+  for_stage {
+    name: "my_team.stage.metric"
+    expression: "true"
+  }
+}
+output {
+  stage_attribute {
+    name: "my_team.stage.metric"
+    expression: "true"
+  }
+}

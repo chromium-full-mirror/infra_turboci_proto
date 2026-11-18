@@ -1,0 +1,12 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `CheckAttribute` rejects an empty expression.
+
+input {
+  for_check {
+    name: "my_team.metric"
+    expression: ""
+  }
+}
+err: "expression cannot be empty"

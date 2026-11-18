@@ -1,0 +1,13 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `StageAttribute` rejects names starting with `worknode.`, and the error names
+# the attribute and the prefix.
+
+input {
+  for_stage {
+    name: "worknode.my_attr"
+    expression: "true"
+  }
+}
+err: "invalid attribute name \"worknode.my_attr\": uses reserved prefix \"worknode.\""

@@ -1,0 +1,14 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `StageAttribute` rejects `ATTRIBUTE_TYPE_UNKNOWN` as `attribute_type`, and the
+# error shows the rejected value.
+
+input {
+  for_stage {
+    name: "my_team.metric"
+    expression: "true"
+    attribute_type: ATTRIBUTE_TYPE_UNKNOWN
+  }
+}
+err: "invalid attribute type: ATTRIBUTE_TYPE_UNKNOWN"

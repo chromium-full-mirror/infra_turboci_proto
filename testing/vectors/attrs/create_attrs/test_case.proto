@@ -1,0 +1,83 @@
+// Copyright 2026 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+syntax = "proto3";
+
+package testing.vectors.attrs.create_attrs;
+
+import "turboci/graph/orchestrator/v1/attribute.proto";
+import "turboci/graph/orchestrator/v1/check_state.proto";
+import "turboci/graph/orchestrator/v1/stage_state.proto";
+import "turboci/graph/orchestrator/v1/write_nodes_request.proto";
+
+option go_package = "go.chromium.org/turboci/proto/go/testing/vectors/attrs/create_attrs;createattrsvectorspb";
+option java_multiple_files = true;
+
+// CreateAttrs tests building StageAttributeWrite/CheckAttributeWrite messages and
+// adding them to StageWrite/CheckWrite messages.
+message CreateAttrs {
+  // Calls `StageAttribute` in Go and `for_stage` in Python.
+  //
+  // Unset optional fields are not passed.
+  message ForStage {
+    optional string name = 1;
+    optional string expression = 2;
+    optional turboci.graph.orchestrator.v1.StageState on_state = 3;
+    optional turboci.graph.orchestrator.v1.AttributeType attribute_type = 4;
+    optional bool indexed = 5;
+  }
+
+  // Calls `CheckAttribute` in Go and `for_check` in Python.
+  //
+  // Unset optional fields are not passed.
+  message ForCheck {
+    optional string name = 1;
+    optional string expression = 2;
+    optional turboci.graph.orchestrator.v1.CheckState on_state = 3;
+    optional turboci.graph.orchestrator.v1.AttributeType attribute_type = 4;
+    optional bool indexed = 5;
+  }
+
+  // Calls `AddStageAttributes` in Go and `add_stage_attributes` in Python.
+  message AddStageAttributes {
+    // Passed as nil/None when unset.
+    optional turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite stage_write = 1;
+    repeated turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttributeWrite attributes = 2;
+  }
+
+  // Calls `AddCheckAttributes` in Go and `add_check_attributes` in Python.
+  message AddCheckAttributes {
+    // Passed as nil/None when unset.
+    optional turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite check_write = 1;
+    repeated turboci.graph.orchestrator.v1.WriteNodesRequest.CheckAttributeWrite attributes = 2;
+  }
+
+  message Input {
+    oneof call {
+      ForStage for_stage = 1;
+      ForCheck for_check = 2;
+      AddStageAttributes add_stage_attributes = 3;
+      AddCheckAttributes add_check_attributes = 4;
+    }
+  }
+  optional Input input = 1;
+
+  message Output {
+    oneof result {
+      // Returned by `for_stage`.
+      turboci.graph.orchestrator.v1.WriteNodesRequest.StageAttributeWrite stage_attribute = 1;
+      // Returned by `for_check`.
+      turboci.graph.orchestrator.v1.WriteNodesRequest.CheckAttributeWrite check_attribute = 2;
+      // The `stage_write` after `add_stage_attributes`.
+      turboci.graph.orchestrator.v1.WriteNodesRequest.StageWrite stage_write = 3;
+      // The `check_write` after `add_check_attributes`.
+      turboci.graph.orchestrator.v1.WriteNodesRequest.CheckWrite check_write = 4;
+    }
+  }
+  optional Output output = 2;
+
+  // Expected error substring. When set, `add_*_attributes` must also leave the
+  // passed write unchanged.
+  optional string err = 3;
+}

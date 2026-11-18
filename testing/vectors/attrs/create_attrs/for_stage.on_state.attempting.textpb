@@ -1,0 +1,19 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `StageAttribute` accepts `STAGE_STATE_ATTEMPTING` as `on_state`.
+
+input {
+  for_stage {
+    name: "my_team.metric"
+    expression: "true"
+    on_state: STAGE_STATE_ATTEMPTING
+  }
+}
+output {
+  stage_attribute {
+    name: "my_team.metric"
+    expression: "true"
+    on_state: STAGE_STATE_ATTEMPTING
+  }
+}

@@ -1,0 +1,17 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `AddCheckAttributes` rejects a nil `CheckWrite`.
+
+input {
+  add_check_attributes {
+    attributes {
+      name: "my_team.attr1"
+      expression: "true"
+      on_state: CHECK_STATE_FINAL
+      attribute_type: ATTRIBUTE_TYPE_BOOL
+      indexed: true
+    }
+  }
+}
+err: "check write cannot be nil"

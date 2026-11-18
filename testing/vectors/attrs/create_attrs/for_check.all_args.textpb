@@ -1,0 +1,24 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `CheckAttribute` copies the passed `on_state`, `attribute_type`, and `indexed`
+# into the returned write.
+
+input {
+  for_check {
+    name: "my_team.metric"
+    expression: "true"
+    on_state: CHECK_STATE_FINAL
+    attribute_type: ATTRIBUTE_TYPE_INT64
+    indexed: true
+  }
+}
+output {
+  check_attribute {
+    name: "my_team.metric"
+    expression: "true"
+    on_state: CHECK_STATE_FINAL
+    attribute_type: ATTRIBUTE_TYPE_INT64
+    indexed: true
+  }
+}

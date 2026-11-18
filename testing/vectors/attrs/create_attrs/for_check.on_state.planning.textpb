@@ -1,0 +1,19 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `CheckAttribute` accepts `CHECK_STATE_PLANNING` as `on_state`.
+
+input {
+  for_check {
+    name: "my_team.metric"
+    expression: "true"
+    on_state: CHECK_STATE_PLANNING
+  }
+}
+output {
+  check_attribute {
+    name: "my_team.metric"
+    expression: "true"
+    on_state: CHECK_STATE_PLANNING
+  }
+}

@@ -1,0 +1,20 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `AddCheckAttributes` rejects an attribute whose name is not dot-separated
+# lower_snake_case, and the error names it and explains the expected format.
+
+input {
+  add_check_attributes {
+    check_write {}
+    attributes {
+      name: "my_team.attr2"
+      expression: "false"
+    }
+    attributes {
+      name: "My_team.metric"
+      expression: "true"
+    }
+  }
+}
+err: "invalid attribute name \"My_team.metric\": expected dot-separated lower_snake_case with at least one dot (e.g. 'namespace.my_attr')"

@@ -1,0 +1,15 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `CheckAttribute` checks `on_state` before `attribute_type`: with both invalid,
+# the error is about `on_state`.
+
+input {
+  for_check {
+    name: "my_team.metric"
+    expression: "true"
+    on_state: CHECK_STATE_UNKNOWN
+    attribute_type: ATTRIBUTE_TYPE_UNKNOWN
+  }
+}
+err: "invalid check state: CHECK_STATE_UNKNOWN"

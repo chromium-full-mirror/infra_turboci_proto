@@ -1,0 +1,17 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `AddStageAttributes` rejects a nil `StageWrite`.
+
+input {
+  add_stage_attributes {
+    attributes {
+      name: "my_team.attr1"
+      expression: "true"
+      on_state: STAGE_STATE_FINAL
+      attribute_type: ATTRIBUTE_TYPE_BOOL
+      indexed: true
+    }
+  }
+}
+err: "stage write cannot be nil"

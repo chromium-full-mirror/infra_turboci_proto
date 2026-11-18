@@ -1,0 +1,13 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `CheckAttribute` checks the name before the expression: with both invalid, the
+# error is about the name.
+
+input {
+  for_check {
+    name: "metric"
+    expression: ""
+  }
+}
+err: "invalid attribute name \"metric\": expected dot-separated lower_snake_case with at least one dot (e.g. 'namespace.my_attr')"

@@ -1,0 +1,30 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `AddCheckAttributes` called without attributes leaves the `CheckWrite`
+# unchanged.
+
+input {
+  add_check_attributes {
+    check_write {
+      attributes {
+        name: "my_team.attr1"
+        expression: "true"
+        on_state: CHECK_STATE_FINAL
+        attribute_type: ATTRIBUTE_TYPE_BOOL
+        indexed: true
+      }
+    }
+  }
+}
+output {
+  check_write {
+    attributes {
+      name: "my_team.attr1"
+      expression: "true"
+      on_state: CHECK_STATE_FINAL
+      attribute_type: ATTRIBUTE_TYPE_BOOL
+      indexed: true
+    }
+  }
+}

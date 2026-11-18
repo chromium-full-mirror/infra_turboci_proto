@@ -1,0 +1,20 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `StageAttribute` sets `indexed` to false when false is passed (instead of
+# leaving it unset).
+
+input {
+  for_stage {
+    name: "my_team.metric"
+    expression: "true"
+    indexed: false
+  }
+}
+output {
+  stage_attribute {
+    name: "my_team.metric"
+    expression: "true"
+    indexed: false
+  }
+}

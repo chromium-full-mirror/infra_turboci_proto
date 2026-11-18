@@ -1,0 +1,14 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `StageAttribute` checks the expression before `on_state`: with both invalid,
+# the error is about the expression.
+
+input {
+  for_stage {
+    name: "my_team.metric"
+    expression: ""
+    on_state: STAGE_STATE_UNKNOWN
+  }
+}
+err: "expression cannot be empty"
