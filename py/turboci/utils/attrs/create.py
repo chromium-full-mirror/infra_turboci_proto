@@ -12,6 +12,7 @@ __all__ = [
     'for_stage',
 ]
 
+import json
 import re
 from typing import cast
 from typing import Sequence
@@ -32,11 +33,31 @@ _RESERVED_PREFIXES = (
     'work_plan.',
     'workplan.',
 )
-_VALID_ATTRIBUTE_TYPES = frozenset(
-    v
-    for v in attribute_pb2.AttributeType.values()
-    if v != attribute_pb2.ATTRIBUTE_TYPE_UNKNOWN
-)
+
+
+def _go_quote(s: object) -> str:
+  """Quotes `s` like Go's `%q` (for the strings we accept)."""
+  return json.dumps(s, ensure_ascii=False)
+
+
+def _enum_label(enum_type, value: int) -> str:
+  """Formats an enum value like Go's `%v`: its name, or else its number."""
+  if value in enum_type.values():
+    return enum_type.Name(value)
+  return str(value)
+
+
+def _resolve_enum(enum_type, value, unknown: int, kind: str, param: str):
+  """Normalizes an enum given as a value or a name, rejecting `unknown`."""
+  if isinstance(value, str):
+    if value not in enum_type.keys():
+      raise ValueError(f'invalid {kind}: {_go_quote(value)}')
+    value = enum_type.Value(value)
+  if isinstance(value, bool) or not isinstance(value, int):
+    raise TypeError(f'unexpected type for {param}: {type(value)!r}')
+  if value == unknown or value not in enum_type.values():
+    raise ValueError(f'invalid {kind}: {_enum_label(enum_type, value)}')
+  return value
 
 
 def _validate_attribute_name(name: str) -> None:
@@ -54,15 +75,16 @@ def _validate_attribute_name(name: str) -> None:
   Raises:
     ValueError: If the name does not match the regex or uses a reserved prefix.
   """
-  if not isinstance(name, str) or not _ATTR_NAME_REGEX.match(name):
+  if not isinstance(name, str) or not _ATTR_NAME_REGEX.fullmatch(name):
     raise ValueError(
-        f'invalid attribute name {name!r}: expected dot-separated '
+        f'invalid attribute name {_go_quote(name)}: expected dot-separated '
         "lower_snake_case with at least one dot (e.g. 'namespace.my_attr')"
     )
   for prefix in _RESERVED_PREFIXES:
     if name.startswith(prefix):
       raise ValueError(
-          f'invalid attribute name {name!r}: uses reserved prefix {prefix!r}'
+          f'invalid attribute name {_go_quote(name)}: uses reserved prefix '
+          f'{_go_quote(prefix)}'
       )
 
 
@@ -72,22 +94,15 @@ def _resolve_attribute_type(
   """Normalizes and validates an attribute_type parameter."""
   if attribute_type is None:
     return None
-  if isinstance(attribute_type, bool):
-    raise TypeError(
-        f'unexpected type for attribute_type: {type(attribute_type)!r}'
-    )
-  if isinstance(attribute_type, str):
-    if attribute_type in attribute_pb2.AttributeType.keys():
-      val = attribute_pb2.AttributeType.Value(attribute_type)
-      if val != attribute_pb2.ATTRIBUTE_TYPE_UNKNOWN:
-        return cast(attribute_pb2.AttributeType, val)
-    raise ValueError(f'invalid attribute type: {attribute_type!r}')
-  if isinstance(attribute_type, int):
-    if attribute_type in _VALID_ATTRIBUTE_TYPES:
-      return cast(attribute_pb2.AttributeType, attribute_type)
-    raise ValueError(f'invalid attribute type: {attribute_type!r}')
-  raise TypeError(
-      f'unexpected type for attribute_type: {type(attribute_type)!r}'
+  return cast(
+      attribute_pb2.AttributeType,
+      _resolve_enum(
+          attribute_pb2.AttributeType,
+          attribute_type,
+          attribute_pb2.ATTRIBUTE_TYPE_UNKNOWN,
+          'attribute type',
+          'attribute_type',
+      ),
   )
 
 
@@ -97,18 +112,16 @@ def _resolve_stage_state(
   """Normalizes and validates a StageState on_state parameter."""
   if on_state is None:
     return None
-  if isinstance(on_state, str):
-    if on_state in stage_state_pb2.StageState.keys():
-      on_state = stage_state_pb2.StageState.Value(on_state)
-    else:
-      raise ValueError(f'unknown stage state name: {on_state!r}')
-  if isinstance(on_state, bool) or not isinstance(on_state, int):
-    raise TypeError(f'unexpected type for on_state: {type(on_state)!r}')
-  if on_state == stage_state_pb2.STAGE_STATE_UNKNOWN:
-    raise ValueError('cannot use STAGE_STATE_UNKNOWN as on_state')
-  if on_state not in stage_state_pb2.StageState.values():
-    raise ValueError(f'unknown stage state value: {on_state!r}')
-  return cast(stage_state_pb2.StageState, on_state)
+  return cast(
+      stage_state_pb2.StageState,
+      _resolve_enum(
+          stage_state_pb2.StageState,
+          on_state,
+          stage_state_pb2.STAGE_STATE_UNKNOWN,
+          'stage state',
+          'on_state',
+      ),
+  )
 
 
 def _resolve_check_state(
@@ -117,18 +130,16 @@ def _resolve_check_state(
   """Normalizes and validates a CheckState on_state parameter."""
   if on_state is None:
     return None
-  if isinstance(on_state, str):
-    if on_state in check_state_pb2.CheckState.keys():
-      on_state = check_state_pb2.CheckState.Value(on_state)
-    else:
-      raise ValueError(f'unknown check state name: {on_state!r}')
-  if isinstance(on_state, bool) or not isinstance(on_state, int):
-    raise TypeError(f'unexpected type for on_state: {type(on_state)!r}')
-  if on_state == check_state_pb2.CHECK_STATE_UNKNOWN:
-    raise ValueError('cannot use CHECK_STATE_UNKNOWN as on_state')
-  if on_state not in check_state_pb2.CheckState.values():
-    raise ValueError(f'unknown check state value: {on_state!r}')
-  return cast(check_state_pb2.CheckState, on_state)
+  return cast(
+      check_state_pb2.CheckState,
+      _resolve_enum(
+          check_state_pb2.CheckState,
+          on_state,
+          check_state_pb2.CHECK_STATE_UNKNOWN,
+          'check state',
+          'on_state',
+      ),
+  )
 
 
 def for_stage(
@@ -136,7 +147,7 @@ def for_stage(
     expression: str,
     on_state: stage_state_pb2.StageState | str | int | None = None,
     attribute_type: attribute_pb2.AttributeType | str | int | None = None,
-    indexed: bool = False,
+    indexed: bool | None = None,
 ) -> write_nodes_request_pb2.WriteNodesRequest.StageAttributeWrite:
   """Creates a StageAttributeWrite for a Stage node.
 
@@ -147,6 +158,7 @@ def for_stage(
       When omitted, left unset so the server applies STAGE_STATE_FINAL.
     attribute_type: Optional expected attribute result type.
     indexed: Whether this attribute should be exposed in search indexes.
+      When omitted, left unset.
 
   Returns:
     StageAttributeWrite configured with on_state.
@@ -175,7 +187,7 @@ def for_check(
     expression: str,
     on_state: check_state_pb2.CheckState | str | int | None = None,
     attribute_type: attribute_pb2.AttributeType | str | int | None = None,
-    indexed: bool = False,
+    indexed: bool | None = None,
 ) -> write_nodes_request_pb2.WriteNodesRequest.CheckAttributeWrite:
   """Creates a CheckAttributeWrite for a Check node.
 
@@ -186,6 +198,7 @@ def for_check(
       When omitted, left unset so the server applies CHECK_STATE_FINAL.
     attribute_type: Optional expected attribute result type.
     indexed: Whether this attribute should be exposed in search indexes.
+      When omitted, left unset.
 
   Returns:
     CheckAttributeWrite configured with on_state.
@@ -215,7 +228,7 @@ def add_stage_attributes(
 ) -> None:
   """Appends attributes to a StageWrite, validating uniqueness and type."""
   if stage_write is None:
-    raise ValueError('stage_write cannot be None')
+    raise ValueError('stage write cannot be None')
   if not isinstance(
       stage_write, write_nodes_request_pb2.WriteNodesRequest.StageWrite
   ):
@@ -235,7 +248,7 @@ def add_check_attributes(
 ) -> None:
   """Appends attributes to a CheckWrite, validating uniqueness and type."""
   if check_write is None:
-    raise ValueError('check_write cannot be None')
+    raise ValueError('check write cannot be None')
   if not isinstance(
       check_write, write_nodes_request_pb2.WriteNodesRequest.CheckWrite
   ):
@@ -257,7 +270,9 @@ def _validate_and_append_attributes(
   seen: set[str] = set()
   for existing in target_container:
     if existing.name in seen:
-      raise ValueError(f'duplicate attribute name: {existing.name!r}')
+      raise ValueError(
+          f'duplicate attribute name {_go_quote(existing.name)}'
+      )
     seen.add(existing.name)
   for attr in incoming_attrs:
     if attr is None:
@@ -268,6 +283,6 @@ def _validate_and_append_attributes(
       )
     _validate_attribute_name(attr.name)
     if attr.name in seen:
-      raise ValueError(f'duplicate attribute name: {attr.name!r}')
+      raise ValueError(f'duplicate attribute name {_go_quote(attr.name)}')
     seen.add(attr.name)
   target_container.extend(incoming_attrs)

@@ -1,0 +1,13 @@
+# proto-file: testing/vectors/attrs/create_attrs/test_case.proto
+# proto-message: CreateAttrs
+#
+# `StageAttribute` rejects a name with a non-ASCII letter, and the error names
+# it and explains the expected format.
+
+input {
+  for_stage {
+    name: "my_team.métrica"
+    expression: "true"
+  }
+}
+err: "invalid attribute name \"my_team.métrica\": expected dot-separated lower_snake_case with at least one dot (e.g. 'namespace.my_attr')"

@@ -621,6 +621,10 @@ def task_generate_embedded_vectors(mode: None | str = None):
               "go/utils/attrs/create_attrs_test_vectors.go",
               "_CREATE_ATTRS_TEST_VECTORS",
           ),
+          "py": (
+              "py/tests/turboci/utils/attrs/create_attrs_test_vectors.py",
+              "_CREATE_ATTRS_TEST_VECTORS",
+          ),
       },
   }
   for vector_path, language_map in export_to.items():
