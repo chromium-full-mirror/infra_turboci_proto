@@ -250,6 +250,8 @@ type CancelWorkPlanRequest_Reason_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// A human-readable reason. Required.
+	//
+	// No larger than 16KiB.
 	Message *string
 	// Machine-readable reasons. See WriteNodesRequest for semantics. Optional.
 	Details []*ValueWrite

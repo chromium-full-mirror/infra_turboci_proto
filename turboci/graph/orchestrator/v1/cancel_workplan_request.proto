@@ -36,7 +36,10 @@ message CancelWorkPlanRequest {
   // Next ID: 3
   message Reason {
     // A human-readable reason. Required.
+    //
+    // No larger than 16KiB.
     optional string message = 1;
+
     // Machine-readable reasons. See WriteNodesRequest for semantics. Optional.
     repeated ValueWrite details = 2;
   }
